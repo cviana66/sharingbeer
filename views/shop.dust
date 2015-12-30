@@ -1,0 +1,44 @@
+{> "layouts/main" /}
+
+{<body}
+
+<div class="row">
+
+  <div class="container">
+
+    <div id="slider" class="form">
+
+      {> "layouts/carousel" /}
+
+      {#products}
+
+      <form method="POST" action="shop">
+        <input type="hidden" name="item_id" value="{.id}">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+
+        <div class="col-sm-3 col-lg-3 col-md-3 col-xs-12">
+          <div class="thumbnail">
+            <img src="http://placehold.it/280x120" class="img-rounded" alt="">
+
+            <h4 class="nm-np">{.name}</h4>
+
+            <div class="row">
+              <div class="col-sm-12 col-lg-12 col-md-12 col-xs-12">
+                <button type="submit" class="btn btn-primary btn-block" > [ {.prettyPrice} ] Buy              
+                </button>
+
+              </div>
+            </div>
+
+          </div> 
+        </div>   
+      </form>
+
+      {:else}
+      <p>There are no products :(<br>You should <a href="/products">add some</a></p>
+      {/products}
+    </div>
+  </div>
+<div>
+
+{/body}

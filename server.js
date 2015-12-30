@@ -2,12 +2,57 @@
 //  OpenShift sample Node application
 var express = require('express');
 var fs      = require('fs');
+var mongoose = require('mongoose');
+var passport = require('passport');
+var flash    = require('connect-flash');
+
+var morgan       = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser   = require('body-parser');
+var session      = require('express-session');
+var paypal       = require('paypal-rest-sdk');
+
+var cons = require('consolidate');
+
+// config and connect to our database
+var configDB = require('./config/database.js');
+mongoose.connect(configDB.url);
+var db = mongoose.connection;
+
+
+// set the form to post and then create a hidden field _method (DELETE, PUT)
+var methodOverride = require('method-override');
+
+// authentication ==============================================================
+var routesAuth      = require('./app/routesAuth.js');
+
+// ecommerce ===================================================================
+var routesShop      = require ('./app/routesShop.js');
+
+// friends registration ========================================================
+var routesRegister  = require ('./app/routesRegister.js');
+
+// paypal ======================================================================
+var routesPayPal    = require ('./app/routesPayPal.js');
+
+// passport ====================================================================
+var pass            = require('./config/passport');
+
+// paypal ======================================================================
+var config = {
+  "api" : {
+    "host" : "api.sandbox.paypal.com",
+    "port" : "",            
+    'client_id': 'AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv',
+    'client_secret': 'EPgLH41tckQh9R3P4U1cT-ja9Ve_wT-Aia_AWTYqEbgensY8MKrmjFtcDwcUC616RlA3eGH3jiBoUcqM'
+  }
+};
 
 
 /**
  *  Define the sample application.
  */
-var SampleApp = function() {
+var SharingBeer = function() {
 
     //  Scope.
     var self = this;
@@ -32,27 +77,6 @@ var SampleApp = function() {
             self.ipaddress = "127.0.0.1";
         };
     };
-
-
-    /**
-     *  Populate the cache.
-     */
-    self.populateCache = function() {
-        if (typeof self.zcache === "undefined") {
-            self.zcache = { 'index.html': '' };
-        }
-
-        //  Local cache for static content.
-        self.zcache['index.html'] = fs.readFileSync('./index.html');
-    };
-
-
-    /**
-     *  Retrieve entry (content) from cache.
-     *  @param {string} key  Key identifying content to retrieve from cache.
-     */
-    self.cache_get = function(key) { return self.zcache[key]; };
-
 
     /**
      *  terminator === the termination handler
@@ -93,32 +117,44 @@ var SampleApp = function() {
      *  Create the routing table entries + handlers for the application.
      */
     self.createRoutes = function() {
-        self.routes = { };
-
-        self.routes['/asciimo'] = function(req, res) {
-            var link = "http://i.imgur.com/kmbjB.png";
-            res.send("<html><body><img src='" + link + "'></body></html>");
-        };
-
-        self.routes['/'] = function(req, res) {
-            res.setHeader('Content-Type', 'text/html');
-            res.send(self.cache_get('index.html') );
-        };
+        routesAuth(self.app, passport);
+        routesShop(self.app);
+        routesRegister(self.app);
+        routesPayPal(self.app, paypal);
     };
 
-
     /**
-     *  Initialize the server (express) and create the routes and register
-     *  the handlers.
+     *  Initialize the server (express) 
      */
     self.initializeServer = function() {
-        self.createRoutes();
-        self.app = express.createServer();
+        self.app = express();
+        paypal.configure(config.api);
+        db.on('error', console.error.bind(console, 'connection error:'));
+        db.once('open', function callback() {
+            console.log('db connection open');
+        }); 
+        pass(passport);
 
-        //  Add handlers for the app (from the routes).
-        for (var r in self.routes) {
-            self.app.get(r, self.routes[r]);
-        }
+        // set up our express application
+        self.app.use(morgan('dev')); // log every request to the console
+        self.app.use(cookieParser()); // read cookies (needed for auth)
+        self.app.use(bodyParser()); // get information from html forms
+
+        //To serve static files such as images, CSS files, and JavaScript files
+        self.app.use(express.static(__dirname + '/public'));
+
+        //use to ovwrride method in form: put, delete
+        self.app.use(methodOverride('_method'));
+
+        self.app.engine('dust', cons.dust);
+        self.app.set('views', __dirname + '/views');
+        self.app.set('view engine', 'dust'); // set up dust for templating
+
+        // required for passport
+        self.app.use(session({ secret: 'Sam66Kar' })); // session secret
+        self.app.use(passport.initialize());
+        self.app.use(passport.session()); // persistent login sessions
+        self.app.use(flash()); // use connect-flash for flash messages stored in session        
     };
 
 
@@ -127,11 +163,11 @@ var SampleApp = function() {
      */
     self.initialize = function() {
         self.setupVariables();
-        self.populateCache();
         self.setupTerminationHandlers();
 
         // Create the express server and routes.
         self.initializeServer();
+        self.createRoutes();
     };
 
 
@@ -153,7 +189,7 @@ var SampleApp = function() {
 /**
  *  main():  Main code.
  */
-var zapp = new SampleApp();
+var zapp = new SharingBeer();
 zapp.initialize();
 zapp.start();
 
