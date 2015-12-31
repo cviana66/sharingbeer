@@ -1,5 +1,8 @@
 module.exports = {
-	'mode': 'sandbox', //sandbox or live
-  	'client_id': 'AaJikA3Oqv37BEe9V3AUQL1mVBYRDZsxL4KGi_jPvLBLMl_F1Le3mTvLnY1v9h1yTZat6UgBCxkQMetd',
-  	'client_secret': 'ED9Wc6VMNa8AQ0pbdFRM_-CS0SkQCvx5FHfo6eaYuCRyGcYdZ9YR1S8kFWRjegFOXsIHHxmYSRkWIHO-'
+	"api" : {
+    	"host" : "api.sandbox.paypal.com",
+    	"port" : "",            
+    	'client_id': 'AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv',
+    	'client_secret': 'EPgLH41tckQh9R3P4U1cT-ja9Ve_wT-Aia_AWTYqEbgensY8MKrmjFtcDwcUC616RlA3eGH3jiBoUcqM'
+	}
 }

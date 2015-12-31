@@ -39,14 +39,8 @@ var routesPayPal    = require ('./app/routesPayPal.js');
 var pass            = require('./config/passport');
 
 // paypal ======================================================================
-var config = {
-  "api" : {
-    "host" : "api.sandbox.paypal.com",
-    "port" : "",            
-    'client_id': 'AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv',
-    'client_secret': 'EPgLH41tckQh9R3P4U1cT-ja9Ve_wT-Aia_AWTYqEbgensY8MKrmjFtcDwcUC616RlA3eGH3jiBoUcqM'
-  }
-};
+
+var configPayPal = require('./config/paypal.js');
 
 
 /**
@@ -128,7 +122,7 @@ var SharingBeer = function() {
      */
     self.initializeServer = function() {
         self.app = express();
-        paypal.configure(config.api);
+        paypal.configure(configPayPal.api);
         db.on('error', console.error.bind(console, 'connection error:'));
         db.once('open', function callback() {
             console.log('db connection open');
