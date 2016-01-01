@@ -1,6 +1,15 @@
 module.exports = function(app, paypal) {
 
-app.locals.baseurl = 'http://localhost:3001';
+var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
+var port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+
+if (typeof ipaddress === "undefined") {
+    ipaddress = "127.0.0.1";
+}
+
+console.log('http://' + ipaddress + ':' + port);
+
+app.locals.baseurl = 'http://' + ipaddress + ':' + port;
 
 
 
@@ -30,7 +39,7 @@ app.post('/paynow', function(req, res) {
       console.log(error);
     } else {
       if(payment.payer.payment_method === 'paypal') {
-        req.paymentId = payment.id;
+        req.session.paymentId = payment.id;
         var redirectUrl;
         console.log(payment);
         for(var i=0; i < payment.links.length; i++) {
@@ -46,7 +55,20 @@ app.post('/paynow', function(req, res) {
 });
 
 app.get('/success', function(req, res) {
-  res.send("Payment transfered successfully.");
+
+  var paymentId = req.session.paymentId;
+  var payerId = req.param('PayerID');
+  var details = { "payer_id": payerId };
+  
+  paypal.payment.execute(paymentId, details, function (error, payment) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Get Payment Response");
+      console.log(JSON.stringify(payment));
+      res.send("Payment transfered successfully.");
+    }
+  });
 });
  
 // Page will display when you canceled the transaction 
