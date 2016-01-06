@@ -86,7 +86,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
           </tbody> \
         </table> \
       </td> \
-    </tr> \http://sb-sharingbeer.rhcloud.com
+    </tr> \
   	<tr> \
 		<td style="font-weight:300;font-size:10px;color:#88a1af;padding-left:24px;padding-right:24px" align="center"><br><br>  \
 			<a style="text-decoration:none;color:#88a1af" href="http://sb-sharingbeer.rhcloud.com" target="_blank">sharingbeer.it </a> - \
