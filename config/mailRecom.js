@@ -33,9 +33,9 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
   								<p> questo è l\'invito di <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> che ti permettera\' di bere una birra \
                   <span style="font-style:normal;font-weight:bold"> RoL </span>, la prima birra Artigianale da condividere!</p> \
-  								<p>Vuoi saperne di più? Puoi farlo sul sito <a href="http://'+ ipaddress +':'+ port +'" target="_blank"> SharingBeer </a> che è accessibile solo su segnalazione di un tuo amico. \
+  								<p>Vuoi saperne di più? Puoi farlo sul sito <a href="http://http://sb-sharingbeer.rhcloud.com" target="_blank"> SharingBeer </a> che è accessibile solo su segnalazione di un tuo amico. \
                   <span style="font-style:oblique;font-weight:bold">'+ userName +'</span> ha scelto te! </span></p> \
-  								<p>Le tue credenziali per accedere a <a href="http://'+ ipaddress +':'+ port +'/login" target="_blank"> SharingBeer </a> sono: </p> \
+  								<p>Le tue credenziali per accedere a <a href="http://sb-sharingbeer.rhcloud.com/login" target="_blank"> SharingBeer </a> sono: </p> \
   								<div align="center"> \
   									<p>email: <a style="text-decoration:none">'+ friendEmail + '</a></p> \
   								</div> \
@@ -44,7 +44,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   								</div> \
   								<div align="center">   <p> oppure </p>  </div> \
   								<div align="center"> \
-  								<form action="http://'+ ipaddress +':'+ port +'/login" method="post" id="form1"> \
+  								<form action="http://sb-sharingbeer.rhcloud.com/login" method="post" id="form1"> \
 									  <input type="hidden" name="email" value="'+ friendEmail + '"> \
 									  <input type="hidden" name="password" value="'+ friendPassword +'"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;" \
@@ -86,12 +86,12 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
           </tbody> \
         </table> \
       </td> \
-    </tr> \
+    </tr> \http://sb-sharingbeer.rhcloud.com
   	<tr> \
 		<td style="font-weight:300;font-size:10px;color:#88a1af;padding-left:24px;padding-right:24px" align="center"><br><br>  \
-			<a style="text-decoration:none;color:#88a1af" href="sharingbeer.it" target="_blank">sharingbeer.it </a> - \
-			<a style="text-decoration:none;color:#88a1af" href="sharingbeer.com" target="_blank"> sharingbeer.com </a> - \
-			<a style="text-decoration:none;color:#88a1af" href="sharingbeer.eu" target="_blank">sharingbeer.eu</a> \
+			<a style="text-decoration:none;color:#88a1af" href="http://sb-sharingbeer.rhcloud.com" target="_blank">sharingbeer.it </a> - \
+			<a style="text-decoration:none;color:#88a1af" href="http://sb-sharingbeer.rhcloud.com" target="_blank"> sharingbeer.com </a> - \
+			<a style="text-decoration:none;color:#88a1af" href="http://sb-sharingbeer.rhcloud.com" target="_blank">sharingbeer.eu</a> \
 		</td> \
 	</tr> \
  </tbody> \
