@@ -135,7 +135,8 @@ function sendmailToFriend(friendName, friendEmail, friendPassword, userName, use
       subject: 'Hello ✔', // Subject line
       html: mailrecom(friendName, friendEmail, friendPassword, userName, userSurname)
   };
-
+  
+  console.log(mailrecom(friendName, friendEmail, friendPassword, userName, userSurname));
   console.log('friendMail: ' + friendEmail);
   console.log('friendPassword: ' + friendPassword);
   console.log('userEmail: ' + userEmail);

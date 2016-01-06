@@ -27,7 +27,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   				<tbody> \
   					<tr> \
   						<td style="border-radius:12px;padding-left:50px;padding-right:50px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
-  							<div style="border-radius: 25px; background-image: url(http://'+ ipaddress +':'+ port +'/img/rol.png); background-position: left top;padding: 0px;width: 200px;height: 278px;"> \
+  							<div style="border-radius: 25px; background-image: url(http://sb-sharingbeer.rhcloud.com/img/rol.png); background-position: left top;padding: 0px;width: 200px;height: 278px;"> \
   							</div> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
@@ -56,11 +56,11 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
                 	<p>A presto e buon divertimento dallo staff del birrificio RoL. </br>Mi raccomando, bevi in modo responsabile :D</p> \
   							</div>  \
                 <div align="left"> \
-                  <img style="padding-right:12px;vertical-align:middle" src="http://'+ ipaddress +':'+ port +'/img/cellphone-android.png" height="24" width="24"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="http://sb-sharingbeer.rhcloud.com/img/cellphone-android.png" height="24" width="24"> \
                   <a style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686"> +39 393 033 2728 </a> \
                 </div> \
                 <div align="left"> \
-                  <img style="padding-right:12px;vertical-align:middle" src="http://'+ ipaddress +':'+ port +'/img/mail-ru.png" height="24" width="24"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="http://sb-sharingbeer.rhcloud.com/img/mail-ru.png" height="24" width="24"> \
                   <span> \
                     <a href="mailto:friend@sharingbeer.com" style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686" target="_blank">  friend@sharingbeer.com </a> \
                   </span> \
