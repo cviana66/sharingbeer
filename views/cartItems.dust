@@ -88,7 +88,7 @@
       <h4 class="text-right">Total <strong>{cart.total}</strong></h4>
    </div>
    <div class="col-xs-6">
- <form method="POST" action="paynow">
+ <form method="GET" action="/register">
       <button type="submit" class="btn btn-success btn-block">
         Checkout
      </button>

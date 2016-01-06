@@ -20,7 +20,7 @@
                         </i></cite>
           </small>
           <p>
-            <i class="glyphicon glyphicon-envelope"></i>{.local.email}
+            <i class="glyphicon glyphicon-envelope"></i>{.email}
             <br />
             <i class="glyphicon glyphicon-globe"></i>{._id}
             <br />

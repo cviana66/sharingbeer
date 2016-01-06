@@ -1,12 +1,16 @@
 // =============================================================================
 // ECOMMERCE SHOPPING CHAR https://github.com/EastpointSoftware/traider.io =====
 // =============================================================================
-var Product = require('./models/products.js');
+var Product = require('./models/product.js');
 
 
 module.exports = function(app) {
 
 	app.get('/test', function(req, res) {
+        res.render('test.dust');
+    });
+
+	app.get('/dualSlidingPanels', function(req, res) {
         res.render('dualSlidingPanels.dust');
     });
 
@@ -29,7 +33,7 @@ module.exports = function(app) {
     			prod.prettyPrice = prod.prettyPrice();
     		});
     		
-    		message = retriveCart(req,res);
+    		retriveCart(req,res);
 
     		console.log('products-->', prods);
 

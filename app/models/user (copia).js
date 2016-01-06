@@ -6,27 +6,12 @@ var bcrypt   = require('bcrypt-nodejs');
 // define the schema for our user model
 var userSchema = mongoose.Schema({
 
-    email           : { type: String, required: '{PATH} is required.', unique: true },
-    password        : { type: String, required: '{PATH} is required.' },
-    status          : { type: String },
-    name : {
-        first       : { type: String },
-        last        : { type: String },
+    local     : {
+        email           : { type: String, required: '{PATH} is required.', unique: true },
+        password        : { type: String, required: '{PATH} is required.' },
+        initDate        : { type: Date, default: Date.now },
+        numberOfFriends : { type: Number, default: 0}
     },
-    fiscalCode      : { type: String },
-    address: {
-        address1    : { type: String },
-        address2    : { type: String },
-        town        : { type: String },
-        province    : { type: String },
-        conutry     : { type: String },
-        pcd         : { type: String }
-    },
-    mobilePrefix    : { type: String },
-    mobileNumber    : { type: String },
-    initDate        : { type: Date, default: Date.now },
-    endDate         : { type: Date},
-    numAvailableFriends : { type: Number, default: 0},
     facebook  : {
         id           : String,
         token        : String,
@@ -56,7 +41,7 @@ userSchema.methods.generateHash = function(password) {
 
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.password);
+    return bcrypt.compareSync(password, this.local.password);
 };
 
 // create the model for users and expose it to our app

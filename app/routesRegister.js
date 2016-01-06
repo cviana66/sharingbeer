@@ -4,11 +4,48 @@
 //var transporter     = require('./mailerXOAuth2');
 var transporter     = require('../config/mailerMailgun');
 
+var mailrecom       = require('../config/mailRecom');
+
 // load up the user model
 var User						= require('../app/models/user');
 var Friend					= require('../app/models/friend');
 
 module.exports = function(app) {
+
+// GET RECOMMENDED ======================================================================  
+  app.post('/activate', function(req, res) {
+    req.body.email;
+    req.body.password;
+
+  });
+
+// GET RECOMMENDED ======================================================================  
+  app.get('/register', isLoggedIn, function(req, res) {
+    if (req.user.status == 'confirmed') {
+      res.render ('registration.dust');
+    } else if (req.user.status == 'customer') {
+      res.redirect('/paynow');
+    } else {
+      console.log('User: ', req.user);
+      res.redirect('/');
+    } 
+  });
+
+// GET RECOMMENDED ======================================================================  
+  app.post('/register', isLoggedIn, function(req, res) {
+    User.findByIdAndUpdate(req.user._id, 
+      { $set: { 
+                name: {
+                        first: capitalizeFirstLetter(req.body.firstName),
+                        last: capitalizeFirstLetter(req.body.lastName)
+                      }
+              }
+      }, 
+      function (err, user) {
+        if (err) return handleError(err);
+        res.send(user);
+    });
+  });
 
 // GET RECOMMENDED ======================================================================
 	app.get('/recomm',isLoggedIn, function(req,res) {
@@ -19,13 +56,17 @@ module.exports = function(app) {
 	});
 
 // POST RECOMMENDED =====================================================================
-	app.post('/recomm', function(req, res) {
+	app.post('/recomm',isLoggedIn, function(req, res) {
 
 		var password = generatePassword(6);
     var newUser = new User();
     // set the user's local credentials
-		newUser.local.email    = 	req.body.email;
-    newUser.local.password = newUser.generateHash(password);
+		newUser.email    = 	req.body.email;
+    newUser.password = newUser.generateHash(password);
+    newUser.name.first = capitalizeFirstLetter(req.body.firstName);
+    newUser.status = 'new'; // status
+
+    console.log(newUser);
 
     newUser.save(function(err) {
 			if (err) {
@@ -40,19 +81,20 @@ module.exports = function(app) {
         // Record new friends in mongodb
         var newFriend = new Friend();
         newFriend.id = req.user._id; // id parent
-        newFriend.emailParent = req.user.local.email; // mail parent
-        newFriend.emailFriend = newUser.local.email; // mail friend
+        newFriend.emailParent = req.user.email; // mail user
+        newFriend.emailFriend = newUser.email; // mail friend
+
         newFriend.save(function(err) {
           if (err) {
             var error = 'Something bad happened! Please try again.';
 						//remove Friend from User
-						User.findOne({ 'local.email' :  newUser.local.email }).remove(callback);
+						User.findOne({ 'email' :  newUser.email }).remove(callback);
             //render for message display
 						res.render('recommended.dust', {message: error});
           }
         });
         // send email to Friend
-        sendmailToFriend(password, req.user.local.email, newUser.local.email);
+        sendmailToFriend(capitalizeFirstLetter(req.body.firstName), newUser.email, password, req.user.name.first, req.user.name.last, req.user.email);
         // send mail to Parent
         // decrement number of freinds 
         // increment NeXO (New eXchange Open)
@@ -86,18 +128,17 @@ function generatePassword(n) {
 }
 
 // send password to Frined via email
-function sendmailToFriend(password, parentMail, friendMail) {
+function sendmailToFriend(friendName, friendEmail, friendPassword, userName, userSurname, userEmail) {
   var mailOptions = {
       from: 'info@sharingbeer.com', // sender address
       to: 'cviana66@gmail.com', // list of receivers
       subject: 'Hello ✔', // Subject line
-      text: 'password: ' + password, // plaintext body
-      html: '<b>password: ' + password + '</b>' // html body
+      html: mailrecom(friendName, friendEmail, friendPassword, userName, userSurname)
   };
 
-  console.log('password: ' + password);
-  console.log('parentMail: ' + parentMail);
-  console.log('friendMail: ' + friendMail);
+  console.log('friendMail: ' + friendEmail);
+  console.log('friendPassword: ' + friendPassword);
+  console.log('userEmail: ' + userEmail);
 
   transporter.sendMail(mailOptions, function(error, info){
       if(error){
@@ -106,4 +147,8 @@ function sendmailToFriend(password, parentMail, friendMail) {
           console.log('Message sent!', info);
       };
   });
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
