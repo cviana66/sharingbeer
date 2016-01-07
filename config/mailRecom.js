@@ -26,18 +26,18 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   			<table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
   				<tbody> \
             <tr> \
-              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:40px;padding-right:40px;padding-top:30px;padding-bottom:12px;background-color:#7CCD7C" align="right"> \
+              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#7CCD7C" align="right"> \
                 <div> \
                   <img src=http://sb-sharingbeer.rhcloud.com/img/rol1.png title="LOGO Birrificio RoL" alt="LOGO Birrificio RoL"> \
                 </div> \
               </td> \
             </tr> \
   					<tr> \
-  						<td style="border-radius:12px;padding-left:40px;padding-right:40px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
+  						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
-  								<p> questo invito di <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> ti permettera\' di bere una birra \
-                  <span style="font-style:normal;font-weight:bold"> RoL </span>, la prima birra Artigianale da condividere!</p> \
+  								<p> questo invito di <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> ti permettera\' di bere la birra \
+                  <span style="font-style:normal;font-weight:bold"> RoL</span>, la prima birra Artigianale da condividere!</p> \
   								<p>Vuoi saperne di più? Puoi farlo sul sito <a href="http://http://sb-sharingbeer.rhcloud.com" target="_blank"> SharingBeer </a> che è accessibile solo su segnalazione di un tuo amico. \
                   <span style="font-style:oblique;font-weight:bold">'+ userName +'</span> ha scelto te! </span></p> \
   								<p>Le tue credenziali per accedere a <a href="http://sb-sharingbeer.rhcloud.com/login" target="_blank"> SharingBeer </a> sono: </p> \
@@ -81,7 +81,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
         <table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
           <tbody> \
             <tr> \
-              <td style="border-radius:12px;padding-left:50px;padding-right:50px;padding-top:12px;padding-bottom:12px;background-color:#ffffff" align="right"> \
+              <td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:12px;padding-bottom:12px;background-color:#ffffff" align="right"> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:10px;text-align:left;color:#88a1af;margin-top:10px"> \
                   Le informazioni contenute in questo messaggio di posta elettronica sono riservate, rivolte esclusivamente al destinatario e non comportano alcun vincolo ne\' alcun obbligo. \
                   L\'invito ti è stato iviato per tramite una persona che è a conoscenza del tuo indirizzo email e non da un sistema automatico . Segnalaci eventuali abusi rispondendo a questa mail. \
