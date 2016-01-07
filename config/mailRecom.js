@@ -25,13 +25,18 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   		<td style="background-color:#f0f0f0" align="center" bgcolor="#F0F0F0" valign="top"><br> \
   			<table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
   				<tbody> \
+            <tr> \
+              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:40px;padding-right:40px;padding-top:30px;padding-bottom:12px;background-color:#7CCD7C" align="right"> \
+                <div> \
+                  <img src=http://sb-sharingbeer.rhcloud.com/img/rol1.png title="LOGO Birrificio RoL" alt="LOGO Birrificio RoL"> \
+                </div> \
+              </td> \
+            </tr> \
   					<tr> \
-  						<td style="border-radius:12px;padding-left:50px;padding-right:50px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
-  							<div style="border-radius: 25px; background-image: url(http://sb-sharingbeer.rhcloud.com/img/rol.png); background-position: left top;padding: 0px;width: 200px;height: 278px;"> \
-  							</div> \
+  						<td style="border-radius:12px;padding-left:40px;padding-right:40px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
-  								<p> questo è l\'invito di <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> che ti permettera\' di bere una birra \
+  								<p> questo invito di <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> ti permettera\' di bere una birra \
                   <span style="font-style:normal;font-weight:bold"> RoL </span>, la prima birra Artigianale da condividere!</p> \
   								<p>Vuoi saperne di più? Puoi farlo sul sito <a href="http://http://sb-sharingbeer.rhcloud.com" target="_blank"> SharingBeer </a> che è accessibile solo su segnalazione di un tuo amico. \
                   <span style="font-style:oblique;font-weight:bold">'+ userName +'</span> ha scelto te! </span></p> \

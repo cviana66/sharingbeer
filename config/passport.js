@@ -118,7 +118,7 @@ module.exports = function(passport) {
             // all is well, return successful user
             console.log('id: ', user._id);
 
-            // if the user is in status "new" then this is the first access --> validation  
+            // if the user is in status "new" then this is the first access --> validation put status = confirmed
             if (user.status == 'new') {
                 User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, user) {
                     if (err) return done(err);

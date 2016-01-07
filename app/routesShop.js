@@ -6,10 +6,6 @@ var Product = require('./models/product.js');
 
 module.exports = function(app) {
 
-	app.get('/test', function(req, res) {
-        res.render('test.dust');
-    });
-
 	app.get('/dualSlidingPanels', function(req, res) {
         res.render('dualSlidingPanels.dust');
     });

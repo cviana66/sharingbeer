@@ -12,6 +12,11 @@ var Friend					= require('../app/models/friend');
 
 module.exports = function(app) {
 
+// TESTING
+app.get('/test', function(req, res) {
+        res.send(mailrecom('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+    });
+
 // GET RECOMMENDED ======================================================================  
   app.post('/activate', function(req, res) {
     req.body.email;
@@ -43,7 +48,8 @@ module.exports = function(app) {
       }, 
       function (err, user) {
         if (err) return handleError(err);
-        res.send(user);
+        //res.send(user);
+        res.redirect('/????');
     });
   });
 
