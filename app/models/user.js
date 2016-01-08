@@ -26,7 +26,7 @@ var userSchema = mongoose.Schema({
     mobileNumber    : { type: String },
     initDate        : { type: Date, default: Date.now },
     endDate         : { type: Date},
-    numAvailableFriends : { type: Number, default: 0},
+    possibleFriends : { type: Number, default: 0},
     facebook  : {
         id           : String,
         token        : String,

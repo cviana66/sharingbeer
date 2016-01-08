@@ -4,7 +4,7 @@
 //var transporter     = require('./mailerXOAuth2');
 var transporter     = require('../config/mailerMailgun');
 
-var mailrecom       = require('../config/mailRecom');
+var nailfriend       = require('../config/mailFriend');
 
 // load up the user model
 var User						= require('../app/models/user');
@@ -14,17 +14,17 @@ module.exports = function(app) {
 
 // TESTING
 app.get('/test', function(req, res) {
-        res.send(mailrecom('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+        res.send(nailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
     });
 
-// GET RECOMMENDED ======================================================================  
+// GET FRIEND ======================================================================  
   app.post('/activate', function(req, res) {
     req.body.email;
     req.body.password;
 
   });
 
-// GET RECOMMENDED ======================================================================  
+// GET FRIEND ======================================================================  
   app.get('/register', isLoggedIn, function(req, res) {
     if (req.user.status == 'confirmed') {
       res.render ('registration.dust');
@@ -36,7 +36,7 @@ app.get('/test', function(req, res) {
     } 
   });
 
-// GET RECOMMENDED ======================================================================  
+// GET FRIEND ======================================================================  
   app.post('/register', isLoggedIn, function(req, res) {
     User.findByIdAndUpdate(req.user._id, 
       { $set: { 
@@ -47,22 +47,54 @@ app.get('/test', function(req, res) {
               }
       }, 
       function (err, user) {
-        if (err) return handleError(err);
+        if (err) return console.log('error',err);
         //res.send(user);
         res.redirect('/????');
     });
   });
 
-// GET RECOMMENDED ======================================================================
+// GET FRIEND ======================================================================
 	app.get('/recomm',isLoggedIn, function(req,res) {
-		res.render('recommended.dust', {
-      user: req.user,
-      numProducts : req.session.numProducts
+
+    Friend.count({ emailParent:req.user.email }, function (err, friends) {
+      if (err) return console.log('error',err);
+      console.log('Friends: ', friends);
+      
+      User.findOne({ email: req.user.email }, function (err, user) {
+        if (err) return console.log('error',err);
+        friendsInvited = parseInt(friends,10);        
+        
+        req.session.invitationAvailable = parseInt(user.possibleFriends,10);
+        req.session.friendsInvited = friendsInvited;
+        error = "";
+        controlSates = "";
+
+        if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
+          error = "You have no more invitations! Please buy more RoL beer";
+          controlSates = "disabled";
+        }
+
+
+        res.render('friend.dust', {
+          controlSates: controlSates, 
+          message: error,
+          user: req.user,
+          invitationAvailable: req.session.invitationAvailable,
+          friendsInvited:  req.session.friendsInvited,
+          percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable ),
+          numProducts : req.session.numProducts
+        });
+      }); 
     });
 	});
 
-// POST RECOMMENDED =====================================================================
+// POST FRIEND =====================================================================
 	app.post('/recomm',isLoggedIn, function(req, res) {
+
+    if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
+          error = "You have no more invitations! Please buy more RoL beer";
+          res.redirect('/recomm')
+    };   
 
 		var password = generatePassword(6);
     var newUser = new User();
@@ -82,8 +114,14 @@ app.get('/test', function(req, res) {
 				if (err.code === 11000) { //duplicate key: email
 					error = 'That email is already taken, please try another.';
 				}
-				res.render('recommended.dust', {message: error});
-			} else {
+console.log('session.friendsInvited: ',req.session.friendsInvited );
+				res.render('friend.dust', { message: error,
+                                    invitationAvailable: req.session.invitationAvailable,
+                                    friendsInvited:  req.session.friendsInvited,
+                                    percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
+                                  });
+			} else { 
+
         // Record new friends in mongodb
         var newFriend = new Friend();
         newFriend.id = req.user._id; // id parent
@@ -94,9 +132,13 @@ app.get('/test', function(req, res) {
           if (err) {
             var error = 'Something bad happened! Please try again.';
 						//remove Friend from User
-						User.findOne({ 'email' :  newUser.email }).remove(callback);
+						User.fndOne({ 'email' :  newUser.email }).remove(callback);
             //render for message display
-						res.render('recommended.dust', {message: error});
+						res.render('friend.dust', { message: error,
+                                        invitationAvailable: req.session.invitationAvailable,
+                                        friendsInvited:  req.session.friendsInvited,
+                                        percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
+                                      });
           }
         });
         // send email to Friend
@@ -104,7 +146,8 @@ app.get('/test', function(req, res) {
         // send mail to Parent
         // decrement number of freinds 
         // increment NeXO (New eXchange Open)
-				res.redirect('/shop');
+        res.redirect('/recomm');
+				
 			}
 		});
 	});
@@ -139,10 +182,10 @@ function sendmailToFriend(friendName, friendEmail, friendPassword, userName, use
       from: 'info@sharingbeer.com', // sender address
       to: 'cviana66@gmail.com', // list of receivers
       subject: 'Hello ✔', // Subject line
-      html: mailrecom(friendName, friendEmail, friendPassword, userName, userSurname)
+      html: nailfriend(friendName, friendEmail, friendPassword, userName, userSurname)
   };
   
-  console.log(mailrecom(friendName, friendEmail, friendPassword, userName, userSurname));
+  console.log(nailfriend(friendName, friendEmail, friendPassword, userName, userSurname));
   console.log('friendMail: ' + friendEmail);
   console.log('friendPassword: ' + friendPassword);
   console.log('userEmail: ' + userEmail);
@@ -157,5 +200,7 @@ function sendmailToFriend(friendName, friendEmail, friendPassword, userName, use
 }
 
 function capitalizeFirstLetter(string) {
+  if (typeof(string) != "undefined") {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  }
 }

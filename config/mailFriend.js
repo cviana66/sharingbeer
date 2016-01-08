@@ -1,17 +1,5 @@
 module.exports = function(friendName, friendEmail, friendPassword, userName, userSurname ) {
 
-
-
-//  Set the environment variables we need.
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-var port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-
-console.log('url in mailrecom: ', ipaddress, port)
-
-if (typeof ipaddress === "undefined") {
-  ipaddress = "127.0.0.1";
-};
-
 var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
 <html xmlns="http://www.w3.org/1999/xhtml"> \
     <head> \

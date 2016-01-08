@@ -1,0 +1,49 @@
+{> "layouts/main" /}
+
+{<body}
+
+<div class="container">
+  <div class="row">
+    <div class="main">
+
+      <h3>Sign your Friends </h3>
+      <hr class="hr">
+      <!-- show any messages that come back with authentication -->
+      {?message}
+      {#message}
+      <div class="alert alert-danger">{.}</div>
+      {/message}
+      {/message}
+
+      <form role="form" action="/recomm" method="POST">
+        <!--input type="hidden", name="_csrf", value="csrfToken" -->
+        <div class="form-group">
+          <label for="inputUsernameEmail">Email</label>
+          <input type="email" class="form-control" id="inputUsernameEmail"
+          name="email" placeholder="your@email.address" autofocus required {controlSates}>
+        </div>
+        <div class="form-group">
+          <label for="inputUsernameEmail">Name</label>
+          <input type="text" class="form-control" id="inputFirsName"
+          name="firstName" placeholder="First name" required {controlSates}>
+        </div>
+        <button type="submit" class="btn btn btn-primary {controlSates}">
+          Sig Up
+        </button>
+      </form>
+    </div>
+  </div>
+  <div class="row">
+    <div class="main">
+      <p class="text-left"><strong> Friends  invited </strong></p>    
+      <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="{friendsInvited}" aria-valuemin="0" aria-valuemax="{invitationAvailable}" style="width: {percentage}%;">
+          {friendsInvited}
+        </div>
+      </div>
+      <p class="text-right"> Invitations available {invitationAvailable} </label> </p>
+    </div>
+  </div>  
+</div>
+
+{/body}

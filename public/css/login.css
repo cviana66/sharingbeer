@@ -19,6 +19,7 @@ color: #999;
 .main {
   max-width: 420px;
   margin: 0 auto;
+  padding-bottom:30px
 }
 .center{
   width: 150px;
