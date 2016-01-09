@@ -96,7 +96,7 @@ app.get('/paynow', isLoggedIn, function(req, res) {
           name: cart[item].name,
           price: subtotal.toFixed(2),
           currency: "EUR",
-          quantity: cart[item].qty<
+          quantity: cart[item].qty
         });
       }
     }
