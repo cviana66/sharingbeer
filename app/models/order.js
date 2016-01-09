@@ -12,3 +12,5 @@ var OrderSchema = new Schema({
     discount    : { type: Number},
     totalPrice  : { type: Number}
 });
+// create the model for orsers and expose it to our app
+module.exports = mongoose.model('Order', OrderSchema);

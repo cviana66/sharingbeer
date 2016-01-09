@@ -33,7 +33,7 @@ var routesShop      = require ('./app/routesShop.js');
 var routesRegister  = require ('./app/routesRegister.js');
 
 // paypal ======================================================================
-var routesPayPal    = require ('./app/routesPayPal.js');
+var routesPayment    = require ('./app/routesPayment.js');
 
 // passport ====================================================================
 var pass            = require('./config/passport');
@@ -114,7 +114,7 @@ var SharingBeer = function() {
         routesAuth(self.app, passport);
         routesShop(self.app);
         routesRegister(self.app);
-        routesPayPal(self.app, paypal);
+        routesPayment(self.app, paypal);
     };
 
     /**

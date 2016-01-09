@@ -10,6 +10,7 @@ var nailfriend       = require('../config/mailFriend');
 var User						= require('../app/models/user');
 var Friend					= require('../app/models/friend');
 
+
 module.exports = function(app) {
 
 // TESTING
@@ -17,40 +18,44 @@ app.get('/test', function(req, res) {
         res.send(nailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
     });
 
-// GET FRIEND ======================================================================  
-  app.post('/activate', function(req, res) {
-    req.body.email;
-    req.body.password;
 
-  });
-
-// GET FRIEND ======================================================================  
+// GET REGISTER ======================================================================  
   app.get('/register', isLoggedIn, function(req, res) {
-    if (req.user.status == 'confirmed') {
+
+    if (req.user.status == 'confirmed') {  
       res.render ('registration.dust');
+    
     } else if (req.user.status == 'customer') {
       res.redirect('/paynow');
+    
     } else {
       console.log('User: ', req.user);
       res.redirect('/');
     } 
   });
 
-// GET FRIEND ======================================================================  
+// POST REGISTER ======================================================================  
   app.post('/register', isLoggedIn, function(req, res) {
     User.findByIdAndUpdate(req.user._id, 
       { $set: { 
                 name: {
                         first: capitalizeFirstLetter(req.body.firstName),
-                        last: capitalizeFirstLetter(req.body.lastName)
-                      }
+                        last: capitalizeFirstLetter(req.body.lastName),
+                      },
+                status: 'customer'
               }
       }, 
-      function (err, user) {
-        if (err) return console.log('error',err);
-        //res.send(user);
-        res.redirect('/????');
+      function (err, req) {
+        if (err) {
+          console.log('error', err);
+          res.redirect('/');
+          return;
+        }
     });
+
+    req.user.status = "customer";
+    res.redirect('/register');
+
   });
 
 // GET FRIEND ======================================================================
@@ -66,17 +71,20 @@ app.get('/test', function(req, res) {
         
         req.session.invitationAvailable = parseInt(user.possibleFriends,10);
         req.session.friendsInvited = friendsInvited;
-        error = "";
-        controlSates = "";
+        var error = "";
+        var controlSates = "";
+        var flag = "false";
+
 
         if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
           error = "You have no more invitations! Please buy more RoL beer";
           controlSates = "disabled";
+          flag = "true";
         }
-
 
         res.render('friend.dust', {
           controlSates: controlSates, 
+          flag : flag,
           message: error,
           user: req.user,
           invitationAvailable: req.session.invitationAvailable,
@@ -114,7 +122,7 @@ app.get('/test', function(req, res) {
 				if (err.code === 11000) { //duplicate key: email
 					error = 'That email is already taken, please try another.';
 				}
-console.log('session.friendsInvited: ',req.session.friendsInvited );
+
 				res.render('friend.dust', { message: error,
                                     invitationAvailable: req.session.invitationAvailable,
                                     friendsInvited:  req.session.friendsInvited,

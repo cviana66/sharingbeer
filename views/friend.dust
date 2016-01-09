@@ -27,8 +27,8 @@
           <input type="text" class="form-control" id="inputFirsName"
           name="firstName" placeholder="First name" required {controlSates}>
         </div>
-        <button type="submit" class="btn btn btn-primary {controlSates}">
-          Sig Up
+        <button type="submit" onfocus="this.disabled={flag}" class="btn btn btn-primary {controlSates}">
+          Sign Up
         </button>
       </form>
     </div>

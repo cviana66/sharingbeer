@@ -44,7 +44,7 @@ module.exports = function(app) {
     });
 
 // POST SHOP ===========================================================================
-	app.post('/shop', function (req, res) {
+	app.post('/shop', isLoggedIn ,function (req, res) {
 
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
@@ -69,7 +69,7 @@ module.exports = function(app) {
 				cart[id] = {
 					id : prod._id,
 					name: prod.name,
-					price: prod.price,
+					price: prod.price.toFixed(2),
 					prettyPrice: prod.prettyPrice(),
 					qty: 1
 				};
@@ -99,7 +99,7 @@ module.exports = function(app) {
 
 
 // POST CART MINUS ====================================================================
-	app.post('/cart/minus', function (req, res) {
+	app.post('/cart/minus', isLoggedIn, function (req, res) {
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
 		var cart = req.session.cart; //cart è l'oggetto sessione
@@ -128,7 +128,7 @@ module.exports = function(app) {
 	});
 
 // POST CART PLUS ====================================================================
-	app.post('/cart/plus', function (req, res) {
+	app.post('/cart/plus', isLoggedIn, function (req, res) {
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
 		var cart = req.session.cart; //cart è l'oggetto sessione
@@ -156,7 +156,7 @@ module.exports = function(app) {
 	});
 
 // POST CART MINUS ====================================================================
-	app.post('/cart/delete', function (req, res) {
+	app.post('/cart/delete', isLoggedIn, function (req, res) {
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
 		var cart = req.session.cart; //cart è l'oggetto sessione
@@ -222,7 +222,7 @@ module.exports = function(app) {
 		 I would strongly advise against using this code in production.
 		 You've been warned!
 		 */
-		var price = parseFloat(req.body.price, 10);
+		var price = parseFloat(req.body.price, 10).toFixed(2);
 
 		//Some very lightweight input checking
 		if (name === '' || isNaN(price)) {

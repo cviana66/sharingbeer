@@ -6,6 +6,10 @@ var Schema = mongoose.Schema;
 var ItemSchema = new Schema({
     idOrder    	: { type: String, required: true },
     idPrdoduct 	: { type: String, required: true },
+    nameProduct	: { type: String},
     quantity	: { type: String},
     price	    : { type: Number}
 });
+
+// create the model for orsers and expose it to our app
+module.exports = mongoose.model('Item', ItemSchema);
