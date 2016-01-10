@@ -14,13 +14,11 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   			<table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
   				<tbody> \
             <tr> \
-              <div style="box-shadow: 10px 10px 5px grey"> \
               <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#7CCD7C" align="right"> \
                 <div> \
                   <img src=http://sb-sharingbeer.rhcloud.com/img/rol1.png title="LOGO Birrificio RoL" alt="LOGO Birrificio RoL"> \
                 </div> \
               </td> \
-              </div> \
             </tr> \
   					<tr> \
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \

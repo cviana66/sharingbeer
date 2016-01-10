@@ -19,6 +19,12 @@ app.get('/test', function(req, res) {
     });
 
 
+// POST VALIDATION
+  app.post('/validation', function(req,res){
+    req.body.email
+    req.body.password
+  });
+
 // GET REGISTER ======================================================================  
   app.get('/register', isLoggedIn, function(req, res) {
 
