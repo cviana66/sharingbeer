@@ -1,7 +1,10 @@
 module.exports = function(app, paypal) {
 
-  var Order          = require('../app/models/order');
+  var Order         = require('../app/models/order');
   var Item          = require('../app/models/item');
+  var PayInfo       = require('../app/models/payinfo');
+  var User         = require('../app/models/user');
+
 
   var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
   if (typeof ipaddress === "undefined") {
@@ -17,7 +20,8 @@ module.exports = function(app, paypal) {
 app.get('/paynow', isLoggedIn, function(req, res) {
   
   var jsonsItems = new Array();
-  var cart = req.session.cart;  
+  var cart = req.session.cart; 
+  req.session.order = {}; 
   
   // ORDER MANAGEMENT ---------------------------------------------------------------
   // idUser      : { type: String, required: true },
@@ -42,6 +46,9 @@ app.get('/paynow', isLoggedIn, function(req, res) {
       var error = 'Something bad happened! Please try again.';
       console.log("error code: ",err.code);
     } else {
+      //save in session Order ID used after for return success payment
+      req.session.order.id = order.id;
+      console.log('ORDER ID : ', req.session.order.id );
 
       // ITEM MANAGEMENT ------------------------------
       //ItemSchema = new Schema({
@@ -50,8 +57,6 @@ app.get('/paynow', isLoggedIn, function(req, res) {
       //nameProduct  : { type: String},
       //quantity  : { type: String},
       //price     : { type: Number}
-
-      //var cart = req.session.cart;
     
       if (!cart) {
           //TODO manahement if not exisat cart ????
@@ -145,23 +150,89 @@ app.get('/paynow', isLoggedIn, function(req, res) {
   });
 });
 
-app.get('/success', function(req, res) {
+// GET SUCCESS ===========================================================================
+app.get('/success',  function(req, res) {
 
   var paymentId = req.session.paymentId;
   var payerId = req.param('PayerID');
   var details = { "payer_id": payerId };
+
+  req.session.cart  = {};
+  //req.session.order = {};
+  req.session.total = 0;
+  req.session.numProducts = 0;
+
   
   paypal.payment.execute(paymentId, details, function (error, payment) {
     if (error) {
       console.log(error);
+      // TODO MANAEMET
     } else {
-      console.log("Get Payment Response");
-      console.log(JSON.stringify(payment));
-      res.send("Payment transfered successfully.");
-    }
+
+      var payInfo = new PayInfo();
+
+      payInfo.idPay   = paymentId;
+      payInfo.idOrder = req.session.order.id;
+      payInfo.state   = payment.state;
+      payInfo.esponseMsg = JSON.stringify(payment);
+
+      payInfo.save(function(err, payinfo) {
+        if (err) {
+          var error = 'Something bad happened! Please try again.';
+          console.log("error code: ",err.code);
+          res.redirect('/???')
+        }
+      }); 
+
+      var status="";
+
+      if (payment.state === 'approved')  { 
+        status = 'payed';
+      }else{
+        status = 'tobeVerify';
+      }
+      
+      console.log('PAYMET STATUS : ', payment.state);
+      Order.findByIdAndUpdate(req.session.order.id, 
+        { $set: { 
+                  paypal: {
+                          paymentId: paymentId,
+                          payerId: payerId,                        
+                        },
+                  status: 'payed'
+                }
+        }, 
+        function (err, req) {
+          if (err) {
+            console.log('error', err);
+            res.redirect('/');
+            return;
+          }
+      });
+
+      User.findByIdAndUpdate(req.user._id, 
+        { $set: { 
+                  possibleFriends : req.user.possibleFriends + 3
+                }
+        }, 
+        function (err, req) {
+          if (err) {
+            console.log('error', err);
+            res.redirect('/???');
+            return;
+          }
+      });
+
+      if (status === 'payed')
+         res.redirect('/recomm')
+        //console.log("Get Payment Response");
+        //console.log(JSON.stringify(payment));      
+
+    };
   });
 });
- 
+
+// GET CANCEL ===========================================================================
 // Page will display when you canceled the transaction 
 app.get('/cancel', function(req, res) {
   res.send("Payment canceled successfully.");
@@ -169,7 +240,8 @@ app.get('/cancel', function(req, res) {
 
 }
 
-// route middleware to make sure a user is logged in ===========================
+// MIDDLEWARE ==========================================================================
+// route middleware to make sure a user is logged in 
 function isLoggedIn(req, res, next) {
 
   // if user is authenticated in the session, carry on

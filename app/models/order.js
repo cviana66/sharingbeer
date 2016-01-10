@@ -10,7 +10,11 @@ var OrderSchema = new Schema({
     status      : { type: String, required: true},
     idPayment   : { type: String},
     discount    : { type: Number},
-    totalPrice  : { type: Number}
+    totalPrice  : { type: Number},
+    paypal : {
+    	paymentId 	: { type: String},
+    	payerId		: { type: String}
+    }
 });
 // create the model for orsers and expose it to our app
 module.exports = mongoose.model('Order', OrderSchema);

@@ -120,8 +120,6 @@ module.exports = function(app) {
 				cart[id].qty--;
 			}
 
-			//req.session.numProducts = Object.keys(cart).length;
-
 			res.redirect('/cart');
 
 		});
