@@ -1,4 +1,3 @@
-<div class="container">
   <div class="row">
     <div class="main">
       <h2>Your cart</h2>
@@ -99,12 +98,9 @@
         <form method="GET" action="/shop">
           <button type="submit" class="btn btn-success btn-block btn-lg">
            SHOP
-          </button>
-        </form>
-      </div>
-      {/cart.items}
-    </div>
-  </div>
-</div>
-
-
+         </button>
+       </form>
+     </div>
+     {/cart.items}
+   </div>
+ </div>

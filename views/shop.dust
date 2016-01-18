@@ -2,16 +2,10 @@
 
 {<body}
 
-<div class="row">
-
-  <div class="container">
-
+  <div class="row">
     <div id="slider" class="form">
 
-      {> "layouts/carousel" /}
-
       {#products}
-
       <form method="POST" action="shop">
         <input type="hidden" name="item_id" value="{.id}">
         <input type="hidden" name="_csrf" value="{_csrf}">
@@ -33,12 +27,12 @@
           </div> 
         </div>   
       </form>
-
       {:else}
       <p>There are no products :(<br>You should <a href="/products">add some</a></p>
       {/products}
+    
     </div>
   </div>
-<div>
+
 
 {/body}

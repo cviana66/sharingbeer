@@ -1,17 +1,103 @@
 {> "layouts/main" /}
 
 {<body}
+
 <div class="container">
 
-    <div class="jumbotron text-center">
-        <h1><span class="fa fa-lock"></span> Node Authentication</h1>
-
-        <p>Login or Register with:</p>
-
-        <a href="/login" class="btn btn-default"><span class="fa fa-user"></span> Local Login</a>
-        <a href="/signup" class="btn btn-default"><span class="fa fa-user"></span> Local Signup</a>
-        <a href="/auth/facebook" class="btn btn-primary"><span class="fa fa-facebook"></span> Facebook</a>
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-12" style="background-color:#976400;border-radius:12px">
+      <h1> <span style="font-family:Arial,Verdana;color:#480413"> Sharing Beer </span></h1>
+      <hr class="hr" style="border-top: 1px solid #480413;">
+      <p class="text-center">
+        <span style="font-family:Arial,Verdana;color:#480413;font-weight:300;font-size:30px"> how it works </span>       
+      </p>
     </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+  </div>
 
-</div>
+  <div class="row"><br></div>
+
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0'"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-12" style="background-color:#976400;border-radius:12px">
+      <div class="col-sm-8 col-lg-8 col-md-8 col-xs-8" style="display:inline-block;vertical-align:middle;float:none;">
+        <p class="text-center">
+          <img src="img/quarta.png">
+          <img src="img/prima.png">  
+        </p>
+      </div>
+      <div class="col-sm-4 col-lg-4 col-md-4 col-xs-4" style="display:inline-block;vertical-align:middle;float:none;">
+        <p>
+          <span style="font-family:Arial,Verdana;color:#480413;font-weight:300;font-size:24px"> did your friend invite you? </span>       
+        </p>
+      </div>
+    </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+  </div>
+
+  <div class="row"><br></div>
+
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>      
+      <div class="col-sm-8 col-lg-8 col-md-8 col-xs-12" style="background-color:#C18000;border-radius:12px">
+        <p class="text-center">
+          <span style="font-family:Arial,Verdana;font-weight:300;font-size:26px;color:#480413"> 
+            you are lucky!!! 
+          </span> 
+          <img src="img/seconda.png">
+        </p>
+      </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+  </div>
+
+  <div class="row"><br></div>
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-12" style="background-color:#F6A300;border-radius:12px">
+      <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6" style="display:inline-block;vertical-align:middle;float:none;"> 
+        <p class="text-center"> <img src="img/terza.png"> </p>
+      </div>
+      <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6" style="display:inline-block;vertical-align:middle;float:none;"> 
+        <p class="text-left"> <span style="font-family:Arial,Verdana;font-weight:300;font-size:22px;color:#480413"> your friend offer you your first beer!  now you can taste the </span>
+          <span style="font-family:Arial,Verdana;font-weight:300;font-size:24px;color:#480413"> RòL </span>
+        </p>
+      </div>
+    </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+  </div>
+
+  <div class="row"><br></div>
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-12" style="background-color:#F6A300;border-radius:12px">
+      <p class="text-center">
+        <span style="font-family:Arial,Verdana;font-weight:300;font-size:26px;color:#480413"> amazing!!! </span> 
+        <img src="img/quinta.png"> </p>
+    </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+  </div>
+
+  <div class="row"><br></div>
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#FFBB35;border-radius:12px">
+      <p> <span style="font-family:Arial,Verdana;font-weight:300;font-size:22px;color:#480413"> Buy and Drink Rol Beer then offer it to your frined </span> </p>
+    </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+  </div>
+
+  <div class="row"><br></div>
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#FFC960;border-radius:12px">
+      <p> <span style="font-family:Arial,Verdana;font-weight:300;font-size:22px;color:#480413"> Remember! </span> </p>
+      <p> <span style="font-family:Arial,Verdana;font-weight:300;font-size:22px;color:#480413"> Every time they drink a RòL Beer you'll receive a Booze for free onces </span> </p>
+    </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+  </div>
+
+</div>  
+
+
 {/body}
