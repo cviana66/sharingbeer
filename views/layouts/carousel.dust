@@ -6,11 +6,11 @@
 	      <li data-target="#carousel-example-generic" data-slide-to="1"></li>
 	    </ol>
 	    <div class="carousel-inner" >
-	      <div class="item active" style="margin-bottom:10px;margin-top:5px;margin-right:5px;margin-left:5px;">
-	        <img alt="First slide" src="img/logoRol600x440.jpg" width="340" class="img-responsive center-block" style="box-shadow: 0px 3px 5px black;">
+	      <div class="item active" >
+	        <img alt="First slide" src="img/logoRol600x440.jpg" width="340" class="img-responsive center-block">
 	      </div>
-	      <div class="item" style="margin-bottom:10px;margin-top:5px;margin-right:5px;margin-left:5px;">
-	        <img alt="Second slide" src="img/logoRol600x440.jpg" width="340" class="img-responsive center-block" style="box-shadow: 0px 3px 5px black;">
+	      <div class="item" >
+	        <img alt="Second slide" src="img/logoRol600x440.jpg" width="340" class="img-responsive center-block" >
 	      </div>
 	    </div>
 	    <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
