@@ -13,6 +13,7 @@ var session      = require('express-session');
 var paypal       = require('paypal-rest-sdk');
 var qr           = require('qr-image');
 var fs           = require('fs');
+//var async        = require('async');
     
 var cons = require('consolidate');
 

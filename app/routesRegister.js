@@ -4,7 +4,7 @@
 //var transporter     = require('./mailerXOAuth2');
 var transporter     = require('../config/mailerMailgun');
 
-var nailfriend       = require('../config/mailFriend');
+var mailfriend       = require('../config/mailFriend');
 
 // load up the user model
 var User						= require('../app/models/user');
@@ -15,7 +15,7 @@ module.exports = function(app) {
 
 // TESTING
 app.get('/test', function(req, res) {
-        res.send(nailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+        res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
     });
 
 
@@ -199,10 +199,10 @@ function sendmailToFriend(friendName, friendEmail, friendPassword, userName, use
       from: 'info@sharingbeer.com', // sender address
       to: 'cviana66@gmail.com', // list of receivers
       subject: 'Hello ✔', // Subject line
-      html: nailfriend(friendName, friendEmail, friendPassword, userName, userSurname)
+      html: mailfriend(friendName, friendEmail, friendPassword, userName, userSurname)
   };
   
-  console.log(nailfriend(friendName, friendEmail, friendPassword, userName, userSurname));
+  console.log(mailfriend(friendName, friendEmail, friendPassword, userName, userSurname));
   console.log('friendMail: ' + friendEmail);
   console.log('friendPassword: ' + friendPassword);
   console.log('userEmail: ' + userEmail);

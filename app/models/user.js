@@ -45,8 +45,11 @@ var userSchema = mongoose.Schema({
         email        : String,
         name         : String
     },
-    idParent   : { type: String, required: '{PATH} is required.' },
-    booze      : { type: Number, default: 0}
+    idParent   : { type: String },
+    booze      : { type: Number, default: 0},
+    resetPasswordToken: String,
+    resetPasswordExpires : Date
+
 });
 
 // methods =====================================================================
@@ -59,6 +62,23 @@ userSchema.methods.generateHash = function(password) {
 userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
+
+userSchema.pre('save', function(next) {
+  var user = this;
+  var SALT_FACTOR = 8;
+
+  if (!user.isModified('password')) return next();
+
+  bcrypt.genSalt(SALT_FACTOR, function(err, salt) {
+    if (err) return next(err);
+
+    bcrypt.hash(user.password, salt, null, function(err, hash) {
+      if (err) return next(err);
+      user.password = hash;
+      next();
+    });
+  });
+});
 
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);
