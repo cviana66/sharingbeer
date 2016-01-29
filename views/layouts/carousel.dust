@@ -1,20 +1,16 @@
-<div class="row" style="margin-bottom:20px;">
+<div class="row">
 	<div class="col-md-12 col-xs-12">
 	  <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
 	    <ol class="carousel-indicators">
 	      <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
 	      <li data-target="#carousel-example-generic" data-slide-to="1"></li>
 	    </ol>
-	    <div class="carousel-inner">
-	      <div class="item active">
-	        <img alt="First slide" src="http://placehold.it/600x600" style="width: 100%;">
-	        <div class="carousel-caption">
-	        	<h2>SharingBeer by RòL</h2>
-		    	<p> How it works</p>
-		    </div>
+	    <div class="carousel-inner" >
+	      <div class="item active" style="margin-bottom:10px;margin-top:5px;margin-right:5px;margin-left:5px;">
+	        <img alt="First slide" src="img/logoRol600x440.jpg" width="340" class="img-responsive center-block" style="box-shadow: 0px 3px 5px black;">
 	      </div>
-	      <div class="item">
-	        <img alt="Second slide" src="http://placehold.it/600x600" style="width: 100%;">
+	      <div class="item" style="margin-bottom:10px;margin-top:5px;margin-right:5px;margin-left:5px;">
+	        <img alt="Second slide" src="img/logoRol600x440.jpg" width="340" class="img-responsive center-block" style="box-shadow: 0px 3px 5px black;">
 	      </div>
 	    </div>
 	    <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">

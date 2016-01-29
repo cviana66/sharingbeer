@@ -28,7 +28,7 @@
 
 </head>
 
-<body style="background-color:#fff; background-image: url('img/bg_hopfen_sfocata.jpg');">
+<body style="background:#2A0009 fixed top no-repeat url('img/bg_hopfen_sfocata.jpg');">
 	<div class="container-fluid">
 
 		<!--h2>Sharing Beer</h2-->

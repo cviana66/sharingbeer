@@ -1,0 +1,51 @@
+{> "layouts/main" /}
+
+{<body}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
+
+      <h3><span style="color:#480413"> Orders </span></h3>
+      <hr class="hr" style="border-top: 1px solid #480413;">
+      <!-- show any messages that come back -->
+      {?message}
+        {#message}
+          <div class="alert alert-danger">{.}</div>
+        {/message}
+      {/message}
+
+      {?order.items}
+        {#order.items}
+          <p>{.dateInsert} {._id} {.status} </p>
+        {/order.items}
+      {:else}
+       <p> Not order in delivery 
+      {/order.items}
+
+      <br>
+    </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+  </div>
+
+<div class="row"><br></div>
+  
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+      <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#ffc85d;border-radius:12px">
+        <br>
+        <p class="text-left"><strong> Old orders </strong></p>    
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="{friendsInvited}" aria-valuemin="0" aria-valuemax="{invitationAvailable}" style="width: {percentage}%;background-color:#480413">
+            {friendsInvited}
+          </div>
+        </div>
+        <p class="text-right"> Invitations available {invitationAvailable} </p>
+      </div>
+      <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    </div>
+  </div>  
+</div>
+
+{/body}

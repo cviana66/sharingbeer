@@ -29,7 +29,9 @@ app.get('/test', function(req, res) {
   app.get('/register', isLoggedIn, function(req, res) {
 
     if (req.user.status == 'confirmed') {  
-      res.render ('registration.dust');
+      res.render ('registration.dust', {
+        firstName : req.user.name.first
+      });
     
     } else if (req.user.status == 'customer') {
       res.redirect('/paynow');
@@ -116,6 +118,7 @@ app.get('/test', function(req, res) {
 		newUser.email    = 	req.body.email;
     newUser.password = newUser.generateHash(password);
     newUser.name.first = capitalizeFirstLetter(req.body.firstName);
+    newUser.idParent = req.user._id; //id parent
     newUser.status = 'new'; // status
 
     console.log(newUser);

@@ -4,10 +4,9 @@
 
 <div class="container">
   <div class="row">
-
-    <div class="main">
-
-      <h3>Please Log In, or <a href="/signup">Sign Up</a></h3>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
+      <h3>Please Log In</h3>
       <hr class="hr">
       <!-- show any messages that come back with authentication -->
       {?message}
@@ -29,11 +28,11 @@
           <a class="pull-right" href="#">Forgot password?</a>
         </div>
         <button type="submit" class="btn btn btn-primary">
-          Log In
+          <h4>Log In</h4>
         </button>
       </form>
-
-      <div class="login-or">
+      <br>
+      <!--div class="login-or">
         <hr class="hr-or">
         <span class="span-or">or</span>
       </div>
@@ -45,9 +44,10 @@
         <div class="col-xs-6 col-sm-6 col-md-6">
           <a href="#" class="btn btn-lg btn-info btn-block">Google</a>
         </div>
-      </div>
+      </div-->
 
     </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
   </div>
 </div>
 

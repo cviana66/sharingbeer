@@ -13,7 +13,14 @@ var OrderSchema = new Schema({
     totalPrice  : { type: Number},
     paypal : {
     	paymentId 	: { type: String},
-    	payerId		: { type: String}
+    	payerId		: { type: String},
+        state       : { type: String},
+        method      : { type: String},
+        createTime  : { type: String},
+        updateTime  : { type: String},
+        totalAmount : { type: String},
+        currencyAmount : { type: String}
+
     }
 });
 // create the model for orsers and expose it to our app

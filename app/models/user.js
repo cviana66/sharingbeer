@@ -44,8 +44,9 @@ var userSchema = mongoose.Schema({
         token        : String,
         email        : String,
         name         : String
-    }
-
+    },
+    idParent   : { type: String, required: '{PATH} is required.' },
+    booze      : { type: Number, default: 0}
 });
 
 // methods =====================================================================

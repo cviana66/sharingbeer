@@ -11,7 +11,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 var paypal       = require('paypal-rest-sdk');
-
+var qr           = require('qr-image');
+var fs           = require('fs');
+    
 var cons = require('consolidate');
 
 // config and connect to our database
@@ -114,7 +116,7 @@ var SharingBeer = function() {
         routesAuth(self.app, passport);
         routesShop(self.app);
         routesRegister(self.app);
-        routesPayment(self.app, paypal);
+        routesPayment(self.app, paypal, qr, fs);
     };
 
     /**

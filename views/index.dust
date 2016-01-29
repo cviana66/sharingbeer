@@ -5,15 +5,27 @@
 <div class="container">
 
   <div class="row">
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
-    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-12" style="background-color:#976400;border-radius:12px">
-      <h1> <span style="font-family:Arial,Verdana;color:#480413"> Sharing Beer </span></h1>
-      <hr class="hr" style="border-top: 1px solid #480413;">
-      <p class="text-center">
-        <span style="font-family:Arial,Verdana;color:#480413;font-weight:300;font-size:30px"> how it works </span>       
-      </p>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+      <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#FFC960;border-radius:12px">
+          <h3> <span style="color:#480413"> Sharing Beer </span></h3>
+          <hr class="hr" style="border-top: 1px solid #480413;">
+           {> "layouts/carousel" /}
+          <!--img src="img/logoRol600x440.jpg" class="img-responsive center-block" style="box-shadow: 0px 3px 5px black;"-->
+          <br>
+      </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+  </div>
+
+  <div class="row"><br></div>
+
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#FFBB35;border-radius:12px">
+        <h3> <span style="color:#480413"> How it works </span></h3>
+        <hr class="hr" style="border-top: 1px solid #480413;">
     </div>
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-0"></div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+  </div>
   </div>
 
   <div class="row"><br></div>

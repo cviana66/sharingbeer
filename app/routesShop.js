@@ -18,6 +18,15 @@ module.exports = function(app) {
         res.render('slide.dust');
     });
 
+// POST ORDER SUMMARY =================================================================
+	app.post("/order", isLoggedIn, function(req,res) {
+		
+		// prendere tutti gli ordini in stato payed o tobe verify e visualizzarli
+		//	quelli in tobeVerify commentare il momtivo
+		
+		// Using query builder
+	})
+
 // GET SHOP ===========================================================================
     app.get('/shop', isLoggedIn, function (req,res) {
     	
@@ -138,7 +147,7 @@ module.exports = function(app) {
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
 			if (err) {
-				console.log('Error deleting product to cart: ', err);
+				console.log('Error adding product to cart: ', err);
 				res.redirect('/shop');
 				return;
 			}
@@ -266,12 +275,13 @@ function isLoggedIn(req, res, next) {
     // if they aren't redirect them to the home page
     res.redirect('/login');
 }
-
+//-----------------------------------------------------------------------------
 function retriveCart (req, res) {
 	//Retrieve the shopping cart from memory
 	var cart = req.session.cart,
 	displayCart = {items: [], total: 0},
-	total = 0;
+	total = 0,
+	totalqty = 0
 
 	if (!cart) {
 		req.session.numProducts = 0;
@@ -282,10 +292,12 @@ function retriveCart (req, res) {
 			if (cart[item].qty > 0) {
 				displayCart.items.push(cart[item]);
 				total += (cart[item].qty * cart[item].price);
+				totalqty += cart[item].qty;
 			}
 		}
 		req.session.displayCart = displayCart;
 		req.session.total = displayCart.total = total.toFixed(2);
+		req.session.totalQty = totalqty;
 		req.session.numProducts = Object.keys(cart).length; 
 	}
 }

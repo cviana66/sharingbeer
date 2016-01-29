@@ -122,7 +122,24 @@ module.exports = function(passport) {
             if (user.status == 'new') {
                 User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
                     if (err) return done(err);
+                    //next();
                 });
+
+                // booze to add to parent for invitatition done
+                console.log('IDPARENT in AUTH (passport): ',user.idParent );
+                User.findOne({'_id': user.idParent }, function(err, parent) {
+
+                    parent.booze += (req.session.cost * req.session.change);
+                    
+                    User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
+                      if (err) {
+                        console.log('error', err);
+                        res.redirect('/???');
+                        return;
+                        }
+                    });     
+                });
+                
             } 
       
             return done(null, user);

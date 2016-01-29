@@ -16,6 +16,10 @@ module.exports = function(app, passport) {
     // =====================================
     // show the login form
     app.get('/login', function(req, res) {
+        //set session variable
+        req.session.cost = 3;
+        req.session.change = 1;
+
 
         // render the page and pass in any flash data if it exists
         res.render('login.dust', { message: req.flash('loginMessage') });

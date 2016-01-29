@@ -1,4 +1,4 @@
-module.exports = function(app, paypal) {
+module.exports = function(app, paypal, qr, fs) {
 
   var Order         = require('../app/models/order');
   var Item          = require('../app/models/item');
@@ -14,6 +14,14 @@ module.exports = function(app, paypal) {
   }
   
   app.locals.baseurl = 'http://' + address;
+
+
+//TEST ==================================================================================
+app.get('/qr', function(req, res) {  
+  var code = qr.image('sb-sharingbeer', { type: 'svg' });
+  res.type('svg');
+  code.pipe(res);
+});
 
 // GET PAYNOW ============================================================================
 
@@ -89,7 +97,7 @@ app.get('/paynow', isLoggedIn, function(req, res) {
   });
   
   if (!cart) {
-    //TODO manahement if not exisat cart ????
+    //TODO manahement if not exist cart ????
     console.log("Cart not exist");
   } else {
     //Prepare JSON Items for transactions
@@ -135,9 +143,10 @@ app.get('/paynow', isLoggedIn, function(req, res) {
       console.log(error);
     } else {
       if(payment.payer.payment_method === 'paypal') {
-        req.session.paymentId = payment.id;
+
         var redirectUrl;
         console.log(payment);
+        
         for(var i=0; i < payment.links.length; i++) {
           var link = payment.links[i];
           if (link.method === 'REDIRECT') {
@@ -153,7 +162,7 @@ app.get('/paynow', isLoggedIn, function(req, res) {
 // GET SUCCESS ===========================================================================
 app.get('/success',  function(req, res) {
 
-  var paymentId = req.session.paymentId;
+  var paymentId = req.param('paymentId');
   var payerId = req.param('PayerID');
   var details = { "payer_id": payerId };
 
@@ -165,8 +174,8 @@ app.get('/success',  function(req, res) {
   
   paypal.payment.execute(paymentId, details, function (error, payment) {
     if (error) {
-      console.log(error);
-      // TODO MANAEMET
+      console.log('EXECUTE PAYMENT: ' ,error);
+      // TODO MANAGEMENT
     } else {
 
       var payInfo = new PayInfo();
@@ -174,7 +183,7 @@ app.get('/success',  function(req, res) {
       payInfo.idPay   = paymentId;
       payInfo.idOrder = req.session.order.id;
       payInfo.state   = payment.state;
-      payInfo.esponseMsg = JSON.stringify(payment);
+      payInfo.responseMsg = JSON.stringify(payment);
 
       payInfo.save(function(err, payinfo) {
         if (err) {
@@ -191,28 +200,24 @@ app.get('/success',  function(req, res) {
       }else{
         status = 'tobeVerify';
       }
+
       
-      console.log('PAYMET STATUS : ', payment.state);
+      console.log('PAYMENT : ',  payment.transactions[0].amount);
+
       Order.findByIdAndUpdate(req.session.order.id, 
         { $set: { 
                   paypal: {
-                          paymentId: paymentId,
-                          payerId: payerId,                        
+                          paymentId : paymentId,
+                          payerId   : payerId, 
+                          intent    : payment.intent,
+                          method    : payment.payer.payment_method,  
+                          state     : payment.state,
+                          createTime: String(payment.create_time),
+                          updateTime: String(payment.update_time),
+                          totalAmount   : String(payment.transactions[0].amount.total),
+                          currencyAmount: payment.transactions[0].amount.currency
                         },
-                  status: 'payed'
-                }
-        }, 
-        function (err, req) {
-          if (err) {
-            console.log('error', err);
-            res.redirect('/');
-            return;
-          }
-      });
-
-      User.findByIdAndUpdate(req.user._id, 
-        { $set: { 
-                  possibleFriends : req.user.possibleFriends + 3
+                  status: status
                 }
         }, 
         function (err, req) {
@@ -223,11 +228,42 @@ app.get('/success',  function(req, res) {
           }
       });
 
-      if (status === 'payed')
-         res.redirect('/recomm')
+      if (status === 'payed') {
+        // add Friends after buy
+        User.findByIdAndUpdate(req.user._id, 
+          { $set: { 
+                    possibleFriends : req.user.possibleFriends + 3
+                  }
+          }, 
+          function (err, req) {
+            if (err) {
+              console.log('error', err);
+              res.redirect('/???');
+              return;
+            }
+        });
+
+        //add Booze to friend parent
+        User.findOne({'_id': req.user.idParent }, function(err, parent) {
+            
+              parent.booze +=  (req.session.cost * req.session.change * req.session.totalQty) /4 ;            
+              console.log('BOOZE', parent.booze);
+              
+              User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
+                  if (err) {
+                    console.log('error', err);
+                    res.redirect('/???');
+                    return;
+                  }
+              });            
+            
+        });
+      
+        res.redirect('/recomm')
         //console.log("Get Payment Response");
         //console.log(JSON.stringify(payment));      
 
+      };
     };
   });
 });
@@ -238,7 +274,38 @@ app.get('/cancel', function(req, res) {
   res.send("Payment canceled successfully.");
 });
 
-}
+// GET ORDER ===========================================================================
+app.get('/order', isLoggedIn, function(req, res) {
+  Order.find({idUser:req.user._id}, function(err, orders) {
+    
+    var displayOrder = {items: []};
+    
+    if (err) {
+      var error = 'Something bad happened! Please try again.';
+      console.log("error code: ",err.code);
+    } else {
+      
+      if (!orders) {
+        //TODO manahement if not exist order ????
+        console.log("Order not exist");
+      } else {
+      //Prepare JSON Items for transactions
+        for (var item in orders) {
+
+          if (orders[item].status != 'reserved') {
+            displayOrder.items.push(orders[item]);
+          }
+        }
+
+        var model = { order: displayOrder };
+        res.render('order.dust', model);
+      }
+    }
+
+  });
+});
+
+} //FINE APP
 
 // MIDDLEWARE ==========================================================================
 // route middleware to make sure a user is logged in 
