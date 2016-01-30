@@ -1,23 +1,27 @@
 {> "layouts/main" /}
-
 {<body}
+
 <div class="container">
   <div class="row">
-    <h3>Profile</a>
-    </h3>
-    <div class="main">
-      <hr class="hr">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
+    <h3>Profile</a></h3>
+    <hr class="hr" style="border-top: 1px solid #480413;"> 
+      {?message}
+      {#message}
+      <div class="alert alert-danger">{.}</div>
+      {/message}
+      {/message}
+
       <div class="row">
         <div class="col-sm-6 col-md-4">
           <img src="http://placehold.it/380x500" alt="" class="img-rounded img-responsive" />
         </div>
         {#user}
         <div class="col-sm-6 col-md-8">
-          <h4>
-            Bhaumik Patel</h4>
+          <h4> Bhaumik Patel</h4>
           <small>
-            <cite title="San Francisco, USA">San Francisco, USA <i class="glyphicon glyphicon-map-marker">
-                        </i></cite>
+            <cite title="San Francisco, USA">San Francisco, USA <i class="glyphicon glyphicon-map-marker"></i></cite>
           </small>
           <p>
             <i class="glyphicon glyphicon-envelope"></i>{.email}
@@ -30,7 +34,9 @@
         </div>
         {/user}
       </div>
-    </div>
+      </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
   </div>
 </div>
+
 {/body}

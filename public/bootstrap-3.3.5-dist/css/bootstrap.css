@@ -1097,12 +1097,12 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #337ab7;
+  color: #480413;
   text-decoration: none;
 }
 a:hover,
 a:focus {
-  color: #23527c;
+  color: #903246;
   text-decoration: underline;
 }
 a:focus {
@@ -1338,11 +1338,11 @@ mark,
   color: #777;
 }
 .text-primary {
-  color: #337ab7;
+  color: #480413;
 }
 a.text-primary:hover,
 a.text-primary:focus {
-  color: #286090;
+  color: #6B1628;
 }
 .text-success {
   color: #3c763d;

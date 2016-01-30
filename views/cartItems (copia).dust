@@ -7,30 +7,31 @@
 
         <div class="row">
           {#cart.items}
-          <div class="col-sm-12 col-lg-12 col-md-12 col-xs-12" >
-            <p class="text-primary"><strong> {.name} </strong> : descrizione del tipo di birra e riporto del nume pipp ipipip</p>
-          </div>
-        </div>
-
-
-        <div class="row">
           
-          <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6">          
-            <div class="col-sm-9 col-lg-4 col-md-4 col-xs-9">
-              <img class="img-responsive" src="http://placehold.it/80x100">
-            </div> 
-            <div class="col-sm-1 col-lg-3 col-md-3 col-xs-1">
-              <p class="text-primary"><strong>{.qty}</strong></p>
+          <div class="col-sm-7 col-lg-7 col-md-7 col-xs-7">          
+            <div class="col-sm-4 col-lg-4 col-md-4 col-xs-4">
+              <img class="img-responsive center-block" src="http://placehold.it/80x100">
             </div>
-            <div class="col-sm-1 col-lg-2 col-md-2 col-xs-1">
-              <p class="text-muted">x</p>
+            
+            <div class="col-sm-8 col-lg-8 col-md-8 col-xs-8" >
+              <div class="col-sm-12 col-lg-12 col-md-12 col-xs-12" >
+                <div class="col-sm-4 col-lg-4 col-md-4 col-xs-4">
+                  <p class="text-primary"><strong>{.qty}</strong></p>
+                </div>
+                <div class="col-sm-4 col-lg-4 col-md-4 col-xs-4">
+                  <p class="text-muted">x</p>
+                </div>
+                <div class="col-sm-4 col-lg-4 col-md-4 col-xs-4">    
+                  <p class="text-primary">{.prettyPrice} </p>
+                </div>
+              </div>
+              <div class="col-sm-12 col-lg-12 col-md-12 col-xs-12" >
+                <p class="text-primary"> {.name}: descrizione del tipo di birra e riporto del nume pipp ipipip</p>
+              </div>
             </div>
-            <div class="col-sm-1 col-lg-3 col-md-2 col-xs-1">    
-              <p class="text-primary">{.prettyPrice} </p>
-            </div>
-          </div>      
+          </div>
 
-          <div class="col-sm-2 col-lg-3 col-md-3 col-xs-3">
+          <div class="col-sm-2 col-lg-2 col-md-2 col-xs-2">
             <form method="POST" action="cart/plus">
               <input type="hidden" name="item_id" value="{.id}">
               <input type="hidden" name="_csrf" value="{_csrf}">
@@ -84,10 +85,13 @@
         {?cart.items}
         <div class="row" style="background-color:#FFBB35;border-bottom-right-radius:12px;border-bottom-left-radius:12px">
         <br>
-          <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6">                        
-            <h4 class="text-right">Total <strong>{cart.total}</strong></h4>            
+          <div class="col-sm-7 col-lg-7 col-md-7 col-xs-7">
+            <div class="col-sm-4 col-lg-4 col-md-4 col-xs-4"></div>
+            <div class="col-sm-8 col-lg-8 col-md-8 col-xs-8">
+              <h4 class="text-right">Total <strong>{cart.total}</strong></h4>
+            </div>
           </div>
-          <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6" >
+          <div class="col-sm-5 col-lg-5 col-md-5 col-xs-5" >
             <form method="GET" action="/register">
               <button type="submit" class="btn btn-primary center-block">
                 <h4>Checkout</h4>

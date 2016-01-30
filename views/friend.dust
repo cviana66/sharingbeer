@@ -9,12 +9,12 @@
 
       <h3><span style="color:#480413">Sign your Friends </span></h3>
       <hr class="hr" style="border-top: 1px solid #480413;">
-      <!-- show any messages that come back with authentication -->
-      {?message}
-      {#message}
-      <div class="alert alert-danger">{.}</div>
-      {/message}
-      {/message}
+      
+        {?message}
+        {#message}
+        <div class="alert alert-danger">{.}</div>
+        {/message}
+        {/message}
 
       <form role="form" action="/recomm" method="POST">
         <!--input type="hidden", name="_csrf", value="csrfToken" -->

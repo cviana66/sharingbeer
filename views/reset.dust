@@ -15,7 +15,8 @@
       {/message}
       {/message}
 
-      <form role="form" action="/login" method="post">
+      <form role="form" action="/reset" method="post">
+        <input type="hidden" name="token" value="{token}">
         <div class="form-group">
           <label for="inputPassword">Password</label>
           <input type="password" class="form-control" id="inputPassword" name="password" autofocus>
@@ -27,7 +28,7 @@
         </div>
         
         <button type="submit" class="btn btn btn-primary">
-          <h4>Log In</h4>
+          <h4>Update Password</h4>
         </button>
       </form>
       <br>

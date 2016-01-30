@@ -2,15 +2,20 @@
 
 {<body}
 
+<div class="container">
   <div class="row">
-    <div id="slider" class="form">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
+
+      <h3><span style="color:#480413">Beer Shop</span></h3>
+      <hr class="hr" style="border-top: 1px solid #480413;">
 
       {#products}
       <form method="POST" action="shop">
         <input type="hidden" name="item_id" value="{.id}">
         <input type="hidden" name="_csrf" value="{_csrf}">
 
-        <div class="col-sm-3 col-lg-3 col-md-3 col-xs-12">
+        <div class="col-sm-6 col-lg-6 col-md-6 col-xs-12">
           <div class="thumbnail">
             <img src="http://placehold.it/280x120" class="img-rounded" alt="">
 
@@ -32,7 +37,8 @@
       {/products}
     
     </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
   </div>
-
+</div>
 
 {/body}

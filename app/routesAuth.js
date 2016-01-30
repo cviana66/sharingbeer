@@ -1,7 +1,6 @@
 // app/routes.js
 
 var transporter   = require('../config/mailerMailgun');
-var async         = require('async');
 var crypto        = require('crypto');
 var User          = require('../app/models/user');
 
@@ -125,7 +124,7 @@ module.exports = function(app, passport) {
                 subject: 'SharingBeer Password Reset',
                 text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
                   'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-                  'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+                  'http://' + req.headers.host + '/reset?token=' + token + '\n\n' +
                   'If you did not request this, please ignore this email and your password will remain unchanged.\n'
               };
           
@@ -143,13 +142,38 @@ module.exports = function(app, passport) {
         });      
     });
 
-  app.get('/reset/:token', function(req, res) {
-    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+  app.get('/reset', function(req, res) {
+    User.findOne({ resetPasswordToken: req.param('token'), resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
       if (!user) {
         req.flash('error', 'Password reset token is invalid or has expired.');
         res.render('forgot.dust', {message: req.flash('error')});
       } else {
-        res.render('reset.dust', { user: req.user });
+        res.render('reset.dust', { user: req.user, token:req.param('token') });
+      };
+    });
+  });
+
+  app.post('/reset', function(req, res) {
+    console.log('TOKEN RESET: ', req.param('token'));
+    User.findOne({ resetPasswordToken: req.param('token'), resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+      if (!user) {
+        req.flash('error', 'Password reset token is invalid or has expired.');
+        res.render('forgot.dust', {message: req.flash('error')});          
+      } else {
+        user.password = req.body.password;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        user.save(function(err) {
+          if(err){
+              return console.log('ERROR: ', err);
+          } else {
+            req.logIn(user, function(err) {
+              req.flash('success', 'Success! Your password has been changed.'); 
+              res.render('profile.dust', { user: req.user, message: req.flash('success')});
+            });
+          };
+        });
       };
     });
   });
