@@ -1,33 +1,49 @@
 {
-  "name": "OpenShift-Sample-App",
+  "name": "sharingbeer",
   "version": "1.0.0",
-  "description": "OpenShift Sample Application",
+  "description": " SharingBeer Application",
   "keywords": [
-    "OpenShift",
     "Node.js",
-    "application",
-    "openshift"
+    "application"
   ],
-  "author": {
-    "name": "OpenShift",
-    "email": "ramr@example.org",
-    "url": "http://www.openshift.com/"
-  },
-  "homepage": "http://www.openshift.com/",
+  "author": "CarloV <cviana66@gmail,com> (http://www.SharingBeer.com/)",
+  "homepage": "http://www.SharingBeer.com/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/openshift/origin-server"
+    "url": "git+https://github.com/cviana66/sharingbeer.git"
   },
   "engines": {
-    "node": ">= 0.6.0",
-    "npm": ">= 1.0.0"
+    "node": ">= 8.0.0",
+    "npm": ">= 6.0.0"
   },
   "dependencies": {
-    "express": "~3.4.4",
-    "qr-image": "^3.1.0"
+    "bcrypt-nodejs": "0.0.3",
+    "connect-flash": "^0.1.1",
+    "consolidate": "^0.15.1",
+    "cookie-parser": "^1.4.3",
+    "dustjs-linkedin": "^2.7.5",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "method-override": "^3.0.0",
+    "mongoose": "^5.3.13",
+    "morgan": "^1.9.1",
+    "nodemailer": "^4.7.0",
+    "nodemailer-mailgun-transport": "^1.4.0",
+    "passport": "^0.4.0",
+    "passport-facebook": "^2.1.1",
+    "passport-local": "^1.0.0",
+    "paypal-rest-sdk": "^1.8.1",
+    "qr-image": "^3.2.0"
   },
   "devDependencies": {},
   "bundleDependencies": [],
   "private": true,
-  "main": "server.js"
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "bugs": {
+    "url": "https://github.com/cviana66/sharingbeer/issues"
+  },
+  "license": "ISC"
 }

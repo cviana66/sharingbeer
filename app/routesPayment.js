@@ -8,7 +8,7 @@ module.exports = function(app, paypal, qr, fs) {
 
   var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
   if (typeof ipaddress === "undefined") {
-      address = "127.0.0.1:8080";
+      address = "127.0.0.1:8089";
   } else {
       address = "sb-sharingbeer.rhcloud.com";
   }

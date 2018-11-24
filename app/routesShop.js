@@ -22,7 +22,7 @@ module.exports = function(app) {
 	app.post("/order", isLoggedIn, function(req,res) {
 		
 		// prendere tutti gli ordini in stato payed o tobe verify e visualizzarli
-		//	quelli in tobeVerify commentare il momtivo
+		//	quelli in tobeVerify commentare il motivo
 		
 		// Using query builder
 	})
@@ -94,7 +94,7 @@ module.exports = function(app) {
 // GET CART ============================================================================
 	app.get('/cart', isLoggedIn, function (req, res) {
 
-		//Retrieve the shopping cart from memory
+		//Retrieve the shopping cart from session
 		retriveCart(req,res);
 
 			var model = { 	user: req.user,
@@ -104,7 +104,6 @@ module.exports = function(app) {
 
     	res.render('cart.dust', model);
 	});
-
 
 
 // POST CART MINUS ====================================================================

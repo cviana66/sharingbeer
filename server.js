@@ -64,12 +64,12 @@ var SharingBeer = function() {
     self.setupVariables = function() {
         //  Set the environment variables we need.
         self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-        self.port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+        self.port      = process.env.OPENSHIFT_NODEJS_PORT || 8089;
 
         if (typeof self.ipaddress === "undefined") {
             //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
             //  allows us to run/test the app locally.
-            console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
+            console.warn('No REMOTE SERVER IP, using 127.0.0.1');
             self.ipaddress = "127.0.0.1";
         };
     };
@@ -87,8 +87,6 @@ var SharingBeer = function() {
         }
         console.log('%s: Node server stopped.', Date(Date.now()) );
     };
-
-
     /**
      *  Setup termination handlers (for exit and a list of signals).
      */
@@ -125,7 +123,7 @@ var SharingBeer = function() {
     self.initializeServer = function() {
         self.app = express();
         paypal.configure(configPayPal.api);
-        db.on('error', console.error.bind(console, 'connection error:'));
+        db.on('error', console.error.bind(console, 'DataBase connection error:'));
         db.once('open', function callback() {
             console.log('db connection open');
         }); 
@@ -147,7 +145,7 @@ var SharingBeer = function() {
         self.app.set('view engine', 'dust'); // set up dust for templating
 
         // required for passport
-        self.app.use(session({ secret: 'Sam66Kar' })); // session secret
+        self.app.use(session({ secret: '1234567890' })); // session secret
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
         self.app.use(flash()); // use connect-flash for flash messages stored in session        
@@ -185,7 +183,7 @@ var SharingBeer = function() {
 /**
  *  main():  Main code.
  */
-var zapp = new SharingBeer();
-zapp.initialize();
-zapp.start();
+var sb = new SharingBeer();
+sb.initialize();
+sb.start();
 

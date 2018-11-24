@@ -1,4 +1,4 @@
-/* Copyright 2015 PayPal */
+/* Copyright 2015-2016 PayPal, Inc. */
 "use strict";
 var https = require('https');
 var isArray = Array.isArray;
