@@ -24,6 +24,7 @@
     "dustjs-linkedin": "^2.7.5",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
+    "https": "^1.0.0",
     "method-override": "^3.0.0",
     "mongoose": "^5.3.13",
     "morgan": "^1.9.1",

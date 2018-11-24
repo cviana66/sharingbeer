@@ -18,7 +18,9 @@ var cons = require('consolidate');
 
 // config and connect to our database
 var configDB = require('./config/database.js');
-mongoose.connect(configDB.url);
+mongoose.connect(configDB.url, 
+                 {useCreateIndex: true,
+                  useNewUrlParser: true});
 var db = mongoose.connection;
 
 
@@ -132,7 +134,7 @@ var SharingBeer = function() {
         // set up our express application
         self.app.use(morgan('dev')); // log every request to the console
         self.app.use(cookieParser()); // read cookies (needed for auth)
-        self.app.use(bodyParser()); // get information from html forms
+        self.app.use(bodyParser.urlencoded({extended: true})); // get information from html forms
 
         //To serve static files such as images, CSS files, and JavaScript files
         self.app.use(express.static(__dirname + '/public'));
@@ -145,7 +147,11 @@ var SharingBeer = function() {
         self.app.set('view engine', 'dust'); // set up dust for templating
 
         // required for passport
-        self.app.use(session({ secret: '1234567890' })); // session secret
+        self.app.use(session({secret: '1234567890', 
+                              saveUninitialized: true,
+                              resave: true
+                            })); // session secret
+
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
         self.app.use(flash()); // use connect-flash for flash messages stored in session        
