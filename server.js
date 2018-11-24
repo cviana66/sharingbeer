@@ -65,14 +65,13 @@ var SharingBeer = function() {
      */
     self.setupVariables = function() {
         //  Set the environment variables we need.
-        self.ipaddress = process.env.IP;
+        //self.ipaddress = process.env.IP;
         self.port      = process.env.PORT || 8080;
 
-        if (typeof self.ipaddress === "undefined") {
-            //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
-            //  allows us to run/test the app locally.
-            console.warn('No REMOTE SERVER IP, using 127.0.0.1');
-            self.ipaddress = "127.0.0.1";
+        if (typeof self.port === 8080) {
+            console.warn('LOCAL SERVER');
+        } else {
+            console.warn('REMOTE SERVER');
         };
     };
 
@@ -149,7 +148,8 @@ var SharingBeer = function() {
         // required for passport
         self.app.use(session({secret: '1234567890', 
                               saveUninitialized: true,
-                              resave: true
+                              resave: true,
+                              cookie: { secure: false }
                             })); // session secret
 
         self.app.use(passport.initialize());
@@ -176,9 +176,9 @@ var SharingBeer = function() {
      */
     self.start = function() {
         //  Start the app on the specific interface (and port).
-        self.app.listen(self.port, self.ipaddress, function() {
-            console.log('%s: Node server started on %s:%d ...',
-                        Date(Date.now() ), self.ipaddress, self.port);
+        self.app.listen(self.port, function() {
+            console.log('Node server started: %s',
+                        Date(Date.now() ));
         });
     };
 
