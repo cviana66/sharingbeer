@@ -1,9 +1,3 @@
-|^^^^^^^^^^^^^|
-| Sharingbeer |
-|_____________|
 
-========
-La birreria a casa tua
---------
-The beer at ypur house
-========
+Sharingbeer 
+La birreria a casa tua <-§-> The beer at your home
