@@ -286,7 +286,7 @@ function retriveCart (req, res) {
 		req.session.numProducts = 0;
 	} else {
 
-		//Ready the products for display
+		//Read the products for display
 		for (var item in cart) {
 			if (cart[item].qty > 0) {
 				displayCart.items.push(cart[item]);

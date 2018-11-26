@@ -1,19 +1,19 @@
 module.exports = function(app, paypal, qr, fs) {
 
-  var Order         = require('../app/models/order');
-  var Item          = require('../app/models/item');
-  var PayInfo       = require('../app/models/payinfo');
-  var User         = require('../app/models/user');
+  var Order   = require('../app/models/order');
+  var Item    = require('../app/models/item');
+  var PayInfo = require('../app/models/payinfo');
+  var User    = require('../app/models/user');
 
 
-  var ipaddress = process.env.OPENSHIFT_NODEJS_IP;
-  if (typeof ipaddress === "undefined") {
-      address = "127.0.0.1:8089";
+  var port = process.env.port;
+  if (port === 8080) {
+      address = "htpp://127.0.0.1:8080";
   } else {
-      address = "sb-sharingbeer.rhcloud.com";
+      address = "https://sharingbeer.herokuapp.com";
   }
   
-  app.locals.baseurl = 'http://' + address;
+  app.locals.baseurl = address;
 
 
 //TEST ==================================================================================
@@ -67,7 +67,7 @@ app.get('/paynow', isLoggedIn, function(req, res) {
       //price     : { type: Number}
     
       if (!cart) {
-          //TODO manahement if not exisat cart ????
+          //TODO manahement if not exist cart ????
           console.log("Cart not exist");
       } else {
         //Insert Product in cart into Item
@@ -246,7 +246,7 @@ app.get('/success',  function(req, res) {
         //add Booze to friend parent
         User.findOne({'_id': req.user.idParent }, function(err, parent) {
             
-              parent.booze +=  (req.session.cost * req.session.change * req.session.totalQty) /4 ;            
+              parent.booze +=  ( 3 * req.session.totalQty) /4 ;            
               console.log('BOOZE', parent.booze);
               
               User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {

@@ -1,14 +1,14 @@
 // config/passport.js
 
 // load all the things we need
-var LocalStrategy     = require('passport-local').Strategy;
-var FacebookStrategy  = require('passport-facebook').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
+//var FacebookStrategy  = require('passport-facebook').Strategy;
 
 // load up the user model
-var User            = require('../app/models/user');
+var User = require('../app/models/user');
 
 //var transporter     = require('./mailerXOAuth2');
-var transporter     = require('./mailerMailgun');
+var transporter = require('./mailerMailgun');
 
 // load the auth variables
 var configAuth = require('./auth');
@@ -45,45 +45,42 @@ module.exports = function(passport) {
         usernameField : 'email',
         passwordField : 'password',
         passReqToCallback : true // allows us to pass back the entire request to the callback
-    },
-    function(req, email, password, done) {
+        },
+        function(req, email, password, done) {
 
-        // asynchronous
-        // User.findOne wont fire unless data is sent back
-        process.nextTick(function() {
+            // asynchronous
+            // User.findOne wont fire unless data is sent back
+            process.nextTick(function() {
 
-        console.log("signup");
-        // find a user whose email is the same as the forms email
-        // we are checking to see if the user trying to login already exists
-        User.findOne({ 'email' :  email }, function(err, user) {
-            // if there are any errors, return the error
-            if (err)
-                return done(err);
+                console.log("signup");
+                // find a user whose email is the same as the forms email
+                // we are checking to see if the user trying to login already exists
+                User.findOne({ 'email' :  email }, function(err, user) {
+                    
+                    // if there are any errors, return the error
+                    if (err) { return done(err); }
+                    
+                    // check to see if theres already a user with that email
+                    if (user) {
+                        return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
+                    } else {
 
-            // check to see if theres already a user with that email
-            if (user) {
-                return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
-            } else {
+                        // if there is no user with that email create the user
+                        var newUser = new User();
 
-                // if there is no user with that email
-                // create the user
-                var newUser            = new User();
+                        // set the user's local credentials
+                        newUser.email    = email;
+                        newUser.password = newUser.generateHash(password);
 
-                // set the user's local credentials
-                newUser.email    = email;
-                newUser.password = newUser.generateHash(password);
-
-                // save the user
-                newUser.save(function(err) {
-                    if (err)
-                        throw err;
-                    return done(null, newUser);
+                        // save the user
+                        newUser.save(function(err) {
+                            if (err)
+                                throw err;
+                            return done(null, newUser);
+                        });
+                    }
                 });
-            }
-
-        });
-
-        });
+            });
 
     }));
     // =========================================================================
@@ -97,55 +94,66 @@ module.exports = function(passport) {
         usernameField : 'email',
         passwordField : 'password',
         passReqToCallback : true // allows us to pass back the entire request to the callback
-    },
-    function(req, email, password, done) { // callback with email and password from our form
-        console.log("login");
-        // find a user whose email is the same as the forms email
-        // we are checking to see if the user trying to login already exists
-        User.findOne({ 'email' :  email }, function(err, user) {
-            // if there are any errors, return the error before anything else
-            if (err)
-                return done(err);
+        },
+        function(req, email, password, done) { // callback with email and password from our form
+            
+            console.log("login");
+            
+            // find a user whose email is the same as the forms email
+            // we are checking to see if the user trying to login already exists
+            User.findOne({ 'email' :  email }, function(err, user) {
+                // if there are any errors, return the error before anything else
+                if (err)
+                    return done(err);
 
-            // if no user is found, return the message
-            if (!user)
-                return done(null, false, req.flash('loginMessage', 'No user found.')); // req.flash is the way to set flashdata using connect-flash
+                // if no user is found, return the message
+                if (!user)
+                    // req.flash is the way to set flashdata using connect-flash
+                    return done(null, false, req.flash('loginMessage', 'No user found.')); 
 
-            // if the user is found but the password is wrong
-            if (!user.validPassword(password))
-                return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
+                // if the user is found but the password is wrong, return the message
+                if (!user.validPassword(password))
+                    // create the loginMessage and save it to session as flashdata
+                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); 
 
-            // all is well, return successful user
-            console.log('id: ', user._id);
+                // all is well, return successful user
+                console.log('id: ', user._id);
 
-            // if the user is in status "new" then this is the first access --> validation put status = confirmed
-            if (user.status == 'new') {
-                User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
-                    if (err) return done(err);
-                    //next();
-                });
+                // if the user is in status "new" then this is the first access --> validation put status = confirmed
+                if (user.status == 'new') {
+                    User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
+                        
+                        if (err) { 
+                            console.log('error', err);
+                            return done(err) }
+                        else {
 
-                // booze to add to parent for invitatition done
-                console.log('IDPARENT in AUTH (passport): ',user.idParent );
-                User.findOne({'_id': user.idParent }, function(err, parent) {
+                            // booze to add to parent for invitatition done
+                            User.findOne({'_id': user.idParent }, function(err, parent) {
+                                // if there are any errors, return the error
+                                if (err) { return done(err); }
 
-                    parent.booze += (req.session.cost * req.session.change);
-                    
-                    User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
-                      if (err) {
-                        console.log('error', err);
-                        res.redirect('/???');
-                        return;
-                        }
-                    });     
-                });
-                
-            } 
-      
-            return done(null, user);
-        });
+                                console.log('PARENT ID: ', parent._id);
 
-    }));
+                                parent.booze += 3;
+                                
+                                User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req, res) {
+                                  
+                                  if (err) { 
+                                    console.log('error', err);
+                                    res.redirect('/profile');
+                                    return;
+                                    }
+                                });     
+                            });
+                        };
+                    });
+                } 
+                return done(null, user)
+            });
+        }
+    ));
+    /*
     // =========================================================================
     // FACEBOOK ================================================================
     // =========================================================================
@@ -162,7 +170,8 @@ module.exports = function(passport) {
     function(token, refreshToken, profile, done) {
 
         // asynchronous
-        process.nextTick(function() {
+        process.
+        nextTick(function() {
 
             // find the user in the database based on their facebook id
             User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
@@ -196,5 +205,5 @@ module.exports = function(passport) {
                 }
             });
         });
-    }));
+    })); */
 };

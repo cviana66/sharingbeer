@@ -1,7 +1,7 @@
 #!/bin/env node
 //  OpenShift sample Node application
-var express = require('express');
-var fs      = require('fs');
+var express  = require('express');
+var fs       = require('fs');
 var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
@@ -18,11 +18,9 @@ var cons = require('consolidate');
 
 // config and connect to our database
 var configDB = require('./config/database.js');
-mongoose.connect(configDB.url, 
-                 {useCreateIndex: true,
-                  useNewUrlParser: true});
+mongoose.connect(configDB.url, {useCreateIndex: true,
+                                useNewUrlParser: true});
 var db = mongoose.connection;
-
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
 var methodOverride = require('method-override');
@@ -55,7 +53,6 @@ var SharingBeer = function() {
     //  Scope.
     var self = this;
 
-
     /*  ================================================================  */
     /*  Helper functions.                                                 */
     /*  ================================================================  */
@@ -65,13 +62,12 @@ var SharingBeer = function() {
      */
     self.setupVariables = function() {
         //  Set the environment variables we need.
-        //self.ipaddress = process.env.IP;
         self.port      = process.env.PORT || 8080;
 
-        if (typeof self.port === 8080) {
-            console.warn('LOCAL SERVER');
+        if ( self.port === 8080 ) {
+            console.log('LOCAL SERVER, PORT: ', self.port);
         } else {
-            console.warn('REMOTE SERVER');
+            console.log('REMOTE SERVER, PORT: ', self.port);
         };
     };
 
@@ -128,7 +124,6 @@ var SharingBeer = function() {
         db.once('open', function callback() {
             console.log('db connection open');
         }); 
-        pass(passport);
 
         // set up our express application
         self.app.use(morgan('dev')); // log every request to the console
@@ -145,13 +140,14 @@ var SharingBeer = function() {
         self.app.set('views', __dirname + '/views');
         self.app.set('view engine', 'dust'); // set up dust for templating
 
-        // required for passport
+        // required for passport and session for persistent login
+        pass(passport);
         self.app.use(session({secret: '1234567890', 
                               saveUninitialized: true,
                               resave: true,
-                              cookie: { secure: false }
+                              cookie: { secure: false,
+                                        expires: 600000 }
                             })); // session secret
-
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
         self.app.use(flash()); // use connect-flash for flash messages stored in session        
@@ -177,14 +173,11 @@ var SharingBeer = function() {
     self.start = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, function() {
-            console.log('Node server started: %s',
-                        Date(Date.now() ));
+            console.log('Node server started: %s',Date(Date.now() ));
         });
     };
 
 };   /*  Sample Application.  */
-
-
 
 /**
  *  main():  Main code.
@@ -193,3 +186,12 @@ var sb = new SharingBeer();
 sb.initialize();
 sb.start();
 
+/*  =========================================================================        
+    |                 NOTE DI FUNZIONAMENTO DI PROCESSO                     |
+    | 1) E'ad invito quindi non è disponibile la funzionalità di SIGN-UP    | 
+*/
+
+/*  =========================================================================        
+    |                               TODO                                    |
+    | 1) Funzionalità amministrativa di cancellazione di un user            | 
+*/

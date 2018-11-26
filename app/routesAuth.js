@@ -6,9 +6,9 @@ var User          = require('../app/models/user');
 
 module.exports = function(app, passport) {
 
-  // =====================================
-  // HOME PAGE (with login links) ========
-  // =====================================
+// =====================================
+// HOME PAGE (with login links) ========
+// =====================================
   app.get('/', function(req, res) {
       res.render('index.dust', {
           user: req.user,
@@ -16,16 +16,11 @@ module.exports = function(app, passport) {
       }); // load the index.ejs file
   });
 
-  // =====================================
-  // LOGIN ===============================
-  // =====================================
+// =====================================
+// LOGIN ===============================
+// =====================================
   // show the login form
   app.get('/login', function(req, res) {
-      //set session variable
-      req.session.cost = 3;
-      req.session.change = 1;
-
-
       // render the page and pass in any flash data if it exists
       res.render('login.dust', { message: req.flash('loginMessage') });
   });
@@ -37,9 +32,9 @@ module.exports = function(app, passport) {
       failureFlash : true // allow flash messages
   }));
 
-  // =====================================
-  // SIGNUP ==============================
-  // =====================================
+// =====================================
+// SIGNUP ==============================
+// =====================================
   // show the signup form
   app.get('/signup', isLoggedIn, function(req, res) {
 
@@ -57,9 +52,9 @@ module.exports = function(app, passport) {
       failureFlash : true // allow flash messages
   }));
 
-  // =====================================
-  // PROFILE SECTION =====================
-  // =====================================
+// =====================================
+// PROFILE SECTION =====================
+// =====================================
   // we will want this protected so you have to be logged in to visit
   // we will use route middleware to verify this (the isLoggedIn function)
   app.get('/profile', isLoggedIn, function(req, res) {
@@ -83,18 +78,18 @@ module.exports = function(app, passport) {
       }));
 
 
-  // =====================================
-  // LOGOUT ==============================
-  // =====================================
-  app.get('/logout', function(req, res) {
+// =====================================
+// LOGOUT ==============================
+// =====================================
+app.get('/logout', function(req, res) {
       req.session.destroy();
       req.logout();
       res.redirect('/');
   });
 
-  // =====================================
-  // FORGOT ==============================
-  // =====================================
+// =====================================
+// FORGOT ==============================
+// =====================================
   app.get('/forgot', function(req, res) {
       res.render('forgot', {
         user: req.user

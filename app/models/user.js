@@ -63,9 +63,13 @@ userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
 
+/*
+https://www.npmjs.com/package/bcrypt
+
+
 userSchema.pre('save', function(next) {
   var user = this;
-  var SALT_FACTOR = 8;
+  var saltRounds = 8;
 
   if (!user.isModified('password')) return next();
 
@@ -79,6 +83,7 @@ userSchema.pre('save', function(next) {
     });
   });
 });
+*/
 
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);

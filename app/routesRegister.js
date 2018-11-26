@@ -2,13 +2,13 @@
 // FRIENDS MANAGEMENT ==========================================================
 // =============================================================================
 //var transporter     = require('./mailerXOAuth2');
-var transporter     = require('../config/mailerMailgun');
+var transporter = require('../config/mailerMailgun');
 
-var mailfriend       = require('../config/mailFriend');
+var mailfriend = require('../config/mailFriend');
 
 // load up the user model
-var User						= require('../app/models/user');
-var Friend					= require('../app/models/friend');
+var User	= require('../app/models/user');
+var Friend = require('../app/models/friend');
 
 
 module.exports = function(app) {
@@ -33,12 +33,12 @@ app.get('/test', function(req, res) {
         firstName : req.user.name.first
       });
     
-    } else if (req.user.status == 'customer') {
-      res.redirect('/paynow');
+    } else if (req.user.status == 'customer' && req.session.numProducts > 0) {
+      res.redirect('/paynow'); 
     
     } else {
       console.log('User: ', req.user);
-      res.redirect('/');
+      res.redirect('/shop');
     } 
   });
 
@@ -85,7 +85,7 @@ app.get('/test', function(req, res) {
 
 
         if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
-          error = "You have no more invitations! Please buy more RoL beer";
+          req.flash('error', "You have no more invitations! Please buy more beer");
           controlSates = "disabled";
           flag = "true";
         }
@@ -93,7 +93,7 @@ app.get('/test', function(req, res) {
         res.render('friend.dust', {
           controlSates: controlSates, 
           flag : flag,
-          message: error,
+          message: req.flash('error'),
           user: req.user,
           invitationAvailable: req.session.invitationAvailable,
           friendsInvited:  req.session.friendsInvited,
@@ -108,31 +108,31 @@ app.get('/test', function(req, res) {
 	app.post('/recomm',isLoggedIn, function(req, res) {
 
     if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
-          error = "You have no more invitations! Please buy more RoL beer";
+          req.flash('error',"You have no more invitations! Please buy more beer");
           res.redirect('/recomm')
     };   
 
 		var password = generatePassword(6);
     var newUser = new User();
     // set the user's local credentials
-		newUser.email    = 	req.body.email;
-    newUser.password = newUser.generateHash(password);
-    newUser.name.first = capitalizeFirstLetter(req.body.firstName);
-    newUser.idParent = req.user._id; //id parent
-    newUser.status = 'new'; // status
+		newUser.email       = req.body.email;
+    newUser.password    = newUser.generateHash(password);
+    newUser.name.first  = capitalizeFirstLetter(req.body.firstName);
+    newUser.idParent    = req.user._id; //id parent
+    newUser.status      = 'new'; // status
 
     console.log(newUser);
 
     newUser.save(function(err) {
 			if (err) {
-				var error = 'Something bad happened! Please try again.';
+				req.flash('error','Something bad happened! Please try again');
         console.log("error code: ",err.code);
 
 				if (err.code === 11000) { //duplicate key: email
-					error = 'That email is already taken, please try another.';
+					req.flash('error','That email is already taken, please try another');
 				}
 
-				res.render('friend.dust', { message: error,
+				res.render('friend.dust', { message: req.flash('error'),
                                     invitationAvailable: req.session.invitationAvailable,
                                     friendsInvited:  req.session.friendsInvited,
                                     percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
@@ -147,11 +147,11 @@ app.get('/test', function(req, res) {
 
         newFriend.save(function(err) {
           if (err) {
-            var error = 'Something bad happened! Please try again.';
+            req.flash('error','Something bad happened! Please try again');
 						//remove Friend from User
 						User.fndOne({ 'email' :  newUser.email }).remove(callback);
             //render for message display
-						res.render('friend.dust', { message: error,
+						res.render('friend.dust', { message: req.flash('error'),
                                         invitationAvailable: req.session.invitationAvailable,
                                         friendsInvited:  req.session.friendsInvited,
                                         percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
@@ -159,7 +159,11 @@ app.get('/test', function(req, res) {
           }
         });
         // send email to Friend
-        sendmailToFriend(capitalizeFirstLetter(req.body.firstName), newUser.email, password, req.user.name.first, req.user.name.last, req.user.email);
+        sendmailToFriend(capitalizeFirstLetter(req.body.firstName), 
+                                               newUser.email, password, 
+                                               req.user.name.first, 
+                                               req.user.name.last, 
+                                               req.user.email);
         // send mail to Parent
         // decrement number of freinds 
         // increment NeXO (New eXchange Open)
