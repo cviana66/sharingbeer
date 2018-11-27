@@ -149,10 +149,13 @@ var SharingBeer = function() {
                               cookie: { secure: false, 
                                         expires: 600000 }
                             })); // session secret
+        /*
         if (self.app.get('env') === 'production') {
             //self.app.set('trust proxy', 1); // trust first proxy
             self.app.use(session.cookie.secure = true); // serve secure cookies
         }
+        */
+
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
         self.app.use(flash()); // use connect-flash for flash messages stored in session        
