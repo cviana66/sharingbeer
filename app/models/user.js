@@ -65,8 +65,7 @@ userSchema.methods.validPassword = function(password) {
 
 /*
 https://www.npmjs.com/package/bcrypt
-
-
+????? non so a cosa foss utilizzato. Fose un prototipo di cambio password ?????
 userSchema.pre('save', function(next) {
   var user = this;
   var saltRounds = 8;
