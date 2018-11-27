@@ -142,7 +142,7 @@ var SharingBeer = function() {
 
         // required for passport and session for persistent login
         pass(passport);
-
+        
         self.app.use(session({secret: '1234567890', 
                               saveUninitialized: true,
                               resave: true,
@@ -150,8 +150,8 @@ var SharingBeer = function() {
                                         expires: 600000 }
                             })); // session secret
         if (self.app.get('env') === 'production') {
-            self.app.set('trust proxy', 1) // trust first proxy
-            self.app.use(session.cookie.secure = true) // serve secure cookies
+            //self.app.set('trust proxy', 1); // trust first proxy
+            self.app.use(session.cookie.secure = true); // serve secure cookies
         }
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
