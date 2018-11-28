@@ -149,19 +149,30 @@ var SharingBeer = function() {
                               cookie: { secure: false, 
                                         expires: 600000 }
                             })); // session secret
+        
         console.log('ENV: ', self.app.get('env'))
-        /*
-        if (self.app.get('env') === 'production') {
-            //self.app.set('trust proxy', 1); // trust first proxy
-            self.app.use(session.cookie.secure = true); // serve secure cookies
+
+        if (self.app.get('env') === 'development') {
+            self.app.use(session({secret: '1234567890', 
+                              saveUninitialized: true,
+                              resave: true,
+                              cookie: { secure: false, 
+                                        expires: 600000 }
+                            }));
+        } else {
+            self.app.set('trust proxy', 1); // trust first proxy
+            self.app.use(session({secret: '1234567890', 
+                              saveUninitialized: true,
+                              resave: true,
+                              cookie: { secure: true, // serve secure cookies
+                                        expires: 600000 }
+                            }));
         }
-        */
 
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
         self.app.use(flash()); // use connect-flash for flash messages stored in session        
     };
-
 
     /**
      *  Initializes the sample application.
