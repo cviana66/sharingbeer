@@ -149,6 +149,7 @@ var SharingBeer = function() {
                               cookie: { secure: false, 
                                         expires: 600000 }
                             })); // session secret
+        console.log('ENV: ', self.app.get('env'))
         /*
         if (self.app.get('env') === 'production') {
             //self.app.set('trust proxy', 1); // trust first proxy
