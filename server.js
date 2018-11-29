@@ -44,6 +44,7 @@ var pass            = require('./config/passport');
 
 var configPayPal = require('./config/paypal.js');
 
+global.cost = 3;
 
 /**
  *  Define the sample application.
@@ -126,7 +127,6 @@ var SharingBeer = function() {
         }); 
 
         // set up our express application
-        self.app.use(morgan('dev')); // log every request to the console
         self.app.use(cookieParser()); // read cookies (needed for auth)
         self.app.use(bodyParser.urlencoded({extended: true})); // get information from html forms
 
@@ -143,16 +143,10 @@ var SharingBeer = function() {
         // required for passport and session for persistent login
         pass(passport);
         
-        self.app.use(session({secret: '1234567890', 
-                              saveUninitialized: true,
-                              resave: true,
-                              cookie: { secure: false, 
-                                        expires: 600000 }
-                            })); // session secret
-        
         console.log('ENV: ', self.app.get('env'))
 
         if (self.app.get('env') === 'development') {
+            self.app.use(morgan('dev')); // log every request to the console
             self.app.use(session({secret: '1234567890', 
                               saveUninitialized: true,
                               resave: true,

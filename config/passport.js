@@ -97,7 +97,7 @@ module.exports = function(passport) {
         },
         function(req, email, password, done) { // callback with email and password from our form
             
-            console.log("login");
+            console.log("LOGIN");
             
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
@@ -117,7 +117,7 @@ module.exports = function(passport) {
                     return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); 
 
                 // all is well, return successful user
-                console.log('id: ', user._id);
+                console.log('ID PASSPORT: ', user._id);
 
                 // if the user is in status "new" then this is the first access --> validation put status = confirmed
                 if (user.status == 'new') {
@@ -135,7 +135,7 @@ module.exports = function(passport) {
 
                                 console.log('PARENT ID: ', parent._id);
 
-                                parent.booze += 3;
+                                parent.booze += global.cost; //add Booze to Parent
                                 
                                 User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req, res) {
                                   

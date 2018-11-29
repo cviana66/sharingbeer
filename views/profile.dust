@@ -14,26 +14,32 @@
       {/message}
 
       <div class="row">
-        <div class="col-sm-6 col-md-4">
-          <img src="http://placehold.it/380x500" alt="" class="img-rounded img-responsive" />
-        </div>
         {#user}
         <div class="col-sm-6 col-md-8">
-          <h4> Bhaumik Patel</h4>
-          <small>
-            <cite title="San Francisco, USA">San Francisco, USA <i class="glyphicon glyphicon-map-marker"></i></cite>
-          </small>
+          <h4> {.name.first} {.name.last}</h4>
           <p>
             <i class="glyphicon glyphicon-envelope"></i>{.email}
             <br />
-            <i class="glyphicon glyphicon-globe"></i>{._id}
+            <i class="glyphicon glyphicon-piggy-bank"></i>{.booze} booze
             <br />
-            <i class="glyphicon glyphicon-gift"></i>June 02, 1988
+        {/user}
+            <i class="glyphicon glyphicon glyphicon-user"></i>{.numFriends} friends            
           </p>
 
         </div>
-        {/user}
+        
       </div>
+      {#friendMap}
+          <p>   
+            <i class="glyphicon glyphicon-user"></i>{.nameFriend} 
+            <i class="glyphicon glyphicon-envelope"></i>{.emailFriend}
+            <br />
+          </p>
+
+       {/friendMap}    
+        </div> <!--row -->       
+      
+      
       </div>
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
   </div>

@@ -121,7 +121,8 @@ app.get('/test', function(req, res) {
     newUser.idParent    = req.user._id; //id parent
     newUser.status      = 'new'; // status
 
-    console.log(newUser);
+    console.log('USER: ',newUser);
+    console.log('GLOBAL: ', global.cost)
 
     newUser.save(function(err) {
 			if (err) {
@@ -144,6 +145,7 @@ app.get('/test', function(req, res) {
         newFriend.id = req.user._id; // id parent
         newFriend.emailParent = req.user.email; // mail user
         newFriend.emailFriend = newUser.email; // mail friend
+        newFriend.nameFriend  = newUser.name.first;
 
         newFriend.save(function(err) {
           if (err) {

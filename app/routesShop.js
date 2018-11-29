@@ -74,7 +74,7 @@ module.exports = function(app) {
 			if (cart[id]) {
 				cart[id].qty++;
 			}
-			else {
+			else {  // se il prodotto è scelto per la prima volta
 				cart[id] = {
 					id : prod._id,
 					name: prod.name,

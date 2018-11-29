@@ -2,7 +2,8 @@
 
 var transporter   = require('../config/mailerMailgun');
 var crypto        = require('crypto');
-var User          = require('../app/models/user');
+var Friends       = require('../app/models/friend');
+var Users         = require('../app/models/friend');
 
 module.exports = function(app, passport) {
 
@@ -58,10 +59,21 @@ module.exports = function(app, passport) {
   // we will want this protected so you have to be logged in to visit
   // we will use route middleware to verify this (the isLoggedIn function)
   app.get('/profile', isLoggedIn, function(req, res) {
-      res.render('profile.dust', {
-          user : req.user, // get the user out of session and pass to template
-          numProducts : req.session.numProducts
-      });
+      
+    console.log('REQ.USER: ', req.user)
+
+    Friends.find({id : req.user._id }, function(err, friends) {
+        
+        if (err) { res.send(err); }
+        
+        console.log('FRIENDS: ', friends.length, friends);
+
+        res.render('profile.dust', {
+            user : req.user, // get the user out of session and pass to template
+            numFriends  : friends.length,
+            friendMap   : friends
+        });
+    });
   });
 
   // =====================================

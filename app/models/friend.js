@@ -8,6 +8,11 @@ var friendSchema = mongoose.Schema({
     type: String,
     required: '{PATH} is required.'
   },
+  nameFriend: {
+    type: String,
+    required: '{PATH} is required.',
+    unique: false
+  },
   emailParent: {
     type: String,
     required: '{PATH} is required.',
