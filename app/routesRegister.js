@@ -5,9 +5,10 @@
 var transporter = require('../config/mailerMailgun');
 
 var mailfriend = require('../config/mailFriend');
+var mailparent = require('../config/mailParent');
 
 // load up the user model
-var User	= require('../app/models/user');
+var User	 = require('../app/models/user');
 var Friend = require('../app/models/friend');
 
 
@@ -107,73 +108,102 @@ app.get('/test', function(req, res) {
 // POST FRIEND =====================================================================
 	app.post('/recomm',isLoggedIn, function(req, res) {
 
+    console.log('/recomm FRIEND INVITED: ',req.session.friendsInvited )
+
     if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
           req.flash('error',"You have no more invitations! Please buy more beer");
-          res.redirect('/recomm')
-    };   
-
-		var password = generatePassword(6);
-    var newUser = new User();
-    // set the user's local credentials
-		newUser.email       = req.body.email;
-    newUser.password    = newUser.generateHash(password);
-    newUser.name.first  = capitalizeFirstLetter(req.body.firstName);
-    newUser.idParent    = req.user._id; //id parent
-    newUser.status      = 'new'; // status
-
-    console.log('USER: ',newUser);
-    console.log('GLOBAL: ', global.cost)
-
-    newUser.save(function(err) {
-			if (err) {
-				req.flash('error','Something bad happened! Please try again');
-        console.log("error code: ",err.code);
-
-				if (err.code === 11000) { //duplicate key: email
-					req.flash('error','That email is already taken, please try another');
-				}
-
-				res.render('friend.dust', { message: req.flash('error'),
-                                    invitationAvailable: req.session.invitationAvailable,
-                                    friendsInvited:  req.session.friendsInvited,
-                                    percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
-                                  });
-			} else { 
-
-        // Record new friends in mongodb
-        var newFriend = new Friend();
-        newFriend.id = req.user._id; // id parent
-        newFriend.emailParent = req.user.email; // mail user
-        newFriend.emailFriend = newUser.email; // mail friend
-        newFriend.nameFriend  = newUser.name.first;
-
-        newFriend.save(function(err) {
-          if (err) {
-            req.flash('error','Something bad happened! Please try again');
-						//remove Friend from User
-						User.fndOne({ 'email' :  newUser.email }).remove(callback);
-            //render for message display
-						res.render('friend.dust', { message: req.flash('error'),
+          res.render('friend.dust', { message: req.flash('error'),
                                         invitationAvailable: req.session.invitationAvailable,
                                         friendsInvited:  req.session.friendsInvited,
                                         percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
                                       });
-          }
-        });
-        // send email to Friend
-        sendmailToFriend(capitalizeFirstLetter(req.body.firstName), 
-                                               newUser.email, password, 
-                                               req.user.name.first, 
-                                               req.user.name.last, 
-                                               req.user.email);
-        // send mail to Parent
-        // decrement number of freinds 
-        // increment NeXO (New eXchange Open)
-        res.redirect('/recomm');
-				
-			}
-		});
-	});
+    } else {   
+
+  		var password = generatePassword(6);
+      var newUser = new User();
+      // set the user's local credentials
+  		newUser.email       = req.body.email;
+      newUser.password    = newUser.generateHash(password);
+      newUser.name.first  = capitalizeFirstLetter(req.body.firstName);
+      newUser.idParent    = req.user._id; //id parent
+      newUser.status      = 'new'; // status
+
+      //console.log('USER: ',newUser);
+      //console.log('GLOBAL: ', global.cost)
+
+      newUser.save(function(err) {
+  			if (err) {
+  				req.flash('error','Something bad happened! Please try again');
+          console.log("ERROR: ",err);
+
+  				if (err.code === 11000) { //duplicate key: email
+  					req.flash('error','That email is already taken, please try another');
+  				}
+
+  				res.render('friend.dust', { message: req.flash('error'),
+                                      invitationAvailable: req.session.invitationAvailable,
+                                      friendsInvited:  req.session.friendsInvited,
+                                      percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
+                                    });
+  			} else { 
+
+          // Record new friends in mongodb
+          var newFriend = new Friend();
+          newFriend.id = req.user._id; // id parent
+          newFriend.emailParent = req.user.email; // mail user
+          newFriend.emailFriend = newUser.email; // mail friend
+          newFriend.firstNameFriend  = newUser.name.first;
+
+          newFriend.save(function(err) {
+            if (err) {
+              console.log("ERROR: ",err);
+              req.flash('error','Something bad happened! Please try again');
+  						
+              //remove Friend from User
+  						User.findOneAndRemove({ 'email' :  newUser.email }, function(err){
+                if (err) { res.send(err); }
+              });
+              //render for message display
+              res.render('friend.dust', { message: req.flash('error'),
+                                          invitationAvailable: req.session.invitationAvailable,
+                                          friendsInvited:  req.session.friendsInvited,
+                                          percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
+                                        });
+            } else {
+              // send email to Friend
+              sendmailToPerson( newUser.name.first, 
+                                newUser.email, 
+                                password, 
+                                req.user.name.first, 
+                                req.user.name.last, 
+                                req.user.email,
+                                'friend');
+              // send email to Parent
+              sendmailToPerson( req.user.name.first, 
+                                req.user.email,
+                                '',
+                                newUser.name.first,
+                                '',
+                                newUser.email,
+                                'parent');
+              // TODO
+              // send mail to Parent
+              // decrement number of freinds 
+              // increment NeXO (New eXchange Open)
+
+              req.session.friendsInvited += 1;
+              req.flash('message','You have added a new Friend');
+              res.render('friend.dust', { message: req.flash('message'),
+                                          invitationAvailable: req.session.invitationAvailable,
+                                          friendsInvited:  req.session.friendsInvited,
+                                          percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
+                                        });
+            }
+          })
+  			}
+  		})
+    }  
+	})
 };
 
 // route middleware to make sure a user is logged in ===========================
@@ -199,25 +229,36 @@ function generatePassword(n) {
   return retVal;
 }
 
-// send password to Frined via email
-function sendmailToFriend(friendName, friendEmail, friendPassword, userName, userSurname, userEmail) {
-  var mailOptions = {
+// send password to Friend via email
+function sendmailToPerson(Name, Email, Password, userName, userSurname, userEmail, typeOfMail) {
+  console.log('MAIL TYPE: ', typeOfMail)
+  if (typeOfMail == 'friend') {
+    var mailOptions = {
       from: 'info@sharingbeer.com', // sender address
       to: 'cviana66@gmail.com', // list of receivers
       subject: 'Hello ✔', // Subject line
-      html: mailfriend(friendName, friendEmail, friendPassword, userName, userSurname)
-  };
+      html: mailfriend(Name, Email, Password, userName, userSurname) 
+    }   
+  } else {
+
+    var mailOptions = {
+        from: 'info@sharingbeer.com', // sender address
+        to: 'cviana66@gmail.com', // list of receivers
+        subject: 'Thanks ✔', // Subject line
+        html: mailparent(Name, Email, userName, userEmail)
+    }
+  }
   
-  console.log(mailfriend(friendName, friendEmail, friendPassword, userName, userSurname));
-  console.log('friendMail: ' + friendEmail);
-  console.log('friendPassword: ' + friendPassword);
-  console.log('userEmail: ' + userEmail);
+  //console.log(mailparent(Name, Email, userName, userEmail));
+  //console.log('friendMail: ' + friendEmail);
+  //console.log('friendPassword: ' + friendPassword);
+  //console.log('userEmail: ' + userEmail);
 
   transporter.sendMail(mailOptions, function(error, info){
       if(error){
         return console.log('ERROR: ', error);
       }else{
-          console.log('Message sent!', info);
+          console.log('MESSAGE SENT: ', info);
       };
   });
 }

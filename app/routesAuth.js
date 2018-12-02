@@ -3,7 +3,7 @@
 var transporter   = require('../config/mailerMailgun');
 var crypto        = require('crypto');
 var Friends       = require('../app/models/friend');
-var Users         = require('../app/models/friend');
+var Users         = require('../app/models/user');
 
 module.exports = function(app, passport) {
 
@@ -65,8 +65,17 @@ module.exports = function(app, passport) {
     Friends.find({id : req.user._id }, function(err, friends) {
         
         if (err) { res.send(err); }
-        
-        console.log('FRIENDS: ', friends.length, friends);
+      /* 
+        friends.forEach(function(friend) {
+
+          Users.findOne({email : friend.emailFriend} , function(err,user) {
+            
+            if (err) { res.send(err); }            
+            
+          });
+        });
+      */
+      //  console.log('FRIENDS: ', friends.length, friends);
 
         res.render('profile.dust', {
             user : req.user, // get the user out of session and pass to template

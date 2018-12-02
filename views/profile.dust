@@ -31,7 +31,7 @@
       </div>
       {#friendMap}
           <p>   
-            <i class="glyphicon glyphicon-user"></i>{.nameFriend} 
+            <i class="glyphicon glyphicon-user"></i>{.firstNameFriend} 
             <i class="glyphicon glyphicon-envelope"></i>{.emailFriend}
             <br />
           </p>

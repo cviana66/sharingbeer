@@ -8,9 +8,13 @@ var friendSchema = mongoose.Schema({
     type: String,
     required: '{PATH} is required.'
   },
-  nameFriend: {
+  firstNameFriend: {
     type: String,
     required: '{PATH} is required.',
+    unique: false
+  },
+  lastNameFriend: {
+    type: String,
     unique: false
   },
   emailParent: {
@@ -24,6 +28,8 @@ var friendSchema = mongoose.Schema({
     unique: true
   }
 });
+
+//var Friend = mongoose.model('Friend', friendSchema);
 
 // create the model for users and expose it to our app
 module.exports = mongoose.model('Friend', friendSchema);

@@ -49,8 +49,9 @@ var userSchema = mongoose.Schema({
     booze      : { type: Number, default: 0},
     resetPasswordToken: String,
     resetPasswordExpires : Date
-
 });
+
+  //var User = mongoose.model('Users', userSchema);
 
 // methods =====================================================================
 // generating a hash
