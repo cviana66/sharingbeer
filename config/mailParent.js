@@ -24,10 +24,10 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + parentName + '</span>. </p> \
-  								<p> Il tuo invito è stao inviato a <span style="font-style:oblique;font-weight:normal">' +friendName+ ' (' +friendEmail+ ' )</span> che ora potrà accedere in SharingBeer \
+  								<p> Il tuo invito è stato spedito a <span style="font-style:oblique;font-weight:normal">' +friendName+ ' (' +friendEmail+ ' )</span> che ora potrà accedere in SharingBeer \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
-                	<p>Garzie e a presto  dal Sharinbeer. </br>Mi raccomando, bevi in modo responsabile :)</p> \
+                	<p>Garzie e a presto! </br>Mi raccomando, bevi in modo responsabile :)</p> \
   							</div>  \
                 <div align="left"> \
                   <img style="padding-right:12px;vertical-align:middle" src="https://sharingbeer.herokuapp.com/img/cellphone-android.png" height="24" width="24"> \

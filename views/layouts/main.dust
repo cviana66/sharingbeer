@@ -16,15 +16,15 @@
 	<title>SB</title>
 
     <!--link rel="stylesheet" href="css/app.css"/-->
-    <link rel="stylesheet" href="css/main.css"/>
+    <link rel="stylesheet" href="/css/main.css"/>
     <!--link rel="stylesheet" href="css/dualSlidingPanels.css"/-->
-    <link rel="stylesheet" href="bootstrap-3.3.5-dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/bootstrap-3.3.5-dist/css/bootstrap.css"/>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 	
-	<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
-	<script type="text/javascript" src="bootstrap-3.3.5-dist/js/bootstrap.js"></script>
-    <script type="text/javascript" src="js/jFormslider.js"></script>
+	<script type="text/javascript" src="/js/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="/bootstrap-3.3.5-dist/js/bootstrap.js"></script>
+  <script type="text/javascript" src="/js/jFormslider.js"></script>
 
 </head>
 
@@ -111,14 +111,12 @@
 			</div> <!-- /.container-fluid -->
 		</nav>
 
-
 		{+body /}
 
 	</div>
 
-	<script type="text/javascript" src="js/plusMinus.js"></script>
+	<script type="text/javascript" src="/js/plusMinus.js"></script>
 	<!--script type="text/javascript" src="js/dualSlidingPanels.js"></script-->
-
 
 </body>
 </html>

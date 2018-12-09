@@ -64,26 +64,5 @@ userSchema.methods.validPassword = function(password) {
     return bcrypt.compareSync(password, this.password);
 };
 
-/*
-https://www.npmjs.com/package/bcrypt
-????? non so a cosa foss utilizzato. Fose un prototipo di cambio password ?????
-userSchema.pre('save', function(next) {
-  var user = this;
-  var saltRounds = 8;
-
-  if (!user.isModified('password')) return next();
-
-  bcrypt.genSalt(SALT_FACTOR, function(err, salt) {
-    if (err) return next(err);
-
-    bcrypt.hash(user.password, salt, null, function(err, hash) {
-      if (err) return next(err);
-      user.password = hash;
-      next();
-    });
-  });
-});
-*/
-
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);

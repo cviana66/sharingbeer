@@ -3,7 +3,7 @@ module.exports = function(friendName, friendEmail, friendPassword, userName, use
 var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
 <html xmlns="http://www.w3.org/1999/xhtml"> \
     <head> \
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> \
+        <meta https-equiv="Content-Type" content="text/html; charset=utf-8" /> \
         <title>Recommendation</title> \
     </head> \
 <body yahoo> \
@@ -25,15 +25,15 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
   								<p> questo invito di <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> ti permettera\' di bere la birra \
-                  <span style="font-style:normal;font-weight:bold"> RoL</span>, la prima birra Artigianale da condividere!</p> \
-  								<p>Vuoi saperne di più? Puoi farlo sul sito <a href="https://sharingbeer.herokuapp.com" target="_blank"> SharingBeer </a> che è accessibile solo su segnalazione di un tuo amico. \
+                  <span style="font-style:normal;font-weight:bold"> Viana</span>, la prima birra Real Ale Italiana da condividere!</p> \
+  								<p>Vuoi saperne di più? Puoi farlo sul sito <a href="https://sharingbeer.herokuapp.com" target="_blank"> SharingBeer </a> che è accessibile solo su segnalazione di chi ha gia\' bevuto la birra Viana. \
                   <span style="font-style:oblique;font-weight:bold">'+ userName +'</span> ha scelto te! </span></p> \
-  								<p>Le tue credenziali per accedere a <a href="https://sharingbeer.herokuapp.com/login" target="_blank"> SharingBeer </a> sono: </p> \
+  								<p>Se vuoi accedere in <a href="https://sharingbeer.herokuapp.com/login" target="_blank"> SharingBeer </a> le tue credenziali sono: </p> \
   								<div align="center"> \
-  									<p>email: <a style="text-decoration:none">'+ friendEmail + '</a></p> \
+  									<p>Utente: <a style="text-decoration:none">'+ friendEmail + '</a></p> \
   								</div> \
   								<div align="center"> \
-  									<p>password: ' + friendPassword + '</p> \
+  									<p>Password: ' + friendPassword + '</p> \
   								</div> \
   								<div align="center">   <p> oppure </p>  </div> \
   								<div align="center"> \
@@ -46,7 +46,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 									</div> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
-                	<p>A presto e buon divertimento dallo staff del birrificio RoL. </br>Mi raccomando, bevi in modo responsabile :D</p> \
+                	<p>A presto e buon divertimento dallo staff del birrificio Viana. </br>Mi raccomando, bevi in modo responsabile :)</p> \
   							</div>  \
                 <div align="left"> \
                   <img style="padding-right:12px;vertical-align:middle" src="https://sharingbeer.herokuapp.com/img/cellphone-android.png" height="24" width="24"> \
