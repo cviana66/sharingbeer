@@ -11,23 +11,48 @@ var mailparent = require('../config/mailParent');
 var User	 = require('../app/models/user');
 var Friend = require('../app/models/friend');
 
+var lib           = require('./libfunction');
 
 module.exports = function(app) {
 
 // TESTING
 app.get('/test', function(req, res) {
-        res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+        //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+        res.render('validation.dust', { message: req.flash('validation') });
     });
 
+// =====================================
+// VALIDATION ==========================
+// =====================================
+//GET
+  app.get('/validation', function(req,res){
+    
+    console.log('TOKEN VALIDATION GET: ', req.query.token);
+  
+    User.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 
-// POST VALIDATION
+      if (err) { return console.error('error',err); next(err) }
+      
+      // TODO i 2 render sotto + scrivere corretamente mail
+
+      if (!user) {   
+        req.flash('error', 'Invitation is invalid or has expired.');
+        res.render('info.dust', {message: req.flash('error')});
+      } else {
+        res.render('validation.dust', { user: req.user, token:req.query.token });
+      };
+    });
+  });
+//POST  
   app.post('/validation', function(req,res){
     req.body.email
     req.body.password
   });
 
-// GET REGISTER ======================================================================  
-  app.get('/register', isLoggedIn, function(req, res) {
+// =====================================
+// REGISTER ============================
+// =====================================
+  app.get('/register', lib.isLoggedIn, function(req, res) {
 
     if (req.user.status == 'confirmed') {  
       res.render ('registration.dust', {
@@ -43,13 +68,13 @@ app.get('/test', function(req, res) {
     } 
   });
 
-// POST REGISTER ======================================================================  
-  app.post('/register', isLoggedIn, function(req, res) {
+//POST
+  app.post('/register', lib.isLoggedIn, function(req, res) {
     User.findByIdAndUpdate(req.user._id, 
       { $set: { 
                 name: {
-                        first: capitalizeFirstLetter(req.body.firstName),
-                        last: capitalizeFirstLetter(req.body.lastName),
+                        first: lib.capitalizeFirstLetter(req.body.firstName),
+                        last:  lib.capitalizeFirstLetter(req.body.lastName),
                       },
                 status: 'customer'
               }
@@ -67,12 +92,16 @@ app.get('/test', function(req, res) {
 
   });
 
-// GET FRIEND ======================================================================
-	app.get('/recomm',isLoggedIn, function(req,res) {
+// =====================================
+// FRIEND ==============================
+// =====================================
+//GET
+	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
     Friend.count({ emailParent:req.user.email }, function (err, friends) {
       if (err) return console.log('error',err);
-      console.log('Friends: ', friends);
+      
+      console.log('GET RECOMM FRIENDS: ', friends);
       
       User.findOne({ email: req.user.email }, function (err, user) {
         if (err) return console.log('error',err);
@@ -83,8 +112,7 @@ app.get('/test', function(req, res) {
         var error = "";
         var controlSates = "";
         var flag = "false";
-
-
+        // Controllo che ci siano ancora inviti diposnibili
         if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
           req.flash('error', "You have no more invitations! Please buy more beer");
           controlSates = "disabled";
@@ -104,11 +132,10 @@ app.get('/test', function(req, res) {
       }); 
     });
 	});
+//POST
+	app.post('/recomm', lib.isLoggedIn, function(req, res) {
 
-// POST FRIEND =====================================================================
-	app.post('/recomm',isLoggedIn, function(req, res) {
-
-    console.log('/recomm FRIEND INVITED: ',req.session.friendsInvited )
+    console.log('POST RECOMM FRIEND INVITED: ',req.session.friendsInvited )
 
     if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
           req.flash('error',"You have no more invitations! Please buy more beer");
@@ -118,15 +145,17 @@ app.get('/test', function(req, res) {
                                         percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
                                       });
     } else {   
-
-  		var password = generatePassword(6);
+      // creo nuovo user con i dati segnalati dal PARENT
+  		var password = lib.generatePassword(6);
       var newUser = new User();
       // set the user's local credentials
   		newUser.email       = req.body.email;
       newUser.password    = newUser.generateHash(password);
-      newUser.name.first  = capitalizeFirstLetter(req.body.firstName);
+      newUser.name.first  = lib.capitalizeFirstLetter(req.body.firstName);
       newUser.idParent    = req.user._id; //id parent
       newUser.status      = 'new'; // status
+      newUser.resetPasswordToken = lib.generateToken(20); // token
+      newUser.resetPasswordExpires = Date.now() + (3600000*24*365); // 1 hour * 24 * 365 = 1 anno
 
       //console.log('USER: ',newUser);
       //console.log('GLOBAL: ', global.cost)
@@ -171,26 +200,24 @@ app.get('/test', function(req, res) {
                                         });
             } else {
               // send email to Friend
-              sendmailToPerson( newUser.name.first, 
+              lib.sendmailToPerson( newUser.name.first, 
                                 newUser.email, 
-                                password, 
+                                '',
+                                newUser.resetPasswordToken, 
                                 req.user.name.first, 
                                 req.user.name.last, 
                                 req.user.email,
                                 'friend');
               // send email to Parent
-              sendmailToPerson( req.user.name.first, 
+              lib.sendmailToPerson( req.user.name.first, 
                                 req.user.email,
+                                '',
                                 '',
                                 newUser.name.first,
                                 '',
                                 newUser.email,
                                 'parent');
-              // TODO
-              // send mail to Parent
-              // decrement number of freinds 
-              // increment NeXO (New eXchange Open)
-
+              
               req.session.friendsInvited += 1;
               req.flash('message','You have added a new Friend');
               res.render('friend.dust', { message: req.flash('message'),
@@ -204,67 +231,4 @@ app.get('/test', function(req, res) {
   		})
     }  
 	})
-};
-
-// route middleware to make sure a user is logged in ===========================
-function isLoggedIn(req, res, next) {
-
-  // if user is authenticated in the session, carry on
-  if (req.isAuthenticated())
-    return next();
-
-  // if they aren't redirect them to the home page
-  res.redirect('/login');
-};
-
-// UTILITY =====================================================================
-
-function generatePassword(n) {
-  var length = n,
-    charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-    retVal = "";
-  for (var i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
-}
-
-// send password to Friend via email
-function sendmailToPerson(Name, Email, Password, userName, userSurname, userEmail, typeOfMail) {
-  console.log('MAIL TYPE: ', typeOfMail)
-  if (typeOfMail == 'friend') {
-    var mailOptions = {
-      from: 'info@sharingbeer.com', // sender address
-      to: 'cviana66@gmail.com', // list of receivers
-      subject: 'Hello ✔', // Subject line
-      html: mailfriend(Name, Email, Password, userName, userSurname) 
-    }   
-  } else {
-
-    var mailOptions = {
-        from: 'info@sharingbeer.com', // sender address
-        to: 'cviana66@gmail.com', // list of receivers
-        subject: 'Thanks ✔', // Subject line
-        html: mailparent(Name, Email, userName, userEmail)
-    }
-  }
-  
-  //console.log(mailparent(Name, Email, userName, userEmail));
-  //console.log('friendMail: ' + friendEmail);
-  //console.log('friendPassword: ' + friendPassword);
-  //console.log('userEmail: ' + userEmail);
-
-  transporter.sendMail(mailOptions, function(error, info){
-      if(error){
-        return console.log('ERROR: ', error);
-      }else{
-          console.log('MESSAGE SENT: ', info);
-      };
-  });
-}
-
-function capitalizeFirstLetter(string) {
-  if (typeof(string) != "undefined") {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  }
 }

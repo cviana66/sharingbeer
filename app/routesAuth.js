@@ -4,12 +4,14 @@ var transporter   = require('../config/mailerMailgun');
 var crypto        = require('crypto');
 var Friends       = require('../app/models/friend');
 var Users         = require('../app/models/user');
+var lib           = require('./libfunction');
 
 module.exports = function(app, passport) {
 
 // =====================================
 // HOME PAGE (with login links) ========
 // =====================================
+//GET
   app.get('/', function(req, res) {
       res.render('index.dust', {
           user: req.user,
@@ -20,6 +22,7 @@ module.exports = function(app, passport) {
 // =====================================
 // LOGIN ===============================
 // =====================================
+//GET
   // show the login form
   app.get('/login', function(req, res) {
       // render the page and pass in any flash data if it exists
@@ -31,7 +34,7 @@ module.exports = function(app, passport) {
       res.render('login.dust', { message: req.flash('loginMessage'), 
                                  user: req.params.user });
   });
-
+//POST
   // process the login form
   app.post('/login', passport.authenticate('local-login', {
       successRedirect : '/shop', // redirect to the secure profile section
@@ -42,8 +45,9 @@ module.exports = function(app, passport) {
 // =====================================
 // SIGNUP ==============================
 // =====================================
+//GET
   // show the signup form
-  app.get('/signup', isLoggedIn, function(req, res) {
+  app.get('/signup', lib.isLoggedIn, function(req, res) {
 
       // render the page and pass in any flash data if it exists
       res.render('signup.dust', { 
@@ -51,7 +55,7 @@ module.exports = function(app, passport) {
           numProducts : req.session.numProducts 
       });
   });
-
+//POST
   // process the signup form
   app.post('/signup', passport.authenticate('local-signup', {
       successRedirect : '/profile', // redirect to the secure profile section
@@ -62,9 +66,10 @@ module.exports = function(app, passport) {
 // =====================================
 // PROFILE SECTION =====================
 // =====================================
+//GET
   // we will want this protected so you have to be logged in to visit
   // we will use route middleware to verify this (the isLoggedIn function)
-  app.get('/profile', isLoggedIn, function(req, res) {
+  app.get('/profile', lib.isLoggedIn, function(req, res) {
       
     console.log('REQ.USER: ', req.user)
 
@@ -81,23 +86,10 @@ module.exports = function(app, passport) {
     });
   });
 
-  // =====================================
-  // FACEBOOK ROUTES =====================
-  // =====================================
-  // route for facebook authentication and login
-  app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
-
-  // handle the callback after facebook has authenticated the user
-  app.get('/auth/facebook/callback',
-      passport.authenticate('facebook', {
-          successRedirect : '/profile',
-          failureRedirect : '/'
-      }));
-
-
 // =====================================
 // LOGOUT ==============================
 // =====================================
+//GET
 app.get('/logout', function(req, res) {
       req.session.destroy();
       req.logout();
@@ -107,28 +99,29 @@ app.get('/logout', function(req, res) {
 // =====================================
 // FORGOT ==============================
 // =====================================
+//GET
   app.get('/forgot', function(req, res) {
-      res.render('forgot');
+      res.render('forgot.dust');
   });
-
-  app.post('/forgot', function(req, res) {
+//POST
+  app.post('/forgot', function(req, res, next) {
     Users.findOne({ email: req.body.email }, function(err, user) {
         
-        if (err) return console.log('error',err);
+        if (err) { return console.error('error',err); next(err)}; //TIDO verificare simulando comportamento con errore
 
         if (!user) {
           req.flash('error', 'No account with that email address exists.');
           res.render('forgot.dust', {message: req.flash('error')});
         } else {
-          var token = generateToken(20);
+          var token = lib.generateToken(20);
           user.resetPasswordToken = token;
           user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-          console.log('USER: ',user)
+          console.log('POST FORGOT USER: ',user)
           
           user.save(function(err) {
           
-            if(err) return console.log('error: ', err);
+            if(err) return console.log('error: ', err); //TODO la gestione in caso di errore
           
             var mailOptions = {
               to: user.email,
@@ -136,7 +129,7 @@ app.get('/logout', function(req, res) {
               subject: 'SharingBeer Password Reset',
               text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
                 'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-                'http://' + req.headers.host + '/reset?token=' + token + '\n\n' +
+                'https://' + req.headers.host + '/reset?token=' + token + '\n\n' +
                 'If you did not request this, please ignore this email and your password will remain unchanged.\n'
             };
         
@@ -145,8 +138,8 @@ app.get('/logout', function(req, res) {
                   return console.log('ERROR: ', error);
                 } else {
                  console.log('Message reset password sent!', info);
-                 req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-                 res.render('forgot.dust', {message: req.flash('info')});
+                 req.flash('loginMessage', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+                 res.redirect('/login');
                 };
             });
           });
@@ -157,10 +150,10 @@ app.get('/logout', function(req, res) {
 // =====================================
 // RESET PASSWORD ======================
 // =====================================
-
+//GET
   app.get('/reset', function(req, res) {
 
-    console.log('TOKEN RESET GET: ', req.query.token);
+    console.log('GET RESET TOKEN: ', req.query.token);
   
     Users.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 
@@ -174,10 +167,10 @@ app.get('/logout', function(req, res) {
       };
     });
   });
-
+//POST
   app.post('/reset', function(req, res) {
 
-    console.log('TOKEN RESET POST: ', req.body.token);
+    console.log('POST RESET TOKEN: ', req.body.token);
 
     if (req.body.password != req.body.confirm) {
     
@@ -215,26 +208,18 @@ app.get('/logout', function(req, res) {
     }
   });
 
+// =====================================
+// FACEBOOK ROUTES =====================
+// =====================================
+  // route for facebook authentication and login
+  app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
 
-}; // close module
+  // handle the callback after facebook has authenticated the user
+  app.get('/auth/facebook/callback',
+      passport.authenticate('facebook', {
+          successRedirect : '/profile',
+          failureRedirect : '/'
+      })
+  );
+};
 
-// route middleware to make sure a user is logged in ===========================
-function isLoggedIn(req, res, next) {
-
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
-        return next();
-
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
-}
-
-function generateToken(n) {
-  var length = n,
-    charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-    retVal = "";
-  for (var i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
-}

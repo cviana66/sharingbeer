@@ -1,0 +1,46 @@
+{> "layouts/main" /}
+
+{<body}
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
+      <h2>First visit of SharingBeer</h2>
+      <hr class="hr">
+      <!-- show any messages that come back with authentication -->
+      {?message}
+      {#message}
+      <div class="alert alert-danger">{.}</div>
+      {/message}
+      {/message}
+
+      <h3> I vantaggi </h3>
+      <h4>
+        <ul>
+          <li>Phasellus iaculis neque</li>
+          <li>Purus sodales ultricies</li>
+          <li>Vestibulum laoreet porttitor sem</li>
+          <li>Ac tristique libero volutpat at</li>
+        </ul>
+      </h4> 
+      <form role="form" action="/login" method="post">
+        <div class="form-group">
+          <label for="inputUsernameEmail">User</label>
+          <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{user}" placeholder="your@email.address" autofocus >
+        </div>
+        <div class="form-group">
+          <label for="inputPassword">Password</label>
+          <input type="password" class="form-control" id="inputPassword" name="password">
+        </div>
+        <button type="submit" class="btn btn btn-primary">
+          <h4>Log In</h4>
+        </button>
+      </form>
+      <br> 
+    </div>
+    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+  </div>
+</div>
+
+{/body}

@@ -24,7 +24,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + parentName + '</span>. </p> \
-  								<p> Il tuo invito è stato spedito a <span style="font-style:oblique;font-weight:normal">' +friendName+ ' (' +friendEmail+ ' )</span> che ora potrà accedere in SharingBeer \
+  								<p> Il tuo invito è stato spedito a <span style="font-style:oblique;font-weight:normal">' +friendName+ ' (' +friendEmail+ ' )</span> che ora potrà accedere in <a href="https://sharingbeer.herokuapp.com/"> SharingBeer </a> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
                 	<p>Garzie e a presto! </br>Mi raccomando, bevi in modo responsabile :)</p> \
@@ -53,7 +53,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
               <td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:12px;padding-bottom:12px;background-color:#ffffff" align="right"> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:10px;text-align:left;color:#88a1af;margin-top:10px"> \
                   Le informazioni contenute in questo messaggio di posta elettronica sono riservate, rivolte esclusivamente al destinatario e non comportano alcun vincolo ne\' alcun obbligo. \
-                  L\'invito ti è stato inviato tramite una persona che è a conoscenza del tuo indirizzo email o perchè ti sei registrato su SharingBeer. Segnalaci eventuali abusi rispondendo a questa mail. \
+                  L\'invito ti è stato inviato tramite una persona che è a conoscenza del tuo indirizzo email o perchè ti sei registrato su SharingBeer. Segnalaci eventuali abusi rispondendo a questa email. \
                 </div> \
               </td> \
             </tr> \
