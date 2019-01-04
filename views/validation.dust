@@ -2,12 +2,12 @@
 
 {<body}
 
-<div class="container-fluid">
+<div class="container">
   <div class="row">
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
-      <h2>First visit of SharingBeer</h2>
-      <hr class="hr">
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-9" style="background-color:#F6A300;border-radius:12px">
+      <h2>The first time in SharingBeer</h2>
+      <hr class="hr" style="border-top: 1px solid #480413;">
       <!-- show any messages that come back with authentication -->
       {?message}
       {#message}
@@ -15,29 +15,77 @@
       {/message}
       {/message}
 
-      <h3> I vantaggi </h3>
-      <h4>
-        <ul>
-          <li>Phasellus iaculis neque</li>
-          <li>Purus sodales ultricies</li>
-          <li>Vestibulum laoreet porttitor sem</li>
-          <li>Ac tristique libero volutpat at</li>
-        </ul>
-      </h4> 
-      <form role="form" action="/login" method="post">
-        <div class="form-group">
-          <label for="inputUsernameEmail">User</label>
-          <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{user}" placeholder="your@email.address" autofocus >
+<!-- Jumbotron Header -->
+      <header class="jumbotron my-4" style="background:#F6A300">
+        <h1 class="display-4">Ciao!</h1>
+        <p class="lead">se non hai un bicchiere di birra davanti a te allora sei nel posto giusto.</p>
+        <p class="lead">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
+        <p class="lead">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito e entra in SharingBeer </p>
+      </header>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 mb-12" >
+          <form role="form" action="/login" method="post">
+            <div class="form-group">
+              <label for="inputUsernameEmail">User</label>
+              <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{user}" placeholder="your@email.address" >
+            </div>
+            <div class="form-group">
+              <label for="inputPassword">Password</label>
+              <input type="password" class="form-control" id="inputPassword" name="password">
+            </div>
+            <button type="submit" class="btn btn btn-primary">
+              <h4>Log In</h4>
+            </button>
+          </form>
         </div>
-        <div class="form-group">
-          <label for="inputPassword">Password</label>
-          <input type="password" class="form-control" id="inputPassword" name="password">
+      </div>  
+
+<hr class="hr" style="border-top: 1px solid #480413;">
+<h3 style="color:#480413"> The advantages </h3>
+
+      <div class="row text-center">
+
+        <div class="col-lg-3 col-md-6 mb-4" >
+          <div class="card">
+            <!--img class="card-img-top" src="http://placehold.it/500x325" alt=""-->
+            <div class="card-body">
+              <h4 class="card-title">Card title</h4>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque. </p>
+            </div>
+    
+          </div>
         </div>
-        <button type="submit" class="btn btn btn-primary">
-          <h4>Log In</h4>
-        </button>
-      </form>
-      <br> 
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Card title</h4>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo magni sapiente, tempore debitis beatae culpa natus architecto.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Card title</h4>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Card title</h4>
+              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo magni sapiente, tempore debitis beatae culpa natus architecto.</p>
+            </div>
+          </div>
+        </div>
+      </div> 
+      <br>
+<!-- /.row -->
     </div>
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
   </div>

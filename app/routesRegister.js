@@ -1,17 +1,13 @@
 // =============================================================================
 // FRIENDS MANAGEMENT ==========================================================
 // =============================================================================
-//var transporter     = require('./mailerXOAuth2');
-var transporter = require('../config/mailerMailgun');
-
-var mailfriend = require('../config/mailFriend');
-var mailparent = require('../config/mailParent');
 
 // load up the user model
 var User	 = require('../app/models/user');
 var Friend = require('../app/models/friend');
 
-var lib           = require('./libfunction');
+var lib = require('./libfunction');
+
 
 module.exports = function(app) {
 

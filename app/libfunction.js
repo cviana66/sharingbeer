@@ -1,4 +1,9 @@
-//libfunction,js
+//libfunction.js
+
+//email settings
+var transporter = require('../config/mailerMailgun');
+var mailfriend  = require('../config/mailFriend');
+var mailparent  = require('../config/mailParent');
 
 module.exports = {
 
@@ -37,9 +42,6 @@ module.exports = {
                             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
                           }
                          },
-// =====================================
-// MAIL UTILITY ========================
-// =====================================
   sendmailToPerson: function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail) {
                       console.log('MAIL TYPE: ', typeOfMail)
                       if (typeOfMail == 'friend') {

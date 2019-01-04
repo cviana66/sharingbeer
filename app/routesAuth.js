@@ -107,7 +107,7 @@ app.get('/logout', function(req, res) {
   app.post('/forgot', function(req, res, next) {
     Users.findOne({ email: req.body.email }, function(err, user) {
         
-        if (err) { return console.error('error',err); next(err)}; //TIDO verificare simulando comportamento con errore
+        if (err) { return console.error('error',err); next(err)}; //TODO verificare simulando comportamento con errore
 
         if (!user) {
           req.flash('error', 'No account with that email address exists.');
@@ -163,7 +163,7 @@ app.get('/logout', function(req, res) {
         req.flash('error', 'Password reset token is invalid or has expired.');
         res.render('forgot.dust', {message: req.flash('error')});
       } else {
-        res.render('reset.dust', { user: req.user, token:req.query.token });
+        res.render('reset.dust', { user: req.user, token: req.query.token });
       };
     });
   });
