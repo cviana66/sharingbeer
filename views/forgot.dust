@@ -18,7 +18,7 @@
       <form role="form" action="/forgot" method="post">
         <div class="form-group">
           <label for="inputUsernameEmail">Email</label>
-          <input type="text" class="form-control" id="inputUsernameEmail" name="email" autofocus>
+          <input type="text" class="form-control" id="inputUsernameEmail" name="email" placeholder="your@email.address" autofocus>
         </div>
         <button type="submit" class="btn btn btn-primary">
           <h4>Reset Password</h4>

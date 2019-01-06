@@ -5,7 +5,7 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-9" style="background-color:#F6A300;border-radius:12px">
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
       <h2>The first time in SharingBeer</h2>
       <hr class="hr" style="border-top: 1px solid #480413;">
       <!-- show any messages that come back with authentication -->
@@ -17,25 +17,36 @@
 
 <!-- Jumbotron Header -->
       <header class="jumbotron my-4" style="background:#F6A300">
-        <h1 class="display-4">Ciao!</h1>
-        <p class="lead">se non hai un bicchiere di birra davanti a te allora sei nel posto giusto.</p>
-        <p class="lead">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
-        <p class="lead">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito e entra in SharingBeer </p>
+        <h1 class="display-4" style="color:#1140A4">Ciao</h1>
+        <h2 style="color:#0C3281">se non hai un bicchiere di birra davanti a te allora sei nel posto giusto!</h2>
+        <p class="lead" style="color:#480413" align="center">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
+        <p class="lead" style="color:#480413" align="center">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito e entra in SharingBeer </p> 
       </header>
+        
 
       <div class="row">
-        <div class="col-lg-12 col-md-12 mb-12" >
-          <form role="form" action="/login" method="post">
+        <div class="col-lg-12 col-md-12 col-xs-12" >
+          <form role="form" action="/validation" method="post" autocomplete="off">
             <div class="form-group">
-              <label for="inputUsernameEmail">User</label>
-              <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{user}" placeholder="your@email.address" >
+              <label for="inputUsernameEmail">User <font size="1">(Email dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile)  </font></label>              
+              <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{user.email}" placeholder="your@email.address">
+            </div>
+            <div class="form-group">
+              <label for="inputUserName">Name</label>
+              <input type="text" class="form-control" id="inputFirsName" value="{user.name.first}"
+               name="firstName" placeholder="First name" required>
+            </div>
+            <div class="form-group">
+              <label for="inputUsernSurname">Surname</label>
+              <input type="text" class="form-control" id="inputLastName"
+               name="lastName" placeholder="Last name"  required>
             </div>
             <div class="form-group">
               <label for="inputPassword">Password</label>
-              <input type="password" class="form-control" id="inputPassword" name="password">
-            </div>
+              <input type="password" class="form-control" id="inputPassword" name="password" required>
+            </div >
             <button type="submit" class="btn btn btn-primary">
-              <h4>Log In</h4>
+              <h4>Validate</h4>
             </button>
           </form>
         </div>
@@ -84,7 +95,7 @@
           </div>
         </div>
       </div> 
-      <br>
+      </br>
 <!-- /.row -->
     </div>
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>

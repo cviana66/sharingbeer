@@ -29,13 +29,14 @@ app.get('/test', function(req, res) {
 
       if (err) { return console.error('error',err); next(err) }
       
+      console.log('USER VALIATION GET: ', user)
       // TODO i 2 render sotto + scrivere corretamente mail
 
       if (!user) {   
         req.flash('error', 'Invitation is invalid or has expired.');
         res.render('info.dust', {message: req.flash('error')});
       } else {
-        res.render('validation.dust', { user: req.user, token:req.query.token });
+        res.render('validation.dust', { user: user});
       };
     });
   });
