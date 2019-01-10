@@ -5,6 +5,7 @@
 // load up the user model
 var User	 = require('../app/models/user');
 var Friend = require('../app/models/friend');
+var bcrypt   = require('bcrypt-nodejs'); //TODO da spostare in libfunction
 
 var lib = require('./libfunction');
 
@@ -36,14 +37,51 @@ app.get('/test', function(req, res) {
         req.flash('error', 'Invitation is invalid or has expired.');
         res.render('info.dust', {message: req.flash('error')});
       } else {
-        res.render('validation.dust', { user: user});
+        res.render('validation.dust', { prospect: user});
       };
     });
   });
 //POST  
-  app.post('/validation', function(req,res){
-    req.body.email
-    req.body.password
+  app.post('/validation', function(req,res){ 
+
+    User.findOne(req.body.resetPasswordToken, function (err, user) {
+        
+      if (err) {
+        req.flash('error','Token is invalid');
+        console.log('ERROR: ', err );
+        res.redirect('/Validation?token='+req.body.resetPasswordToken ,{message: req.flash('error')})
+      } else {
+        var common = new User();
+        user.password = common.generateHash(req.body.password)
+        user.name.first = lib.capitalizeFirstLetter(req.body.firstName)
+        user.name.last = lib.capitalizeFirstLetter(req.body.lastName)
+        user.email =  req.body.email
+        user.status = 'validated'
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpires = undefined;
+
+        user.save(function(err) {
+          
+          if(err) { 
+            //req.flash('error','Something bad happened! Validation faild');
+            console.log('ERROR: ', err);
+            res.redirect('/Validation?token='+req.body.resetPasswordToken)
+          }else{
+            req.logIn(user, function(err) {
+              
+              if(err) {
+                req.flash('error','TODO pagina di cortesia');
+                console.log('ERROR: ', err );
+               }else{
+                console.log('POST VALIDATION SET: ', user )
+                req.flash('success', 'Validated and logged'); 
+                res.render('profile.dust',{message: req.flash('success'),user: user})   
+               } 
+            });
+          }
+        });
+      }
+    })
   });
 
 // =====================================
@@ -82,7 +120,8 @@ app.get('/test', function(req, res) {
           res.redirect('/');
           return;
         }
-    });
+      }
+    );
 
     req.user.status = "customer";
     res.redirect('/register');
@@ -147,6 +186,7 @@ app.get('/test', function(req, res) {
       var newUser = new User();
       // set the user's local credentials
   		newUser.email       = req.body.email;
+      newUser.inviteEmail = req.body.email;
       newUser.password    = newUser.generateHash(password);
       newUser.name.first  = lib.capitalizeFirstLetter(req.body.firstName);
       newUser.idParent    = req.user._id; //id parent

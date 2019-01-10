@@ -1,7 +1,7 @@
 // app/routes.js
 
 var transporter   = require('../config/mailerMailgun');
-var crypto        = require('crypto');
+
 var Friends       = require('../app/models/friend');
 var Users         = require('../app/models/user');
 var lib           = require('./libfunction');

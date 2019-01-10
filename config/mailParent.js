@@ -14,7 +14,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   			<table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
   				<tbody> \
             <tr> \
-              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#7CCD7C" align="right"> \
+              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#F6A300" align="right"> \
                 <div> \
                   <img src=https://sharingbeer.herokuapp.com/img/rol1.png title="LOGO Birrificio RoL" alt="LOGO Birrificio RoL"> \
                 </div> \
