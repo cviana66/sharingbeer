@@ -40,7 +40,7 @@ module.exports = function(app) {
     		
     		retriveCart(req,res);
 
-    		console.log('products-->', prods);
+    		//console.log('products-->', prods);
 
 			var model = { 	products: prods,
     						user: req.user,

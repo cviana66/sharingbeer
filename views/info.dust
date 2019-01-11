@@ -7,7 +7,7 @@
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
     <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
       <h3>Important info</h3>
-      <hr class="hr">
+      <hr class="hr" style="color:#2A0009">
       <!-- show any messages that come back with authentication -->
       {?message}
       {#message}

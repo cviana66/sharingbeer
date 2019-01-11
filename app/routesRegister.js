@@ -26,7 +26,7 @@ app.get('/test', function(req, res) {
     
     console.log('TOKEN VALIDATION GET: ', req.query.token);
   
-    User.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+    User.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
 
       if (err) { return console.error('error',err); next(err) }
       
@@ -44,35 +44,44 @@ app.get('/test', function(req, res) {
 //POST  
   app.post('/validation', function(req,res){ 
 
-    User.findOne(req.body.resetPasswordToken, function (err, user) {
-        
+    User.findOne({resetPasswordToken:req.body.token, resetPasswordExpires: { $gt: Date.now() }}, function (err, user) {
+      
       if (err) {
-        req.flash('error','Token is invalid');
-        console.log('ERROR: ', err );
-        res.redirect('/Validation?token='+req.body.resetPasswordToken ,{message: req.flash('error')})
+        req.flash('error','Token is invalid or has expired');
+        console.log('POST VALIDATION ERROR: ', err );
+        res.render('info.dust', {message: req.flash('error')});
+      
       } else {
+      
         var common = new User();
         user.password = common.generateHash(req.body.password)
         user.name.first = lib.capitalizeFirstLetter(req.body.firstName)
         user.name.last = lib.capitalizeFirstLetter(req.body.lastName)
-        user.email =  req.body.email
+        console.log('===> ', user.email)
+        console.log('===> ', req.body.email)
+        if (user.email !=  req.body.email) {
+          user.email = req.body.email
+        }
         user.status = 'validated'
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
 
         user.save(function(err) {
-          
+
           if(err) { 
-            //req.flash('error','Something bad happened! Validation faild');
-            console.log('ERROR: ', err);
-            res.redirect('/Validation?token='+req.body.resetPasswordToken)
-          }else{
+            console.log('ERROR VALIDATION UPDATE: ', err);
+            req.flash('error', 'Something bad happened! Validation faild');
+            res.render('info.dust', {message: req.flash('error')});
+          
+          } else {
+          
             req.logIn(user, function(err) {
               
               if(err) {
-                req.flash('error','TODO pagina di cortesia');
+                req.flash('error','Something bad happened! Login faild');
                 console.log('ERROR: ', err );
-               }else{
+                res.render('info.dust', {message: req.flash('error')})
+              } else {
                 console.log('POST VALIDATION SET: ', user )
                 req.flash('success', 'Validated and logged'); 
                 res.render('profile.dust',{message: req.flash('success'),user: user})   

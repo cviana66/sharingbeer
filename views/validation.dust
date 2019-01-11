@@ -19,8 +19,8 @@
       <header class="jumbotron my-4" style="background:#F6A300">
         <h1 class="display-4" style="color:#1140A4">Ciao</h1>
         <h2 style="color:#0C3281">se non hai un bicchiere di birra davanti a te allora sei nel posto giusto!</h2>
-        <p class="lead" style="color:#480413" align="center">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
-        <p class="lead" style="color:#480413" align="center">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito e entra in SharingBeer </p> 
+        <p class="lead" style="color:#2A0009" align="center">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
+        <p class="lead" style="color:#2A0009" align="center">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito e entra in SharingBeer </p> 
       </header>
         
 
@@ -28,7 +28,7 @@
         <div class="col-lg-12 col-md-12 col-xs-12" >
           <form role="form" action="/validation" method="post" autocomplete="off">
             <div class="form-group">
-              <label for="inputUsernameEmail">User <font size="1">(email dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile)  </font></label>              
+              <label for="inputUsernameEmail">User <font size="1">(L'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Quella proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.)  </font></label>              
               <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{prospect.email}" placeholder="your@email.address">
             </div>
             <div class="form-group">
