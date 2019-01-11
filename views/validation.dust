@@ -55,7 +55,7 @@
       </div>  
 
 <hr class="hr" style="border-top: 1px solid #480413;">
-<h3 style="color:#480413"> The advantages </h3>
+<h2 style="color:#480413"> The advantages </h2>
 
       <div class="row text-center">
 
@@ -63,8 +63,8 @@
           <div class="card">
             <!--img class="card-img-top" src="http://placehold.it/500x325" alt=""-->
             <div class="card-body">
-              <h4 class="card-title">Card title</h4>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque. </p>
+              <h3 class="card-title" style="color:#0C3281"><!--svg style="vertical-align:bottom;width:36px;height:36px"  viewBox="0 0 24 24"><path d="M0 0h24v24H0zm18.31 6l-2.76 5z" fill="none"/><path d="M11 9h2V6h3V4h-3V1h-2v3H8v2h3v3zm-4 9c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/></svg--> Una birra offerta </h3>
+              <p class="card-text">accettando questo invito hai 1 birra gratis sull'acquisto di un packaging da 4</p>
             </div>
     
           </div>
@@ -73,8 +73,8 @@
         <div class="col-lg-3 col-md-6 mb-4">
           <div class="card">
             <div class="card-body">
-              <h4 class="card-title">Card title</h4>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo magni sapiente, tempore debitis beatae culpa natus architecto.</p>
+              <h3 class="card-title" style="color:#0C3281">Invita i tuoi amici</h3>
+              <p class="card-text">invita i tuoi amici e dagli la possibilità di bere la nostra birra e tu potrai accumalare Booze per bere gratis </p>
             </div>
           </div>
         </div>
@@ -82,17 +82,24 @@
         <div class="col-lg-3 col-md-6 mb-4">
           <div class="card">
             <div class="card-body">
-              <h4 class="card-title">Card title</h4>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sapiente esse necessitatibus neque.</p>
+              <h3 class="card-title" style="color:#0C3281" >Prodotto per me</h3>
+              <p class="card-text">scegli o proponi una ricetta e potrai dare il tuo nome all'etichetta del lotto di birra</p>
             </div>
           </div>
         </div>
-
         <div class="col-lg-3 col-md-6 mb-4">
           <div class="card">
             <div class="card-body">
-              <h4 class="card-title">Card title</h4>
-              <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo magni sapiente, tempore debitis beatae culpa natus architecto.</p>
+              <h3 class="card-title" style="color:#0C3281">Conoscere la birra</h3>
+              <p class="card-text">impara a riconosncerla nelle sue molteplici differenze, degusta con i 4 sensi, accostarla ai cibi</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h3 class="card-title" style="color:#0C3281">Fare la birra</h3>
+              <p class="card-text">partecipa alla produzione di una cotta imparado l'arte della birrificazione</p>
             </div>
           </div>
         </div>
