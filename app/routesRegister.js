@@ -15,7 +15,7 @@ module.exports = function(app) {
 // TESTING
 app.get('/test', function(req, res) {
         //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
-        res.render('validation.dust', { message: req.flash('validation') });
+        //res.render('validation.dust', { message: req.flash('validation') });
     });
 
 // =====================================
@@ -28,20 +28,23 @@ app.get('/test', function(req, res) {
   
     User.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
 
-      if (err) { return console.error('error',err); next(err) }
+      if (err) {
+        req.flash('error','Token is invalid or has expired');
+        console.log('POST VALIDATION ERROR: ', err );
+        res.render('info.dust', {message: req.flash('error'), type: "danger"}); 
+      }
       
-      console.log('USER VALIATION GET: ', user)
-      // TODO i 2 render sotto + scrivere corretamente mail
+      //console.log('USER VALIATION GET: ', user)
 
       if (!user) {   
         req.flash('error', 'Invitation is invalid or has expired.');
-        res.render('info.dust', {message: req.flash('error')});
+        res.render('info.dust', {message: req.flash('error'), type: "danger"});
       } else {
         res.render('validation.dust', { prospect: user});
       };
     });
   });
-//POST  
+//POST
   app.post('/validation', function(req,res){ 
 
     User.findOne({resetPasswordToken:req.body.token, resetPasswordExpires: { $gt: Date.now() }}, function (err, user) {
@@ -49,7 +52,7 @@ app.get('/test', function(req, res) {
       if (err) {
         req.flash('error','Token is invalid or has expired');
         console.log('POST VALIDATION ERROR: ', err );
-        res.render('info.dust', {message: req.flash('error')});
+        res.render('info.dust', {message: req.flash('error'), type: "danger"});
       
       } else {
       
@@ -57,8 +60,7 @@ app.get('/test', function(req, res) {
         user.password = common.generateHash(req.body.password)
         user.name.first = lib.capitalizeFirstLetter(req.body.firstName)
         user.name.last = lib.capitalizeFirstLetter(req.body.lastName)
-        console.log('===> ', user.email)
-        console.log('===> ', req.body.email)
+        
         if (user.email !=  req.body.email) {
           user.email = req.body.email
         }
@@ -71,7 +73,7 @@ app.get('/test', function(req, res) {
           if(err) { 
             console.log('ERROR VALIDATION UPDATE: ', err);
             req.flash('error', 'Something bad happened! Validation faild');
-            res.render('info.dust', {message: req.flash('error')});
+            res.render('info.dust', {message: req.flash('error'), type: "danger"});
           
           } else {
           
@@ -80,11 +82,11 @@ app.get('/test', function(req, res) {
               if(err) {
                 req.flash('error','Something bad happened! Login faild');
                 console.log('ERROR: ', err );
-                res.render('info.dust', {message: req.flash('error')})
+                res.render('info.dust', {message: req.flash('error'), type: "danger"})
               } else {
                 console.log('POST VALIDATION SET: ', user )
-                req.flash('success', 'Validated and logged'); 
-                res.render('profile.dust',{message: req.flash('success'),user: user})   
+                req.flash('success', 'Validated and Logged'); 
+                res.render('profile.dust',{message: req.flash('success'),user: user, type: "success"})   
                } 
             });
           }
@@ -94,11 +96,11 @@ app.get('/test', function(req, res) {
   });
 
 // =====================================
-// REGISTER ============================
+// PAYMENT ============================
 // =====================================
   app.get('/register', lib.isLoggedIn, function(req, res) {
 
-    if (req.user.status == 'confirmed') {  
+    if (req.user.status == 'validated') {  
       res.render ('registration.dust', {
         firstName : req.user.name.first
       });

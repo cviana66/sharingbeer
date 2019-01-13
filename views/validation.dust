@@ -59,7 +59,7 @@
 
       <div class="row text-center">
 
-        <div class="col-lg-3 col-md-6 mb-4" >
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <div class="card">
             <!--img class="card-img-top" src="http://placehold.it/500x325" alt=""-->
             <div class="card-body">
@@ -70,7 +70,7 @@
           </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 mb-4">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <div class="card">
             <div class="card-body">
               <h3 class="card-title" style="color:#0C3281">Invita i tuoi amici</h3>
@@ -79,7 +79,7 @@
           </div>
         </div>
 
-        <div class="col-lg-3 col-md-6 mb-4">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <div class="card">
             <div class="card-body">
               <h3 class="card-title" style="color:#0C3281" >Prodotto per me</h3>
@@ -87,15 +87,7 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <h3 class="card-title" style="color:#0C3281">Conoscere la birra</h3>
-              <p class="card-text">impara a riconosncerla nelle sue molteplici differenze, degusta con i 4 sensi, accostarla ai cibi</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-4">
+        <div class="col-lg-3 col-md-6 col-sm-6">
           <div class="card">
             <div class="card-body">
               <h3 class="card-title" style="color:#0C3281">Fare la birra</h3>

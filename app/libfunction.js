@@ -73,5 +73,29 @@ module.exports = {
                               console.log('MESSAGE SENT: ', info);
                           };
                       });
+                  },
+  retriveCart:  function retriveCart (req) {
+                  //Retrieve the shopping cart from memory
+                  var cart = req.session.cart,
+                  displayCart = {items: [], totalPrice: 0},
+                  totalPrice = 0,
+                  totalQty = 0
+
+                  if (!cart) {
+                    req.session.numProducts = 0;
+                  } else {
+                    //Read the products for display
+                    for (var item in cart) {
+                      if (cart[item].qty > 0) {
+                        displayCart.items.push(cart[item]);
+                        totalPrice += (cart[item].qty * cart[item].price);
+                        totalQty += cart[item].qty;
+                      }
+                    }
+                    req.session.displayCart = displayCart;
+                    req.session.totalPrc = displayCart.totalPrice = totalPrice.toFixed(2);
+                    req.session.totalQty = totalQty;
+                    req.session.numProducts = Object.keys(cart).length; 
                   }
+                }
 }

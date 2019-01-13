@@ -5,7 +5,7 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
+    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px 12px 0px 0px">
 
       <h3><span style="color:#480413">Sign your Friends </span></h3>
       <hr class="hr" style="border-top: 1px solid #480413;">
@@ -36,10 +36,9 @@
     </div>
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
   </div>
-<div class="row"><br></div>
   <div class="row">
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-      <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#ffc85d;border-radius:12px">
+      <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#ffc85d;border-radius:0px 0px 12px 12px">
         <br>
         <p class="text-left"><strong> Friends  invited </strong></p>    
         <div class="progress">

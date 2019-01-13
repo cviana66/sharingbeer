@@ -9,7 +9,7 @@
     <hr class="hr" style="border-top: 1px solid #480413;"> 
       {?message}
       {#message}
-      <div class="alert alert-danger">{.}</div>
+      <div class="alert alert-{type}">{.}</div>
       {/message}
       {/message}
 

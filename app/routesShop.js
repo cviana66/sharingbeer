@@ -2,70 +2,52 @@
 // ECOMMERCE SHOPPING CHAR https://github.com/EastpointSoftware/traider.io =====
 // =============================================================================
 var Product = require('./models/product.js');
-
+var lib = require('./libfunction');
 
 module.exports = function(app) {
 
-	app.get('/dualSlidingPanels', function(req, res) {
-        res.render('dualSlidingPanels.dust');
-    });
+// =============================================================================
+// GET SHOP ====================================================================
+// =============================================================================
+//GET
+  app.get('/shop', lib.isLoggedIn, function (req,res) {
 
-	app.get('/shopx', function(req, res) {
-        res.render('shop (copia).dust');
-    });
-
-    app.get('/slide', function(req, res) {
-        res.render('slide.dust');
-    });
-
-// POST ORDER SUMMARY =================================================================
-	app.post("/order", isLoggedIn, function(req,res) {
-		
-		// prendere tutti gli ordini in stato payed o tobe verify e visualizzarli
-		//	quelli in tobeVerify commentare il motivo
-		
-		// Using query builder
-	})
-
-// GET SHOP ===========================================================================
-    app.get('/shop', isLoggedIn, function (req,res) {
+    console.log(req.session.cart)
     	
-    	Product.find(function (err, prods) {
-    		if (err) {
-    			console.log(err);
-    		}
-    		prods.forEach(function(prod) {
-    			prod.prettyPrice = prod.prettyPrice();
-    		});
-    		
-    		retriveCart(req,res);
+  	Product.find(function (err, prods) {
+  		if (err) {
+  			console.log(err);
+  		}
+  		prods.forEach(function(prod) {
+  			prod.prettyPrice = prod.prettyPrice();
+  		});
+  		
+  		//mette in memoria i prodotti dal carrello
+      lib.retriveCart(req);
 
-    		//console.log('products-->', prods);
+		  var model =  { products   : prods,                   //prodotti dello shop
+  						       user       : req.user,                //utente loggato
+  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello visualizzato su main.dust
+  						       cart       : req.session.displayCart  //prodotti nel carrello
+  					       };
 
-			var model = { 	products: prods,
-    						user: req.user,
-    						numProducts: req.session.numProducts,
-    						cart: req.session.displayCart
-    					};
-
-    		res.render('shop.dust', model);
-    	});
-    });
-
-// POST SHOP ===========================================================================
-	app.post('/shop', isLoggedIn ,function (req, res) {
+  		res.render('shop.dust', model);
+  	});
+  });
+//POST
+	app.post('/shop', lib.isLoggedIn ,function (req, res) {
 
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart; //cart è l'oggetto sessione
+		var cart = req.session.cart;
 
-		//Read the incoming product data
-		var id = req.param('item_id');
+		//Read the incoming product data from shop.dust
+		var id = req.body.item_id;
 
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
 			if (err) {
-				console.log('Error adding product to cart: ', err);
+				console.log('SHOP POST Error adding product to cart: ', err);
 				res.redirect('/shop');
 				return;
 			}
@@ -74,7 +56,7 @@ module.exports = function(app) {
 			if (cart[id]) {
 				cart[id].qty++;
 			}
-			else {  // se il prodotto è scelto per la prima volta
+			else {     //il prodotto è scelto per la prima volta
 				cart[id] = {
 					id : prod._id,
 					name: prod.name,
@@ -90,30 +72,31 @@ module.exports = function(app) {
 
 		});
 	});
-
-// GET CART ============================================================================
-	app.get('/cart', isLoggedIn, function (req, res) {
+// =============================================================================
+// CART ========================================================================
+// =============================================================================
+//GET
+	app.get('/cart', lib.isLoggedIn, function (req, res) {
 
 		//Retrieve the shopping cart from session
-		retriveCart(req,res);
+		lib.retriveCart(req);
 
-			var model = { 	user: req.user,
-    						numProducts: req.session.numProducts,
-    						cart: req.session.displayCart
-    					};
+		var model = { user       : req.user,
+  						    numProducts: req.session.numProducts,
+  						    cart       : req.session.displayCart,
+                  totalPrice : req.session.totalPrc
+  					    };
 
-    	res.render('cart.dust', model);
+  	res.render('cart.dust', model);
 	});
-
-
-// POST CART MINUS ====================================================================
-	app.post('/cart/minus', isLoggedIn, function (req, res) {
+//POST MINUS ===================================================================
+	app.post('/cart/minus', lib.isLoggedIn, function (req, res) {
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart; //cart è l'oggetto sessione
+		var cart = req.session.cart; 
 
 		//Read the incoming product data
-		var id = req.param('item_id');
+		var id = req.body.item_id;
 		
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
@@ -121,54 +104,49 @@ module.exports = function(app) {
 				console.log('Error deleting product to cart: ', err);
 				res.redirect('/shop');
 				return;
-			}
-
-			//Add or increase the product quantity in the shopping cart.
-			if (cart[id].qty > 1) {
-				cart[id].qty--;
-			}
-
-			res.redirect('/cart');
-
+			} else {
+  			//decrement the product quantity in the shopping cart.
+  			if (cart[id].qty > 1) {
+  				cart[id].qty--;
+  			}
+      }
+  			res.redirect('/cart');
 		});
 	});
 
-// POST CART PLUS ====================================================================
-	app.post('/cart/plus', isLoggedIn, function (req, res) {
+//POST PLUS ====================================================================
+	app.post('/cart/plus', lib.isLoggedIn, function (req, res) {
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart; //cart è l'oggetto sessione
+		var cart = req.session.cart;
 
 		//Read the incoming product data
-		var id = req.param('item_id');
-		console.log('object cart ->',cart );
-
+		var id = req.body.item_id;
+		
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
 			if (err) {
 				console.log('Error adding product to cart: ', err);
 				res.redirect('/shop');
 				return;
-			}
-
-			//Add or increase the product quantity in the shopping cart.
-			if (cart[id]) {
-				cart[id].qty++;
-			}
-
+			} else {
+  			//Add or increase the product quantity in the shopping cart.
+  			if (cart[id]) {
+  				cart[id].qty++;
+  			}
+      }
 			res.redirect('/cart');
-
 		});
 	});
 
-// POST CART MINUS ====================================================================
-	app.post('/cart/delete', isLoggedIn, function (req, res) {
+//POST DELETE ==================================================================
+	app.post('/cart/delete', lib.isLoggedIn, function (req, res) {
 		//Load (or initialize) the cart 
 		req.session.cart = req.session.cart || {};
 		var cart = req.session.cart; //cart è l'oggetto sessione
 
 		//Read the incoming product data
-		var id = req.param('item_id');
+		var id = req.body.item_id;
 
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
@@ -176,12 +154,12 @@ module.exports = function(app) {
 				console.log('Error deleting product to cart: ', err);
 				res.redirect('/shop');
 				return;
-			}
-
-			//Add or increase the product quantity in the shopping cart.
-			if (cart[id]) {
-				delete req.session.cart[id];
-			}
+			} else {
+  			//Add or increase the product quantity in the shopping cart.
+  			if (cart[id]) {
+  				delete req.session.cart[id];
+  			}
+      }
 
 			req.session.numProducts = Object.keys(cart).length;
 
@@ -190,11 +168,12 @@ module.exports = function(app) {
 		});
 	});
 
+// ========================= SHOP ADMIN ROUTE ==================================
 // =============================================================================
 // Add a new product to the database.
 // =============================================================================
 
-    app.get('/admin/product', isLoggedIn, function (req,res) {
+    app.get('/admin/product',lib.isLoggedIn, function (req,res) {
 
       Product.find(function (err, prods) {
   			if (err) {
@@ -263,40 +242,3 @@ module.exports = function(app) {
 	});
 
 };
-
-// route middleware to make sure a user is logged in ===========================
-function isLoggedIn(req, res, next) {
-
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
-        return next();
-
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
-}
-//-----------------------------------------------------------------------------
-function retriveCart (req, res) {
-	//Retrieve the shopping cart from memory
-	var cart = req.session.cart,
-	displayCart = {items: [], total: 0},
-	total = 0,
-	totalqty = 0
-
-	if (!cart) {
-		req.session.numProducts = 0;
-	} else {
-
-		//Read the products for display
-		for (var item in cart) {
-			if (cart[item].qty > 0) {
-				displayCart.items.push(cart[item]);
-				total += (cart[item].qty * cart[item].price);
-				totalqty += cart[item].qty;
-			}
-		}
-		req.session.displayCart = displayCart;
-		req.session.total = displayCart.total = total.toFixed(2);
-		req.session.totalQty = totalqty;
-		req.session.numProducts = Object.keys(cart).length; 
-	}
-}

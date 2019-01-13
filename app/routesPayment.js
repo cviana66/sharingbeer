@@ -47,7 +47,7 @@ app.get('/paynow', isLoggedIn, function(req, res) {
   newOrder.dateInsert = Date.now();
   newOrder.status = 'reserved';
   newOrder.discount = 0;
-  newOrder.totalPrice = req.session.total;
+  newOrder.totalPrice = req.session.totalPrc;
 
   newOrder.save(function(err, order) {
     if (err) {
@@ -132,7 +132,7 @@ app.get('/paynow', isLoggedIn, function(req, res) {
         },
         "amount": {
             "currency": "EUR",
-            "total": req.session.total
+            "total": req.session.totalPrc
         },
         "description": "This is the payment description."
     }]
@@ -168,7 +168,7 @@ app.get('/success',  function(req, res) {
 
   req.session.cart  = {};
   //req.session.order = {};
-  req.session.total = 0;
+  req.session.totalPrc = 0;
   req.session.numProducts = 0;
 
   

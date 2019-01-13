@@ -16,7 +16,7 @@ module.exports = function(app, paypal) {
 
 app.get('/paynow', isLoggedIn, function(req, res) {
    // paypal payment configuration.
-  console.log("TOTAL : ",req.session.total);
+  console.log("TOTAL : ",req.session.totalPrc);
 
   var jsonsItems = new Array();
   var cart = req.session.cart;
@@ -40,7 +40,7 @@ app.get('/paynow', isLoggedIn, function(req, res) {
   newOrder.dateInsert = Date.now();
   newOrder.status = 'reserved';
   newOrder.discount = 0;
-  newOrder.totalPrice = req.session.total;
+  newOrder.totalPrice = req.session.totalPrc;
 
   newOrder.save(function(err, order) {
     if (err) {
@@ -124,7 +124,7 @@ console.log('ITEMS: ', jsonsItems);
         },
         "amount": {
             "currency": "EUR",
-            "total": req.session.total
+            "total": req.session.totalPrc
         },
         "description": "This is the payment description."
     }]
