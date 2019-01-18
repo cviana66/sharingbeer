@@ -3,8 +3,9 @@
 // =============================================================================
 
 // load up the user model
-var User	 = require('../app/models/user');
-var Friend = require('../app/models/friend');
+var User	   = require('../app/models/user');
+var Friend   = require('../app/models/friend');
+var CityCap  = require('../app/models/cityCap');
 var bcrypt   = require('bcrypt-nodejs'); //TODO da spostare in libfunction
 
 var lib = require('./libfunction');
@@ -95,16 +96,19 @@ app.get('/test', function(req, res) {
     })
   });
 
-// =====================================
-// PAYMENT ============================
-// =====================================
+// =============================================================================
+// PAYMENT =====================================================================
+// =============================================================================
+//GET  
   app.get('/register', lib.isLoggedIn, function(req, res) {
 
-    if (req.user.status == 'validated') {  
+    if (req.user.status == 'validated') { 
+      
       res.render ('registration.dust', {
-        firstName : req.user.name.first
+        firstName : req.user.name.first,
+        lastName  : req.user.name.last,
       });
-    
+
     } else if (req.user.status == 'customer' && req.session.numProducts > 0) {
       res.redirect('/paynow'); 
     
@@ -113,9 +117,10 @@ app.get('/test', function(req, res) {
       res.redirect('/shop');
     } 
   });
-
 //POST
   app.post('/register', lib.isLoggedIn, function(req, res) {
+
+
     User.findByIdAndUpdate(req.user._id, 
       { $set: { 
                 name: {

@@ -1,0 +1,1 @@
+mongoimport -h ds045464.mlab.com:45464 -d dbm1 -c comuniItaliani -u sb -p sharing11beer --file /home/carlo/Documenti/Birra/comuni_italiani_per_excel.csv --type csv --headerline

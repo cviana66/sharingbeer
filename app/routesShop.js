@@ -11,8 +11,6 @@ module.exports = function(app) {
 // =============================================================================
 //GET
   app.get('/shop', lib.isLoggedIn, function (req,res) {
-
-    console.log(req.session.cart)
     	
   	Product.find(function (err, prods) {
   		if (err) {
@@ -21,7 +19,7 @@ module.exports = function(app) {
   		prods.forEach(function(prod) {
   			prod.prettyPrice = prod.prettyPrice();
   		});
-  		
+		
   		//mette in memoria i prodotti dal carrello
       lib.retriveCart(req);
 

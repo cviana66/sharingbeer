@@ -21,11 +21,33 @@
         <div class="form-group">
           <label for="inputUsernameEmail">Name</label>
           <input type="text" class="form-control" id="inputFirsName" value="{firstName}"
-           name="firstName" placeholder="First name" required>
+           name="firstName" placeholder="First name" readonly>
         </div>
         <div class="form-group">
-          <input type="text" class="form-control" id="inputLastName"
-           name="lastName" placeholder="Last name" autofocus required>
+          <input type="text" class="form-control" id="inputLastName" value="{lastName}" 
+           name="lastName" placeholder="Last name" autofocus readonly>
+        </div>
+        <div class="form-group">
+          <label for="inputMobile">Cellulare</label>
+          <input type="text" class="form-control" id="inputMobile" value="{mobile}" 
+           name="mobile" placeholder="" autofocus>
+        </div>
+        <div class="form-group">
+          <label for="inputCity">Comune</label>
+          <input type="text" class="form-control" id="inputCity" value="{city}" 
+           name="city" placeholder="" >
+        </div>
+        <div class="form-group">
+          <label for="inputCap">CAP</label>
+          <input type="text" class="form-control" id="inputCap" value="{cap}" name="cap">
+        </div>
+        <div class="form-group">
+          <label for="inputAddress">Indirizzo</label>
+          <input type="text" class="form-control" id="inputAddress" value="{address}" name="address">
+        </div>
+        <div class="form-group">
+          <label for="inputNumber">Numero Civico</label>
+          <input type="text" class="form-control" id="inputNumber" value="{number}" name="number">
         </div>
         <button type="submit" class="btn btn-primary">
           <h4>Save</h4>
