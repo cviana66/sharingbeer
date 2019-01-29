@@ -138,7 +138,7 @@ Element.prototype.remove = function() {
 };
 
 function hideMyselect(select) {
-   document.getElementById(select).style.visibility= 'visible'; 
+   document.getElementById(select).style.visibility= 'hidden'; 
 }
 
 function sleep(ms) {
