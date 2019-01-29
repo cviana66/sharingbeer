@@ -10,7 +10,8 @@ var userSchema = mongoose.Schema({
         town        : { type: String },
         province    : { type: String },
         conutry     : { type: String },
-        cap         : { type: String }
+        cap         : { type: String },
+        status      : { type: String }, //VERIFIED or NO_VERiFIED
 });
 
 // create the model for users and expose it to our app

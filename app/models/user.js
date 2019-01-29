@@ -15,14 +15,6 @@ var userSchema = mongoose.Schema({
         last        : { type: String },
     },
     fiscalCode      : { type: String },
-    address: {
-        address1    : { type: String },
-        address2    : { type: String },
-        town        : { type: String },
-        province    : { type: String },
-        conutry     : { type: String },
-        pcd         : { type: String }
-    },
     mobilePrefix    : { type: String },
     mobileNumber    : { type: String },
     initDate        : { type: Date, default: Date.now },

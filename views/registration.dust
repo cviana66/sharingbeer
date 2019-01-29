@@ -28,32 +28,259 @@
            name="lastName" placeholder="Last name" autofocus readonly>
         </div>
         <div class="form-group">
-          <label for="inputMobile">Cellulare</label>
+          <div class="col"><label for="inputMobile">Cellulare</label></div>
+          <div class="col" style="color:yellow; font-size:80%;" id="wrongPhone"></div> 
           <input type="text" class="form-control" id="inputMobile" value="{mobile}" 
-           name="mobile" placeholder="" autofocus>
+           name="mobile" placeholder="" autofocus required>
         </div>
         <div class="form-group">
-          <label for="inputCity">Comune</label>
+          <div class="col"><label for="inputCity">Comune</label></div>
+          <div class="col" style="color:yellow; font-size:80%;" id="wrongCity"></div>           
           <input type="text" class="form-control" id="inputCity" value="{city}" 
-           name="city" placeholder="" >
+           name="city" placeholder="" required oninput="myFunction(this.value)"/>
+          <div class="w-100"></div>
+          <div class="col" id="cities"></div>
         </div>
         <div class="form-group">
-          <label for="inputCap">CAP</label>
-          <input type="text" class="form-control" id="inputCap" value="{cap}" name="cap">
+          <div class="col"><label for="inputCap">CAP</label></div>
+          <div class="col" style="color:yellow; font-size:80%;" id="wrongCap"></div> 
+          <input type="text" class="form-control" id="inputCap" value="{cap}" name="cap" required readonly>
+          <div class="w-100"></div>
+          <div class="col-6" id="caps"></div>
+
         </div>
         <div class="form-group">
-          <label for="inputAddress">Indirizzo</label>
-          <input type="text" class="form-control" id="inputAddress" value="{address}" name="address">
+          <div class="col"><label for="inputAddress">Indirizzo</label></div>
+          <div class="col" style="color:yellow; font-size:80%;" id="wrongAddress"></div> 
+          <input type="text" class="form-control" id="inputAddress" value="{address}" name="address" required>
         </div>
         <div class="form-group">
-          <label for="inputNumber">Numero Civico</label>
-          <input type="text" class="form-control" id="inputNumber" value="{number}" name="number">
+          <div class="col"><label for="inputNumciv">Numero Civico</label></div>
+          <div class="col" style="color:yellow; font-size:80%;" id="wrongNumciv"></div> 
+          <input type="text" class="form-control" id="inputNumciv" value="{number}" name="number" required>
         </div>
-        <button type="submit" class="btn btn-primary">
+        <button type="submit" class="btn btn-primary" id="mybutton">
           <h4>Save</h4>
         </button>
       </form>
       <br>
+
+<script type="text/javascript">
+  
+  window.onload = function () {
+    var mybutton = document.getElementById('mybutton');
+    
+    mybutton.onclick = function () {
+      var phone = document.getElementById("inputMobile").value.replace(/\W+/g, '');
+      var city = document.getElementById("inputCity").value;
+      var cap = document.getElementById("inputCap").value;
+      var address = document.getElementById("inputAddress").value;
+      var numciv = document.getElementById("inputNumciv").value;
+      var phoneno = /^\d{10}$/;
+      var capno = /^\d{5}$/;
+      var submit = true;
+
+      
+      if (phone == "" || !phone.match(phoneno)) {
+        text = "Please provide a valid mobile phone. ";
+        document.getElementById("wrongPhone").innerHTML = text;
+        submit = false;
+      } else {
+        document.getElementById("wrongPhone").innerHTML = "";
+      } 
+      if (city == "") {
+        text = "Please provide a valid City";
+        document.getElementById("wrongCity").innerHTML = text;
+        submit = false;
+      } else {
+        document.getElementById("wrongCity").innerHTML = "";
+      } 
+      if (cap == "" || !cap.match(capno)) {
+        text = "Please provide a valid CAP ";
+        document.getElementById("wrongCap").innerHTML = text;
+        submit = false;
+      } else {
+        document.getElementById("wrongCap").innerHTML = "";
+      }
+      if (address == "") {
+        text = "Please provide a valid address";
+        document.getElementById("wrongAddress").innerHTML = text;
+        submit = false;
+      } else {
+        document.getElementById("wrongAddress").innerHTML = "";
+      }
+      if (numciv == "") {
+        text = "Please provide a valid Civic Number";
+        document.getElementById("wrongNumciv").innerHTML = text;
+        submit = false;
+      } else {
+        document.getElementById("wrongNumciv").innerHTML = "";
+      }
+      if (submit) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+  };
+/*==================================================================*/
+/* GESTIONE della CITTA e CAP con recupero da MONGODB               */
+/*==================================================================*/
+Element.prototype.remove = function() {
+      this.parentElement.removeChild(this);
+    };
+    NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+      for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+          this[i].parentElement.removeChild(this[i]);
+        }
+      }
+};
+
+function hideMyselect(select) {
+   document.getElementById(select).style.visibility= 'hidden';
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+} 
+
+function myFunction (v) { 
+  var vl = v.toLowerCase();
+  if (vl.length > 2 || vl =='lu' || vl =='ne' || vl =='re' || vl =='ro') {
+    
+    var data = {};
+    data.city = v;
+/* Seleziono la città con API che ricerca su MongoDB */
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      url: '/cities',
+      data: data,
+      success: function(res) {
+        if (typeof res !== 'undefined' && res.length > 0) {
+          /* Creo la select option con elenco delle città in modo dinamico */
+          var select = document.createElement('select'),
+              option= null,
+              i = 0,
+              il = res.length;
+
+          select.setAttribute('id','myselect');
+          select.setAttribute('class','form-control');
+          select.setAttribute('onchange','if (this.selectedIndex) hideMyselect("myselect");');
+        
+          option = document.createElement('option');
+          option.text = 'Select a City';
+          select.appendChild(option);
+          for (; i < il; i += 1) {
+              
+              option = document.createElement('option');
+              option.setAttribute('CAP', res[i].CAP);
+              option.setAttribute('city', res[i].Comune);
+              option.setAttribute('provincia', res[i].Provincia);
+              option.appendChild(document.createTextNode(res[i].Comune+'('+res[i].Provincia+')'));
+              select.appendChild(option);
+          };
+          /* Selezion la città dalla select */
+          select.onclick = async function () {
+
+            var inputCity = document.getElementById('inputCity');
+            var inputCap = document.getElementById('inputCap');
+            var city = select.options[myselect.selectedIndex].getAttribute('city');
+            var text = select.options[myselect.selectedIndex].getAttribute('CAP');
+            
+            var data = {}; 
+            data.city = city;
+            /* Recuper i CAP della città selezionata da MongoDB */
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              async: true,
+              url: '/caps',
+              data: data,
+              success: function(res) {
+                /* Creo la select option con elenco dei CAP se multipli e dinamicamente */
+                if (typeof res !== 'undefined' && res.length > 0) {
+                  var selectcaps = document.createElement('select'),
+                      option= null,
+                      i = 0,
+                      il = res.length;
+
+                  selectcaps.setAttribute('id','myselectcaps');
+                  selectcaps.setAttribute('class','form-control');
+                  selectcaps.setAttribute('onchange','if (this.selectedIndex) hideMyselect("myselectcaps");');
+                  
+                  option = document.createElement('option');
+                  option.text = 'Select a CAP';
+                  selectcaps.appendChild(option);
+                  for (; i < il; i += 1) {
+                      
+                      option = document.createElement('option');
+                      option.setAttribute('CAP', res[i].CAP);
+                      option.setAttribute('city', res[i].Comune);
+                      option.setAttribute('provincia', res[i].Provincia);
+                      option.appendChild(document.createTextNode(res[i].CAP));
+                      selectcaps.appendChild(option);
+                  };
+
+                  $("#caps").html(selectcaps);  
+                } else {
+                  if (document.getElementById('myselectcaps') !=null) {
+                    document.getElementById('myselectcaps').remove();
+                  }
+                }
+              },
+              error: function (e) {
+                console.log("Error", e);
+              }
+            });
+            /* attendo il caricamento della select dei CAP che è chiamata async */
+            await sleep(1000); 
+            inputCity.value = city;
+
+            selectcaps = document.getElementById('myselectcaps');
+            if (selectcaps != null) {
+              selectcaps.onclick = function () {
+                var inputCap = document.getElementById('inputCap');
+                inputCap.value = selectcaps.options[myselectcaps.selectedIndex].getAttribute('CAP');
+              };
+            } else {
+              inputCap.value = text;
+            }
+          };
+
+          $("#cities").html(select); 
+
+        } else {
+          if (document.getElementById('myselectcaps') !=null) {
+                    document.getElementById('myselectcaps').remove();
+          }
+          if (document.getElementById('myselect') != null) {
+            document.getElementById('myselect').remove();
+          }
+        }  
+      },
+      
+      error: function (e) {
+        console.log("Error", e);
+      }      
+    });
+
+  } else {
+
+    inputCap.value=null;
+    if (document.getElementById('myselect') != null) {
+      document.getElementById('myselect').remove();
+    }
+    if (document.getElementById('myselectcaps') !=null) {
+      document.getElementById('myselectcaps').remove();
+    }
+  }
+};  
+
+</script>
+
+
     </div>
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
   </div>

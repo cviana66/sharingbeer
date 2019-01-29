@@ -3,21 +3,49 @@
 // =============================================================================
 
 // load up the user model
-var User	   = require('../app/models/user');
-var Friend   = require('../app/models/friend');
-var CityCap  = require('../app/models/cityCap');
-var bcrypt   = require('bcrypt-nodejs'); //TODO da spostare in libfunction
-
-var lib = require('./libfunction');
+var User	      = require('../app/models/user');
+var Friend      = require('../app/models/friend');
+var CityCap     = require('../app/models/cityCap');
+var MultipleCap = require('../app/models/multipleCap');
+var bcrypt      = require('bcrypt-nodejs'); //TODO da spostare in libfunction
+var lib         = require('./libfunction');
 
 
 module.exports = function(app) {
 
 // TESTING
 app.get('/test', function(req, res) {
-        //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
-        //res.render('validation.dust', { message: req.flash('validation') });
-    });
+  res.render ('test.dust')
+});
+//===================================================
+
+// =====================================
+// API =================================
+// =====================================
+
+app.post('/cities', function(req, res) {
+  //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+  //res.render('validation.dust', { message: req.flash('validation') }); 
+  console.log("city : ", req.body.city);
+  CityCap.find({'Comune': new RegExp('^'+req.body.city, "i")}, function(err, city) { 
+  
+    console.log("Got city : ", city);
+  
+    res.send(city)
+  })
+});
+
+app.post('/caps', function(req, res) {
+  //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+  //res.render('validation.dust', { message: req.flash('validation') }); 
+  console.log("city : ", req.body.city);
+  MultipleCap.find({'Comune': req.body.city}).sort('CAP').exec(function(err, caps) { 
+ 
+    console.log("Got caps : ", caps);
+  
+    res.send(caps)
+  });
+});
 
 // =====================================
 // VALIDATION ==========================
@@ -96,14 +124,14 @@ app.get('/test', function(req, res) {
     })
   });
 
-// =============================================================================
-// PAYMENT =====================================================================
-// =============================================================================
+// =====================================
+// PAYMENT =============================
+// =====================================
 //GET  
   app.get('/register', lib.isLoggedIn, function(req, res) {
 
     if (req.user.status == 'validated') { 
-      
+
       res.render ('registration.dust', {
         firstName : req.user.name.first,
         lastName  : req.user.name.last,
@@ -117,17 +145,68 @@ app.get('/test', function(req, res) {
       res.redirect('/shop');
     } 
   });
-//POST
-  app.post('/register', lib.isLoggedIn, function(req, res) {
+//POST   'Comune': new RegExp(req.body.city, "i"), 
+  app.post('/register', lib.isLoggedIn, function(req, res, next) {
+/*    
+    TODO salvare il dato del MOBILE su USER
 
+    //CityCap.findOne({'Comune': new RegExp(req.body.city, "i"), CAP: parseInt(req.body.cap)}, function(err, city) {
+      CityCap.find({'Comune': new RegExp('^'+req.body.city+'$', "i")}, function(err, city) {
+        console.log('POST REGISTER FIND x CITY:', city )
+        console.log('POST REGISTER COUNT:', city.length )
+        var status = false
+        if (city.length == 2) {
+          
+          var min = Math.min(city[0].CAP, city[1].CAP)
+          var max = Math.max(city[0].CAP, city[1].CAP)
+          var cap = parseInt(req.body.cap)
+          if ( cap > min && cap < max) { status = true }
+        
+        } else if (city.length == 1) {
+          
+          var cap = parseInt(req.body.cap)
+          if (cap == parseInt(city[0].CAP)) { status = true }
+        }
+        // verifico il CAP inserito e se corrisponde a una città lo propongo nel messaggio di errore di ritorno
+        if (status == false) {
+          CityCap.findOne({'CAP': parseInt(req.body.cap)}, function(err, city) {
+            console.log('POST REGISTER FIND x CAP:' city)
+            if (city) {
+
+              TODO: redirect su Registration precompilata e con messagio di errore + proposta della città
+
+            } else {
+              TODO: Ne città ne CAP corrispondono memorizzo ???
+            }
+
+            status = true
+
+            TODO: Salvare i dati su Address 
+            
+            res.redirect('/paynow');
+          })
+        }
+
+
+        console.log('POST REGISTER STATUS:', status )
+
+        //CityCap.find({'Cap': {$gt }})   db.Pupils.find({ "LatestMark": {$gt : 15, $lt : 20}});
+      });
+      next()
+
+      
+      console.log('POST REGISTER CITY:', city)
+      if (city == null) {
+        CityCap.findOne({'Comune': new RegExp(req.body.city, "i"), CAP: parsInt(req.body.cap)}, function(err, city) {
+          
+        })
+      }
 
     User.findByIdAndUpdate(req.user._id, 
       { $set: { 
-                name: {
-                        first: lib.capitalizeFirstLetter(req.body.firstName),
-                        last:  lib.capitalizeFirstLetter(req.body.lastName),
-                      },
-                status: 'customer'
+                mobilePrefix  : '+39',
+                mobileNumber  : lib.capitalizeFirstLetter(req.body.mobile),
+                status        : 'validated' // to change in 'customer' after session  of testing
               }
       }, 
       function (err, req) {
@@ -141,7 +220,7 @@ app.get('/test', function(req, res) {
 
     req.user.status = "customer";
     res.redirect('/register');
-
+*/
   });
 
 // =====================================
