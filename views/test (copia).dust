@@ -37,7 +37,7 @@ $(document).ready(function(e) {
 });;
 
 function hideMyselect(select) {
-   document.getElementById(select).style.visibility= 'visible'; 
+   document.getElementById(select).style.visibility= 'hidden'; 
 }
 
 function sleep(ms) {
@@ -65,9 +65,7 @@ function myFunction (v) {
               il = res.length;
 
           select.setAttribute('id','myselect');
-          select.setAttribute('class','form-control');
-          select.setAttribute('size',2);
-          /*select.setAttribute('class','selectpicker form-control');*/
+          /*select.setAttribute('class','selectpicker');*/
           /*select.setAttribute('data-native-menu',false);*/
           /*select.setAttribute('onchange','if (this.selectedIndex) hideMyselect("myselect");');*/
         
@@ -183,12 +181,6 @@ function myFunction (v) {
   }
 };  
 
-</script>
-
-<script>
-$(document).ready(function(e) {
-  $('.selectpicker').selectpicker();
-});
 </script>
 
 </div>

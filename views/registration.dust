@@ -2,14 +2,13 @@
 
 {<body}
 
-<div class="container">
   <div class="row">
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
+    <div class="col-md-3 col-lg-4"></div>
+   <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
 
-      <h3><span style="color:#480413">Customer Registration</span></h3>
-      <hr class="hr"  style="border-top: 1px solid #480413;">
-      <!-- show any messages that come back with authentication -->
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Customer Registration</h3>
+      <hr style="border-top: 1px solid #5375BD;">
+      
       {?message}
         {#message}
           <div class="alert alert-danger">{.}</div>
@@ -17,9 +16,8 @@
       {/message}
 
       <form role="form" action="/register" method="post">
-          <!--input type="hidden", name="_csrf", value="csrfToken" -->
         <div class="form-group">
-          <label for="inputUsernameEmail">Name</label>
+          <label for="inputUsernameEmail" class="text-white col-form-label-lg">Name</label>
           <input type="text" class="form-control" id="inputFirsName" value="{firstName}"
            name="firstName" placeholder="First name" readonly>
         </div>
@@ -28,40 +26,42 @@
            name="lastName" placeholder="Last name" autofocus readonly>
         </div>
         <div class="form-group">
-          <div class="col"><label for="inputMobile">Cellulare</label></div>
-          <div class="col" style="color:yellow; font-size:80%;" id="wrongPhone"></div> 
+          <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div>
+          <div style="color:yellow; font-size:80%;" id="wrongPhone"></div> 
           <input type="text" class="form-control" id="inputMobile" value="{mobile}" 
            name="mobile" placeholder="" autofocus required>
         </div>
         <div class="form-group">
-          <div class="col"><label for="inputCity">Comune</label></div>
-          <div class="col" style="color:yellow; font-size:80%;" id="wrongCity"></div>           
+          <div ><label for="inputCity" class="text-white col-form-label-lg">Comune</label></div>
+          <div style="color:yellow; font-size:80%;" id="wrongCity"></div>           
           <input type="text" class="form-control" id="inputCity" value="{city}" 
            name="city" placeholder="" required oninput="myFunction(this.value)"/>
           <div class="w-100"></div>
-          <div class="col" id="cities"></div>
+          <div id="cities"></div>
         </div>
         <div class="form-group">
-          <div class="col"><label for="inputCap">CAP</label></div>
-          <div class="col" style="color:yellow; font-size:80%;" id="wrongCap"></div> 
+          <div "><label for="inputCap" class="text-white col-form-label-lg">CAP</label></div>
+          <div style="color:yellow; font-size:80%;" id="wrongCap"></div> 
           <input type="text" class="form-control" id="inputCap" value="{cap}" name="cap" required readonly>
           <div class="w-100"></div>
-          <div class="col-6" id="caps"></div>
-
+          <div id="caps"></div>
         </div>
         <div class="form-group">
-          <div class="col"><label for="inputAddress">Indirizzo</label></div>
-          <div class="col" style="color:yellow; font-size:80%;" id="wrongAddress"></div> 
+          <div><label for="inputAddress" class="text-white col-form-label-lg">Indirizzo</label></div>
+          <div style="color:yellow; font-size:80%;" id="wrongAddress"></div> 
           <input type="text" class="form-control" id="inputAddress" value="{address}" name="address" required>
         </div>
         <div class="form-group">
-          <div class="col"><label for="inputNumciv">Numero Civico</label></div>
-          <div class="col" style="color:yellow; font-size:80%;" id="wrongNumciv"></div> 
+          <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div>
+          <div style="color:yellow; font-size:80%;" id="wrongNumciv"></div> 
           <input type="text" class="form-control" id="inputNumciv" value="{number}" name="number" required>
         </div>
-        <button type="submit" class="btn btn-primary" id="mybutton">
-          <h4>Save</h4>
-        </button>
+        <br>
+        <div>
+          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+            Save
+          </button>
+        </div>
       </form>
       <br>
 
@@ -124,7 +124,7 @@
     };
   };
 /*==================================================================*/
-/* GESTIONE della CITTA e CAP con recupero da MONGODB               */
+/* GESTIONE della CITTA' e CAP con recupero da MONGODB               */
 /*==================================================================*/
 Element.prototype.remove = function() {
       this.parentElement.removeChild(this);
@@ -138,7 +138,8 @@ Element.prototype.remove = function() {
 };
 
 function hideMyselect(select) {
-   document.getElementById(select).style.visibility= 'visible'; 
+   document.getElementById(select).style.visibility= 'hidden'; 
+   document.getElementById("inputCap").focus();
 }
 
 function sleep(ms) {
@@ -167,6 +168,7 @@ function myFunction (v) {
 
           select.setAttribute('id','myselect');
           select.setAttribute('class','form-control');
+          select.setAttribute('size',2);
           select.setAttribute('data-native-menu',false);
           select.setAttribute('onchange','if (this.selectedIndex) hideMyselect("myselect");');
         
@@ -196,7 +198,6 @@ function myFunction (v) {
             $.ajax({
               type: 'POST',
               dataType: 'json',
-              async: true,
               url: '/caps',
               data: data,
               success: function(res) {
@@ -209,6 +210,7 @@ function myFunction (v) {
 
                   selectcaps.setAttribute('id','myselectcaps');
                   selectcaps.setAttribute('class','form-control');
+                  selectcaps.setAttribute('size',2);
                   selectcaps.setAttribute('onchange','if (this.selectedIndex) hideMyselect("myselectcaps");');
                   selectcaps.setAttribute('data-native-menu',false);
                   
@@ -282,9 +284,8 @@ function myFunction (v) {
 
 </script>
 
-
     </div>
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-md-3 col-lg-4"></div>
   </div>
-</div>
+
 {/body}

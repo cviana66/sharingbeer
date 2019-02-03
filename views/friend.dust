@@ -2,7 +2,6 @@
 
 {<body}
 
-<div class="container">
   <div class="row">
     <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
     <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px 12px 0px 0px">
@@ -51,6 +50,5 @@
       <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
     </div>
   </div>  
-</div>
 
 {/body}
