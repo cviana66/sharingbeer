@@ -28,11 +28,12 @@
 	  .btn-my:hover{background-color: #1140A4;color: #fff;}
 	</style>
 
-	<script>
+	<!--script>
 		$(document).ready(function(e) {
+			console.log("selectpicker");
 		  $('.selectpicker').selectpicker();
 		});
-	</script>
+	</script-->
 
 </head>
 

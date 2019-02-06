@@ -40,10 +40,15 @@ app.post('/caps', function(req, res) {
   //res.render('validation.dust', { message: req.flash('validation') }); 
   console.log("city : ", req.body.city);
   MultipleCap.find({'Comune': req.body.city}).sort('CAP').exec(function(err, caps) { 
- 
-    console.log("Got caps : ", caps);
-  
-    res.send(caps)
+    if (caps.length == 0) {
+      CityCap.find({'Comune': req.body.city}, function(err,cap) {
+        console.log('CAP: ', cap);
+        res.send(cap)
+      })
+    } else {
+      console.log('CAPS: ', caps);
+      res.send(caps)
+    }
   });
 });
 

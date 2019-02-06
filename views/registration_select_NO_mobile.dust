@@ -1,3 +1,5 @@
+registration_select_NO_mobile.dust
+
 {> "layouts/main" /}
 
 {<body}
@@ -35,7 +37,7 @@
           <div ><label for="inputCity" class="text-white col-form-label-lg">Comune</label></div>
           <div style="color:yellow; font-size:80%;" id="wrongCity"></div>           
           <input type="text" class="form-control" id="inputCity" value="{city}" 
-           name="city" placeholder="" required oninput="selectCity(this.value)"/>
+           name="city" placeholder="" required oninput="myFunction(this.value)"/>
           <div class="w-100"></div>
           <div id="cities"></div>
         </div>
@@ -129,90 +131,25 @@
 Element.prototype.remove = function() {
       this.parentElement.removeChild(this);
     };
-NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-  for(var i = this.length - 1; i >= 0; i--) {
-    if(this[i] && this[i].parentElement) {
-      this[i].parentElement.removeChild(this[i]);
-    }
-  }
+    NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+      for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+          this[i].parentElement.removeChild(this[i]);
+        }
+      }
 };
 
 function hideMyselect(select) {
-   document.getElementById(select).style.visibility= 'hidden';
+   document.getElementById(select).style.visibility= 'hidden'; 
    document.getElementById("inputCap").focus();
 }
 
-function selectCap() {
-  $("#myselectcaps").on("changed.bs.select", function(e, clickedIndex, isSelected, oldValue) {
-    var cap = $(this).find('option').eq(clickedIndex).text();
-    inputCap.value = cap;
-    $("#myselectcaps").selectpicker('hide');
-    document.getElementById("inputAddress").focus();
-  });
-}
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+} 
 
-function selectCaps() {
-  $("#myselect").on("changed.bs.select", function(e, clickedIndex, isSelected, oldValue) {
-    var selectedD = $(this).find('option').eq(clickedIndex).text();
-    var city = selectedD.substring(0, selectedD.length - 4 ); 
-    inputCity.value = city;
-   
-    $("#myselect").selectpicker('hide');
-    document.getElementById("inputCap").focus();
-
-    var data = {}; 
-    data.city = city;
-    /* Recuper i CAP della città selezionata da MongoDB */
-    $.ajax({
-      type: 'POST',
-      dataType: 'json',
-      url: '/caps',
-      data: data,
-      success: function(res) {
-        /* Creo la select option con elenco dei CAP se multipli e dinamicamente */
-        if (typeof res !== 'undefined' && res.length > 0) {
-          var selectcaps = document.createElement('select'),
-              option= null,
-              i = 0, 
-              il = res.length;
-          if ( il == 1 ) {
-            inputCap.value = res[0].CAP;
-            document.getElementById("inputAddress").focus();
-          } else {  
-            selectcaps.setAttribute('id','myselectcaps');
-            selectcaps.setAttribute('class','form-control selectpicker');
-            selectcaps.setAttribute('onchange','if (this.selectedIndex) selectCap();');
-            
-            option = document.createElement('option');
-            option.text = 'Select a CAP';
-            selectcaps.appendChild(option);
-            
-            for (; i < il; i += 1) {
-              option = document.createElement('option');
-              option.appendChild(document.createTextNode(res[i].CAP));
-              selectcaps.appendChild(option);
-            };
-
-            $("#caps").html(selectcaps);  
-            $("#myselectcaps").selectpicker('refresh'); 
-          }
-        } else {
-          if (document.getElementById('myselectcaps') !=null) {
-            document.getElementById('myselectcaps').remove();
-            $("#myselectcaps").selectpicker('destroy');
-          }
-        }
-      },
-      error: function (e) {
-        console.log("Error", e);
-      }
-    });
-  });
-}
-
-function selectCity (v) { 
+function myFunction (v) { 
   var vl = v.toLowerCase();
-/*  Per ottimizzare le chiamate al DB  solo le citta con 2 caratteri sono permesse */
   if (vl.length > 2 || vl =='lu' || vl =='ne' || vl =='re' || vl =='ro') {
     
     var data = {};
@@ -232,31 +169,100 @@ function selectCity (v) {
               il = res.length;
 
           select.setAttribute('id','myselect');
-          select.setAttribute('class','form-control selectpicker');
-          select.setAttribute('onchange','if (this.selectedIndex) selectCaps();');
+          select.setAttribute('class','form-control');
+          select.setAttribute('size',2);
+          select.setAttribute('data-native-menu',false);
+          select.setAttribute('onchange','if (this.selectedIndex) hideMyselect("myselect");');
         
           option = document.createElement('option');
           option.text = 'Select a City';
           select.appendChild(option);
-          
-          for (; i < il; i += 1) {              
+          for (; i < il; i += 1) {
+              
               option = document.createElement('option');
+              option.setAttribute('CAP', res[i].CAP);
+              option.setAttribute('city', res[i].Comune);
+              option.setAttribute('provincia', res[i].Provincia);
               option.appendChild(document.createTextNode(res[i].Comune+'('+res[i].Provincia+')'));
               select.appendChild(option);
           };
+          /* Selezion la città dalla select */
+          select.onclick = async function () {
+
+            var inputCity = document.getElementById('inputCity');
+            var inputCap = document.getElementById('inputCap');
+            var city = select.options[myselect.selectedIndex].getAttribute('city');
+            var text = select.options[myselect.selectedIndex].getAttribute('CAP');
+            
+            var data = {}; 
+            data.city = city;
+            /* Recuper i CAP della città selezionata da MongoDB */
+            $.ajax({
+              type: 'POST',
+              dataType: 'json',
+              url: '/caps',
+              data: data,
+              success: function(res) {
+                /* Creo la select option con elenco dei CAP se multipli e dinamicamente */
+                if (typeof res !== 'undefined' && res.length > 0) {
+                  var selectcaps = document.createElement('select'),
+                      option= null,
+                      i = 0,
+                      il = res.length;
+
+                  selectcaps.setAttribute('id','myselectcaps');
+                  selectcaps.setAttribute('class','form-control');
+                  selectcaps.setAttribute('size',2);
+                  selectcaps.setAttribute('onchange','if (this.selectedIndex) hideMyselect("myselectcaps");');
+                  selectcaps.setAttribute('data-native-menu',false);
+                  
+                  option = document.createElement('option');
+                  option.text = 'Select a CAP';
+                  selectcaps.appendChild(option);
+                  for (; i < il; i += 1) {
+                      
+                      option = document.createElement('option');
+                      option.setAttribute('CAP', res[i].CAP);
+                      option.setAttribute('city', res[i].Comune);
+                      option.setAttribute('provincia', res[i].Provincia);
+                      option.appendChild(document.createTextNode(res[i].CAP));
+                      selectcaps.appendChild(option);
+                  };
+
+                  $("#caps").html(selectcaps);  
+                } else {
+                  if (document.getElementById('myselectcaps') !=null) {
+                    document.getElementById('myselectcaps').remove();
+                  }
+                }
+              },
+              error: function (e) {
+                console.log("Error", e);
+              }
+            });
+            /* attendo il caricamento della select dei CAP che è chiamata async */
+            await sleep(1000); 
+            inputCity.value = city;
+
+            selectcaps = document.getElementById('myselectcaps');
+            if (selectcaps != null) {
+              selectcaps.onclick = function () {
+                var inputCap = document.getElementById('inputCap');
+                inputCap.value = selectcaps.options[myselectcaps.selectedIndex].getAttribute('CAP');
+              };
+            } else {
+              inputCap.value = text;
+            }
+          };
 
           $("#cities").html(select); 
-          $("#myselect").selectpicker('refresh'); 
 
         } else {
-
-          if (document.getElementById('myselect') != null) {
-            $("#myselect").selectpicker('destroy');
-            document.getElementById('myselect').remove();
-          }
           if (document.getElementById('myselectcaps') !=null) {
-            $("#myselectcaps").selectpicker('destroy');
-            document.getElementById('myselectcaps').remove();
+                    document.getElementById('myselectcaps').remove();
+          }
+          if (document.getElementById('myselect') != null) {
+            document.getElementById('myselect').remove();
           }
         }  
       },
@@ -270,11 +276,9 @@ function selectCity (v) {
 
     inputCap.value=null;
     if (document.getElementById('myselect') != null) {
-      $("#myselect").selectpicker('destroy');
       document.getElementById('myselect').remove();
     }
     if (document.getElementById('myselectcaps') !=null) {
-      $("#myselectcaps").selectpicker('destroy');
       document.getElementById('myselectcaps').remove();
     }
   }
