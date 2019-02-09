@@ -1,0 +1,3 @@
+migliorie.txt
+
+Pagina registration.dust --> arire direttamente le select. La select è realizzata con Select-Mobile Bootstrap

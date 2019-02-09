@@ -140,6 +140,7 @@ app.post('/caps', function(req, res) {
       res.render ('registration.dust', {
         firstName : req.user.name.first,
         lastName  : req.user.name.last,
+        user : req.user, // get the user out of session and pass to template
       });
 
     } else if (req.user.status == 'customer' && req.session.numProducts > 0) {
@@ -150,83 +151,29 @@ app.post('/caps', function(req, res) {
       res.redirect('/shop');
     } 
   });
-//POST   'Comune': new RegExp(req.body.city, "i"), 
+//POST   
   app.post('/register', lib.isLoggedIn, function(req, res, next) {
-/*    
-    TODO salvare il dato del MOBILE su USER
-
-    //CityCap.findOne({'Comune': new RegExp(req.body.city, "i"), CAP: parseInt(req.body.cap)}, function(err, city) {
-      CityCap.find({'Comune': new RegExp('^'+req.body.city+'$', "i")}, function(err, city) {
-        console.log('POST REGISTER FIND x CITY:', city )
-        console.log('POST REGISTER COUNT:', city.length )
-        var status = false
-        if (city.length == 2) {
-          
-          var min = Math.min(city[0].CAP, city[1].CAP)
-          var max = Math.max(city[0].CAP, city[1].CAP)
-          var cap = parseInt(req.body.cap)
-          if ( cap > min && cap < max) { status = true }
-        
-        } else if (city.length == 1) {
-          
-          var cap = parseInt(req.body.cap)
-          if (cap == parseInt(city[0].CAP)) { status = true }
-        }
-        // verifico il CAP inserito e se corrisponde a una città lo propongo nel messaggio di errore di ritorno
-        if (status == false) {
-          CityCap.findOne({'CAP': parseInt(req.body.cap)}, function(err, city) {
-            console.log('POST REGISTER FIND x CAP:' city)
-            if (city) {
-
-              TODO: redirect su Registration precompilata e con messagio di errore + proposta della città
-
-            } else {
-              TODO: Ne città ne CAP corrispondono memorizzo ???
+//DA SISTEMARE 
+  User.findByIdAndUpdate(req.user._id, 
+    { $set: { 
+              mobilePrefix  : '+39',
+              mobileNumber  : lib.capitalizeFirstLetter(req.body.mobile),
+              status        : 'validated' // to change in 'customer' after session  of testing
             }
-
-            status = true
-
-            TODO: Salvare i dati su Address 
-            
-            res.redirect('/paynow');
-          })
-        }
-
-
-        console.log('POST REGISTER STATUS:', status )
-
-        //CityCap.find({'Cap': {$gt }})   db.Pupils.find({ "LatestMark": {$gt : 15, $lt : 20}});
-      });
-      next()
-
-      
-      console.log('POST REGISTER CITY:', city)
-      if (city == null) {
-        CityCap.findOne({'Comune': new RegExp(req.body.city, "i"), CAP: parsInt(req.body.cap)}, function(err, city) {
-          
-        })
+    }, 
+    function (err, req) {
+      if (err) {
+        console.log('error', err);
+        res.redirect('/');
+        return;
       }
+    }
+  );
 
-    User.findByIdAndUpdate(req.user._id, 
-      { $set: { 
-                mobilePrefix  : '+39',
-                mobileNumber  : lib.capitalizeFirstLetter(req.body.mobile),
-                status        : 'validated' // to change in 'customer' after session  of testing
-              }
-      }, 
-      function (err, req) {
-        if (err) {
-          console.log('error', err);
-          res.redirect('/');
-          return;
-        }
-      }
-    );
+  req.user.status = "customer";
+  res.redirect('/register');
 
-    req.user.status = "customer";
-    res.redirect('/register');
-*/
-  });
+});
 
 // =====================================
 // FRIEND ==============================

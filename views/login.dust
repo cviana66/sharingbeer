@@ -4,11 +4,10 @@
 
   <div class="row">
     <div class="col-md-3 col-lg-4"></div>
-
     <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Please Log In</h3>
       <hr style="border-top: 1px solid #5375BD;">
-      <!-- show any messages that come back with authentication -->
+     
       {?message}
       {#message}
       <div class="alert alert-warning">{.}</div>
@@ -18,7 +17,8 @@
       <form role="form" action="/login" method="post">
         <div class="form-group">
           <label  for="inputUsernameEmail" class="text-white col-form-label-lg">User</label>
-          <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{user}" placeholder="your@email.address" autofocus >
+          <div style="color:yellow; font-size:80%;" id="wrongMail"></div> 
+          <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{user}" placeholder="your@email.address" autofocus required >
         </div>
         <div class="form-group">
           <label for="inputPassword" class="text-white col-form-label-lg">Password</label>
@@ -28,7 +28,7 @@
           <a class="text-right nav-link" href="/forgot">Forgot password?</a>
         </div>
         <div>
-          <button type="submit" class="btn btn-my btn-lg btn-block">
+          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return fieldLoginControl()">
             Log In
           </button>
         </div>

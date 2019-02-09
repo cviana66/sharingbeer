@@ -4,14 +4,14 @@
 
   <div class="row">
     <div class="col-md-3 col-lg-4"></div>
-   <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
+    <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
 
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Customer Registration</h3>
       <hr style="border-top: 1px solid #5375BD;">
       
       {?message}
         {#message}
-          <div class="alert alert-danger">{.}</div>
+          <div class="alert alert-warning">{.}</div>
         {/message}
       {/message}
 
@@ -58,7 +58,7 @@
         </div>
         <br>
         <div>
-          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return fieldsRegisterControl()">
             Save
           </button>
         </div>
@@ -66,63 +66,6 @@
       <br>
 
 <script type="text/javascript">
-  
-  window.onload = function () {
-    var mybutton = document.getElementById('mybutton');
-    
-    mybutton.onclick = function () {
-      var phone = document.getElementById("inputMobile").value.replace(/\W+/g, '');
-      var city = document.getElementById("inputCity").value;
-      var cap = document.getElementById("inputCap").value;
-      var address = document.getElementById("inputAddress").value;
-      var numciv = document.getElementById("inputNumciv").value;
-      var phoneno = /^\d{10}$/;
-      var capno = /^\d{5}$/;
-      var submit = true;
-
-      
-      if (phone == "" || !phone.match(phoneno)) {
-        text = "Please provide a valid mobile phone. ";
-        document.getElementById("wrongPhone").innerHTML = text;
-        submit = false;
-      } else {
-        document.getElementById("wrongPhone").innerHTML = "";
-      } 
-      if (city == "") {
-        text = "Please provide a valid City";
-        document.getElementById("wrongCity").innerHTML = text;
-        submit = false;
-      } else {
-        document.getElementById("wrongCity").innerHTML = "";
-      } 
-      if (cap == "" || !cap.match(capno)) {
-        text = "Please provide a valid CAP ";
-        document.getElementById("wrongCap").innerHTML = text;
-        submit = false;
-      } else {
-        document.getElementById("wrongCap").innerHTML = "";
-      }
-      if (address == "") {
-        text = "Please provide a valid address";
-        document.getElementById("wrongAddress").innerHTML = text;
-        submit = false;
-      } else {
-        document.getElementById("wrongAddress").innerHTML = "";
-      }
-      if (numciv == "") {
-        text = "Please provide a valid Civic Number";
-        document.getElementById("wrongNumciv").innerHTML = text;
-        submit = false;
-      } else {
-        document.getElementById("wrongNumciv").innerHTML = "";
-      }
-      if (submit) {
-        return true;
-      } else {
-        return false;
-      }
-    };
-  };
 /*==================================================================*/
 /* GESTIONE della CITTA' e CAP con recupero da MONGODB               */
 /*==================================================================*/
