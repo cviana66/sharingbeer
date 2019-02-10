@@ -1,21 +1,32 @@
-<div class="container">
   
-  <div class="row">
-    <div class="col-sx-1 col-md-3 col-lg-4"></div>
-    <div class="col-sx-10 col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
+    <div class="row">
+    <div class="col-md-3 col-lg-4"></div>
+    <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">You Cart</h3>
       <hr style="border-top: 1px solid #5375BD;">   
-
-        <div class="row" >
-          {#cart.items}
+      
+      {#cart.items}
+        <div class="row col-md-12 col-lg-12" >
+          
           <div class="col">
-            <p class="text-white text-left"> {.name} : descrizione del tipo di birra e riporto del nume pipp ipipip</p>
+            <p class="text-white text-left"> {.name} : nome della biarra e caratteristiche varie</p>
           </div>
         </div>
 
         <div class="row align-items-center">
           <div class="col">
             <table class="mx-auto" style="width:100%;">
+              <tr>
+                <td>
+                  <p class="text-white text-center font-weight-bold">{.qty}</p>
+                </td>
+                <td>
+                  <p class="text-white text-center font-weight-normal">x</p>
+                </td>
+                <td>
+                  <p class="text-white text-center font-weight-bold">{.prettyPrice} </p>
+                </td>
+              </tr>
               <tr>
                 <td rowspan="2"> 
                   <div>
@@ -75,20 +86,14 @@
                 </td>
               </tr>
               <tr>
-                <td>
-                  <p class="text-white text-center font-weight-bold">{.qty}</p>
-                </td>
-                <td>
-                  <p class="text-white text-center font-weight-normal">x</p>
-                </td>
-                <td>
-                  <p class="text-white text-center font-weight-bold">{.prettyPrice} </p>
+                <td colspan="3">
+                  <hr style="border-top: 1px solid #5375BD;"> 
                 </td>
               </tr>
             </table>  
           </div>
-          {/cart.items}    
-        </div> <!--row -->       
+        </div>
+      {/cart.items}          
   
 
   {?cart.items}    
@@ -98,7 +103,7 @@
         <div>
           <h4 class="text-center">Total</h4>            
         <div>
-          <h4 class="text-center"><strong>{totalPrice}</strong></h4>            
+          <h4 class="text-center"><strong>€{totalPrice}</strong></h4>            
         </div>
         <div >
           <form method="GET" action="/register">
@@ -129,6 +134,5 @@
       </div>
   {/cart.items}
 
-    <div class="col-sx-1 col-md-3 col-lg-4"></div>
+    <div class="col-md-3 col-lg-4"></div>
   </div>
-</div>

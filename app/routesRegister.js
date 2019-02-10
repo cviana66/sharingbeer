@@ -7,6 +7,7 @@ var User	      = require('../app/models/user');
 var Friend      = require('../app/models/friend');
 var CityCap     = require('../app/models/cityCap');
 var MultipleCap = require('../app/models/multipleCap');
+var Address     = require('../app/models/address')
 var bcrypt      = require('bcrypt-nodejs'); //TODO da spostare in libfunction
 var lib         = require('./libfunction');
 
@@ -153,27 +154,42 @@ app.post('/caps', function(req, res) {
   });
 //POST   
   app.post('/register', lib.isLoggedIn, function(req, res, next) {
-//DA SISTEMARE 
-  User.findByIdAndUpdate(req.user._id, 
-    { $set: { 
-              mobilePrefix  : '+39',
-              mobileNumber  : lib.capitalizeFirstLetter(req.body.mobile),
-              status        : 'validated' // to change in 'customer' after session  of testing
-            }
-    }, 
-    function (err, req) {
-      if (err) {
-        console.log('error', err);
-        res.redirect('/');
-        return;
+
+    User.findByIdAndUpdate(req.user._id, 
+      { $set: { 
+                mobilePrefix  : '+39',
+                mobileNumber  : lib.capitalizeFirstLetter(req.body.mobile),
+                status        : 'customer' // to change in 'customer' after session  of testing
+              }
+      }, 
+      function (err, req) {
+        if (err) {
+          console.log('error', err);
+          req.flash('error', 'The application has encountered an unknown error.It doesn\'t appear to have affected your data, but our technical staff have been automatically notified and will be looking into this with the utmost urgency.');
+          res.render('info.dust', {message: req.flash('error'), type: "danger"});
+          return;
+        }
       }
-    }
-  );
+    );
 
-  req.user.status = "customer";
-  res.redirect('/register');
+    var adrs = new Address();
+    adrs.id = req.user._id
+    adrs.address.address = req.body.address;
+    adrs.address.number = req.body.number;
+    adrs.address.town = req.body.city;
+    adrs.cap = req.body.cap;
 
-});
+    adrs.save(function(err) {
+      if (err) {
+        console.log("ERROR: ",err);
+        req.flash('error','Something bad happened! Please try again');
+      } else {
+        req.user.status = 'customer' 
+        if (req.user.status == 'customer' && req.session.numProducts > 0)
+          res.redirect('/paynow');
+      }
+    });
+  });
 
 // =====================================
 // FRIEND ==============================

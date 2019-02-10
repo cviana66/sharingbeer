@@ -1,3 +1,17 @@
 migliorie.txt
 
-Pagina registration.dust --> arire direttamente le select. La select è realizzata con Select-Mobile Bootstrap
+- Pagina registration.dust --> arire direttamente le select. La select è realizzata con Select-Mobile Bootstrap
+
+- Inserire l'icona del lucchetto er evidenziare che la connession è sicura. Mettere su titolo o  su linea di divisione Titolo da corpo della pagina
+
+- Inserire il processo che porta all'acquisto con i vari step fino al pagamento
+
+- Inseirire il diclaimer per l'uso dei cukies
+
+- Barra degli indirizzi da far scomparire in automatico 
+
+- Aggiungre un test in PAYMENT dopo "if (req.user.status == 'customer' && req.session.numProducts > 0)"
+
+- Mandare gli errori in posta elettronica per monitoraggio (vedere se possibile configurare Heroku)
+
+- Uso dei BOOZE come sconto per l'acquisto di Birra

@@ -23,13 +23,18 @@
         </div>
         <div class="form-group">
           <input type="text" class="form-control" id="inputLastName" value="{lastName}" 
-           name="lastName" placeholder="Last name" autofocus readonly>
+           name="lastName" placeholder="Last name" readonly>
         </div>
         <div class="form-group">
           <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div>
           <div style="color:yellow; font-size:80%;" id="wrongPhone"></div> 
-          <input type="text" class="form-control" id="inputMobile" value="{mobile}" 
-           name="mobile" placeholder="" autofocus required>
+          <div class="input-group mb-2">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">+39</span>
+            </div>
+            <input type="text" class="form-control" id="inputMobile" value="{mobile}" 
+             name="mobile" placeholder="" autofocus required>
+          </div>
         </div>
         <div class="form-group">
           <div ><label for="inputCity" class="text-white col-form-label-lg">Comune</label></div>
@@ -67,7 +72,8 @@
 
 <script type="text/javascript">
 /*==================================================================*/
-/* GESTIONE della CITTA' e CAP con recupero da MONGODB               */
+/* GESTIONE della CITTA' e CAP con recupero da MONGODB              */
+/* https://developer.snapappointments.com/bootstrap-select/         */
 /*==================================================================*/
 Element.prototype.remove = function() {
       this.parentElement.removeChild(this);
@@ -175,7 +181,7 @@ function selectCity (v) {
               il = res.length;
 
           select.setAttribute('id','myselect');
-          select.setAttribute('class','form-control selectpicker');
+          select.setAttribute('class','form-control selectpicker dropup');
           select.setAttribute('onchange','if (this.selectedIndex) selectCaps();');
         
           option = document.createElement('option');
@@ -188,7 +194,7 @@ function selectCity (v) {
               select.appendChild(option);
           };
 
-          $("#cities").html(select); 
+          $("#cities").html(select);
           $("#myselect").selectpicker('refresh'); 
 
         } else {
