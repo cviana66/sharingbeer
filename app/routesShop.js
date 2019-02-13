@@ -63,7 +63,6 @@ module.exports = function(app) {
 					qty: 1
 				};
 			}
-
 			req.session.numProducts = Object.keys(cart).length;
 
 			res.redirect('/shop');
@@ -120,7 +119,6 @@ module.exports = function(app) {
 
 		//Read the incoming product data
 		var id = req.body.item_id;
-		
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
 			if (err) {

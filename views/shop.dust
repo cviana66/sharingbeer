@@ -10,24 +10,6 @@
       
       <div class="row">
       {#products}
-
-        <!--form method="POST" action="/shop">
-          <input type="hidden" name="item_id" value="{.id}">
-          <input type="hidden" name="_csrf" value="{_csrf}">
-          <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="http://placehold.it/250x180" alt="Card image cap">
-            <div class="card-body">
-              <h5 class="card-title">{.name}</h5>
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            </div>
-            <div>
-              <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-                [ {.prettyPrice} ] Buy
-              </button>
-            </div>
-          </div>   
-        </form-->
-
         <form method="POST" action="/shop">
           <input type="hidden" name="item_id" value="{.id}">
           <input type="hidden" name="_csrf" value="{_csrf}">
@@ -51,6 +33,7 @@
             </div>
             <hr style="border-top: 1px solid #5375BD;">
           </div>
+        </form>
 
      {:else}
 
