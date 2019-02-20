@@ -63,7 +63,7 @@ var SharingBeer = function() {
      */
     self.setupVariables = function() {
         //  Set the environment variables we need.
-        self.port      = process.env.PORT || 8080;
+        self.port = process.env.PORT || 8080;
 
         if ( self.port === 8080 ) {
             console.log('LOCAL SERVER, PORT: ', self.port);

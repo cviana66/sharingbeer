@@ -15,3 +15,6 @@ migliorie.txt
 - Mandare gli errori in posta elettronica per monitoraggio (vedere se possibile configurare Heroku)
 
 - Uso dei BOOZE come sconto per l'acquisto di Birra
+
+- Usare i cookies session in produzione per evitare problemi di memoria http://www.senchalabs.org/connect/cookieSession.html
+https://stackoverflow.com/questions/10760620/using-memorystore-in-production
