@@ -18,9 +18,7 @@
   <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>  
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js"></script>
-  <!--script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script-->
-    
-	<script type="text/javascript" src="/js/jFormslider.js"></script>
+
 	<script type="text/javascript" src="/js/inputControl.js"></script>
 
 	<style type="text/css">
@@ -30,7 +28,7 @@
 
 </head>
 
-<body style="background:#F6A300;margin:0px 0px 0px 0px;">
+<body style="background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;">
 	
 	<nav class="navbar navbar-expand-md navbar-dark" style="background-color:#2A0009;">
 		<div class="navbar-nav">
