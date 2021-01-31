@@ -20,22 +20,21 @@
     "bcrypt-nodejs": "0.0.3",
     "connect-flash": "^0.1.1",
     "consolidate": "^0.15.1",
-    "cookie-parser": "^1.4.3",
+    "cookie-parser": "^1.4.5",
     "dustjs-linkedin": "^2.7.5",
-    "express": "^4.16.4",
-    "express-session": "^1.15.6",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
     "https": "^1.0.0",
     "method-override": "^3.0.0",
-    "mongoose": "^5.3.13",
-    "morgan": "^1.9.1",
+    "mongoose": "^5.11.13",
+    "morgan": "^1.10.0",
     "nodemailer": "^4.7.0",
     "nodemailer-mailgun-transport": "^1.4.0",
-    "passport": "^0.4.0",
+    "passport": "^0.4.1",
     "passport-facebook": "^2.1.1",
     "passport-local": "^1.0.0",
     "paypal-rest-sdk": "^1.8.1",
-    "qr-image": "^3.2.0",
-    "session-mongoose": "^0.5.2"
+    "qr-image": "^3.2.0"
   },
   "devDependencies": {},
   "bundleDependencies": [],
@@ -47,5 +46,8 @@
   "bugs": {
     "url": "https://github.com/cviana66/sharingbeer/issues"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "optionalDependencies": {
+    "connect": "^3.7.0"
+  }
 }

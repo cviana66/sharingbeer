@@ -197,7 +197,7 @@ app.post('/caps', function(req, res) {
 //GET
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
-    Friend.count({ emailParent:req.user.email }, function (err, friends) {
+    Friend.countDocuments({ emailParent:req.user.email }, function (err, friends) {
       if (err) return console.log('error',err);
       
       console.log('GET RECOMM FRIENDS: ', friends);
@@ -211,7 +211,7 @@ app.post('/caps', function(req, res) {
         var error = "";
         var controlSates = "";
         var flag = "false";
-        // Controllo che ci siano ancora inviti diposnibili
+        // Controllo che ci siano ancora inviti diponibili
         if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
           req.flash('error', "You have no more invitations! Please buy more beer");
           controlSates = "disabled";
@@ -257,7 +257,7 @@ app.post('/caps', function(req, res) {
       newUser.resetPasswordToken = lib.generateToken(20); // token
       newUser.resetPasswordExpires = Date.now() + (3600000*24*365); // 1 hour * 24 * 365 = 1 anno
 
-      //console.log('USER: ',newUser);
+      console.log('USER: ',newUser);
       //console.log('GLOBAL: ', global.cost)
 
       newUser.save(function(err) {

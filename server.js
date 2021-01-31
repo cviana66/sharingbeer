@@ -19,7 +19,8 @@ var cons = require('consolidate');
 // config and connect to our database
 var configDB = require('./config/database.js');
 mongoose.connect(configDB.url, {useCreateIndex: true,
-                                useNewUrlParser: true});
+                                useNewUrlParser: true,
+                                useUnifiedTopology: true});
 var db = mongoose.connection;
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
@@ -47,7 +48,7 @@ var configPayPal = require('./config/paypal.js');
 global.cost = 3;
 
 /**
- *  Define the sample application.
+ *  Define the application.
  */
 var SharingBeer = function() {
 
@@ -136,6 +137,7 @@ var SharingBeer = function() {
         //use to ovwrride method in form: put, delete
         self.app.use(methodOverride('_method'));
 
+        // assign the dust engine to .dust files
         self.app.engine('dust', cons.dust);
         self.app.set('views', __dirname + '/views');
         self.app.set('view engine', 'dust'); // set up dust for templating

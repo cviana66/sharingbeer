@@ -1,8 +1,8 @@
 migliorie.txt
 
-- Pagina registration.dust --> arire direttamente le select. La select è realizzata con Select-Mobile Bootstrap
+- Pagina registration.dust --> aprire direttamente le select. La select è realizzata con Select-Mobile Bootstrap
 
-- Inserire l'icona del lucchetto er evidenziare che la connession è sicura. Mettere su titolo o  su linea di divisione Titolo da corpo della pagina
+- Inserire l'icona del lucchetto per evidenziare che la connession è sicura. Mettere su titolo o  su linea di divisione Titolo da corpo della pagina
 
 - Inserire il processo che porta all'acquisto con i vari step fino al pagamento
 
