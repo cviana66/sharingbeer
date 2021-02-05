@@ -79,8 +79,12 @@ app.get('/logout', function(req, res) {
 // FORGOT ==============================
 // =====================================
 //GET
-  app.get('/forgot', function(req, res) {
+  app.get('/forgot', function(req, res, next) {
+    if (req.isAuthenticated()) {
+      res.redirect('/');
+    } else {  
       res.render('forgot.dust');
+    }
   });
 //POST
   app.post('/forgot', function(req, res, next) {
