@@ -19,7 +19,8 @@ var cons = require('consolidate');
 // config and connect to our database
 var configDB = require('./config/database.js');
 mongoose.connect(configDB.url, {useCreateIndex: true,
-                                useNewUrlParser: true});
+                                useNewUrlParser: true,
+                                useUnifiedTopology: true});
 var db = mongoose.connection;
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
