@@ -137,9 +137,9 @@ var SharingBeer = function() {
         //use to ovwrride method in form: put, delete
         self.app.use(methodOverride('_method'));
 
-        self.app.engine('dust', cons.dust);
+        //self.app.engine('dust', cons.dust);
         self.app.set('views', __dirname + '/views');
-        self.app.set('view engine', 'dust'); // set up dust for templating
+        //self.app.set('view engine', 'dust'); // set up dust for templating
 
         // required for passport and session for persistent login
         pass(passport);
