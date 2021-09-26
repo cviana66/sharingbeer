@@ -29,7 +29,7 @@ module.exports = function(app) {
   						       cart       : req.session.displayCart  //prodotti nel carrello
   					       };
 
-  		res.render('shop.dust', model);
+  		res.render('shop.njk', model);
   	});
   });
 //POST

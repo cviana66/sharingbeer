@@ -1,4 +1,5 @@
-{> "layouts/main" /}
+{% extends layouts/main %}
+{% block body %}
 
 {<body}
 
@@ -107,4 +108,4 @@
 </div-->  
 
 
-{/body}
+{% endblock %}

@@ -1,5 +1,5 @@
 #!/bin/env node
-//  OpenShift sample Node application
+
 var express  = require('express');
 var fs       = require('fs');
 var mongoose = require('mongoose');
@@ -13,8 +13,8 @@ var session      = require('express-session');
 var paypal       = require('paypal-rest-sdk');
 var qr           = require('qr-image');
 var fs           = require('fs');
-    
-var cons = require('consolidate');
+var nunjucks     = require('nunjucks') 
+var cons         = require('consolidate');
 
 // config and connect to our database
 var configDB = require('./config/database.js');
@@ -24,7 +24,7 @@ mongoose.connect(configDB.url, {useCreateIndex: true,
 var db = mongoose.connection;
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
-var methodOverride = require('method-override');
+var methodOverride  = require('method-override');
 
 // authentication ==============================================================
 var routesAuth      = require('./app/routesAuth.js');
@@ -36,14 +36,12 @@ var routesShop      = require ('./app/routesShop.js');
 var routesRegister  = require ('./app/routesRegister.js');
 
 // paypal ======================================================================
-var routesPayment    = require ('./app/routesPayment.js');
+var routesPayment   = require ('./app/routesPayment.js');
+var configPayPal    = require('./config/paypal.js');
 
 // passport ====================================================================
 var pass            = require('./config/passport');
 
-// paypal ======================================================================
-
-var configPayPal = require('./config/paypal.js');
 
 global.cost = 3;
 
@@ -137,9 +135,11 @@ var SharingBeer = function() {
         //use to ovwrride method in form: put, delete
         self.app.use(methodOverride('_method'));
 
-        self.app.engine('dust', cons.dust);
-        self.app.set('views', __dirname + '/views');
-        self.app.set('view engine', 'dust'); // set up dust for templating
+        //template engine
+        nunjucks.configure('views', {
+          autoescape:  true,
+          express:  self.app
+        });
 
         // required for passport and session for persistent login
         pass(passport);
@@ -192,8 +192,7 @@ var SharingBeer = function() {
         });
     };
 
-};   /*  Sample Application.  */
-
+};   /*  Sharingbeer Application.  */
 /**
  *  main():  Main code.
  */

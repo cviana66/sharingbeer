@@ -1,6 +1,5 @@
-{> "layouts/main" /}
-
-{<body} <!--https://github.com/BlackrockDigital/startbootstrap-shop-homepage -->
+{% extends "layouts/main.njk" %}
+{% block body %}
 
   <div class="row">
     <div class="col-md-3 col-lg-4"></div>
@@ -9,7 +8,7 @@
       <hr style="border-top: 1px solid #5375BD;">
       
       <div class="row">
-      {#products}
+      {% for prod in products %}
         <form method="POST" action="/shop">
           <input type="hidden" name="item_id" value="{.id}">
           <input type="hidden" name="_csrf" value="{_csrf}">
@@ -18,11 +17,11 @@
               <a href="#"><img class="card-img-top" src="http://placehold.it/500x300" alt=""></a>
               <div class="card-body" style="background-color:#FFBB35;">
                 <h4 class="card-title text-left">
-                  {.name}
+                  {{prod.name}}
                 </h4>
                 <div>
               <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-                [ {.prettyPrice} ] Buy
+                [ {{prod.prettyPrice}} ] Buy
               </button>
             </div>
                 <p class="card-text text-left">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!</p>
@@ -35,15 +34,15 @@
           </div>
         </form>
 
-     {:else}
+     {% else %}
 
       <p>There are no products :(<br>You should <a href="/products">add some</a></p>
 
-    {/products}
+    {% endfor %}
     </div>
     
     </div>
     <div class="col-md-3 col-lg-4"></div>
   </div>
 
-{/body}
+{% endblock %}
