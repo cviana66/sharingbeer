@@ -80,7 +80,7 @@ app.get('/logout', function(req, res) {
 // =====================================
 //GET
   app.get('/forgot', function(req, res) {
-      res.render('forgot.dust');
+      res.render('forgot.njk');
   });
 //POST
   app.post('/forgot', function(req, res, next) {
@@ -90,7 +90,7 @@ app.get('/logout', function(req, res) {
 
         if (!user) {
           req.flash('error', 'No account with that email address exists.');
-          res.render('forgot.dust', {message: req.flash('error')});
+          res.render('forgot.njk', {message: req.flash('error')});
         } else {
           var token = lib.generateToken(20);
           user.resetPasswordToken = token;

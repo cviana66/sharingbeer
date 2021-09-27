@@ -1,27 +1,25 @@
-{> "layouts/main" /}
+{% extends "layouts/main.njk" %}
+{% block body %}
 
-{<body}
-
-<div class="container">
   <div class="row">
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
-      <h3>Forgot Password</h3>
-      <hr class="hr">
+    <div class="col-md-3 col-lg-4"></div>
+    <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Forgot Password</h3>
+      <hr style="border-top: 1px solid #5375BD;">
       <!-- show any messages that come back with authentication -->
-      {?message}
-      {#message}
-      <div class="alert alert-danger">{.}</div>
-      {/message}
-      {/message}
+      {% if message %}
+      {% for message in message %}
+      <div class="alert alert-danger">{{message}}</div>
+      {% endfor%}
+      {% endif %}
 
       <form role="form" action="/forgot" method="post">
         <div class="form-group">
           <label for="inputUsernameEmail">Email</label>
           <input type="text" class="form-control" id="inputUsernameEmail" name="email" placeholder="your@email.address" autofocus>
         </div>
-        <button type="submit" class="btn btn btn-primary">
-          <h4>Reset Password</h4>
+        <button type="submit" class="btn btn-my btn-lg btn-block"">
+          Reset Password
         </button>
       </form>
       <br>
@@ -40,8 +38,7 @@
       </div-->
 
     </div>
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
+    <div class="col-md-3 col-lg-4"></div>
   </div>
-</div>
 
-{/body}
+{% endblock %}

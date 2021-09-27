@@ -28,7 +28,8 @@ module.exports = function(app) {
   						       numProducts: req.session.numProducts, //numero di proodotti nel carrello visualizzato su main.dust
   						       cart       : req.session.displayCart  //prodotti nel carrello
   					       };
-
+      console.log("numero di prodotti in carrello: ",req.session.numProducts)
+      console.log("prodotti: ",req.session.displayCart)
   		res.render('shop.njk', model);
   	});
   });
@@ -41,6 +42,7 @@ module.exports = function(app) {
 
 		//Read the incoming product data from shop.dust
 		var id = req.body.item_id;
+    console.log("ID: ",id);
 
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
@@ -64,6 +66,7 @@ module.exports = function(app) {
 				};
 			}
 			req.session.numProducts = Object.keys(cart).length;
+      console.log("numero di prodotti in carrello: ",req.session.numProducts)
 
 			res.redirect('/shop');
 
@@ -84,7 +87,7 @@ module.exports = function(app) {
                   totalPrice : req.session.totalPrc
   					    };
 
-  	res.render('cart.dust', model);
+  	res.render('cart.njk', model);
 	});
 //POST MINUS ===================================================================
 	app.post('/cart/minus', lib.isLoggedIn, function (req, res) {

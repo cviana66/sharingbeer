@@ -1,6 +1,0 @@
-{> "layouts/main" /}
-{<body}
-
-{> cartItems /}
-
-{/body}
