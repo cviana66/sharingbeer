@@ -6,15 +6,18 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var flash    = require('connect-flash');
 
-var morgan       = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser   = require('body-parser');
-var session      = require('express-session');
-var paypal       = require('paypal-rest-sdk');
-var qr           = require('qr-image');
-var fs           = require('fs');
-var nunjucks     = require('nunjucks') 
-var cons         = require('consolidate');
+var morgan        = require('morgan');
+var cookieParser  = require('cookie-parser');
+var bodyParser    = require('body-parser');
+var session       = require('express-session');
+var paypal        = require('paypal-rest-sdk');
+var qr            = require('qr-image');
+var fs            = require('fs');
+var nunjucks      = require('nunjucks'); 
+var cons          = require('consolidate');
+var qrCode        = require('qrcode-reader');
+var Jimp          = require('jimp');
+
 
 // config and connect to our database
 var configDB = require('./config/database.js');
@@ -111,7 +114,7 @@ var SharingBeer = function() {
         routesAuth(self.app, passport);
         routesShop(self.app);
         routesRegister(self.app);
-        routesPayment(self.app, paypal, qr, fs);
+        routesPayment(self.app, paypal, qr, fs, Jimp, qrCode);
     };
 
     /**
@@ -127,7 +130,8 @@ var SharingBeer = function() {
 
         // set up our express application
         self.app.use(cookieParser()); // read cookies (needed for auth)
-        self.app.use(bodyParser.urlencoded({extended: true})); // get information from html forms
+        self.app.use(bodyParser.json({limit: '50mb'}));
+        self.app.use(bodyParser.urlencoded({limit: '50mb', extended: true, parameterLimit: 50000})); // get information from html forms
 
         //To serve static files such as images, CSS files, and JavaScript files
         self.app.use(express.static(__dirname + '/public'));

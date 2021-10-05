@@ -28,6 +28,7 @@
     "glob-parent": ">=5.1.2",
     "https": "^1.0.0",
     "install": "^0.13.0",
+    "jimp": "^0.16.1",
     "method-override": "^3.0.0",
     "mongoose": "^5.3.13",
     "morgan": "^1.9.1",
@@ -42,7 +43,9 @@
     "paypal-rest-sdk": "^1.8.1",
     "peer": "^0.6.1",
     "qr-image": "^3.2.0",
+    "qrcode-reader": "^1.0.4",
     "utf-8-validate": "^5.0.5",
+    "webcam-easy": "^1.0.5",
     "ws": "^8.2.2"
   },
   "bundleDependencies": [],
