@@ -63,13 +63,15 @@ class Webcam {
     /* Select camera based on facingMode */ 
     selectCamera(){
       for(let webcam of this._webcamList){
-        if(   (this._facingMode=='user' && webcam.label.toLowerCase().includes('front'))
-          ||  (this._facingMode=='enviroment' && webcam.label.toLowerCase().includes('back'))
+        if(   (this._facingMode=='enviroment' && webcam.label.toLowerCase().includes('back'))
+          ||  (this._facingMode=='user' && webcam.label.toLowerCase().includes('front'))
         )
         {
           this._selectedDeviceId = webcam.deviceId;
+          console.log ('webcam.deviceId -> ',webcam.deviceId);
           break;
         }
+        console.log ('webcam.deviceId -> ',webcam.deviceId, ' # ',this._facingMode );
       }
     }
 
@@ -124,6 +126,7 @@ class Webcam {
           .then(devices =>{
             this.getVideoInputs(devices);
             resolve(this._webcamList);
+            console.log('_webcamList -this.> ',this._webcamList);
           }) 
           .catch(error => {
             reject(error);
