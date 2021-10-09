@@ -40,7 +40,8 @@ class Webcam {
         }
       });
       if(this._webcamList.length == 1){
-        this._facingMode = 'user';
+        //this._facingMode = 'user'; //settings iniziale
+        this._facingMode = 'enviroment';
       }    
       return this._webcamList;
     }

@@ -10,7 +10,7 @@ const webcam = new Webcam(webcamElement, 'user', canvasElement, snapSoundElement
 $("#webcam-switch").change(function () {
     if(this.checked){
         $('.md-modal').addClass('md-show');
-        webcam.start()
+        webcam.start() // Attiva la webcam
             .then(result =>{
                cameraStarted();
                console.log("webcam started");
