@@ -13,6 +13,8 @@ $("#webcam-switch").change(function () {
         webcam.start() // Attiva la webcam
             .then(result =>{
                cameraStarted();
+               webcam.flip();
+               webcam.start();
                console.log("webcam started");
             })
             .catch(err => {
@@ -50,7 +52,6 @@ function cameraStarted(){
     $("#webcam-control").addClass("webcam-on");
     $(".webcam-container").removeClass("d-none");
     if( webcam.webcamList.length > 1){
-        webcam.flip();
         $("#cameraFlip").removeClass('d-none');
     }
     $("#wpfront-scroll-top-container").addClass("d-none");
