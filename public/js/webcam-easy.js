@@ -1,5 +1,5 @@
 class Webcam {
-    constructor(webcamElement, facingMode = 'user', canvasElement = null, snapSoundElement = null) {
+    constructor(webcamElement, facingMode = 'environment', canvasElement = null, snapSoundElement = null) {
       this._webcamElement = webcamElement;
       this._webcamElement.width = this._webcamElement.width || 640;
       this._webcamElement.height = this._webcamElement.height || video.width * (3 / 4);
@@ -49,32 +49,35 @@ class Webcam {
     /* Get media constraints */
     getMediaConstraints() {
         var videoConstraints = {};
+        console.log('getMediaConstraints -> this._selectedDeviceId -> ',this._selectedDeviceId);
         if (this._selectedDeviceId == '') {
-            //videoConstraints.facingMode =  this._facingMode;
-            videoConstraints.facingMode = { exact:'environment'}; 
+            videoConstraints.facingMode =  this._facingMode;
+            //videoConstraints.facingMode = { exact:'environment'}; 
         } else {
-            videoConstraints.deviceId = { exact: this._selectedDeviceId};
+            videoConstraints.deviceId = { exact: this._selectedDeviceId}
         }
         var constraints = {
             video: videoConstraints,
             audio: false
         };
-        console.log(constraints);
+        console.log('getMediaConstraints -> constraints -> ', constraints);
         return constraints;
     }
 
     /* Select camera based on facingMode */ 
     selectCamera(){
       for(let webcam of this._webcamList){
+        console.log('selectCamera -> webcam.label -> ', webcam.label)
         if(   (this._facingMode=='user' && webcam.label.toLowerCase().includes('front'))
           ||  (this._facingMode=='environment' && webcam.label.toLowerCase().includes('back'))
         )
         {
           this._selectedDeviceId = webcam.deviceId;
-          console.log ('webcam.deviceId -> ',webcam.deviceId);
+          console.log ('selectCamera -> webcam.deviceId -> ',webcam.deviceId);
           break;
         }
-        console.log ('webcam.deviceId -> ',webcam.deviceId, ' # ',this._facingMode );
+        console.log ('selectCamera -> webcam.deviceId -> ',webcam.deviceId);
+        console.log('selectCamera -> this._facingMode -> ',this._facingMode);
       }
     }
 
@@ -129,7 +132,7 @@ class Webcam {
           .then(devices =>{
             this.getVideoInputs(devices);
             resolve(this._webcamList);
-            console.log('_webcamList -this.> ',this._webcamList);
+            console.log('info -> _webcamList -this.> ',this._webcamList);
           }) 
           .catch(error => {
             reject(error);
