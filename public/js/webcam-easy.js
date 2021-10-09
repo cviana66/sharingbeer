@@ -50,7 +50,8 @@ class Webcam {
     getMediaConstraints() {
         var videoConstraints = {};
         if (this._selectedDeviceId == '') {
-            videoConstraints.facingMode =  this._facingMode;
+            //videoConstraints.facingMode =  this._facingMode;
+            videoConstraints.facingMode = { exact:'environment'}; 
         } else {
             videoConstraints.deviceId = { exact: this._selectedDeviceId};
         }
@@ -58,6 +59,7 @@ class Webcam {
             video: videoConstraints,
             audio: false
         };
+        console.log(constraints);
         return constraints;
     }
 
