@@ -50,6 +50,7 @@ function cameraStarted(){
     $("#webcam-control").addClass("webcam-on");
     $(".webcam-container").removeClass("d-none");
     if( webcam.webcamList.length > 1){
+        webcam.flip();
         $("#cameraFlip").removeClass('d-none');
     }
     $("#wpfront-scroll-top-container").addClass("d-none");

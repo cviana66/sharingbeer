@@ -51,9 +51,10 @@ class Webcam {
         var videoConstraints = {};
         console.log('getMediaConstraints -> this._selectedDeviceId -> ',this._selectedDeviceId);
         if (this._selectedDeviceId == '') {
-            videoConstraints.facingMode =  this._facingMode;
-            //videoConstraints.facingMode = { exact:'environment'}; 
+           console.log('1 ',this._facingMode);
+            videoConstraints.facingMode =  this._facingMode; 
         } else {
+            console.log('2');
             videoConstraints.deviceId = { exact: this._selectedDeviceId}
         }
         var constraints = {
@@ -95,6 +96,7 @@ class Webcam {
       4. Start stream
     */
     async start(startStream = true) {
+      console.log('async start');
       return new Promise((resolve, reject) => {         
         this.stop();
         navigator.mediaDevices.getUserMedia(this.getMediaConstraints()) //get permisson from user
