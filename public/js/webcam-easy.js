@@ -1,5 +1,5 @@
 class Webcam {
-    constructor(webcamElement, facingMode = 'environment', canvasElement = null, snapSoundElement = null) {
+    constructor(webcamElement, facingMode = 'user', canvasElement = null, snapSoundElement = null) {
       this._webcamElement = webcamElement;
       this._webcamElement.width = this._webcamElement.width || 640;
       this._webcamElement.height = this._webcamElement.height || video.width * (3 / 4);
@@ -40,9 +40,7 @@ class Webcam {
         }
       });
       if(this._webcamList.length == 1){
-        //this._facingMode = 'user'; //settings iniziale
-        this._facingMode = 'environment';
-      }    
+        this._facingMode = 'user';      }    
       return this._webcamList;
     }
 

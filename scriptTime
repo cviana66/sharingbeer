@@ -1,0 +1,22 @@
+<script>
+var myVar;
+var x=0
+
+function myFunction() {
+ if (x<6) {
+  alert("Hello!"+ x);
+  x=x+1
+  myVar = setTimeout(myFunction, 1000);
+ } else {
+  clearTimeout();
+    alert('fine Hello :(');
+ }
+ 
+}
+
+function alertFunc() {
+  alert("Hello!");
+}
+
+
+</script>

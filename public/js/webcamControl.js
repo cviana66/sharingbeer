@@ -11,11 +11,13 @@ $("#webcam-switch").change(function () {
     if(this.checked){
         $('.md-modal').addClass('md-show');
         webcam.start() // Attiva la webcam
-            .then(result =>{
-               cameraStarted();
-               webcam.flip();
-               webcam.start();
-               console.log("webcam started");
+            .then(result => {
+                if( webcam.webcamList.length > 1){ // nel cellulare setto la camera back 
+                   webcam.flip();
+                   webcam.start();
+                }
+                cameraStarted();
+                console.log("webcam started");
             })
             .catch(err => {
                 displayError();
@@ -51,9 +53,9 @@ function cameraStarted(){
     $("#webcam-control").removeClass("webcam-off");
     $("#webcam-control").addClass("webcam-on");
     $(".webcam-container").removeClass("d-none");
-    if( webcam.webcamList.length > 1){
+    /*if( webcam.webcamList.length > 1){
         $("#cameraFlip").removeClass('d-none');
-    }
+    }*/
     $("#wpfront-scroll-top-container").addClass("d-none");
     window.scrollTo(0, 0); 
     $('body').css('overflow-y','hidden');
@@ -66,7 +68,7 @@ function cameraStopped(){
     $("#webcam-control").addClass("webcam-off");
     $("#cameraFlip").addClass('d-none');
     $(".webcam-container").addClass("d-none");
-    $("#webcam-caption").html("Click to Start Camera");
+    $("#webcam-caption").html("Click to Start");
     $('.md-modal').removeClass('md-show');
 }
 
