@@ -6,18 +6,14 @@ const snapSoundElement = document.getElementById('snapSound');
 
 const webcam = new Webcam(webcamElement, 'user', canvasElement, snapSoundElement);
 
-var firt = true;
 
 $("#webcam-switch").change(function () {
     if(this.checked){
         $('.md-modal').addClass('md-show');
         webcam.start() // Attiva la webcam
             .then(result => {
-                if( webcam.webcamList.length > 1 ) { // nel cellulare setto la camera back 
-                    if (first) {
-                      webcam.flip();
-                      first = false;
-                    }
+                if( webcam.webcamList.length > 1 && webcam.facingMode == 'user' ){ // nel cellulare setto la camera back 
+                   webcam.flip();
                    webcam.start();
                 }
                 cameraStarted();
