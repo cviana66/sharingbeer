@@ -13,10 +13,12 @@ $("#webcam-switch").change(function () {
         $('.md-modal').addClass('md-show');
         webcam.start() // Attiva la webcam
             .then(result => {
-                if( webcam.webcamList.length > 1 && first) { // nel cellulare setto la camera back 
-                   webcam.flip();
+                if( webcam.webcamList.length > 1 ) { // nel cellulare setto la camera back 
+                    if (first) {
+                      webcam.flip();
+                      first = false;
+                    }
                    webcam.start();
-                   first = false;
                 }
                 cameraStarted();
                 console.log("webcam started");
