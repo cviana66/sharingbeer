@@ -1,11 +1,6 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-<FrameLayout
-    android:layout_width="250dp"
-    android:layout_height="250dp"
-    android:background="@img/qr_code_reader_square"/>
-
   <div class="row">
     <div class="col-md-3 col-lg-4"></div>
     <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
@@ -18,7 +13,6 @@
         {% endfor %}
       {% endif %}
 
-      <div id="reader"></div>
 
       <div class="form-control webcam-start" id="webcam-control">
         <label class="form-switch">
@@ -37,9 +31,22 @@
       <div class="md-modal md-effect-12">
           <div id="app-panel" class="app-panel md-content row p-0 m-0">     
               <div id="webcam-container" class="webcam-container col-12 d-none p-0 m-0">
-                  <video id="webcam" autoplay playsinline width="640" height="480"></video>
+                  <!--video id="webcam" autoplay playsinline width="640" height="480"></video-->
+                  <video id="webcam" width="640" height="480"></video>
+                  
                   <canvas id="canvas" class="d-none"></canvas>
-                  <div class="flash"></div>
+
+      <div style="position: absolute; z-index: 9999; border-color: rgba(0, 0, 0, 0.48); border-style: solid; border-width: 115px 195px; box-sizing: border-box; inset: 0px;">
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: -5px; left: 0px;"></div>
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: -5px; right: 0px;"></div>
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: 255px; left: 0px;"></div>
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: 255px; right: 0px;"></div>
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: -5px; left: -5px;"></div>
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: 215px; left: -5px;"></div>
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: -5px; right: -5px;"></div>
+        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: 215px; right: -5px;"></div>
+      </div>
+                  <!--div class="flash"></div-->
                   <audio id="snapSound" src="audio/snap.wav" preload = "auto"></audio>
               </div>
               <div id="cameraControls" class="cameraControls">
@@ -50,6 +57,7 @@
               </div>
           </div>        
       </div>
+      <br>
       <br>
       <div class="col-md-3 col-lg-4"></div>
     </div>

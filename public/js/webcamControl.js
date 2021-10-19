@@ -53,7 +53,7 @@ function sendPhoto() {
    var id = setInterval(takePhoto, 3000);
    
    function takePhoto() {
-      if (nPhoto == 3 || ischecked == false) {
+      if (nPhoto == 30 || ischecked == false) {
          console.log ('nPhoto-> ',nPhoto);
          nPhoto = 0;
          clearInterval(id);
@@ -64,7 +64,6 @@ function sendPhoto() {
          picture = webcam.snap();
          decodeImageFromBase64(picture,function(decodedInformation){
             console.log(decodedInformation);
-            alert(decodedInformation);
          });
 
     

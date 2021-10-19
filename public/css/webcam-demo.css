@@ -26,10 +26,10 @@
  }
 
 .form-control.webcam-start{
-    /*position: relative;*/
+    position: relative;
     background: #2A0009;
     /*opacity: 1;*/
-    padding: 10px 0px;
+    padding: 8px 0px;
     border: none;
     color: white;
     /*text-shadow: 1px 1px #000;*/
@@ -47,7 +47,7 @@
 
 .form-control.webcam-on {
   position: fixed;
-  top: 10vh;
+  top: 5vh;
   bottom: auto;
   left: 0px;
   right: auto;
@@ -170,7 +170,7 @@
       left: 0;
       z-index: 1000;
       opacity: 0;
-      background: rgba(#e4f0e3, 0.8);
+      background: rgba(4,0,3,0.8);
       -webkit-transition: all 0.3s;
       -moz-transition: all 0.3s;
       transition: all 0.3s;
