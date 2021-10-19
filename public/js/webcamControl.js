@@ -1,3 +1,8 @@
+//Version OK 211011 21:56
+//Version OK 211013 23:56
+
+//import QrcodeDecoder from 'qrcode-decoder';
+
 const webcamElement = document.getElementById('webcam');
 
 const canvasElement = document.getElementById('canvas');
@@ -6,6 +11,8 @@ const snapSoundElement = document.getElementById('snapSound');
 
 const webcam = new Webcam(webcamElement, 'user', canvasElement, snapSoundElement);
 
+var nPhoto = 0;
+var ischecked;
 
 $("#webcam-switch").change(function () {
     if(this.checked){
@@ -22,13 +29,64 @@ $("#webcam-switch").change(function () {
             .catch(err => {
                 displayError();
             });
+         console.log('this.checked-> ',this.checked)
+         ischecked = this.checked;
+         sendPhoto();
     }
     else {        
+        console.log('this.checked-> ',this.checked)
+        ischecked = this.checked;
         cameraStopped();
         webcam.stop();
         console.log("webcam stopped");
     }        
 });
+
+function decodeImageFromBase64(data, callback){
+                // set callback
+                qrcode.callback = callback;
+                // Start decoding
+                qrcode.decode(data)
+};
+
+function sendPhoto() {
+   var id = setInterval(takePhoto, 3000);
+   
+   function takePhoto() {
+      if (nPhoto == 3 || ischecked == false) {
+         console.log ('nPhoto-> ',nPhoto);
+         nPhoto = 0;
+         clearInterval(id);
+      } else {
+         console.log('nPhoto-> ',nPhoto);
+         console.log('ischecked-> ',ischecked);
+         nPhoto = nPhoto+1;
+         picture = webcam.snap();
+         decodeImageFromBase64(picture,function(decodedInformation){
+            console.log(decodedInformation);
+            alert(decodedInformation);
+         });
+
+    
+         /*$.ajax({
+            type: "POST",
+            url: "/webcam",
+            data: {base64: picture},
+            success: function () {
+                  console.log("OK");
+                  if (xhr.readyState === 4) {
+                     console.log(xhr.status);
+                     console.log(xhr.responseText);
+                  }},
+            error: function (xhr, ajaxOptions, thrownError) { 
+                     console.log("KO");
+                   },
+            dataType: "json"
+         });*/
+      }
+    }
+}
+
 
 $('#cameraFlip').click(function() {
     webcam.flip();

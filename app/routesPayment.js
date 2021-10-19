@@ -54,6 +54,8 @@ app.post('/webcam', function(req, res, next) {
               }
               // Printing the decrypted value
               console.log(value);
+              req.session.qrcode = value;
+              res.redirect('/qrcodeOrder'); 
               //console.log('qrcode ha funzionato!')
           };
           // Decoding the QR code
@@ -61,6 +63,10 @@ app.post('/webcam', function(req, res, next) {
       });
     }
   });
+});
+
+app.get('/qrcodeOrder', function(req, res, next) {
+  res.render('qrcodeOrder.njk', {QrcodeData : req.session.qrcode});
 });
 
 // GET PAYNOW ============================================================================
