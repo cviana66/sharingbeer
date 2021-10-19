@@ -51,7 +51,7 @@ function decodeImageFromBase64(data, callback){
 
 function sendPhoto() {
    var id = setInterval(takePhoto, 3000);
-   
+
    function takePhoto() {
       if (nPhoto == 30 || ischecked == false) {
          console.log ('nPhoto-> ',nPhoto);
@@ -64,6 +64,7 @@ function sendPhoto() {
          picture = webcam.snap();
          decodeImageFromBase64(picture,function(decodedInformation){
             console.log(decodedInformation);
+            alert(decodedInformation);
          });
 
     
