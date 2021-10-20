@@ -59,6 +59,7 @@ function sendPhoto() {
          nPhoto = 0;
          cameraStopped();
          clearInterval(id);
+         $("#webcam-switch").prop("checked", false).change();
       } else {
          console.log('nPhoto-> ',nPhoto);
          console.log('ischecked-> ',ischecked);
@@ -69,7 +70,10 @@ function sendPhoto() {
             console.log(decodedInformation.status);
             if (decodedInformation.status == 'ok') {
                cameraStopped()
+               $("#webcam-switch").prop("checked", false).change();
                alert(decodedInformation.result);
+               afterTakePhoto(picture);
+
                /*
                $.ajax({
                   type: "POST",
@@ -135,6 +139,7 @@ function cameraStopped(){
     $(".webcam-container").addClass("d-none");
     $("#webcam-caption").html("Click to Start");
     $('.md-modal').removeClass('md-show');
+
 }
 
 
