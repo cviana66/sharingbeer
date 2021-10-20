@@ -140,6 +140,8 @@ qrcode.decode = function(src){
     
     if(arguments.length==0)
     {
+        console.log ('qrcode.decode.arguments.length==0');
+
         if(qrcode.canvas_qr2)
         {
             var canvas_qr = qrcode.canvas_qr2;
@@ -162,9 +164,13 @@ qrcode.decode = function(src){
     {
         var image = new Image();
         image.crossOrigin = "Anonymous";
+        console.log ('image.crossOrigin-> ',image.crossOrigin);
+        
         image.onload=function(){
+
             //var canvas_qr = document.getElementById("qr-canvas");
             var canvas_out = document.getElementById("out-canvas");
+            console.log('canvas_out-> ', canvas_out);
             if(canvas_out!=null)
             {
                 var outctx = canvas_out.getContext('2d');
@@ -176,6 +182,9 @@ qrcode.decode = function(src){
             var context = canvas_qr.getContext('2d');
             var nheight = image.height;
             var nwidth = image.width;
+            console.log('mage.width*image.height-> ', image.width*image.height);
+            console.log('qrcode.maxImgSize-> ', qrcode.maxImgSize);
+            
             if(image.width*image.height>qrcode.maxImgSize)
             {
                 var ir = image.width / image.height;
@@ -191,8 +200,10 @@ qrcode.decode = function(src){
             qrcode.height = canvas_qr.height;
             try{
                 qrcode.imagedata = context.getImageData(0, 0, canvas_qr.width, canvas_qr.height);
-            }catch(e){
-                qrcode.result = "Cross domain image reading not supported in your browser! Save it to your computer then drag and drop the file!";
+            }
+            catch(e)
+            {
+                qrcode.result = {'result':"Cross domain image reading not supported in your browser! Save it to your computer then drag and drop the file!",'status':'ko'};
                 if(qrcode.callback!=null)
                     qrcode.callback(qrcode.result);
                 return;
@@ -200,15 +211,15 @@ qrcode.decode = function(src){
             
             try
             {
-                qrcode.result = qrcode.process(context);
+                qrcode.result = {'result':qrcode.process(context),'status':'ok'};   
             }
             catch(e)
             {
                 console.log(e);
-                qrcode.result = "error decoding QR Code";
+                qrcode.result = {"result":"error decoding QR Code",'status':'ko'};
             }
             if(qrcode.callback!=null)
-                qrcode.callback(qrcode.result);
+                qrcode.callback(qrcode.result);  //ritorna la decodifica del QRcode
         }
         image.onerror = function ()
         {

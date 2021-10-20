@@ -1,7 +1,7 @@
 //Version OK 211011 21:56
 //Version OK 211013 23:56
 
-//import QrcodeDecoder from 'qrcode-decoder';
+//https://github.com/bensonruan/webcam-easy
 
 const webcamElement = document.getElementById('webcam');
 
@@ -19,8 +19,8 @@ $("#webcam-switch").change(function () {
         $('.md-modal').addClass('md-show');
         webcam.start() // Attiva la webcam
             .then(result => {
-                if( webcam.webcamList.length > 1 && webcam.facingMode == 'user' ){ // nel cellulare setto la camera back 
-                   webcam.flip();
+                if( webcam.webcamList.length > 1 && webcam.facingMode == 'user' ){ 
+                   webcam.flip();   // nel cellulare setto la camera back 
                    webcam.start();
                 }
                 cameraStarted();
@@ -45,6 +45,7 @@ $("#webcam-switch").change(function () {
 function decodeImageFromBase64(data, callback){
                 // set callback
                 qrcode.callback = callback;
+                //console.log('qrcode.callback-> ',qrcode.callback)
                 // Start decoding
                 qrcode.decode(data)
 };
@@ -63,26 +64,30 @@ function sendPhoto() {
          nPhoto = nPhoto+1;
          picture = webcam.snap();
          decodeImageFromBase64(picture,function(decodedInformation){
-            console.log(decodedInformation);
-            alert(decodedInformation);
+            console.log(decodedInformation.result);
+            console.log(decodedInformation.status);
+            if (decodedInformation.status == 'ok') {
+               cameraStopped()
+               alert(decodedInformation.result);
+               /*
+               $.ajax({
+                  type: "POST",
+                  url: "/webcam",
+                  data: {base64: picture},
+                  success: function () {
+                        console.log("OK");
+                        if (xhr.readyState === 4) {
+                           console.log(xhr.status);
+                           console.log(xhr.responseText);
+                        }},
+                  error: function (xhr, ajaxOptions, thrownError) { 
+                           console.log("KO");
+                         },
+                  dataType: "json"
+               });
+               */
+            }   
          });
-
-    
-         /*$.ajax({
-            type: "POST",
-            url: "/webcam",
-            data: {base64: picture},
-            success: function () {
-                  console.log("OK");
-                  if (xhr.readyState === 4) {
-                     console.log(xhr.status);
-                     console.log(xhr.responseText);
-                  }},
-            error: function (xhr, ajaxOptions, thrownError) { 
-                     console.log("KO");
-                   },
-            dataType: "json"
-         });*/
       }
     }
 }
@@ -107,16 +112,17 @@ function displayError(err = ''){
 function cameraStarted(){
     $("#errorMsg").addClass("d-none");
     $('.flash').hide();
-    $("#webcam-caption").html("on");
+    $("#webcam-caption").html("on"); 
     $("#webcam-control").removeClass("webcam-off");
     $("#webcam-control").addClass("webcam-on");
     $(".webcam-container").removeClass("d-none");
-    /*if( webcam.webcamList.length > 1){
+    /*
+    if( webcam.webcamList.length > 1){
         $("#cameraFlip").removeClass('d-none');
     }*/
-    $("#wpfront-scroll-top-container").addClass("d-none");
-    window.scrollTo(0, 0); 
-    $('body').css('overflow-y','hidden');
+    //$("#wpfront-scroll-top-container").addClass("d-none");
+    //window.scrollTo(0, 0); 
+    //$('body').css('overflow-y','hidden');
 }
 
 function cameraStopped(){
