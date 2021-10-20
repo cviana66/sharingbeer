@@ -51,7 +51,7 @@ function decodeImageFromBase64(data, callback){
 };
 
 function sendPhoto() {
-   var id = setInterval(takePhoto, 3000);
+   var id = setInterval(takePhoto, 1000);
 
    function takePhoto() {
       if (nPhoto == 30 || ischecked == false) {
