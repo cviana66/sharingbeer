@@ -57,6 +57,7 @@ function sendPhoto() {
       if (nPhoto == 30 || ischecked == false) {
          console.log ('nPhoto-> ',nPhoto);
          nPhoto = 0;
+         cameraStopped();
          clearInterval(id);
       } else {
          console.log('nPhoto-> ',nPhoto);
@@ -66,7 +67,6 @@ function sendPhoto() {
          decodeImageFromBase64(picture,function(decodedInformation){
             console.log(decodedInformation.result);
             console.log(decodedInformation.status);
-            alert(decodedInformation.result);
             if (decodedInformation.status == 'ok') {
                cameraStopped()
                alert(decodedInformation.result);
