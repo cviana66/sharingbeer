@@ -66,6 +66,7 @@ function sendPhoto() {
          decodeImageFromBase64(picture,function(decodedInformation){
             console.log(decodedInformation.result);
             console.log(decodedInformation.status);
+            alert(decodedInformation.result);
             if (decodedInformation.status == 'ok') {
                cameraStopped()
                alert(decodedInformation.result);
