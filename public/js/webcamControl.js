@@ -57,7 +57,6 @@ function sendPhoto() {
       if (nPhoto == 30 || ischecked == false) {
          console.log ('nPhoto-> ',nPhoto);
          nPhoto = 0;
-         cameraStopped();
          clearInterval(id);
          $("#webcam-switch").prop("checked", false).change();
       } else {
@@ -65,32 +64,14 @@ function sendPhoto() {
          console.log('ischecked-> ',ischecked);
          nPhoto = nPhoto+1;
          picture = webcam.snap();
+         //picture = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASIAAAEiAQMAAABncE31AAAABlBMVEX///8AAABVwtN+AAABA0lEQVRoge3ZUQ6CMAzG8SYcwCNx9R2JA5jU0a6ARKIP60z0/z0wZD+fmm1siBBCCPmfaMu93t/sEk8KKlv5jwrq3VT7jO4dqEy1lsT65mVS92vBUAOVKupbKmYm1DhljffpB/MXqp/aVmQfIuXNuo3qp46p4KIHlaFiTKzXRdrS4GszKlnJHCPBhkgF2z9RyWqvkNWlUdWrOqL6qZiP2kuoVWivGipT+cAosfsNOqHy1cm34txOuwBUhtKW2Hf52Zu8XLdRnVWxZtt3+duQ3gU1QD2d+kSFBDVUFX8ytZcj1Eh1OHMWQQ1Q1kSF2hb4ev5CdVTHFVl1/86FSleEEEJ+PQ/ANYzwx13NHQAAAABJRU5ErkJggg==";
          decodeImageFromBase64(picture,function(decodedInformation){
             console.log(decodedInformation.result);
             console.log(decodedInformation.status);
             if (decodedInformation.status == 'ok') {
-               cameraStopped()
+               clearInterval(id);
                $("#webcam-switch").prop("checked", false).change();
-               alert(decodedInformation.result);
-               afterTakePhoto(picture);
-
-               /*
-               $.ajax({
-                  type: "POST",
-                  url: "/webcam",
-                  data: {base64: picture},
-                  success: function () {
-                        console.log("OK");
-                        if (xhr.readyState === 4) {
-                           console.log(xhr.status);
-                           console.log(xhr.responseText);
-                        }},
-                  error: function (xhr, ajaxOptions, thrownError) { 
-                           console.log("KO");
-                         },
-                  dataType: "json"
-               });
-               */
+               afterTakePhoto(decodedInformation.result);
             }   
          });
       }
@@ -161,7 +142,7 @@ function beforeTakePhoto(){
     $('#cameraControls').addClass('d-none');
 }
 
-function afterTakePhoto(picture){
+function afterTakePhoto(qrinfo){
     webcam.stop();
     console.log("Picture -> ",picture);
     $('#canvas').removeClass('d-none');
@@ -173,17 +154,14 @@ function afterTakePhoto(picture){
     $.ajax({
       type: "POST",
       url: "/webcam",
-      data: {base64: picture},
-      success: function () {
-        console.log("OK");
-        if (xhr.readyState === 4) {
-          console.log(xhr.status);
-          console.log(xhr.responseText);
-      }},
+      dataType: "json",
+      data: {"qrinfo": qrinfo},
+      success: function() {
+        window.location.replace("/qrcodeOrder");
+      },
       error: function (xhr, ajaxOptions, thrownError) { 
-       console.log("KO");
-       },
-      dataType: "json"
+       console.log("KO" ,thrownError + '  ' + xhr);
+       }
     });
 }
 

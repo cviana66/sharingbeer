@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Decode QRCode from image using javascript</title>
+    </head>
+    <body>
+        <input type="button" id="action" value="Decode"/>
+        <script type="text/javascript" src="js/jsqrcode/grid.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/version.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/detector.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/formatinf.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/errorlevel.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/bitmat.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/datablock.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/bmparser.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/datamask.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/rsdecoder.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/gf256poly.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/gf256.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/decoder.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/qrcode.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/findpat.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/alignpat.js"></script>
+        <script type="text/javascript" src="js/jsqrcode/databr.js"></script>
+        <script>
+            // A qrcode with "ourcodeworld.com" as value in format base64 encoded
+            var imageURI = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASIAAAEiAQMAAABncE31AAAABlBMVEX///8AAABVwtN+AAABA0lEQVRoge3ZUQ6CMAzG8SYcwCNx9R2JA5jU0a6ARKIP60z0/z0wZD+fmm1siBBCCPmfaMu93t/sEk8KKlv5jwrq3VT7jO4dqEy1lsT65mVS92vBUAOVKupbKmYm1DhljffpB/MXqp/aVmQfIuXNuo3qp46p4KIHlaFiTKzXRdrS4GszKlnJHCPBhkgF2z9RyWqvkNWlUdWrOqL6qZiP2kuoVWivGipT+cAosfsNOqHy1cm34txOuwBUhtKW2Hf52Zu8XLdRnVWxZtt3+duQ3gU1QD2d+kSFBDVUFX8ytZcj1Eh1OHMWQQ1Q1kSF2hb4ev5CdVTHFVl1/86FSleEEEJ+PQ/ANYzwx13NHQAAAABJRU5ErkJggg==";
+
+            /**
+             * The function decodeImageFromBase64 expects as first parameter a base64 string from a QRCode.
+             * As second parameter the callback that expects the data from the QRCode as first parameter.
+             */
+            function decodeImageFromBase64(data, callback){
+                // set callback
+                qrcode.callback = callback;
+                // Start decoding
+                qrcode.decode(data)
+            }
+
+            // On button click, decode the qrCode from the base64 format.
+            document.getElementById("action").addEventListener('click',function(){
+                decodeImageFromBase64(imageURI,function(decodedInformation){
+                    alert(decodedInformation);
+                });
+            },false);
+        </script>
+    </body>
+</html>

@@ -15,8 +15,8 @@ var qr            = require('qr-image');
 var fs            = require('fs');
 var nunjucks      = require('nunjucks'); 
 var cons          = require('consolidate');
-var qrCode        = require('qrcode-reader');
-var Jimp          = require('jimp');
+//var qrCode        = require('qrcode-reader');
+//var Jimp          = require('jimp');
 
 
 // config and connect to our database
@@ -114,7 +114,7 @@ var SharingBeer = function() {
         routesAuth(self.app, passport);
         routesShop(self.app);
         routesRegister(self.app);
-        routesPayment(self.app, paypal, qr, fs, Jimp, qrCode);
+        routesPayment(self.app, paypal, qr, fs);
     };
 
     /**

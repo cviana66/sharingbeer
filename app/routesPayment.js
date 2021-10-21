@@ -1,4 +1,4 @@
-module.exports = function(app, paypal, qr, fs, Jimp, qrCode) {
+module.exports = function(app, paypal, qr, fs) {
 
   var Order   = require('../app/models/order');
   var Item    = require('../app/models/item');
@@ -23,50 +23,22 @@ app.get('/qr', function(req, res) {
   code.pipe(res);
 });
 
+
 app.get('/webcam', function(req, res, next) {
 console.log("webcam-easy")
  res.render('webcam.njk');
 });
 
-app.post('/webcam', function(req, res, next) {
- 
-  var base64Data = req.body.base64.replace(/^data:image\/png;base64,/, "");
-  fs.writeFile("uploads/out.png", base64Data, 'base64', function(err) {
-  if(err){
-    console.log(err);
-  }else{
-    console.log('Salvata immagine')
-  // Read the image and create a buffer
-      // (Here image.png is our QR code)
-      //var buffer = fs.readFileSync('uploads/qr.png');
-      var buffer = fs.readFileSync('uploads/out.png');
-       
-      // Parse the image using Jimp.read() method
-      Jimp.read(buffer, function(err, image) {
-          if (err) {
-              console.error(err + ' -> Jimp read error');
-          }
-          // Creating an instance of qrcode-reader module
-          let qrcode = new qrCode();
-          qrcode.callback = function(err, value) {
-              if (err) {
-                  console.error(err + ' -> qrcode error');
-              }
-              // Printing the decrypted value
-              console.log(value);
-              req.session.qrcode = value;
-              res.redirect('/qrcodeOrder'); 
-              //console.log('qrcode ha funzionato!')
-          };
-          // Decoding the QR code
-          qrcode.decode(image.bitmap);
-      });
-    }
-  });
+
+app.post('/webcam', function(req, res, next) {   
+  qrcodeInfo = req.body.qrinfo;
+  req.session.qrcodeInfo = qrcodeInfo;
+  res.json({msg:'success'});
 });
 
 app.get('/qrcodeOrder', function(req, res, next) {
-  res.render('qrcodeOrder.njk', {QrcodeData : req.session.qrcode});
+  console.log('qrcodeOrder-> ',req.session.qrcodeInfo);
+  res.render('qrcodeOrder.njk', {QrcodeData : req.session.qrcodeInfo});
 });
 
 // GET PAYNOW ============================================================================
