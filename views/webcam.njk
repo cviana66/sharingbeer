@@ -13,6 +13,7 @@
         {% endfor %}
       {% endif %}
 
+      
 
       <div class="form-control webcam-start" id="webcam-control">
         <label class="form-switch">
@@ -20,7 +21,6 @@
             <i></i> 
           <span id="webcam-caption">Click to Start</span>
         </label>      
-        <button id="cameraFlip" class="btn d-none"></button>                  
       </div>
         
       <div id="errorMsg" class="col-12 col-md-6 alert-danger d-none">
@@ -31,21 +31,19 @@
       <div class="md-modal md-effect-12">
           <div id="app-panel" class="app-panel md-content row p-0 m-0">     
               <div id="webcam-container" class="webcam-container col-12 d-none p-0 m-0">
-                  <video id="webcam" autoplay playsinline width="480" height="480"></video>
+                  <video id="webcam" autoplay playsinline width="320" height="240"></video>
                   <canvas id="canvas" class="d-none"></canvas>
-
-      <!--div style="position: absolute; z-index: 9999; border-color: rgba(0, 0, 0, 0.48); border-style: solid; border-width: 115px 195px; box-sizing: border-box; inset: 0px;">
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: -5px; left: 0px;"></div>
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: -5px; right: 0px;"></div>
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: 255px; left: 0px;"></div>
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: 255px; right: 0px;"></div>
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: -5px; left: -5px;"></div>
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: 215px; left: -5px;"></div>
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: -5px; right: -5px;"></div>
-        <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: 215px; right: -5px;"></div>
-      </div-->
+                  <!--div style="position: absolute; z-index: 9999; border-color: rgba(0, 0, 0, 0.48); border-style: solid; border-width: 115px 195px; box-sizing: border-box; inset: 0px;">
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: -5px; left: 0px;"></div>
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: -5px; right: 0px;"></div>
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: 255px; left: 0px;"></div>
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 40px; height: 5px; top: 255px; right: 0px;"></div>
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: -5px; left: -5px;"></div>
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: 215px; left: -5px;"></div>
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: -5px; right: -5px;"></div>
+                    <div style="position: absolute; background-color: rgb(255, 255, 255); width: 5px; height: 45px; top: 215px; right: -5px;"></div>
+                  </div-->
               </div>
-             
           </div>        
       </div>
       <br>

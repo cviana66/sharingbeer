@@ -24,28 +24,22 @@ $("#webcam-switch").change(function () {
                    webcam.start();
                 }
                 cameraStarted();
-                console.log("webcam started");
             })
             .catch(err => {
                 displayError();
             });
-         console.log('this.checked-> ',this.checked)
          ischecked = this.checked;
          sendPhoto();
-    }
-    else {        
-        console.log('this.checked-> ',this.checked)
+    } else {        
         ischecked = this.checked;
         cameraStopped();
         webcam.stop();
-        console.log("webcam stopped");
     }        
 });
 
 function decodeImageFromBase64(data, callback){
                 // set callback
                 qrcode.callback = callback;
-                //console.log('qrcode.callback-> ',qrcode.callback)
                 // Start decoding
                 qrcode.decode(data)
 };
@@ -55,13 +49,10 @@ function sendPhoto() {
 
    function takePhoto() {
       if (nPhoto == 30 || ischecked == false) {
-         console.log ('nPhoto-> ',nPhoto);
          nPhoto = 0;
          clearInterval(id);
          $("#webcam-switch").prop("checked", false).change();
       } else {
-         console.log('nPhoto-> ',nPhoto);
-         console.log('ischecked-> ',ischecked);
          nPhoto = nPhoto+1;
          picture = webcam.snap();
          //picture = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASIAAAEiAQMAAABncE31AAAABlBMVEX///8AAABVwtN+AAABA0lEQVRoge3ZUQ6CMAzG8SYcwCNx9R2JA5jU0a6ARKIP60z0/z0wZD+fmm1siBBCCPmfaMu93t/sEk8KKlv5jwrq3VT7jO4dqEy1lsT65mVS92vBUAOVKupbKmYm1DhljffpB/MXqp/aVmQfIuXNuo3qp46p4KIHlaFiTKzXRdrS4GszKlnJHCPBhkgF2z9RyWqvkNWlUdWrOqL6qZiP2kuoVWivGipT+cAosfsNOqHy1cm34txOuwBUhtKW2Hf52Zu8XLdRnVWxZtt3+duQ3gU1QD2d+kSFBDVUFX8ytZcj1Eh1OHMWQQ1Q1kSF2hb4ev5CdVTHFVl1/86FSleEEEJ+PQ/ANYzwx13NHQAAAABJRU5ErkJggg==";
@@ -78,12 +69,6 @@ function sendPhoto() {
     }
 }
 
-
-$('#cameraFlip').click(function() {
-    webcam.flip();
-    webcam.start();  
-});
-
 $('#closeError').click(function() {
     $("#webcam-switch").prop('checked', false).change();
 });
@@ -97,18 +82,10 @@ function displayError(err = ''){
 
 function cameraStarted(){
     $("#errorMsg").addClass("d-none");
-    $('.flash').hide();
     $("#webcam-caption").html("on"); 
     $("#webcam-control").removeClass("webcam-off");
     $("#webcam-control").addClass("webcam-on");
     $(".webcam-container").removeClass("d-none");
-    /*
-    if( webcam.webcamList.length > 1){
-        $("#cameraFlip").removeClass('d-none');
-    }*/
-    //$("#wpfront-scroll-top-container").addClass("d-none");
-    //window.scrollTo(0, 0); 
-    //$('body').css('overflow-y','hidden');
 }
 
 function cameraStopped(){
@@ -116,30 +93,9 @@ function cameraStopped(){
     $("#wpfront-scroll-top-container").removeClass("d-none");
     $("#webcam-control").removeClass("webcam-on");
     $("#webcam-control").addClass("webcam-off");
-    $("#cameraFlip").addClass('d-none');
     $(".webcam-container").addClass("d-none");
     $("#webcam-caption").html("Click to Start");
     $('.md-modal').removeClass('md-show');
-
-}
-
-
-$("#take-photo").click(function () {
-    beforeTakePhoto();
-    var picture = webcam.snap();
-    //document.querySelector('#download-photo').href = picture;
-    afterTakePhoto(picture);
-});
-
-function beforeTakePhoto(){
-    $('.flash')
-        .show() 
-        .animate({opacity: 0.3}, 500) 
-        .fadeOut(500)
-        .css({'opacity': 0.7});
-    window.scrollTo(0, 0); 
-    $('#webcam-control').addClass('d-none');
-    $('#cameraControls').addClass('d-none');
 }
 
 function afterTakePhoto(qrinfo){
@@ -157,32 +113,10 @@ function afterTakePhoto(qrinfo){
       dataType: "json",
       data: {"qrinfo": qrinfo},
       success: function() {
-        window.location.replace("/qrcodeOrder");
+         window.location.replace("/qrcodeOrder");
       },
       error: function (xhr, ajaxOptions, thrownError) { 
-       console.log("KO" ,thrownError + '  ' + xhr);
+         console.log("KO" ,thrownError + '  ' + xhr);
        }
     });
 }
-
-function removeCapture(){
-    $('#canvas').addClass('d-none');
-    $('#webcam-control').removeClass('d-none');
-    $('#cameraControls').removeClass('d-none');
-    $('#take-photo').removeClass('d-none');
-    $('#exit-app').addClass('d-none');
-    $('#download-photo').addClass('d-none');
-    $('#resume-camera').addClass('d-none');
-}
-
-$("#resume-camera").click(function () {
-    webcam.stream()
-        .then(facingMode =>{
-            removeCapture();
-        });
-});
-
-$("#exit-app").click(function () {
-    removeCapture();
-    $("#webcam-switch").prop("checked", false).change();
-});

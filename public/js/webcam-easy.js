@@ -47,36 +47,28 @@ class Webcam {
     /* Get media constraints */
     getMediaConstraints() {
         var videoConstraints = {};
-        //console.log('getMediaConstraints -> this._selectedDeviceId -> ',this._selectedDeviceId);
         if (this._selectedDeviceId == '') {
-           //console.log('1 ',this._facingMode);
             videoConstraints.facingMode =  this._facingMode; 
         } else {
-            //console.log('2');
             videoConstraints.deviceId = { exact: this._selectedDeviceId}
         }
         var constraints = {
             video: videoConstraints,
             audio: false
         };
-        //console.log('getMediaConstraints -> constraints -> ', constraints);
         return constraints;
     }
 
     /* Select camera based on facingMode */ 
     selectCamera(){
       for(let webcam of this._webcamList){
-        //console.log('selectCamera -> webcam.label -> ', webcam.label)
         if(   (this._facingMode=='user' && webcam.label.toLowerCase().includes('front'))
           ||  (this._facingMode=='environment' && webcam.label.toLowerCase().includes('back'))
         )
         {
           this._selectedDeviceId = webcam.deviceId;
-          //console.log ('selectCamera -> webcam.deviceId -> ',webcam.deviceId);
           break;
         }
-        //console.log ('selectCamera -> webcam.deviceId -> ',webcam.deviceId);
-        //console.log('selectCamera -> this._facingMode -> ',this._facingMode);
       }
     }
 
@@ -94,7 +86,6 @@ class Webcam {
       4. Start stream
     */
     async start(startStream = true) {
-      //console.log('async start');
       return new Promise((resolve, reject) => {         
         this.stop();
         navigator.mediaDevices.getUserMedia(this.getMediaConstraints()) //get permisson from user
@@ -132,7 +123,6 @@ class Webcam {
           .then(devices =>{
             this.getVideoInputs(devices);
             resolve(this._webcamList);
-            //console.log('info -> _webcamList -this.> ',this._webcamList);
           }) 
           .catch(error => {
             reject(error);

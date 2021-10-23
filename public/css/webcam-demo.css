@@ -136,8 +136,8 @@
     display: block;
     position: relative;
     width: auto;
-    height: 100vh;
-    z-index: 999;
+    height: 90vh;
+    z-index: 990;
     pointer-events: none;
     margin: auto;
   }
