@@ -4,7 +4,7 @@ module.exports = function(app, paypal, qr, fs) {
   var Item    = require('../app/models/item');
   var PayInfo = require('../app/models/payinfo');
   var User    = require('../app/models/user');
-
+  var lib     = require('./libfunction');
 
   var port = process.env.port;
   if (port === 8080) {
@@ -15,35 +15,41 @@ module.exports = function(app, paypal, qr, fs) {
   
   app.locals.baseurl = address;
 
+// ======================================================================================
+// QRCODE ===============================================================================
+// ======================================================================================
+//GET
+  //Create QRCode  
+  app.get('/qr', function(req, res) {  
+    var code = qr.image('sb-sharingbeer', { type: 'svg' });
+    res.type('svg');
+    code.pipe(res);
+  });
 
-//TEST ==================================================================================
-app.get('/qr', function(req, res) {  
-  var code = qr.image('sb-sharingbeer', { type: 'svg' });
-  res.type('svg');
-  code.pipe(res);
-});
+//GET 
+  // read  Qrcode 
+  app.get('/webcam', function(req, res, next) {
+  console.log("webcam-easy")
+   res.render('webcam.njk');
+  });
 
+//POST
+  app.post('/webcam', function(req, res, next) {   
+    qrcodeInfo = req.body.qrinfo;
+    req.session.qrcodeInfo = qrcodeInfo;
+    res.json({msg:'success'});
+  });
 
-app.get('/webcam', function(req, res, next) {
-console.log("webcam-easy")
- res.render('webcam.njk');
-});
-
-
-app.post('/webcam', function(req, res, next) {   
-  qrcodeInfo = req.body.qrinfo;
-  req.session.qrcodeInfo = qrcodeInfo;
-  res.json({msg:'success'});
-});
-
-app.get('/qrcodeOrder', function(req, res, next) {
-  console.log('qrcodeOrder-> ',req.session.qrcodeInfo);
-  res.render('qrcodeOrder.njk', {QrcodeData : req.session.qrcodeInfo});
-});
+//GET 
+  // show Qrcode information
+  app.get('/qrcodeOrder', function(req, res, next) {
+    console.log('qrcodeOrder-> ',req.session.qrcodeInfo);
+    res.render('qrcodeOrder.njk', {QrcodeData : req.session.qrcodeInfo});
+  });
 
 // GET PAYNOW ============================================================================
 
-app.get('/paynow', isLoggedIn, function(req, res) {
+app.get('/paynow', lib.isLoggedIn, function(req, res) {
   
   var jsonsItems = new Array();
   var cart = req.session.cart; 
@@ -293,7 +299,7 @@ app.get('/cancel', function(req, res) {
 });
 
 // GET ORDER ===========================================================================
-app.get('/order', isLoggedIn, function(req, res) {
+app.get('/order', lib.isLoggedIn, function(req, res) {
   Order.find({idUser:req.user._id}, function(err, orders) {
     
     var displayOrder = {items: []};
@@ -324,15 +330,3 @@ app.get('/order', isLoggedIn, function(req, res) {
 });
 
 } //FINE APP
-
-// MIDDLEWARE ==========================================================================
-// route middleware to make sure a user is logged in 
-function isLoggedIn(req, res, next) {
-
-  // if user is authenticated in the session, carry on
-  if (req.isAuthenticated())
-    return next();
-
-  // if they aren't redirect them to the home page
-  res.redirect('/login');
-};

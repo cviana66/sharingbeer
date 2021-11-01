@@ -15,9 +15,6 @@ var qr            = require('qr-image');
 var fs            = require('fs');
 var nunjucks      = require('nunjucks'); 
 var cons          = require('consolidate');
-//var qrCode        = require('qrcode-reader');
-//var Jimp          = require('jimp');
-
 
 // config and connect to our database
 var configDB = require('./config/database.js');
@@ -33,14 +30,17 @@ var methodOverride  = require('method-override');
 var routesAuth      = require('./app/routesAuth.js');
 
 // ecommerce ===================================================================
-var routesShop      = require ('./app/routesShop.js');
+var routesShop      = require('./app/routesShop.js');
 
 // friends registration ========================================================
-var routesRegister  = require ('./app/routesRegister.js');
+var routesRegister  = require('./app/routesRegister.js');
 
-// paypal ======================================================================
-var routesPayment   = require ('./app/routesPayment.js');
+// paypal v1 ===================================================================
+var routesPayment   = require('./app/routesPayment.js');
 var configPayPal    = require('./config/paypal.js');
+
+// paypal v2 ===================================================================
+var routesPaypal    = require('./app/routesPaypalV2');
 
 // passport ====================================================================
 var pass            = require('./config/passport');
@@ -49,7 +49,7 @@ var pass            = require('./config/passport');
 global.cost = 3;
 
 /**
- *  Define the sample application.
+ *  Define the application.
  */
 var SharingBeer = function() {
 
@@ -115,6 +115,7 @@ var SharingBeer = function() {
         routesShop(self.app);
         routesRegister(self.app);
         routesPayment(self.app, paypal, qr, fs);
+        routesPaypal(self.app);
     };
 
     /**
