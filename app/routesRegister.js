@@ -64,18 +64,18 @@ app.post('/caps', function(req, res) {
     User.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
 
       if (err) {
+        console.log('GET VALIDATION ERROR: ', err );
         req.flash('error','Token is invalid or has expired');
-        console.log('POST VALIDATION ERROR: ', err );
-        res.render('info.dust', {message: req.flash('error'), type: "danger"}); 
+        res.render('info.njk', {message: req.flash('error'), type: "danger"}); 
       }
       
       //console.log('USER VALIATION GET: ', user)
 
       if (!user) {   
         req.flash('error', 'Invitation is invalid or has expired.');
-        res.render('info.dust', {message: req.flash('error'), type: "danger"});
+        res.render('info.njk', {message: req.flash('error'), type: "danger"});
       } else {
-        res.render('validation.dust', { prospect: user});
+        res.render('validation.njk', { prospect: user});
       };
     });
   });
@@ -87,7 +87,7 @@ app.post('/caps', function(req, res) {
       if (err) {
         req.flash('error','Token is invalid or has expired');
         console.log('POST VALIDATION ERROR: ', err );
-        res.render('info.dust', {message: req.flash('error'), type: "danger"});
+        res.render('info.njk', {message: req.flash('error'), type: "danger"});
       
       } else {
       
@@ -108,7 +108,7 @@ app.post('/caps', function(req, res) {
           if(err) { 
             console.log('ERROR VALIDATION UPDATE: ', err);
             req.flash('error', 'Something bad happened! Validation faild');
-            res.render('info.dust', {message: req.flash('error'), type: "danger"});
+            res.render('info.njk', {message: req.flash('error'), type: "danger"});
           
           } else {
           
@@ -117,7 +117,7 @@ app.post('/caps', function(req, res) {
               if(err) {
                 req.flash('error','Something bad happened! Login faild');
                 console.log('ERROR: ', err );
-                res.render('info.dust', {message: req.flash('error'), type: "danger"})
+                res.render('info.njk', {message: req.flash('error'), type: "danger"})
               } else {
                 console.log('POST VALIDATION SET: ', user )
                 req.flash('success', 'Validated and Logged'); 
@@ -138,7 +138,7 @@ app.post('/caps', function(req, res) {
 
     if (req.user.status == 'validated') { 
 
-      res.render ('registration.dust', {
+      res.render ('registration.njk', {
         firstName : req.user.name.first,
         lastName  : req.user.name.last,
         user : req.user, // get the user out of session and pass to template
@@ -166,7 +166,7 @@ app.post('/caps', function(req, res) {
         if (err) {
           console.log('error', err);
           req.flash('error', 'The application has encountered an unknown error.It doesn\'t appear to have affected your data, but our technical staff have been automatically notified and will be looking into this with the utmost urgency.');
-          res.render('info.dust', {message: req.flash('error'), type: "danger"});
+          res.render('info.njk', {message: req.flash('error'), type: "danger"});
           return;
         }
       }
@@ -197,8 +197,11 @@ app.post('/caps', function(req, res) {
 //GET
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
-    Friend.count({ emailParent:req.user.email }, function (err, friends) {
-      if (err) return console.log('error',err);
+    Friend.countDocuments({ emailParent:req.user.email }, function (err, friends) {
+      if (!err) {
+        return console.log('error',err);
+        next(err);
+      }
       
       console.log('GET RECOMM FRIENDS: ', friends);
       
@@ -218,7 +221,7 @@ app.post('/caps', function(req, res) {
           flag = "true";
         }
 
-        res.render('friend.dust', {
+        res.render('friend.njk', {
           controlSates: controlSates, 
           flag : flag,
           message: req.flash('error'),
@@ -238,7 +241,7 @@ app.post('/caps', function(req, res) {
 
     if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
           req.flash('error',"You have no more invitations! Please buy more beer");
-          res.render('friend.dust', { message: req.flash('error'),
+          res.render('friend.njk', { message: req.flash('error'),
                                         invitationAvailable: req.session.invitationAvailable,
                                         friendsInvited:  req.session.friendsInvited,
                                         percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
@@ -269,7 +272,7 @@ app.post('/caps', function(req, res) {
   					req.flash('error','That email is already taken, please try another');
   				}
 
-  				res.render('friend.dust', { message: req.flash('error'),
+  				res.render('friend.njk', { message: req.flash('error'),
                                       invitationAvailable: req.session.invitationAvailable,
                                       friendsInvited:  req.session.friendsInvited,
                                       percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
@@ -293,7 +296,7 @@ app.post('/caps', function(req, res) {
                 if (err) { res.send(err); }
               });
               //render for message display
-              res.render('friend.dust', { message: req.flash('error'),
+              res.render('friend.njk', { message: req.flash('error'),
                                           invitationAvailable: req.session.invitationAvailable,
                                           friendsInvited:  req.session.friendsInvited,
                                           percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
@@ -320,7 +323,7 @@ app.post('/caps', function(req, res) {
               
               req.session.friendsInvited += 1;
               req.flash('message','You have added a new Friend');
-              res.render('friend.dust', { message: req.flash('message'),
+              res.render('friend.njk', { message: req.flash('message'),
                                           invitationAvailable: req.session.invitationAvailable,
                                           friendsInvited:  req.session.friendsInvited,
                                           percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )

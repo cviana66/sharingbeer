@@ -115,32 +115,6 @@
           </div>
 
           <div id="paypal-button-container"></div>
-            <!--script>
-              paypal.Buttons({
-                createOrder: function(data, actions) {
-                  // This function sets up the details of the transaction, including the amount and line item details.
-                  return actions.order.create({
-                    purchase_units: [{
-                      amount: {
-                        value: '{{totalPrice}}'
-                      }
-                    }]
-                  }); 
-                },
-                onApprove: function(data, actions) {
-                  // This function captures the funds from the transaction.
-                  return actions.order.capture().then(function(details) {
-                    // This function shows a transaction success message to your buyer.
-                    console.log('Transaction details -> ', details.payer.name.surname);
-                    console.log('Transaction details -> ', details.payer.payer_id);
-                  });
-                }
-              }).render('#paypal-button-container');
-              
-
-              // This function displays Smart Payment Buttons on your web page.
-
-            </script-->
 
           <script>
           // Render the PayPal button into #paypal-button-container
@@ -148,21 +122,22 @@
 
               // Call your server to set up the transaction
               createOrder: function(data, actions) {
-                  return fetch('/OrdersCreate', {
+                  console.log('!!! createOrder !!!')
+                  return fetch('/create-paypal-transaction', {
                       method: 'post'
                   }).then(function(res) {
-                      console.log('createOrder/////////////////////////////');
+                      console.log('createOrder.res->',res);
                       return res.json();
                   }).then(function(orderData) {
-                      console.log('orderData.id-> ',orderData.orderID)
+                      console.log('orderData.orderID-> ',orderData.orderID)
                       return orderData.orderID;
                   });
               },
 
               // Call your server to finalize the transaction
               onApprove: function(data) {
-                console.log('onApprove!!!!!!!!!!!')
-                return fetch('/OrdersCapture', {
+                console.log('!!! onApprove !!!')
+                return fetch('/authorize-paypal-transaction', {
                   headers: {
                     'content-type': 'application/json'
                   },
@@ -207,6 +182,8 @@
                     // element.innerHTML = '';
                     // element.innerHTML = '<h3>Thank you for your payment!</h3>';
                     // Or go to another URL:  actions.redirect('thank_you.html');
+
+                    window.location.href = ("/recomm");
                 });
                 /*}).then(function(orderData) {
                   console.log('Transaction approved by->', orderData.details);
@@ -222,7 +199,7 @@
               }
             }).render('#paypal-button-container');
           </script>
-
+          <br>
         </div>
 
     </div>
