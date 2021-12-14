@@ -20,7 +20,8 @@ var cons          = require('consolidate');
 var configDB = require('./config/database.js');
 mongoose.connect(configDB.url, {useCreateIndex: true,
                                 useNewUrlParser: true,
-                                useUnifiedTopology: true});
+                                useUnifiedTopology: true,
+                                useFindAndModify: false});
 var db = mongoose.connection;
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
@@ -172,6 +173,8 @@ var SharingBeer = function() {
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
         self.app.use(flash()); // use connect-flash for flash messages stored in session        
+
+    
     };
 
     /**
@@ -185,6 +188,7 @@ var SharingBeer = function() {
         self.initializeServer();
         self.createRoutes();
     };
+
 
 
     /**

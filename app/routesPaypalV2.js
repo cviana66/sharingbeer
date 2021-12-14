@@ -2,28 +2,19 @@ module.exports = function(app) {
 
   const checkoutNodeJssdk = require('@paypal/checkout-server-sdk');
   const payPalClient      = require('../config/paypal/common/payPalClient');
-
   const lib               = require('./libfunction');
 
   const Order   = require('../app/models/order');
   const Item    = require('../app/models/item');
   const User    = require('../app/models/user');
-
-  const port = process.env.port;
-  if (port === 8080) {
-      address = "htpp://127.0.0.1:8080";
-  } else {
-      address = "https://sharingbeer.herokuapp.com";
-  }
-  
-  app.locals.baseurl = address;
+  const PayInfo = require('../app/models/payinfo');
 
 // =====================================
 // PAYPAL ==============================
 // =====================================
  
 // =====================================
-// Set up a Transaction
+// Set up Transaction
 // =====================================
 
 app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) {
@@ -37,69 +28,59 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
       console.log("Cart not exist");
     } else {
   
-      // ORDER MANAGEMENT ---------------------------------------------------------------
-      // idUser      : { type: String, required: true },
-      // email       : { type: String, required: true },
-      // dateInsert  : { type: Date, required: true },
-      // status      : { type: String, required: true},
-      // idPayment   : { type: String},
-      // discount    : { type: Number},
-      // totalPrice  : { type: Number}
+      try { // Salva l'ordine 
 
-      var newOrder = new Order();
+          var newOrder = new Order();
 
-      newOrder.idUser = req.user._id;
-      newOrder.email  = req.user.email;
-      newOrder.dateInsert = Date.now();
-      newOrder.status = 'reserved';
-      newOrder.discount = 0;
-      newOrder.totalPrice = req.session.totalPrc;
+          newOrder.idUser = req.user._id;
+          newOrder.email  = req.user.email;
+          newOrder.dateInsert = Date.now();
+          newOrder.status = 'reserved';
+          newOrder.discount = 0;
+          newOrder.totalPrice = req.session.totalPrc;
 
-      newOrder.save(function(err, order) {
-        if (err) {
-          var error = 'Something bad happened! Please try again.';
-          console.log("error code: ",err.code);
-        } else {
+          let saveOrder = await newOrder.save();
+          console.log("Mongoose saveOrder",saveOrder); 
+
           //save in session Order ID used after for return success payment
-          req.session.order.id = order.id;
-          console.log('ORDER ID : ', req.session.order.id );
+          req.session.order.id = saveOrder.id;
+          console.log('SHARINGBEER ORDER ID :', req.session.order.id );
+   
+        } catch (err) {
+          console.log('Order save err', err);
+          return res.sendStatus(500);
+      };
 
-          // ITEM MANAGEMENT ------------------------------
-          //ItemSchema = new Schema({
-          //idOrder     : { type: String, required: true },
-          //idPrdoduct  : { type: String, required: true },
-          //nameProduct  : { type: String},
-          //quantity  : { type: String},
-          //price     : { type: Number}
-        
-          
-          //Insert Product in cart into Item
+      try {
+
           for (var item in cart) {
             if (cart[item].qty > 0) {
               
-              var newItem = new Item();
               var subtotal = parseInt(cart[item].price);
+
+              var newItem = new Item();
               
-              newItem.idOrder = order.id
+              newItem.idOrder = req.session.order.id;
               newItem.idPrdoduct = cart[item].id;
               newItem.nameProduct = cart[item].name;
               newItem.quantity = cart[item].qty;
               newItem.price = subtotal.toFixed(2);
 
-              newItem.save(function(err, items) {
-                if (err) {
-                  var error = 'Something bad happened! Please try again.';
-                  console.log("error code: ",err.code);
-                  res.redirect("/error");
-                }
-              });
+              let saveItem = await newItem.save();
+               
             }
-          } //for  
-        }
-      });
+          } 
+          console.log('Items saved');
+        } catch (err) {
+            console.log('Items saved err', err);
+            return res.sendStatus(500);
+      }
+
       // 3. Call PayPal to set up an authorization transaction
       console.log('INI Call PayPal to set up an authorization transaction');
+
       const request = new checkoutNodeJssdk.orders.OrdersCreateRequest();
+      
       request.prefer("return=representation");
       request.requestBody({
         intent: 'CAPTURE',
@@ -108,19 +89,46 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
             currency_code: 'EUR',
             value: req.session.totalPrc
             }
-          //items: jsonsItems
         }]
       });
 
       let order;
 
       try {
+        
         order = await payPalClient.client().execute(request);
+        
+        const paypalOrderStatus =  order.result.status;
+        const paypalOrderId = order.result.id;
+        const sharinbeerOrderId = req.session.order.id
+        
+        console.log('PAYPAL ORDER STATUS:',order.result.status);
+        console.log('PAYPAL ORDER ID:', order.result.id);
+        console.log('SHARINGBEER ORDER ID', req.session.order.id);
+
+        try {
+
+          var payInfo = new PayInfo();
+
+          payInfo.idPay   = paypalOrderId; 
+          payInfo.idOrder = sharinbeerOrderId;
+          payInfo.state   = paypalOrderStatus;
+          payInfo.responseMsg = JSON.stringify(order);
+       
+          let infoPayment = await payInfo.save(); 
+        } catch (err) {
+          console.log('Paypal Info save err', err);
+          return res.sendStatus(500);
+        };
+        console.log('Paypal Info saved');
+        
       } catch (err) {
         // 4. Handle any errors from the call
         console.error(err);
-        return res.send(500);
+        return res.sendStatus(500);
+        // Equivalent to res.status(500).send('KO')
       }
+
       // 5. Return a successful response to the client with the order ID
       console.log('Return a successful response to the client with the Paypal order ID->',order.result.id);
       res.status(200).json({orderID: order.result.id});
@@ -128,91 +136,88 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
   });
 
 //=============================
-// Create an Authorization
+// Capture a Transaction
 //=============================
 // 2. Set up your server to receive a call from the client
 app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, res) {
 
   // 2a. Get the order ID from the request body
-  const orderID = req.body.orderID;
-  console.log('OrdersCapture.orderID->',orderID);
+  const paypalOrderId = req.body.orderID;
 
   // 3. Call PayPal to capture the order
-  const request = new checkoutNodeJssdk.orders.OrdersCaptureRequest(orderID);
+  const request = new checkoutNodeJssdk.orders.OrdersCaptureRequest(paypalOrderId);
   request.requestBody({});
 
   let capture;
 
   try {
     capture = await payPalClient.client().execute(request);
+    console.log('capture ->',capture);
 
     // 4. Save the capture ID to your database. Implement logic to save capture to your database for future reference.
-    const captureID = capture.result.purchase_units[0].payments.captures[0].id;
-    console.log('captureID ->',capture.result.purchase_units[0].payments.captures[0].id);
+    const paypalPaymentId     = capture.result.purchase_units[0].payments.captures[0].id;
+    const sharigbeerOrderId   = req.session.order.id;
+    const paypalPaymentStatus = capture.result.purchase_units[0].payments.captures[0].status; 
+    const paypalPayerId       = capture.result.payer.payer_id;
+    const paypalCreateTime    = capture.result.purchase_units[0].payments.captures[0].create_time;
+    const paypalUpdateTime    = capture.result.purchase_units[0].payments.captures[0].update_time;
+    const paypalAmount        = capture.result.purchase_units[0].payments.captures[0].amount.value;
+    const paypalCurrency      = capture.result.purchase_units[0].payments.captures[0].amount.currency_code;
+    const captureStringify    = JSON.stringify(capture);
 
-      const paymentId = capture.id;
-      const payerId   = capture.payer.payer_id;
-      const orderId   = req.session.order.id;
-      const payStatus = capture.status; 
-      //const details = { "payer_id": payerId };
+    req.session.cart        = {};
+    req.session.displayCart = {}
+    req.session.order       = {};
+    req.session.totalPrc    = 0;
+    req.session.numProducts = 0;
 
-      req.session.cart  = {};
-      req.session.order = {};
-      req.session.totalPrc = 0;
-      req.session.numProducts = 0;
+    try { 
 
+      let infoPayment = await PayInfo.findOneAndUpdate({idOrder:sharigbeerOrderId},
+          { state:paypalPaymentStatus, 
+            responseMsg:captureStringify} 
+      );  
+     
+    } catch {
+      // TODO: scrivere su LOG per recuperare successivamente
+      console.log('Save log after error -> PAYPAL orderID:',paypalOrderId);
+      console.log('Save log after errot -> SHARINGBEER orderID:',req.session.order.id);
+      console.log('Save log after error -> PAYPAL status:',paypalPaymentStatus);
+    };
 
-      var payInfo = new PayInfo();
+    var SharingbeerStatus="";
 
-      payInfo.idPay   = paymentId;
-      payInfo.idOrder = orderId
-      payInfo.state   = payStatus;
-      payInfo.responseMsg = JSON.stringify(payment);
+    if (paypalPaymentStatus === 'COMPLETED')  { 
+      SharingbeerStatus = 'payed';
+    } else {
+      SharingbeerStatus = 'tobeVerify';
+    }
 
-      payInfo.save(function(err, payinfo) {
-        if (err) {
-          var error = 'Something bad happened! Please try again.';
-          console.log("error code: ",err.code);
-          res.redirect('/???')
-        }
-      }); 
+    console.log('PAYMENT ...payments.captures: ', capture.result.purchase_units[0].payments.captures);
 
-      var status="";
-
-      if (payment.state === 'approved')  { 
-        status = 'payed';
-      }else{
-        status = 'tobeVerify';
-      }
-
-      
-      console.log('PAYMENT : ',  payment.transactions[0].amount);
-
-      Order.findByIdAndUpdate(orderId, 
-        { $set: { 
+    try {
+      let updateOrder = await Order.findByIdAndUpdate(sharigbeerOrderId, 
+        { $set: {
                   paypal: {
-                          paymentId : paymentId,
-                          payerId   : payerId, 
-                          intent    : payment.intent,
-                          method    : payment.payer.payment_method,  
-                          state     : payment.state,
-                          createTime: String(payment.create_time),
-                          updateTime: String(payment.update_time),
-                          totalAmount   : String(payment.transactions[0].amount.total),
-                          currencyAmount: payment.transactions[0].amount.currency
+                          payOrderId    : paypalOrderId,
+                          paymentId     : paypalPaymentId,
+                          payerId       : paypalPayerId, 
+                          state         : paypalPaymentStatus,
+                          createTime    : String(paypalCreateTime),
+                          updateTime    : String(paypalUpdateTime),
+                          totalAmount   : String(paypalAmount),
+                          currencyAmount: paypalCurrency
                         },
-                  status: status
+                  status: SharingbeerStatus
                 }
-        }, 
-        function (err, req) {
-          if (err) {
-            console.log('error', err);
-            res.redirect('/???');
-            return;
-          }
-      });
+        })
+    } catch (err) {
+      // TODO: scrivere su LOG per recuperare successivamente
+      console.log('Update error -> SHARINGBEER Order with paypal info\n', err);
+      console.log(JSON.stringify(capture));
+    }
 
-      if (status === 'payed') {
+    if (SharingbeerStatus === 'payed') {
         // add Friends after buy
         User.findByIdAndUpdate(req.user._id, 
           { $set: { 
@@ -221,9 +226,9 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
           }, 
           function (err, req) {
             if (err) {
-              console.log('error', err);
-              res.redirect('/???');
-              return;
+              console.log('User.findByIdAndUpdate', err);
+              //res.redirect('/???');
+              //return;
             }
         });
 
@@ -235,26 +240,26 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
               
               User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
                   if (err) {
-                    console.log('error', err);
-                    res.redirect('/???');
-                    return;
+                    console.log('error User.update', err);
+                    //res.redirect('/???');
+                    //return;
                   }
               });            
             
         });
       
-        res.redirect('/recomm')
+        //res.redirect('/recomm')
         //console.log("Get Payment Response");
         //console.log(JSON.stringify(payment));      
 
       };
     
-   // await database.saveCaptureID(captureID);
+  
 
   } catch (err) {
 
     // 5. Handle any errors from the call
-    console.error(err);
+    console.error('Handle any errors from the call:',err);
     return res.sendStatus(500);
   }
 

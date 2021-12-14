@@ -87,6 +87,8 @@ module.exports = function(app) {
                   totalPrice : req.session.totalPrc
   					    };
 
+    console.log('cart.cart:', req.session.displayCart);
+
   	res.render('cart.njk', model);
 	});
 //POST MINUS ===================================================================

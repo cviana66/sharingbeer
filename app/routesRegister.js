@@ -54,7 +54,7 @@ app.post('/caps', function(req, res) {
 });
 
 // =====================================
-// VALIDATION ==========================
+// TOKEN VALIDATION ====================
 // =====================================
 //GET
   app.get('/validation', function(req,res){
@@ -198,40 +198,45 @@ app.post('/caps', function(req, res) {
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
     Friend.countDocuments({ emailParent:req.user.email }, function (err, friends) {
-      if (!err) {
-        return console.log('error',err);
-        next(err);
-      }
+      if (err) {
+        console.log('ERROR RECOMMANDATION: ', err);
+        req.flash('error', 'Something bad happened!');
+        res.render('info.njk', {message: req.flash('error'), type: "danger"});
       
-      console.log('GET RECOMM FRIENDS: ', friends);
+      } else {
       
-      User.findOne({ email: req.user.email }, function (err, user) {
-        if (err) return console.log('error',err);
-        friendsInvited = parseInt(friends,10);        
+        console.log('GET RECOMM FRIENDS: ', friends);
         
-        req.session.invitationAvailable = parseInt(user.possibleFriends,10);
-        req.session.friendsInvited = friendsInvited;
-        var error = "";
-        var controlSates = "";
-        var flag = "false";
-        // Controllo che ci siano ancora inviti diposnibili
-        if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
-          req.flash('error', "You have no more invitations! Please buy more beer");
-          controlSates = "disabled";
-          flag = "true";
-        }
+        User.findOne({ email: req.user.email }, function (err, user) {
+          
+          if (err) return console.log('error',err);
+          
+          friendsInvited = parseInt(friends,10);        
+          
+          req.session.invitationAvailable = parseInt(user.possibleFriends,10);
+          req.session.friendsInvited = friendsInvited;
+          var error = "";
+          var controlSates = "";
+          var flag = "false";
+          // Controllo che ci siano ancora inviti diposnibili
+          if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
+            req.flash('error', "You have no more invitations! Please buy more beer");
+            controlSates = "disabled";
+            flag = "true";
+          }
 
-        res.render('friend.njk', {
-          controlSates: controlSates, 
-          flag : flag,
-          message: req.flash('error'),
-          user: req.user,
-          invitationAvailable: req.session.invitationAvailable,
-          friendsInvited:  req.session.friendsInvited,
-          percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable ),
-          numProducts : req.session.numProducts
+          res.render('friend.njk', {
+                          controlSates: controlSates, 
+                          flag : flag,
+                          message: req.flash('error'),
+                          user: req.user,
+                          invitationAvailable: req.session.invitationAvailable,
+                          friendsInvited:  req.session.friendsInvited,
+                          percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable ),
+                          numProducts : req.session.numProducts
+          });
         });
-      }); 
+      } 
     });
 	});
 //POST

@@ -12,6 +12,7 @@ var OrderSchema = new Schema({
     discount    : { type: Number},
     totalPrice  : { type: Number},
     paypal : {
+        payOrderId   :{ type: String},
     	paymentId 	: { type: String},
     	payerId		: { type: String},
         state       : { type: String},

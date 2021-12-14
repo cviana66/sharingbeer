@@ -96,7 +96,7 @@
       {% endfor %}          
   
 
-  {% if cart.items %}    
+  {% if numProducts != 0 %}
     <div class="row">
       <div class="col-lg-12 col-md-12" style="background-color:#FFBB35;border-radius:0px 0px 12px 12px">
         <br>
@@ -105,15 +105,7 @@
           <div>
             <h4 class="text-center"><strong>€{{totalPrice}}</strong></h4>            
           </div>
-          <div >
-            <form method="GET" action="/register">
-              <button type="submit" class="btn btn-my btn-lg btn-block">
-                Checkout
-              </button>
-            </form>
-            <br>
-          </div>
-
+         
           <div id="paypal-button-container"></div>
 
           <script>
@@ -125,13 +117,23 @@
                   console.log('!!! createOrder !!!')
                   return fetch('/create-paypal-transaction', {
                       method: 'post'
-                  }).then(function(res) {
+                  })
+                  .then(function(res) {
                       console.log('createOrder.res->',res);
-                      return res.json();
-                  }).then(function(orderData) {
+                      if (res.ok===false) {
+                        return window.location.href = ("/");
+                      } else {
+                        return res.json();
+                      }
+                  })
+                  .then(function(orderData) {
                       console.log('orderData.orderID-> ',orderData.orderID)
                       return orderData.orderID;
-                  });
+                  })
+                  /*.catch(function(error){
+                      console.error('Error:', error);
+                      //window.location.href = ("/");
+                  })*/
               },
 
               // Call your server to finalize the transaction
@@ -146,9 +148,9 @@
                     orderID: data.orderID
                   })
                 }).then(function(res) {
-                  console.log('onApprove.res->',res);
-                  return res.json();
-                }).then(function(orderData) {
+                    console.log('onApprove.res->',res);
+                    return res.json();
+                  }).then(function(orderData) {
                     // Three cases to handle:
                     //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
                     //   (2) Other non-recoverable errors -> Show a failure message
@@ -157,14 +159,13 @@
                     // This example reads a v2/checkout/orders capture response, propagated from the server
                     // You could use a different API or structure for your 'orderData'
                     var errorDetail = Array.isArray(orderData.details) && orderData.details[0];
-                    console.log('errorDetail-> ', errorDetail);
 
                     if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
                         return actions.restart(); // Recoverable state, per:
                         // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
                     }
 
-                    if (errorDetail) {
+                    if (errorDetail) {   
                         var msg = 'Sorry, your transaction could not be processed.';
                         if (errorDetail.description) msg += '\n\n' + errorDetail.description;
                         if (orderData.debug_id) msg += ' (' + orderData.debug_id + ')';
@@ -172,10 +173,10 @@
                     }
 
                     // Successful capture! For demo purposes:
-                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
-                    const obj = JSON.parse(JSON.stringify(orderData, null, 2));
-                    var transaction = obj.orderData.result.purchase_units[0].payments.captures[0];
-                    console.log('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+                    // console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                    // const obj = JSON.parse(JSON.stringify(orderData, null, 2));
+                    // var transaction = obj.orderData.result.purchase_units[0].payments.captures[0];
+                    // console.log('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
 
                     // Replace the above to show a success message within this page, e.g.
                     // const element = document.getElementById('paypal-button-container');
@@ -192,7 +193,7 @@
 
               style: {
                   layout:  'vertical',
-                  height:   45,
+                  height:   48,
                   color:   'blue',
                   shape:   'rect',
                   label:   'paypal'
