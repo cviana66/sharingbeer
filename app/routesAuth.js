@@ -43,7 +43,7 @@ module.exports = function(app, passport) {
   }));
 
 // =====================================
-// PROFILE SECTION =====================
+// PROFILE SECTION ========== 17-12-2021
 // =====================================
 //GET
   // we will want this protected so you have to be logged in to visit
@@ -54,13 +54,17 @@ module.exports = function(app, passport) {
 
     Friends.find({id : req.user._id }, function(err, friends) {
         
-        if (err) { res.send(err); }
+        if (err) {
+          req.flash('error','Something bad happened while retriving friends! Please retry');
+          console.log('ERROR PROFILE FIND FRIENDS:', err );
+          res.render('info.njk', {message: req.flash('error'), type: "danger"});
+        }
 
-        res.render('profile.dust', {
+        res.render('profile.njk', {
             user : req.user, // get the user out of session and pass to template
             numFriends  : friends.length,
-            friendMap   : friends,
-            message: req.flash('success')
+            friendsMap  : friends,
+            message     : req.flash('success')
         });
     });
   });
@@ -76,7 +80,7 @@ app.get('/logout', function(req, res) {
   });
 
 // =====================================
-// FORGOT ==============================
+// FORGOT =================== 17-12-2021
 // =====================================
 //GET
   app.get('/forgot', function(req, res) {
@@ -86,7 +90,11 @@ app.get('/logout', function(req, res) {
   app.post('/forgot', function(req, res, next) {
     Users.findOne({ email: req.body.email }, function(err, user) {
         
-        if (err) { return console.error('error',err); next(err)}; //TODO verificare simulando comportamento con errore
+        if (err) {
+          req.flash('error','Something bad happened! Please retry');
+          console.log('ERROR RESET PASSWORD:', err );
+          res.render('info.njk', {message: req.flash('error'), type: "danger"}); 
+        }; 
 
         if (!user) {
           req.flash('error', 'No account with that email address exists.');
@@ -142,7 +150,7 @@ app.get('/logout', function(req, res) {
         req.flash('error', 'Password reset token is invalid or has expired.');
         res.render('forgot.dust', {message: req.flash('error')});
       } else {
-        res.render('reset.dust', { user: req.user, token: req.query.token });
+        res.render('reset.njk', { user: req.user, token: req.query.token });
       };
     });
   });
@@ -154,7 +162,7 @@ app.get('/logout', function(req, res) {
     if (req.body.password != req.body.confirm) {
     
       req.flash('error', 'Password do not match');
-      res.render('reset.dust', {message: req.flash('error'), token:req.body.token });          
+      res.render('reset.njk', {message: req.flash('error'), token:req.body.token });          
     
     } else {
       
@@ -200,5 +208,18 @@ app.get('/logout', function(req, res) {
           failureRedirect : '/'
       })
   );
+
+// =====================================
+// PASSPORT ERROR HANDLE ==== 18/12/2021
+// =====================================
+  app.use( function(error, req, res, next) {
+  // Error gets here
+
+    let msgFlash = req.flash('error');
+    let msgError = error;
+    console.error(msgFlash);
+    res.render('info.njk', {message: msgFlash, type: "danger"});
+  });
+
 };
 

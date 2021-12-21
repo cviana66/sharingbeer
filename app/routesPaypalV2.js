@@ -251,10 +251,7 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
         //res.redirect('/recomm')
         //console.log("Get Payment Response");
         //console.log(JSON.stringify(payment));      
-
-      };
-    
-  
+      }
 
   } catch (err) {
 

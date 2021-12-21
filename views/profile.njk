@@ -1,0 +1,37 @@
+<!-- last modify 17-12-2021 -->
+
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+  <div class="row">
+    <div class="col-md-3 col-lg-4"></div>
+    <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Profile</h3>
+      <hr style="border-top: 1px solid #5375BD;">
+
+      {% if message %}
+        {% for message in message %}
+          <div class="alert alert-{{type}}">{message}}</div>
+        {% endfor %}
+      {% endif %}
+
+          {% if user %}
+            <ul class="list-group">
+              <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.name.first}} {{user.name.last}} </li>
+              <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.email}} </li>
+              <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.booze}} booze </li>
+          {% endif %}
+        
+              <li class="list-group-item text-white" style="background-color:#2A0009"> {{numFriends}} friends </li> 
+             
+              {% for friend in friendsMap %}
+                <li class="list-group-item text-white" style="background-color:#2A0009"> {{friend.firstNameFriend}} : {{friend.emailFriend}} </li>
+              {% endfor %}
+          
+          </ul> 
+        <br>
+      <div class="col-md-3 col-lg-4"></div>
+    </div>
+  </div>
+{% endblock %}
+        

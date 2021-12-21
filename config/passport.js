@@ -104,8 +104,10 @@ module.exports = function(passport) {
             // we are checking to see if the user trying to login already exists
             User.findOne({ 'email' :  email }, function(err, user) {
                 // if there are any errors, return the error before anything else
-                if (err)
-                    return done(err);
+                if (err) {
+                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
+                    return done(err); 
+                }
 
                 // if no user is found, return the message
                 if (!user)
@@ -120,19 +122,22 @@ module.exports = function(passport) {
                 // all is well, return successful user
                 console.log('ID PASSPORT: ', user._id);
 
-                // if the user is in status "new" then this is the first access --> validation put status = confirmed
+                // if the user status  is "new" then it is the first access --> validation put status = confirmed
                 if (user.status == 'new') {
                     User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
                         
                         if (err) { 
-                            console.log('error', err);
+                            req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
                             return done(err) }
                         else {
 
                             // booze to add to parent for invitatition done
                             User.findOne({'_id': user.idParent }, function(err, parent) {
                                 // if there are any errors, return the error
-                                if (err) { return done(err); }
+                                if (err) {
+                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later'); 
+                                    return done(err); 
+                                }
 
                                 console.log('PARENT ID: ', parent._id);
 
@@ -141,9 +146,8 @@ module.exports = function(passport) {
                                 User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req, res) {
                                   
                                   if (err) { 
-                                    console.log('error', err);
-                                    res.redirect('/profile');
-                                    return;
+                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later'); 
+                                    return done(err);      
                                     }
                                 });     
                             });
