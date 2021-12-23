@@ -57,7 +57,7 @@ module.exports = function(app, passport) {
         if (err) {
           req.flash('error','Something bad happened while retriving friends! Please retry');
           console.log('ERROR PROFILE FIND FRIENDS:', err );
-          res.render('info.njk', {message: req.flash('error'), type: "danger"});
+          return res.render('info.njk', {message: req.flash('error'), type: "danger"});
         }
 
         res.render('profile.njk', {
@@ -80,20 +80,21 @@ app.get('/logout', function(req, res) {
   });
 
 // =====================================
-// FORGOT =================== 17-12-2021
+// FORGOT =================== 21-12-2021
 // =====================================
 //GET
   app.get('/forgot', function(req, res) {
       res.render('forgot.njk');
   });
 //POST
-  app.post('/forgot', function(req, res, next) {
+  app.post('/forgot', function(req, res) {
     Users.findOne({ email: req.body.email }, function(err, user) {
-        
+        // Handle error: best practicies
         if (err) {
           req.flash('error','Something bad happened! Please retry');
           console.log('ERROR RESET PASSWORD:', err );
-          res.render('info.njk', {message: req.flash('error'), type: "danger"}); 
+          return res.render('info.njk', {message: req.flash('error'), type: "danger"}); 
+         
         }; 
 
         if (!user) {
@@ -108,7 +109,11 @@ app.get('/logout', function(req, res) {
           
           user.save(function(err) {
           
-            if(err) return console.log('error: ', err); //TODO la gestione in caso di errore
+            if(err) {
+              req.flash('error','Something bad happened! Please retry');
+              console.log('ERROR RESET PASSWORD:', err );
+              return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+            }
           
             var mailOptions = {
               to: user.email,
@@ -120,9 +125,11 @@ app.get('/logout', function(req, res) {
                 'If you did not request this, please ignore this email and your password will remain unchanged.\n'
             };
         
-            transporter.sendMail(mailOptions, function(error, info){
-                if(error){
-                  return console.log('ERROR: ', error);
+            transporter.sendMail(mailOptions, function(err, info){
+                if(err){
+                  req.flash('error','Something bad happened! I can not send the email. Please retry');
+                  console.log('ERROR RESET PASSWORD SEND EMAIL:', err );
+                  return res.render('info.njk', {message: req.flash('error'), type: "danger"});
                 } else {
                  console.log('Message reset password sent!', info);
                  req.flash('loginMessage', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
@@ -135,7 +142,7 @@ app.get('/logout', function(req, res) {
     });
 
 // =====================================
-// RESET PASSWORD ======================
+// RESET PASSWORD ============ 21/2/2021
 // =====================================
 //GET
   app.get('/reset', function(req, res) {
@@ -144,8 +151,12 @@ app.get('/logout', function(req, res) {
   
     Users.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 
-      if(err) return console.log('ERROR: ', err);
-      
+      if(err) {
+        req.flash('error','Something bad happened! Please retry');
+        console.log('ERROR RESET PASSWORD BY TOKEN:', err );
+        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+      }
+
       if (!user) {
         req.flash('error', 'Password reset token is invalid or has expired.');
         res.render('forgot.dust', {message: req.flash('error')});
@@ -168,7 +179,11 @@ app.get('/logout', function(req, res) {
       
       Users.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
         
-        if(err) return console.log('ERROR: ', err);
+        if(err) {
+          req.flash('error','Something bad happened! Please retry');
+          console.log('ERROR RESET PASSWORD BY TOKEN:', err );
+          return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+        }
 
         if (!user) {
           req.flash('error', 'Password reset token is invalid or has expired.');
@@ -182,8 +197,12 @@ app.get('/logout', function(req, res) {
 
           user.save(function(err) {
             
-            if(err) return console.log('ERROR: ', err);
-            
+            if(err) {
+              req.flash('error','Something bad happened! Please retry');
+              console.log('ERROR RESET PASSWORD BY TOKEN:', err );
+              return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+            }
+
             req.logIn(user, function(err) {
               if(err) return console.log('ERROR: ', err);
               req.flash('success', 'Success! Your password has been changed.'); 
