@@ -192,7 +192,7 @@ app.post('/caps', function(req, res) {
   });
 
 // =====================================
-// FRIEND ==============================
+// FRIEND =================== 24-12-2021
 // =====================================
 //GET
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
@@ -201,42 +201,46 @@ app.post('/caps', function(req, res) {
       if (err) {
         console.log('ERROR RECOMMANDATION: ', err);
         req.flash('error', 'Something bad happened!');
-        res.render('info.njk', {message: req.flash('error'), type: "danger"});
-      
-      } else {
-      
-        console.log('GET RECOMM FRIENDS: ', friends);
-        
-        User.findOne({ email: req.user.email }, function (err, user) {
-          
-          if (err) return console.log('error',err);
-          
-          friendsInvited = parseInt(friends,10);        
-          
-          req.session.invitationAvailable = parseInt(user.possibleFriends,10);
-          req.session.friendsInvited = friendsInvited;
-          var error = "";
-          var controlSates = "";
-          var flag = "false";
-          // Controllo che ci siano ancora inviti diposnibili
-          if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
-            req.flash('error', "You have no more invitations! Please buy more beer");
-            controlSates = "disabled";
-            flag = "true";
-          }
-
-          res.render('friend.njk', {
-                          controlSates: controlSates, 
-                          flag : flag,
-                          message: req.flash('error'),
-                          user: req.user,
-                          invitationAvailable: req.session.invitationAvailable,
-                          friendsInvited:  req.session.friendsInvited,
-                          percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable ),
-                          numProducts : req.session.numProducts
-          });
-        });
+        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       } 
+      
+      console.log('GET RECOMM FRIENDS: ', friends);
+      
+      User.findOne({ email: req.user.email }, function (err, user) {
+        
+        if (err) {
+          console.log('ERROR RECOMMANDATION: ', err);
+          req.flash('error', 'Something bad happened!');
+          return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+        } 
+        
+        friendsInvited = parseInt(friends,10);        
+        
+        req.session.invitationAvailable = parseInt(user.possibleFriends,10);
+        req.session.friendsInvited = friendsInvited;
+        
+        let error = "";
+        let controlSates = "";
+        let flag = "false";
+        
+        // Controllo che ci siano ancora inviti diposnibili
+        if (req.session.friendsInvited - req.session.invitationAvailable <= 0) {
+          req.flash('error', "You have no more invitations! Please buy more beer");
+          controlSates = "disabled";
+          flag = "true";
+        }
+
+        res.render('friend.njk', {
+                        controlSates: controlSates, 
+                        flag : flag,
+                        message: req.flash('error'),
+                        user: req.user,
+                        invitationAvailable: req.session.invitationAvailable,
+                        friendsInvited:  req.session.friendsInvited,
+                        percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable ),
+                        numProducts : req.session.numProducts
+        });
+      });
     });
 	});
 //POST
@@ -244,7 +248,7 @@ app.post('/caps', function(req, res) {
 
     console.log('POST RECOMM FRIEND INVITED: ',req.session.friendsInvited )
 
-    if (req.session.friendsInvited - req.session.invitationAvailable == 0) {
+    if (req.session.friendsInvited - req.session.invitationAvailable <= 0) {
           req.flash('error',"You have no more invitations! Please buy more beer");
           res.render('friend.njk', { message: req.flash('error'),
                                         invitationAvailable: req.session.invitationAvailable,
@@ -293,12 +297,15 @@ app.post('/caps', function(req, res) {
 
           newFriend.save(function(err) {
             if (err) {
-              console.log("ERROR: ",err);
+              console.log('ERROR RECOMMANDATION: ', err);
               req.flash('error','Something bad happened! Please try again');
   						
               //remove Friend from User
   						User.findOneAndRemove({ 'email' :  newUser.email }, function(err){
-                if (err) { res.send(err); }
+                if (err) { 
+                  console.log('ERROR RECOMMANDATION: ', err);
+                  req.flash('error', 'Something bad happened! Please try again');
+                }
               });
               //render for message display
               res.render('friend.njk', { message: req.flash('error'),

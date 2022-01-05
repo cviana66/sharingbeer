@@ -48,7 +48,7 @@ module.exports = {
                         var mailOptions = {
                           from: 'info@sharingbeer.com', // sender address
                           to: 'cviana66@gmail.com', // list of receivers
-                          subject: 'Hello ✔', // Subject line
+                          subject: 'Hello ✔ form sharingbeer', // Subject line
                           html: mailfriend(Name, Email, Password, Token, userName, userSurname) 
                         }   
                       } else {
@@ -56,7 +56,7 @@ module.exports = {
                         var mailOptions = {
                             from: 'info@sharingbeer.com', // sender address
                             to: 'cviana66@gmail.com', // list of receivers
-                            subject: 'Thanks ✔', // Subject line
+                            subject: 'Thanks ✔ from sharingbeer', // Subject line
                             html: mailparent(Name, Email, userName, userEmail)
                         }
                       }
@@ -66,11 +66,11 @@ module.exports = {
                       //console.log('friendPassword: ' + friendPassword);
                       //console.log('userEmail: ' + userEmail);
 
-                      transporter.sendMail(mailOptions, function(error, info){
-                          if(error){
-                            return console.log('ERROR: ', error);
+                      transporter.sendMail(mailOptions, function(err, info){
+                          if(err){
+                            return console.log('ERROR: ', err);
                           }else{
-                              console.log('MESSAGE SENT: ', info);
+                            console.log('MESSAGE SENT: ', info);
                           };
                       });
                   },
