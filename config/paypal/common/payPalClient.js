@@ -20,8 +20,8 @@ function client() {
  * LiveEnvironment.
  */
 function environment() {
-    let clientId = process.env.PAYPAL_CLIENT_ID || 'AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv';
-    let clientSecret = process.env.PAYPAL_CLIENT_SECRET || 'EPgLH41tckQh9R3P4U1cT-ja9Ve_wT-Aia_AWTYqEbgensY8MKrmjFtcDwcUC616RlA3eGH3jiBoUcqM';
+    let clientId = process.env.PAYPAL_CLIENT_ID; 
+    let clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
     console.log('environment-> ',process.env.NODE_ENV);
     
