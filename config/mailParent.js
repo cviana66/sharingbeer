@@ -16,7 +16,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
             <tr> \
               <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#F6A300" align="right"> \
                 <div> \
-                  <img src=https://sharingbeer.herokuapp.com/img/rol1.png title="LOGO Birrificio RoL" alt="LOGO Birrificio RoL"> \
+                  <img src=https://sharingbeer.herokuapp.com/img/rol1.png title="LOGO Birrificio Viana" alt="LOGO Birrificio Viana"> \
                 </div> \
               </td> \
             </tr> \

@@ -11,6 +11,9 @@ var Address     = require('../app/models/address')
 var bcrypt      = require('bcrypt-nodejs'); //TODO da spostare in libfunction
 var lib         = require('./libfunction');
 
+var mailfriend  = require('../config/mailFriend');
+var mailparent  = require('../config/mailParent');
+
 
 module.exports = function(app) {
 
@@ -343,7 +346,19 @@ app.post('/caps', function(req, res) {
             }
           })
   			}
-  		})
+  		});
     }  
 	})
+  
+  app.get('/mailfriend', function(req, res) {
+
+     res.send(mailfriend('Name', 'Email', 'Password', 'Token', 'userName', 'userSurname'))
+
+  })
+
+  app.get('/mailuser', function(req, res) {
+
+     res.send(mailparent('Name', 'Email', 'userName', 'userEmail'))
+
+  })
 }
