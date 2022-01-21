@@ -3,10 +3,10 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-    <div class="col-sm-8 col-lg-8 col-md-8 col-xs-10" style="background-color:#F6A300;border-radius:12px">
-      <h2>The first time in SharingBeer</h2>
-      <hr class="hr" style="border-top: 1px solid #480413;">
+    <div class="col-sm-3 col-lg-4"></div>
+    <div class="col-sm-6 col-lg-4"  style="background-color:#2A0009;border-radius:12px;">
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">The first time in SharingBeer</h3>
+      <hr style="border-top: 1px solid #5375BD;">
       <!-- show any messages that come back with authentication -->
       {% if message %}
         {% for message in message %}
@@ -15,39 +15,46 @@
       {% endif %}
 
 <!-- Jumbotron Header -->
-      <header class="jumbotron my-4" style="background:#F6A300">
-        <h1 class="display-4" style="color:#1140A4">Ciao</h1>
-        <h2 style="color:#0C3281">se non hai un bicchiere di birra davanti a te allora sei nel posto giusto!</h2>
-        <p  style="color:white" align="center">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
-        <p style="color:#2A0009" align="center">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito e entra in SharingBeer </p> 
+      <header class="jumbotron" style="background-color:#2A0009; padding-top: 5px;  padding-bottom: 10px;  margin-bottom: 0px;">
+        <h1 class="display-4" style="color:white">Ciao,</h1>
+        <p class="lead text-white text-justify">se non hai un bicchiere di birra davanti a te allora sei nel posto giusto!</h2>
+        <hr  style="border-top: 1px solid #903246">
+        <p  class="text-white font-weight-light text-justify">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
+        <p class="text-white font-weight-light text-justify">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito, qui di seguito ed entra in SharingBeer </p> 
+        <hr  style="border-top: 1px solid #903246">
+
+          <svg class="arrows">
+                <path class="a1" d="M0 0 L30 32 L60 0"></path>
+                <path class="a2" d="M0 20 L30 52 L60 20"></path>
+                <path class="a3" d="M0 40 L30 72 L60 40"></path>
+          </svg>
+       
       </header>
         
 
       <div class="row">
-        <div class="col-lg-12 col-md-12 col-xs-12" >
+        <div class="col-12" >
           <form role="form" action="/validation" method="post" autocomplete="off">
             <div class="form-group">
-              <label for="inputUsernameEmail">User</label> 
-              <p style="font-size:75%;" >(L'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Quella proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.)  </p>             
+              <label class="text-white" for="inputUsernameEmail">User</label> 
+              <p class="text-white font-weight-light" style="font-size:75%;" >(L'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Quella proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.)  </p>             
               <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{prospect.email}}" placeholder="your@email.address">
             </div>
             <div class="form-group">
-              <label for="inputUserName">Name</label>
+              <label class="text-white" for="inputUserName">Name</label>
               <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}"
                name="firstName" placeholder="First name" required>
             </div>
             <div class="form-group">
-              <label for="inputUsernSurname">Surname</label>
+              <label class="text-white" for="inputUsernSurname">Surname</label>
               <input type="text" class="form-control" id="inputLastName"
                name="lastName" placeholder="Last name"  required>
             </div>
             <div class="form-group">
-              <label for="inputPassword">Password</label>
+              <label class="text-white" for="inputPassword">Password</label>
               <input type="password" class="form-control" id="inputPassword" name="password" required>
             </div >
-            <button type="submit" class="btn btn btn-primary">
-              <h4>Validate</h4>
-            </button>
+            <button type="submit" type="submit" class="btn btn-my btn-lg btn-block"> Validate </button>
             <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
           </form>
         </div>
