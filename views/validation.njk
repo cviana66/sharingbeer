@@ -15,17 +15,26 @@
 
       <header class="jumbotron" style="background-color:#2A0009; padding-top: 5px;  padding-bottom: 10px;  margin-bottom: 0px;">
         <h1 class="display-4" style="color:white">Ciao,</h1>
-        <p class="lead text-white text-justify">se non hai un bicchiere di birra davanti a te allora sei nel posto giusto!</p>
-        <hr  style="border-top: 1px solid #903246">
-        <p  class="text-white font-weight-light text-justify">Tutte le sensazioni che si trovano in un bicchiere della nostra birra sono il risultato della miscela di 4 fondamentali ingredienti: Acqua, Malto di Orzo, Luppoli e Lievito </p>
-        <p class="text-white font-weight-light text-justify">Produciamo Birra perchè amiamo bere birra! Se anche tu sei un amante della Birra allora valida il tuo invito qui di seguito ed entra in SharingBeer </p> 
-        <hr  style="border-top: 1px solid #903246">
-        <svg class="arrows">
+        <p class="lead text-white text-justify">se non hai ancora un bicchiere di birra davanti a te allora sei nel posto giusto!</p>
+        <p class="lead text-white text-center" style="font-size:25px">Prova la <span style="color:#FFC960;font-weight:bold"> Birra Viana </span> </p>
+        
+        <!--hr  style="border-top: 1px solid #903246">
+        
+        <p class="text-white font-weight-light text-justify">Produciamo Birra perchè amiamo berla! Se anche tu sei un amante della Birra prova la birra Viana validando il tuo invito qui di seguito ed entra in SharingBeer </p> 
+        <hr  style="border-top: 1px solid #903246"-->
+        
+      </header>
+      <div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
+        <div class="card-body">
+          <h3 class="card-title text-white font-weight-light"> Una birra offerta </h3>
+          <p class="card-text text-white font-weight-light">accettando questo invito hai 2 birre gratis sull'acquisto di un packaging da 4</p>
+        </div>
+      </div>
+      <svg class="arrows">
               <path class="a1" d="M0 0 L30 32 L60 0"></path>
               <path class="a2" d="M0 20 L30 52 L60 20"></path>
               <path class="a3" d="M0 40 L30 72 L60 40"></path>
-        </svg>
-      </header>
+      </svg>
 
       <div class="row">
         <div class="col-12" >
@@ -40,23 +49,23 @@
               <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}"
                name="firstName" placeholder="First name" required>
             </div>
-            <div class="form-group">
+            <!--div class="form-group">
               <label class="text-white" for="inputUsernSurname">Insert your Surname</label>
               <input type="text" class="form-control" id="inputLastName"
                name="lastName" placeholder="Last name"  required>
-            </div>
+            </div-->
             <div class="form-group">
               <label class="text-white" for="inputPassword">Create a new Password</label>
               <input type="password" class="form-control" id="inputPassword" name="password" required>
             </div >
-            <button type="submit" type="submit" class="btn btn-my btn-lg btn-block"> Validate </button>
+            <button type="submit" type="submit" class="btn btn-my btn-lg btn-block"> Accept the invitation </button>
             <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
           </form>
           <br>
         </div>
       </div>
     
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
+      <!--div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
         <div class="card-body">
           <h3 class="card-title text-white font-weight-light"> Una birra offerta </h3>
           <p class="card-text text-white font-weight-light">accettando questo invito hai 1 birra gratis sull'acquisto di un packaging da 4</p>
@@ -74,7 +83,7 @@
           <p class="card-text text-white font-weight-light">scegli o proponi una ricetta e potrai dare il tuo nome all'etichetta del lotto di birra</p>
         </div>
       </div>
-      <!--div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
+      <div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
         <div class="card-body">
           <h3 class="card-title text-white font-weight-light">Fare la birra</h3>
           <p class="card-text text-white font-weight-light">partecipa alla produzione di una cotta imparado l'arte della birrificazione</p>

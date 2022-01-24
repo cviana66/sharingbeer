@@ -54,3 +54,14 @@
   animation-delay:0s;
   -webkit-animation-delay:0s; /* Safari 和 Chrome */
 }
+
+/* Bootstrap Carousel
+
+.carousel-caption {
+    bottom:-95px;
+}
+
+.carousel-inner { 
+  padding-bottom:95px; 
+}
+*/
