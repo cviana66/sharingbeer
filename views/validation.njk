@@ -13,10 +13,10 @@
         {% endfor %}
       {% endif %}
 
-      <header class="jumbotron" style="background-color:#2A0009; padding-top: 5px;  padding-bottom: 10px;  margin-bottom: 0px;">
+      <header class="jumbotron" style="background-color:#2A0009; padding-top: 0px;  padding-bottom: 10px;  margin-bottom: 0px;">
         <h1 class="display-4" style="color:white">Ciao,</h1>
         <p class="lead text-white text-justify">se non hai ancora un bicchiere di birra davanti a te allora sei nel posto giusto!</p>
-        <p class="lead text-white text-center" style="font-size:22px">Prova la <img style="vertical-align: baseline" height="32" src="/img/birra_viana.png"> </p>
+        <p class="lead text-white text-center" style="font-size:1.7em">Prova la <img style="vertical-align: baseline" height="32" src="/img/birra_viana.png"> </p>
           
         <!--hr  style="border-top: 1px solid #903246">
         
@@ -25,28 +25,30 @@
         
       </header>
 
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
-        <div class="card-body">
-          <h3 class="card-title text-white font-weight-light text-center"> Una birra offerta </h3>
-          <div class="flex-row">
-            <div ><img src="img/quarta-v1-330x390.png" style="height:100%;width:100%;"></div>
-            <div class="align-self-center"><p class="card-text text-white font-weight-light">accettando questo invito hai 2 birre gratis sull'acquisto di un packaging da 4</p></div>
-          </div>
-        </div>
-      </div>
-
       <svg class="arrows">
               <path class="a1" d="M0 0 L30 32 L60 0"></path>
               <path class="a2" d="M0 20 L30 52 L60 20"></path>
               <path class="a3" d="M0 40 L30 72 L60 40"></path>
       </svg>
 
+      <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;;">
+        <div class="card-body">
+          <h3 class="card-title text-white font-weight-light text-center"> Una birra offerta </h3>
+          <div class="flex-row">
+            <div ><img class="mx-auto d-block" src="img/quarta-v1-330x390.png" style="height:70%;width:70%;"></div>
+            <div class="align-self-center"><p class="card-text text-white font-weight-light">accettando questo invito hai 2 birre gratis sull'acquisto di un packaging da 4</p></div>
+          </div>
+        </div>
+      </div>
+
+      
+
       <div class="row">
         <div class="col-12" >
           <form role="form" action="/validation" method="post" autocomplete="off">
             <div class="form-group">
               <label class="text-white" for="inputUsernameEmail">User</label> 
-              <p class="text-white font-weight-light" style="font-size:75%;" >(L'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Questa proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.)  </p>             
+              <p class="text-white font-weight-light" style="font-size:0.5em;" >(L'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Questa proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.)  </p>             
               <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{prospect.email}}" placeholder="your@email.address">
             </div>
             <div class="form-group">
