@@ -41,9 +41,39 @@
   	src="https://www.paypal.com/sdk/js?client-id=AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv&currency=EUR&disable-funding=sofort,venmo,mybank,card"> // Required. Replace YOUR_CLIENT_ID with your sandbox client ID.
   </script>
 
+  <script type="text/javascript">
+
+     if(navigator.userAgent.indexOf("Chrome") != -1 ) 
+    {
+         var fontsize = "<style>body{font-size: 125%;background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;}</style>";
+         console.log ("Chrome");
+    }
+    else if(navigator.userAgent.indexOf("Opera") != -1 )
+    {
+         var fontsize = "<style>body{font-size: 100%;background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;}</style>";
+    }
+    else if(navigator.userAgent.indexOf("Firefox") != -1 ) 
+    {
+         var fontsize = "<style>body{font-size: 100%;background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;}</style>";
+         console.log ("Firefox");
+    }
+    else if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) //IF IE > 10
+    {
+         var fontsize = "<style>body {font-size: 100%;background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;}</style>";
+    }  
+    else 
+    {
+         var fontsize = "<style>body {font-size: 100%;background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;}</style>";
+    }
+    </script>
+
+
 </head>
 
-<body style="background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;"> <!--background:#F6A300;-->
+<script>document.writeln(fontsize);</script>
+
+<!--body style="background:#F6A300;margin:0px 0px 0px 0px; min-height: 480px;"> <background:#F6A300;-->
+<body>
 	
 	<nav class="navbar navbar-expand-lg navbar-dark" style="background-color:#2A0009;">
 		<a class="nav-brand" style="font-size:14px; color: #FFF; text-decoration: none;" href="/" >			      	
