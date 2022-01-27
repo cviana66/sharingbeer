@@ -42,12 +42,12 @@
         <div class="col-12" >
           <form role="form" action="/validation" method="post" autocomplete="off">
             <div class="form-group">
-              <label class="text-white" for="inputUsernameEmail">User</label> 
+              <label class="text-white col-form-label-lg" for="inputUsernameEmail">User</label> 
               <p class="text-white font-weight-light" style="font-size:0.6em;" >(L'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Questa proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.)  </p>             
               <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{prospect.email}}" placeholder="your@email.address">
             </div>
             <div class="form-group">
-              <label class="text-white" for="inputUserName">Name</label>
+              <label class="text-white col-form-label-lg" for="inputUserName">Name</label>
               <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}"
                name="firstName" placeholder="First name" required>
             </div>
@@ -57,7 +57,7 @@
                name="lastName" placeholder="Last name"  required>
             </div-->
             <div class="form-group">
-              <label class="text-white" for="inputPassword">Create a new Password</label>
+              <label class="text-white col-form-label-lg" for="inputPassword">Create a new Password</label>
               <input type="password" class="form-control" id="inputPassword" name="password" required>
             </div >
             <button type="submit" type="submit" class="btn btn-my btn-lg btn-block"> Accept the invitation </button>
