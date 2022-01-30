@@ -1,5 +1,5 @@
 // MODULO preparazione mail HTML
-module.exports = function(friendName, friendEmail, friendPassword, friendToken,  userName, userSurname ) {
+module.exports = function(friendName, friendEmail, friendToken,  userName, userSurname, server) {
 
 var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
 <html xmlns="http://www.w3.org/1999/xhtml"> \
@@ -15,9 +15,9 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   			<table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
   				<tbody> \
             <tr> \
-              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#F6A300" align="right"> \
+              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#2A0009" align="right"> \
                 <div> \
-                  <img src=https://sharingbeer.herokuapp.com/img/rol1.png title="LOGO Birrificio Viana" alt="LOGO Birrificio Viana"> \
+                  <img src="'+server+'/img/birrificio_viana.png" title="LOGO Birrificio Viana" alt="LOGO Birrificio Viana"> \
                 </div> \
               </td> \
             </tr> \
@@ -25,27 +25,27 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
-  								<p> <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> ti ha invitato a bere <span style="font-style:oblique;font-weight:normal"> La Birra Viana</span>, la prima Real Ale Italiana da condividere.</p> \
+  								<p> <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> ti offre una <span style="font-style:oblique;font-weight:normal"> Birra Viana</span>, la prima Real Ale Italiana da condividere.</p> \
   								<p>Vuoi saperne di più? Usa l&apos;invito personale che <span style="font-style:oblique;font-weight:normal">' + userName + '</span> ti ha riservato per entrare in <a href="https://sharingbeer.herokuapp.com/validation?token='+friendToken+'" target="_blank"> SharingBeer. </a> \
   								<div align="center"> \
-  								<a href="https://sharingbeer.herokuapp.com/validation?token='+friendToken+'"> \
+  								<a href="'+server+'/validation?token='+friendToken+'"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
                     GO to SharingBeer</button> \
                   </a> \
 									</div> \
                   <div align="center">   <p> oppure </p>  </div> \
                   <div><p> se non riesci ad accedere copia il seguente link nella barra degli indirizzi del browser </p></div> \
-                  <div align="center">   <p> https://sharingbeer.herokuapp.com/validation?token='+friendToken+' </p>  </div> \
+                  <div align="center">   <p> '+server+'/validation?token='+friendToken+' </p>  </div> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
                 	<p>A presto dal birrificio Viana. </br>Mi raccomando, bevi in modo responsabile :)</p> \
   							</div>  \
                 <div align="left"> \
-                  <img style="padding-right:12px;vertical-align:middle" src="https://sharingbeer.herokuapp.com/img/cellphone-android.png" height="24" width="24"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/cellphone-android.png" height="24" width="24"> \
                   <a style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686"> +39 393 033 2728 </a> \
                 </div> \
                 <div align="left"> \
-                  <img style="padding-right:12px;vertical-align:middle" src="https://sharingbeer.herokuapp.com/img/mail-ru.png" height="24" width="24"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/mail-ru.png" height="24" width="24"> \
                   <span> \
                     <a href="mailto:friend@sharingbeer.com" style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686" target="_blank">  friend@sharingbeer.com </a> \
                   </span> \

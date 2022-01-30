@@ -124,7 +124,7 @@ app.post('/caps', function(req, res) {
               } else {
                 console.log('POST VALIDATION SET: ', user )
                 req.flash('success', 'Validated and Logged'); 
-                res.render('profile.dust',{message: req.flash('success'),user: user, type: "success"})   
+                res.render('profile.njk',{message: req.flash('success'),user: user, type: "success"})   
                } 
             });
           }
@@ -200,6 +200,8 @@ app.post('/caps', function(req, res) {
 //GET
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
+    console.log("SERVER:", global.server);
+
     Friend.countDocuments({ emailParent:req.user.email }, function (err, friends) {
       if (err) {
         console.log('ERROR RECOMMANDATION: ', err);
@@ -227,7 +229,7 @@ app.post('/caps', function(req, res) {
         let flag = "false";
         
         // Controllo che ci siano ancora inviti diposnibili
-        if (req.session.friendsInvited - req.session.invitationAvailable <= 0) {
+        if (req.session.friendsInvited - req.session.invitationAvailable > 0) {
           req.flash('error', "You have no more invitations! Please buy more beer");
           controlSates = "disabled";
           flag = "true";
@@ -249,9 +251,9 @@ app.post('/caps', function(req, res) {
 //POST
 	app.post('/recomm', lib.isLoggedIn, function(req, res) {
 
-    console.log('POST RECOMM FRIEND INVITED: ',req.session.friendsInvited )
+    console.log('POST RECOMM FRIEND INVITED: ',req.session.friendsInvited );
 
-    if (req.session.friendsInvited - req.session.invitationAvailable <= 0) {
+    if (req.session.friendsInvited - req.session.invitationAvailable > 0) {
           req.flash('error',"You have no more invitations! Please buy more beer");
           res.render('friend.njk', { message: req.flash('error'),
                                         invitationAvailable: req.session.invitationAvailable,
@@ -352,13 +354,14 @@ app.post('/caps', function(req, res) {
   
   app.get('/mailfriend', function(req, res) {
 
-     res.send(mailfriend('Name', 'Email', 'Password', 'Token', 'userName', 'userSurname'))
+    console.log("SERVER:", global.server);
+    res.send(mailfriend('Name', 'Email', 'Token', 'userName', 'userSurname', global.server))
 
   })
 
   app.get('/mailuser', function(req, res) {
 
-     res.send(mailparent('Name', 'Email', 'userName', 'userEmail'))
+    res.send(mailparent('Name', 'Email', 'userName', 'userEmail', global.server))
 
   })
 }

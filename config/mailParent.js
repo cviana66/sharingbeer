@@ -1,4 +1,4 @@
-module.exports = function(parentName, parentEmail, friendName,friendEmail) {
+module.exports = function(parentName, parentEmail, friendName,friendEmail, server) {
 
 var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
 <html xmlns="http://www.w3.org/1999/xhtml"> \
@@ -14,9 +14,9 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   			<table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
   				<tbody> \
             <tr> \
-              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#F6A300" align="right"> \
+              <td style="border-top-left-radius:12px;border-top-right-radius:12px;;padding-left:60px;padding-right:60px;padding-top:30px;padding-bottom:12px;background-color:#2A0009" align="right"> \
                 <div> \
-                  <img src=https://sharingbeer.herokuapp.com/img/rol1.png title="LOGO Birrificio Viana" alt="LOGO Birrificio Viana"> \
+                  <img src="'+server+'/img/birrificio_viana.png" title="LOGO Birrificio Viana" alt="LOGO Birrificio Viana"> \
                 </div> \
               </td> \
             </tr> \
@@ -24,17 +24,17 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + parentName + '</span>. </p> \
-  								<p> Il tuo invito è stato spedito a <span style="font-style:oblique;font-weight:normal">' +friendName+ ' (' +friendEmail+ ' )</span> che ora potrà accedere in <a href="https://sharingbeer.herokuapp.com/"> SharingBeer </a> \
+  								<p> Il tuo invito è stato spedito a <span style="font-style:oblique;font-weight:normal">' +friendName+ ' (' +friendEmail+ ' )</span> che ora potrà accedere in <a href="'+server+'"> SharingBeer </a> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
                 	<p>Garzie e a presto! </br>Mi raccomando, bevi in modo responsabile :)</p> \
   							</div>  \
                 <div align="left"> \
-                  <img style="padding-right:12px;vertical-align:middle" src="https://sharingbeer.herokuapp.com/img/cellphone-android.png" height="24" width="24"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/cellphone-android.png" height="24" width="24"> \
                   <a style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686"> +39 393 033 2728 </a> \
                 </div> \
                 <div align="left"> \
-                  <img style="padding-right:12px;vertical-align:middle" src="https://sharingbeer.herokuapp.com/img/mail-ru.png" height="24" width="24"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/mail-ru.png" height="24" width="24"> \
                   <span> \
                     <a href="mailto:friend@sharingbeer.com" style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686" target="_blank">  friend@sharingbeer.com </a> \
                   </span> \

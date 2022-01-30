@@ -49,6 +49,16 @@ var pass            = require('./config/passport');
 
 global.cost = 3;
 
+/*  =======================================================================
+/*  Settings Host                                                             
+/*  ======================================================================= */
+if (process.env.NODE_ENV== "development") {
+  global.server = "http://localhost:8080";
+} else if (process.env.NODE_ENV == "production") {
+  global.server = "https://sharingbeer.herokuapp.com";
+}
+
+
 /**
  *  Define the application.
  */

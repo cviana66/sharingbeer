@@ -43,21 +43,24 @@ module.exports = {
                           }
                          },
   sendmailToPerson: function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail) {
-                      console.log('MAIL TYPE: ', typeOfMail)
+
+                      console.log('MAIL TYPE: ', typeOfMail);
+                      console.log("SERVER:", global.server);
+        
                       if (typeOfMail == 'friend') {
                         var mailOptions = {
-                          from: 'info@sharingbeer.com', // sender address
+                          from: 'birrificio.viana@sharingbeer.com', // sender address
                           to: 'cviana66@gmail.com', // list of receivers
-                          subject: 'Hello ✔ form sharingbeer', // Subject line
-                          html: mailfriend(Name, Email, Password, Token, userName, userSurname) 
+                          subject: userName + ' ' + userSurname + ' ti invita a bere birra Viana', // Subject line
+                          html: mailfriend(Name, Email, Token, userName, userSurname, global.server) 
                         }   
                       } else {
 
                         var mailOptions = {
-                            from: 'info@sharingbeer.com', // sender address
+                            from: 'birrificio.viana@sharingbeer.com', // sender address
                             to: 'cviana66@gmail.com', // list of receivers
-                            subject: 'Thanks ✔ from sharingbeer', // Subject line
-                            html: mailparent(Name, Email, userName, userEmail)
+                            subject: 'Grazie dal Birrificio Viana', // Subject line
+                            html: mailparent(Name, Email, userName, userEmail, global.server)
                         }
                       }
                       
