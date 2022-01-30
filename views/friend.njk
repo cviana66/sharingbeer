@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col-sm-3 col-lg-4"></div>
     <div class="col-sm-6 col-lg-4" style="background-color:#2A0009;border-radius:12px 12px 0px 0px;">
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Sign your Friends </h3>
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Your Friend </h3>
       <hr style="border-top: 1px solid #5375BD;">
       
       {% if message %}
@@ -12,6 +12,16 @@
           <div class="alert alert-warning">{{message}}</div>
         {% endfor %}
       {% endif %}
+
+      <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;;">
+        <div class="card-body">
+          <div class="flex-row">
+            <!--h3 class="card-title text-white font-weight-light text-center"> Invita i tuoi amici a bere birra Viana e ottieni ad ogni loro acquisto punti Booze che ti fanno bere gratis </h3-->
+            <div ><img class="mx-auto d-block" src="img/quarta-v1-330x390.png" style="height:80%;width:60%;margin-bottom:10px"></div>
+            <div class="align-self-center"><p class="card-text text-white font-weight-light text-justify"margin-bottom:20>invita i tuoi amici a bere birra Viana e ottieni ad ogni loro acquisto punti Booze per bere gratis!</p></div>
+          </div>
+        </div>
+      </div>
 
       <form role="form" action="/recomm" method="POST">
         <div class="form-group">
