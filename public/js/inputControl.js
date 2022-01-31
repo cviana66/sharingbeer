@@ -5,7 +5,7 @@ function fieldLoginControl(){
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var submit = true;
   if (email == "" || !re.test(String(email))) {
-    text = "Please provide a valid email. ";
+    text = "Please provide a valid email.";
     document.getElementById("wrongMail").innerHTML = text;
     submit = false;
   }
@@ -15,6 +15,63 @@ function fieldLoginControl(){
     return false;
   }
 }; 
+
+function fieldMailAndPasswordControl() {
+  document.getElementById("wrongMail").innerHTML = "";
+  document.getElementById("wrongPwd").innerHTML = "";
+
+  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  var email = document.getElementById("inputUsernameEmail").value;
+  if(email =="" || !re.test(String(email))) {
+    document.getElementById("wrongMail").innerHTML = "Please provide a valid email.";
+    document.getElementById("inputUsernameEmail").focus();
+    return false;
+  };
+
+  var pwd1 = document.getElementById("inputPassword").value;
+  var pwd2 = document.getElementById("confirmPassword").value;
+  if(pwd1 != "" && pwd1 === pwd2) {
+    if(pwd1.length < 6) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least six characters";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    if(pwd1 == email) {
+      document.getElementById("wrongPwd").innerHTML = "Password must be different from Username";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re1 = /[0-9]/;
+    if(!re1.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one number (0-9)";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re2 = /[a-z]/;
+    if(!re2.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one lowercase letter (a-z)";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re3 = /[A-Z]/;
+    if(!re3.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one uppercase letter (A-Z)";
+      document.getElementById("inputPassword").focus();
+      return false;
+    } 
+    var re4 = /\W|_/g;
+    if(!re4.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one special character";
+      document.getElementById("inputPassword").focus();
+      return false;
+    } 
+  } else {
+    document.getElementById("wrongPwd").innerHTML = "Password different from the confirmed one";
+    document.getElementById("inputPassword").focus();
+    return false;
+  }
+  return true;
+}
 
 function fieldsRegisterControl() {
   var phone = document.getElementById("inputMobile").value.replace(/\W+/g, '');

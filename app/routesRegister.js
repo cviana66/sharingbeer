@@ -92,7 +92,7 @@ app.post('/caps', function(req, res) {
         console.log('POST VALIDATION ERROR: ', err );
         res.render('info.njk', {message: req.flash('error'), type: "danger"});
       
-      } else {
+      } /* else {
       
         var common = new User();
         user.password = common.generateHash(req.body.password)
@@ -129,7 +129,7 @@ app.post('/caps', function(req, res) {
             });
           }
         });
-      }
+      } */
     })
   });
 

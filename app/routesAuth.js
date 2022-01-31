@@ -31,7 +31,7 @@ module.exports = function(app, passport) {
 
   app.get('/login/:user', function(req, res) {
       // render the page and pass in any flash data if it exists
-      res.render('login.dust', { message: req.flash('loginMessage'), 
+      res.render('login.njk', { message: req.flash('loginMessage'), 
                                  user: req.params.user });
   });
 //POST
@@ -158,8 +158,8 @@ app.get('/logout', function(req, res) {
       }
 
       if (!user) {
-        req.flash('error', 'Password reset token is invalid or has expired.');
-        res.render('forgot.dust', {message: req.flash('error')});
+        req.flash('error', 'Password reset: token is invalid or has expired.');
+        res.render('forgot.njk', {message: req.flash('error')});
       } else {
         res.render('reset.njk', { user: req.user, token: req.query.token });
       };
