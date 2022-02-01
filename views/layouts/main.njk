@@ -162,16 +162,28 @@
 	</nav>
 
 	<div class="container-fluid" style="margin:10px 0px 10px 0px;">
-		<!--div class="row">
-			<div class="col-1"></div-->
-			<div class="col-12">
-				{% block body %}
-				{% endblock %}
+		<div class="col-12">
+			<div class="row">
+		    <div class="col-sm-3 col-lg-4"></div>
+		    <div class="col-sm-6 col-lg-4"  style="background-color:#2A0009;border-radius:12px 12px 0px 0px;">
+						{% block body %}
+						{% endblock %}
+				</div>
+  			<div class="col-sm-3 col-lg-4"></div>
 			</div>
-			<!--div class="col"></div>
-		</div-->
+		</div>
+		<div class="col-12">
+			<div class="row">
+		    <div class="col-sm-3 col-lg-4"></div>
+		    <div class="col-sm-6 col-lg-4"  style="background-color:#FFBB35;border-radius:0px 0px 12px 12px;">
+					 <br>
+					  footer
+					 <br>
+				</div>
+  			<div class="col-sm-3 col-lg-4"></div>
+			</div>
+		</div>
 	</div>
-
 	<script type="text/javascript" src="/js/plusMinus.js"></script>
 	
 </body> 

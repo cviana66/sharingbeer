@@ -1,10 +1,8 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-  <div class="row">
-    <div class="col-sm-3 col-lg-4"></div>
-    <div class="col-sm-6 col-lg-4"  style="background-color:#2A0009;border-radius:12px;">
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;"> The first time in SharingBeer </h3>
+  
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;"> La prima volta in Sharing Beer </h3>
       <hr style="border-top: 1px solid #5375BD">
       <!-- show any messages that come back with authentication -->
       {% if message %}
@@ -38,36 +36,36 @@
         </div>
       </div>
 
-      
-
       <div class="row">
         <div class="col-12" >
           <form role="form" action="/validation" method="post" autocomplete="off">
             <fieldset>
               <div class="form-group">
-                <label class="text-white col-form-label-lg" for="inputUsernameEmail">User email</label> 
-                <div style="color:yellow; font-size:0.8em;" id="wrongMail"></div>
+                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Email</label> 
+                <div style="color:#ffc107; font-size:0.9em;" id="wrongMail"></div>
                 <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">l'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Questa proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.</p>             
                 <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{prospect.email}}" placeholder="your@email.address">
               </div>
               <div class="form-group">
-                <label class="text-white col-form-label-lg" for="inputUserName">Name</label>
+                <label class="text-white col-form-label-lg" for="inputUserName">Nome</label>
                 <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}"
                  name="firstName" placeholder="First name" required>
               </div>
-              </div-->
               <div class="form-group">
-                <label for="inputPassword" class="text-white col-form-label-lg">Create a new Password</label>
-                <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">almeno di 6 caratteri contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p> 
-                <div  style="color:yellow; font-size:0.8em; margin-bottom:5px;" id="wrongPwd"></div>
+                <label for="inputPassword" class="text-white col-form-label-lg">Crea una nuova Password</label>
+                <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p> 
+                <div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd"></div>
                 <input type="password" class="form-control" id="inputPassword" name="pwd1" autofocus  required>
               </div>
-              <div class="form-group">
-                <label for="inputPassword" class="text-white col-form-label-lg">Confirm Password</label>
-                <input type="password" class="form-control" id="confirmPassword" name="pwd2" required>
+              <div class="form-check">
+                <div style="color:#ffc107; font-size:0.9em;" id="wrongPrivacy"></div>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
+                <label class="form-check-label text-white font-weight-light text-justify" for="flexCheckDefault">Accetto le Condizioni generali di vendita e l'informativa sulla privacy di Sharing Beer</label>
               </div>
-              <button type="submit" type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldMailAndPasswordControl(this)"> Accept the invitation </button>
-              <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
+              <div style="margin-top: 10px;">
+                <button type="submit" type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsValidationControl()"> Accetto l'invito </button>
+                <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
+              </div>
             </fieldset>
           </form>
           <br>
@@ -98,8 +96,6 @@
           <p class="card-text text-white font-weight-light">partecipa alla produzione di una cotta imparado l'arte della birrificazione</p>
         </div>
       </div-->
-    </div>
-    <div class="col-sm-2 col-lg-2 col-md-2 col-xs-1"></div>
-  </div>
+   
 
 {% endblock %}
