@@ -47,7 +47,23 @@ var routesPaypal    = require('./app/routesPaypalV2');
 var pass            = require('./config/passport');
 
 
-global.cost = 3;
+//global.cost = 3;
+
+/*  =======================================================================
+/*  Settings Booze
+
+    1 bottiglia ogni  12  booze
+    2 bottiglie ogni  24  booze
+    3 bottiglie ogni  36  booze
+    4 bottiglie ogni  48  booze
+
+/*  ======================================================================= */
+global.oneBottleBoozeEquivalent   = 12;
+global.twoBottleBoozeEquivalent   = 24;
+global.threeBottleBoozeEquivalent = 36;
+global.fourBottleBoozeEquivalent  = 48;
+
+global.mktBoozeXfriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato 
 
 /*  =======================================================================
 /*  Settings Host                                                             

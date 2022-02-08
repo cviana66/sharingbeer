@@ -122,7 +122,7 @@ module.exports = function(passport) {
                 // all is well, return successful user
                 console.log('ID PASSPORT: ', user._id);
 
-                // if the user status  is "new" then it is the first access --> validation put status = confirmed
+                /* if the user status  is "new" then it is the first access --> validation put status = confirmed
                 if (user.status == 'new') {
                     User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
                         
@@ -153,7 +153,7 @@ module.exports = function(passport) {
                             });
                         };
                     });
-                } 
+                } */
                 return done(null, user)
             });
         }

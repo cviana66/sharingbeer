@@ -99,7 +99,7 @@ app.get('/logout', function(req, res) {
 
         if (!user) {
           req.flash('error', 'No account with that email address exists.');
-          res.render('forgot.njk', {message: req.flash('error')});
+          return res.render('forgot.njk', {message: req.flash('error')});
         } else {
           var token = lib.generateToken(20);
           user.resetPasswordToken = token;

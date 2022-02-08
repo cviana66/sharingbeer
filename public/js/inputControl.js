@@ -20,6 +20,7 @@ function fieldsValidationControl() {
   document.getElementById("wrongMail").innerHTML = "";
   document.getElementById("wrongPwd").innerHTML = "";
   document.getElementById("wrongPrivacy").innerHTML = "";
+  document.getElementById("wrongAge").innerHTML = "";
 
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var email = document.getElementById("inputUsernameEmail").value;
@@ -71,10 +72,15 @@ function fieldsValidationControl() {
     document.getElementById("inputPassword").focus();
     return false;
   }
-  if(!document.getElementById('flexCheckDefault').checked) {
+  if(!document.getElementById('checkAge').checked) {
+    document.getElementById("wrongAge").innerHTML = "spunta la casella di controllo solo se hai più di 18 anni";
+    return false;
+  }
+  if(!document.getElementById('checkPrivacy').checked) {
     document.getElementById("wrongPrivacy").innerHTML = "spunta la casella di controllo per accettare le condizioni";
     return false;
   }
+
   return true;
 }
 

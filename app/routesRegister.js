@@ -57,7 +57,7 @@ app.post('/caps', function(req, res) {
 });
 
 // =====================================
-// TOKEN VALIDATION ====================
+// TOKEN VALIDATION ========= 05-01-2022
 // =====================================
 //GET
   app.get('/validation', function(req,res){
@@ -78,7 +78,7 @@ app.post('/caps', function(req, res) {
         req.flash('error', 'Invitation is invalid or has expired.');
         res.render('info.njk', {message: req.flash('error'), type: "danger"});
       } else {
-        res.render('validation.njk', { prospect: user});
+        res.render('validation.njk', { prospect: user,  message: req.flash('validateMessage'), type: "warning" });
       };
     });
   });
@@ -92,8 +92,16 @@ app.post('/caps', function(req, res) {
         console.log('POST VALIDATION ERROR: ', err );
         res.render('info.njk', {message: req.flash('error'), type: "danger"});
       
-      } /* else {
-      
+      } else {
+
+        // TODO Validare i dati inseriti lato SERVER perchè potrebbero essere stati disabilitati i Javascript lato CLIENT 
+        
+        //email validation
+        if (!lib.emailValidation(req.body.email)) {
+          req.flash('validateMessage','Please provide a valid email')
+          return res.redirect("/validation?token="+req.body.token);
+        } //end validation
+
         var common = new User();
         user.password = common.generateHash(req.body.password)
         user.name.first = lib.capitalizeFirstLetter(req.body.firstName)
@@ -105,6 +113,7 @@ app.post('/caps', function(req, res) {
         user.status = 'validated'
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
+        user.booze += global.oneBottleBoozeEquivalent;
 
         user.save(function(err) {
 
@@ -129,7 +138,7 @@ app.post('/caps', function(req, res) {
             });
           }
         });
-      } */
+      } 
     })
   });
 
@@ -195,12 +204,13 @@ app.post('/caps', function(req, res) {
   });
 
 // =====================================
-// FRIEND =================== 24-12-2021
+// FRIEND =================== 24-12-2021 
+//                            05-02-2022
 // =====================================
 //GET
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
-    console.log("SERVER:", global.server);
+    console.log("MIA MAIL:", req.user.email );
 
     Friend.countDocuments({ emailParent:req.user.email }, function (err, friends) {
       if (err) {
@@ -319,6 +329,7 @@ app.post('/caps', function(req, res) {
                                           percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
                                         });
             } else {
+
               // send email to Friend
               lib.sendmailToPerson( newUser.name.first, 
                                 newUser.email, 

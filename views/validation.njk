@@ -7,12 +7,12 @@
       <!-- show any messages that come back with authentication -->
       {% if message %}
         {% for message in message %}
-          <div class="alert alert-danger">{{message}}</div>
+          <div class="alert alert-{{type}}">{{message}}</div>
         {% endfor %}
       {% endif %}
 
       <header class="jumbotron" style="background-color:#2A0009; padding-top: 0px;  padding-bottom: 0px;  margin-bottom: 0px;">
-        <h1 class="display-4" style="color:white">Ciao,</h1>
+        <h1 class="display-4 text-white font-weight-light">Ciao,</h1>
         <p class="lead text-white text-justify">se non hai ancora un bicchiere di birra davanti a te allora sei nel posto giusto!</p>
         <p class="lead text-white text-center" style="font-size:1.7em">Prova la <img style="vertical-align: baseline" height="32" src="/img/birra_viana.png"> </p>
         <!--hr  style="border-top: 1px solid #903246"-->
@@ -26,11 +26,11 @@
 
       <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;;">
         <div class="card-body">
-          <h3 class="card-title text-white font-weight-light text-center"> Una birra offerta </h3>
+          <h3 class="card-title text-white font-weight-light text-center"> Una Birra offerte </h3>
           <div class="flex-row">
             <div ><img class="mx-auto d-block" src="img/allegri_con_boccali.png" style="height:100%;width:100%;margin-bottom:30px"></div>
             <div class="align-self-center">
-              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai <span style="font-size:1.2em;"> 2 birre offerte </span> sull'acquisto di un packaging da 4</p>
+              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai <span style="font-size:1.2em;"> 1 birra offerta </span> sull'acquisto di un packaging da 4</p>
             </div>
           </div>
         </div>
@@ -55,12 +55,17 @@
                 <label for="inputPassword" class="text-white col-form-label-lg">Crea una nuova Password</label>
                 <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p> 
                 <div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd"></div>
-                <input type="password" class="form-control" id="inputPassword" name="pwd1" autofocus  required>
+                <input type="password" class="form-control" id="inputPassword" name="pwd1" required>
+              </div>
+              <div class="form-check" style="margin:20px 0px 20px 0px" >
+                <div style="color:#ffc107; font-size:0.9em;" id="wrongAge"></div>
+                <input class="form-check-input" type="checkbox" value="" id="checkAge" />
+                <label class="form-check-label text-white font-weight-light text-justify" for="checkAge">Dichiaro di essere maggiorenne</label>
               </div>
               <div class="form-check">
-                <div style="color:#ffc107; font-size:0.9em;" id="wrongPrivacy"></div>
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-                <label class="form-check-label text-white font-weight-light text-justify" for="flexCheckDefault">Accetto le Condizioni generali di vendita e l'informativa sulla privacy di Sharing Beer</label>
+                <div style="color:#ffc107;font-size:0.9em;" id="wrongPrivacy"></div>
+                <input class="form-check-input" type="checkbox" value="" id="checkPrivacy" />
+                <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacy">Accetto le <a href="#" onclick="return openDocument('condizioniVendita')"> Condizioni generali di vendita </a> e l'informativa sulla privacy di Sharing Beer</label>
               </div>
               <div style="margin-top: 10px;">
                 <button type="submit" type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsValidationControl()"> Accetto l'invito </button>

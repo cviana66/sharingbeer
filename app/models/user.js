@@ -40,6 +40,7 @@ var userSchema = mongoose.Schema({
     },
     idParent   : { type: String },
     booze      : { type: Number, default: 0},
+    boozeXfriend: { type: Number, default: 0},
     resetPasswordToken: String,
     resetPasswordExpires : Date
 });

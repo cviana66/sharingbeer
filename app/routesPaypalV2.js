@@ -219,35 +219,45 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
 
     if (SharingbeerStatus === 'payed') {
         // add Friends after buy
-        User.findByIdAndUpdate(req.user._id, 
-          { $set: { 
-                    possibleFriends : req.user.possibleFriends + 3
-                  }
-          }, 
-          function (err, req) {
-            if (err) {
-              console.log('User.findByIdAndUpdate', err);
-              //res.redirect('/???');
-              //return;
-            }
-        });
 
-        //add Booze to friend parent
-        User.findOne({'_id': req.user.idParent }, function(err, parent) {
-            
-              parent.booze +=  ( 3 * req.session.totalQty) /4 ;            
-              console.log('BOOZE', parent.booze);
+        Order.countDocuments({ email:req.user.email, status:"payed" }, function (err, buyed) {
+
+          // iniviti possibili = N° acquisiti / Booze destinatia al marketing per ogni PKGx4 aquistato
+
+          invitiPossibili = parseInt( buyed/global.mktBoozeXfriends );
+          
+          console.log("INVITI POSSIBILI:",invitiPossibili);
+
+          User.findByIdAndUpdate(req.user._id, 
+            { $set: { 
+                      possibleFriends : invitiPossibili
+                    }
+            }, 
+            function (err, req) {
+              if (err) {
+                console.log('User.findByIdAndUpdate', err);
+                //res.redirect('/???');
+                //return;
+              }
+          });
+
+          //add Booze to friend parent
+          User.findOne({'_id': req.user.idParent }, function(err, parent) {
               
-              User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
-                  if (err) {
-                    console.log('error User.update', err);
-                    //res.redirect('/???');
-                    //return;
-                  }
-              });            
-            
+                parent.booze +=  ( 3 * req.session.totalQty) /4 ;            
+                console.log('BOOZE', parent.booze);
+                
+                User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
+                    if (err) {
+                      console.log('error User.update', err);
+                      //res.redirect('/???');
+                      //return;
+                    }
+                });            
+              
+          });
         });
-      
+        
         //res.redirect('/recomm')
         //console.log("Get Payment Response");
         //console.log(JSON.stringify(payment));      

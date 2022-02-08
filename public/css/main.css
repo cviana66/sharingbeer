@@ -55,3 +55,77 @@
   -webkit-animation-delay:0s; /* Safari 和 Chrome */
 }
 
+/*-----------------------
+/* Design Cookie Consent 
+/*-----------------------*/
+#cookiePopup {
+  background: white;
+  /*width: 25%;*/
+  position: fixed;
+  /*left: 5%;
+  right: 5%; */
+  bottom: 0px;
+  /*box-shadow: 0px 0px 15px #cccccc;*/
+  padding: 5px 10px;
+}
+
+#cookiePopup p{
+text-align: left;
+font-size: 15px;
+color: #4e4e4e;
+}
+
+#cookiePopup button{
+  width: 100%;
+  /*border: navajowhite;*/
+  background: #097fb7;
+  padding: 5px;
+  border-radius: 10px;
+  color: white;
+}
+
+
+/*-----------------------
+/* Design Document display 
+/*-----------------------*/
+
+.DocumentPopup {
+  display: none;
+  position: fixed;
+  left: 0px; right: 0px;
+  top: 0px; bottom: 0px;
+  background-color: #2A0009;
+  overflow-y:scroll;
+}
+
+.DocumentPopup p{
+  padding: 25px;
+  font-size: 14px;
+}
+
+.DocumentPopup h4{
+  padding: 15px;
+}
+
+.DocumentPopup button{
+  width: 100%;
+  /*border: navajowhite;*/
+  background: #097fb7;
+  padding: 5px;
+  border-radius: 10px;
+  color: white;
+}
+
+#myBtn {
+  display: none; /* Hidden by default */
+  position: fixed; /* Fixed/sticky position */
+  top: 10px; /* Place the button at the top of the page */
+  right: 25px; /* Place the button 30px from the right */
+  z-index: 99; /* Make sure it does not overlap */
+  border: none; /* Remove borders */
+  outline: none; /* Remove outline */
+  cursor: pointer; /* Add a mouse pointer on hover */
+  background-color: #2A0009;
+}
+
+
