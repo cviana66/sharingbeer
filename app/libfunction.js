@@ -95,6 +95,7 @@ module.exports = {
                         totalQty += cart[item].qty;
                       }
                     }
+                    console.log("NUMERO PEZZI:", totalQty);
                     req.session.displayCart = displayCart;
                     req.session.totalPrc = displayCart.totalPrice = totalPrice.toFixed(2);
                     req.session.totalQty = totalQty;

@@ -63,7 +63,10 @@ global.twoBottleBoozeEquivalent   = 24;
 global.threeBottleBoozeEquivalent = 36;
 global.fourBottleBoozeEquivalent  = 48;
 
+global.mktBoozeXParent = 1;
 global.mktBoozeXfriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato 
+global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent/global.mktBoozeXfriends;
+
 
 /*  =======================================================================
 /*  Settings Host                                                             

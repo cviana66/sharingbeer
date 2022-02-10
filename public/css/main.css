@@ -89,7 +89,7 @@ color: #4e4e4e;
 /* Design Document display 
 /*-----------------------*/
 
-.DocumentPopup {
+.documentPopup {
   display: none;
   position: fixed;
   left: 0px; right: 0px;
@@ -98,16 +98,16 @@ color: #4e4e4e;
   overflow-y:scroll;
 }
 
-.DocumentPopup p{
+.documentPopup p{
   padding: 25px;
   font-size: 14px;
 }
 
-.DocumentPopup h4{
+.documentPopup h1,h2,h3,h4{
   padding: 15px;
 }
 
-.DocumentPopup button{
+.documentPopup button{
   width: 100%;
   /*border: navajowhite;*/
   background: #097fb7;
@@ -119,8 +119,8 @@ color: #4e4e4e;
 #myBtn {
   display: none; /* Hidden by default */
   position: fixed; /* Fixed/sticky position */
-  top: 10px; /* Place the button at the top of the page */
-  right: 25px; /* Place the button 30px from the right */
+  top: 0px; /* Place the button at the top of the page */
+  right: 0px; /* Place the button 30px from the right */
   z-index: 99; /* Make sure it does not overlap */
   border: none; /* Remove borders */
   outline: none; /* Remove outline */
