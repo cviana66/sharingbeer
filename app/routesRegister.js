@@ -206,41 +206,40 @@ app.post('/caps', function(req, res) {
 // =====================================
 // FRIEND =================== 24-12-2021 
 //                            05-02-2022
+//                            12-02-2022 introddotto il logger
 // =====================================
 //GET
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
     console.log("MIA MAIL:", req.user.email );
-
+    // conto quanti amici ha già lo User
     Friend.countDocuments({ emailParent:req.user.email }, function (err, friends) {
       if (err) {
-        console.log('ERROR RECOMMANDATION: ', err);
+        console.err(moment().format()+' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: Friend.countDocuments: '+err);
         req.flash('error', 'Something bad happened!');
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       } 
       
-      console.log('GET RECOMM FRIENDS: ', friends);
+      //console.log('GET RECOMM FRIENDS: ', friends);
       
       User.findOne({ email: req.user.email }, function (err, user) {
         
         if (err) {
-          console.log('ERROR RECOMMANDATION: ', err);
+          console.err(moment().format()+' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: User.findOne: '+err);
           req.flash('error', 'Something bad happened!');
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
         } 
         
-        friendsInvited = parseInt(friends,10);        
-        
-        req.session.invitationAvailable = parseInt(user.possibleFriends,10);
-        req.session.friendsInvited = friendsInvited;
+        req.session.invitationAvailable = parseInt(user.possibleFriends,10);  //numero di inviti disponibili
+        req.session.friendsInvited = parseInt(friends,10);                    //numero di amici già invitati 
         
         let error = "";
         let controlSates = "";
         let flag = "false";
         
         // Controllo che ci siano ancora inviti diposnibili
-        if (req.session.friendsInvited - req.session.invitationAvailable > 0) {
-          req.flash('error', "You have no more invitations! Please buy more beer");
+        if (req.session.friendsInvited >= req.session.invitationAvailable) {
+          req.flash('info', "You have no more invitations! Please buy more beer");
           controlSates = "disabled";
           flag = "true";
         }
@@ -248,12 +247,13 @@ app.post('/caps', function(req, res) {
         res.render('friend.njk', {
                         controlSates: controlSates, 
                         flag : flag,
-                        message: req.flash('error'),
+                        message: req.flash('info'),
+                        type: "warning",
                         user: req.user,
-                        invitationAvailable: req.session.invitationAvailable,
+                        invitationAvailable: req.session.invitationAvailable-req.session.friendsInvited,
                         friendsInvited:  req.session.friendsInvited,
-                        percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable ),
-                        numProducts : req.session.numProducts
+                        percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
+                        //numProducts : req.session.numProducts
         });
       });
     });
@@ -263,12 +263,13 @@ app.post('/caps', function(req, res) {
 
     console.log('POST RECOMM FRIEND INVITED: ',req.session.friendsInvited );
 
-    if (req.session.friendsInvited - req.session.invitationAvailable > 0) {
+    if (req.session.friendsInvited >= req.session.invitationAvailable) {
           req.flash('error',"You have no more invitations! Please buy more beer");
-          res.render('friend.njk', { message: req.flash('error'),
-                                        invitationAvailable: req.session.invitationAvailable,
-                                        friendsInvited:  req.session.friendsInvited,
-                                        percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
+          res.render('friend.njk', {  message: req.flash('error'),
+                                      type: "warning",
+                                      invitationAvailable: req.session.invitationAvailable-req.session.friendsInvited,
+                                      friendsInvited:  req.session.friendsInvited,
+                                      percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
                                       });
     } else {   
       // creo nuovo user con i dati segnalati dal PARENT
@@ -284,26 +285,24 @@ app.post('/caps', function(req, res) {
       newUser.resetPasswordToken = lib.generateToken(20); // token
       newUser.resetPasswordExpires = Date.now() + (3600000*24*365); // 1 hour * 24 * 365 = 1 anno
 
-      //console.log('USER: ',newUser);
-      //console.log('GLOBAL: ', global.cost)
-
       newUser.save(function(err) {
   			if (err) {
   				req.flash('error','Something bad happened! Please try again');
-          console.log("ERROR: ",err);
+          console.err(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newUser.save: '+err);
 
   				if (err.code === 11000) { //duplicate key: email
   					req.flash('error','That email is already taken, please try another');
   				}
 
-  				res.render('friend.njk', { message: req.flash('error'),
-                                      invitationAvailable: req.session.invitationAvailable,
+  				res.render('friend.njk', {  message: req.flash('error'),
+                                      type: "warning",
+                                      invitationAvailable: req.session.invitationAvailable-req.session.friendsInvited,
                                       friendsInvited:  req.session.friendsInvited,
                                       percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
                                     });
   			} else { 
 
-          // Record new friends in mongodb
+          // Save a new friends in mongodb
           var newFriend = new Friend();
           newFriend.id = req.user._id; // id parent
           newFriend.emailParent = req.user.email; // mail user
@@ -312,19 +311,19 @@ app.post('/caps', function(req, res) {
 
           newFriend.save(function(err) {
             if (err) {
-              console.log('ERROR RECOMMANDATION: ', err);
-              req.flash('error','Something bad happened! Please try again');
-  						
+              console.err(moment().format()+' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newFriend.save: '+err+' TODO: Cancellare in users {"_id":ObjectId("'+newUser.email+'")} se non fatto automaticamente');
+              req.flash('error','Something bad happened! Please try later');
               //remove Friend from User
   						User.findOneAndRemove({ 'email' :  newUser.email }, function(err){
                 if (err) { 
-                  console.log('ERROR RECOMMANDATION: ', err);
-                  req.flash('error', 'Something bad happened! Please try again');
+                  console.err(moment().format()+' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newFriend.save: '+err+' TODO: Cancellare in users {"_id":ObjectId("'+newUser.email+'")}')
+                  req.flash('error', 'Something bad happened! Please try later');
                 }
               });
               //render for message display
-              res.render('friend.njk', { message: req.flash('error'),
-                                          invitationAvailable: req.session.invitationAvailable,
+              res.render('friend.njk', {  message: req.flash('error'),
+                                          type: "error",
+                                          invitationAvailable: req.session.invitationAvailable-req.session.friendsInvited,
                                           friendsInvited:  req.session.friendsInvited,
                                           percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
                                         });
@@ -351,8 +350,9 @@ app.post('/caps', function(req, res) {
               
               req.session.friendsInvited += 1;
               req.flash('message','You have added a new Friend');
-              res.render('friend.njk', { message: req.flash('message'),
-                                          invitationAvailable: req.session.invitationAvailable,
+              res.render('friend.njk', {  message: req.flash('message'),
+                                          type: "info",
+                                          invitationAvailable: req.session.invitationAvailable-req.session.friendsInvited,
                                           friendsInvited:  req.session.friendsInvited,
                                           percentage: Math.round( req.session.friendsInvited * 100 / req.session.invitationAvailable )
                                         });
@@ -362,14 +362,18 @@ app.post('/caps', function(req, res) {
   		});
     }  
 	})
-  
+
+// =====================================
+// Utility =============================
+// =====================================
+  // visualizza in formato HTML la mail Friend
   app.get('/mailfriend', function(req, res) {
 
     console.log("SERVER:", global.server);
     res.send(mailfriend('Name', 'Email', 'Token', 'userName', 'userSurname', global.server))
 
   })
-
+  // visualizza in formato HTML la mail User
   app.get('/mailuser', function(req, res) {
 
     res.send(mailparent('Name', 'Email', 'userName', 'userEmail', global.server))

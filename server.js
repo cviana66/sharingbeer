@@ -1,50 +1,58 @@
 #!/bin/env node
 
-var express  = require('express');
-var fs       = require('fs');
-var mongoose = require('mongoose');
-var passport = require('passport');
-var flash    = require('connect-flash');
+const express  = require('express');
+const fs       = require('fs');
+const util     = require('util');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const flash    = require('connect-flash');
 
-var morgan        = require('morgan');
-var cookieParser  = require('cookie-parser');
-var bodyParser    = require('body-parser');
-var session       = require('express-session');
-var paypal        = require('paypal-rest-sdk');
-var qr            = require('qr-image');
-var fs            = require('fs');
-var nunjucks      = require('nunjucks'); 
-var cons          = require('consolidate');
+const morgan        = require('morgan');
+const cookieParser  = require('cookie-parser');
+const bodyParser    = require('body-parser');
+const session       = require('express-session');
+const paypal        = require('paypal-rest-sdk');
+const qr            = require('qr-image');
+const nunjucks      = require('nunjucks'); 
+const cons          = require('consolidate');
+const moment        = require("moment");
 
 // config and connect to our database
-var configDB = require('./config/database.js');
-mongoose.connect(configDB.url, {useCreateIndex: true,
-                                useNewUrlParser: true,
-                                useUnifiedTopology: true,
-                                useFindAndModify: false});
-var db = mongoose.connection;
+const configDB = require('./config/database.js');
+mongoose.connect(configDB.url, {  useCreateIndex: true,
+                                  useNewUrlParser: true,
+                                  useUnifiedTopology: true,
+                                  useFindAndModify: false
+                                  /*server: { 
+                                    auto_reconnect: true,
+                                    reconnectTries: Number.MAX_VALUE,
+                                    reconnectInterval: 1000,
+                                    socketOptions: {keepAlive: 1, connectTimeoutMS: 30000} 
+                                  } */
+                                });
+const db = mongoose.connection;
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
-var methodOverride  = require('method-override');
+const methodOverride  = require('method-override');
 
 // authentication ==============================================================
-var routesAuth      = require('./app/routesAuth.js');
+const routesAuth      = require('./app/routesAuth.js');
 
 // ecommerce ===================================================================
-var routesShop      = require('./app/routesShop.js');
+const routesShop      = require('./app/routesShop.js');
 
 // friends registration ========================================================
-var routesRegister  = require('./app/routesRegister.js');
+const routesRegister  = require('./app/routesRegister.js');
 
 // paypal v1 ===================================================================
-var routesPayment   = require('./app/routesPayment.js');
-var configPayPal    = require('./config/paypal.js');
+const routesPayment   = require('./app/routesPayment.js');
+const configPayPal    = require('./config/paypal.js');
 
 // paypal v2 ===================================================================
-var routesPaypal    = require('./app/routesPaypalV2');
+const routesPaypal    = require('./app/routesPaypalV2');
 
 // passport ====================================================================
-var pass            = require('./config/passport');
+const pass            = require('./config/passport');
 
 
 //global.cost = 3;
@@ -78,6 +86,25 @@ if (process.env.NODE_ENV== "development") {
 }
 
 
+/*  =======================================================================
+/*  Logger in file                                                          
+/*  ======================================================================= */
+var log_file_action = fs.createWriteStream(__dirname + '/actionTODO.log', {flags : 'w'});
+var log_file_info = fs.createWriteStream(__dirname + '/applicationInfo.log', {flags : 'w'});
+
+var log_stdout = process.stdout;
+
+console.err = function(d) { 
+  log_file_action.write(util.format(d) + '\n');
+  log_stdout.write(util.format(d) + '\n');
+};
+
+console.info = function(d) { 
+  log_file_info.write(util.format(d) + '\n');
+  log_stdout.write(util.format(d) + '\n');
+
+};
+
 /**
  *  Define the application.
  */
@@ -95,13 +122,8 @@ var SharingBeer = function() {
      */
     self.setupVariables = function() {
         //  Set the environment variables we need.
-        self.port = process.env.PORT || 8080;
-
-        if ( self.port === 8080 ) {
-            console.log('LOCAL SERVER, PORT: ', self.port);
-        } else {
-            console.log('REMOTE SERVER, PORT: ', self.port);
-        };
+        self.port = process.env.PORT;
+        console.info(moment().format()+' [INFO] SERVER PORT: '+self.port);
     };
 
     /**
@@ -111,11 +133,11 @@ var SharingBeer = function() {
      */
     self.terminator = function(sig){
         if (typeof sig === "string") {
-           console.log('%s: Received %s - terminating sample app ...',
-                       Date(Date.now()), sig);
-           process.exit(1);
+            console.info(moment().format()+' [INFO] RECEIVED '+sig+': TERMINATING SHARINGBEER APP ...');           
+            process.exit(1);
         }
-        console.log('%s: Node server stopped.', Date(Date.now()) );
+        console.info(moment().format()+' [INFO] NODE SERVER STOPPED!');           
+            
     };
     /**
      *  Setup termination handlers (for exit and a list of signals).
@@ -154,9 +176,13 @@ var SharingBeer = function() {
     self.initializeServer = function() {
         self.app = express();
         paypal.configure(configPayPal.api);
-        db.on('error', console.error.bind(console, 'DataBase connection error:'));
+        
+        db.on('error', err => {
+          console.err(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err);
+        });
+        
         db.once('open', function callback() {
-            console.log('db connection open');
+          console.info(moment().format()+' [INFO] MONGODB OPEN');
         }); 
 
         // set up our express application
@@ -179,7 +205,7 @@ var SharingBeer = function() {
         // required for passport and session for persistent login
         pass(passport);
         
-        console.log('ENV: ', self.app.get('env'))
+        console.info(moment().format()+' [INFO] ENVIRONMENT: '+self.app.get('env'));
 
         if (self.app.get('env') === 'development') {
             self.app.use(morgan('dev')); // log every request to the console
@@ -226,7 +252,7 @@ var SharingBeer = function() {
     self.start = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, function() {
-            console.log('Node server started: %s',Date(Date.now() ));
+          console.info(moment().format()+' [INFO] NODE SERVER STARTED, PORT: '+self.port);
         });
     };
 

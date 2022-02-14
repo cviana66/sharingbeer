@@ -102,15 +102,12 @@ module.exports = {
                     req.session.numProducts = Object.keys(cart).length; 
                   }
                 },
-    emailValidation:  function emailValidation (email) {
-                        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                        if(email =="" || !re.test(String(email))) {
-                          return false;
-                        } else {
-                          return true;
-                        }
+  emailValidation:  function emailValidation (email) {
+                      var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                      if(email =="" || !re.test(String(email))) {
+                        return false;
+                      } else {
+                        return true;
                       }
-
-
-
+                    }
 }

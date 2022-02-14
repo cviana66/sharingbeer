@@ -14,6 +14,9 @@ var transporter = require('./mailerMailgun');
 // load the auth variables
 var configAuth = require('./auth');
 
+// date and time utility
+const moment  = require("moment");
+
 // expose this function to our app using module.exports
 module.exports = function(passport) {
 
@@ -98,8 +101,6 @@ module.exports = function(passport) {
         },
         function(req, email, password, done) { // callback with email and password from our form
             
-            console.log("LOGIN");
-            
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
             User.findOne({ 'email' :  email }, function(err, user) {
@@ -120,7 +121,7 @@ module.exports = function(passport) {
                     return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); 
 
                 // all is well, return successful user
-                console.log('ID PASSPORT: ', user._id);
+                console.info(moment().format()+' [INFO] "/login" USERS_ID: {"_id":ObjectId("'+user._id+'")}');
 
                 /* if the user status  is "new" then it is the first access --> validation put status = confirmed
                 if (user.status == 'new') {
