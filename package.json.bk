@@ -19,6 +19,7 @@
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
     "@paypal/paypalhttp": "^1.0.1",
+    "ansi-regex": "^5.0.1",
     "bcrypt-nodejs": "0.0.3",
     "bufferutil": "^4.0.3",
     "check-dependencies": "^1.1.0",
@@ -48,6 +49,8 @@
     "paypal-rest-sdk": "^1.8.1",
     "peer": "^0.6.1",
     "qr-image": "^3.2.0",
+    "string-width": "^5.1.0",
+    "strip-ansi": "^7.0.1",
     "utf-8-validate": "^5.0.5",
     "webcam-easy": "^1.0.5",
     "ws": "^8.2.2"
