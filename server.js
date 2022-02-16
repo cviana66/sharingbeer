@@ -91,6 +91,7 @@ if (process.env.NODE_ENV== "development") {
 /*  ======================================================================= */
 var log_file_action = fs.createWriteStream(__dirname + '/actionTODO.log', {flags : 'w'});
 var log_file_info = fs.createWriteStream(__dirname + '/applicationInfo.log', {flags : 'w'});
+console.log ('################### '+__dirname+' ###################');
 
 var log_stdout = process.stdout;
 
