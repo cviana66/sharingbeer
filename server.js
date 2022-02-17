@@ -210,7 +210,7 @@ var SharingBeer = function() {
 
         if (self.app.get('env') === 'development') {
             self.app.use(morgan('dev')); // log every request to the console
-            self.app.use(session({secret: '1234567890', 
+            self.app.use(session({secret: process.env.SESSION_SECRET, 
                               saveUninitialized: true,
                               resave: true,
                               cookie: { secure: false, 
