@@ -92,6 +92,7 @@ color: #4e4e4e;
 .documentPopup {
   display: none;
   position: fixed;
+  z-index: 50;
   left: 0px; right: 0px;
   top: 0px; bottom: 0px;
   background-color: #2A0009;
@@ -128,4 +129,34 @@ color: #4e4e4e;
   background-color: #2A0009;
 }
 
+.infoPopup {
+  display: none;
+  position: fixed;
+  width: 250px;
+  height: auto;
+  z-index: 50;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background-color: #2A0009;
+  border: 1px solid #5375BD;
+}
+
+.infoPopup p{
+  padding: 15px;
+  font-size: 14px;
+}
+
+.infoPopup h1,h2,h3,h4{
+  padding: 15px;
+}
+
+.blur.active {
+  filter: blur(2px);
+  pointer-events: none;
+  user-select: none;
+}
 

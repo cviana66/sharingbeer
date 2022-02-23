@@ -5,6 +5,7 @@ var transporter   = require('../config/mailerMailgun');
 var Friends       = require('../app/models/friend');
 var Users         = require('../app/models/user');
 var lib           = require('./libfunction');
+const moment      = require("moment");
 
 module.exports = function(app, passport) {
 
@@ -80,7 +81,7 @@ app.get('/logout', function(req, res) {
   });
 
 // =====================================
-// FORGOT =================== 21-12-2021
+// FORGOT =================== 21-12-2021: Handle error: best practicies
 // =====================================
 //GET
   app.get('/forgot', function(req, res) {
@@ -91,15 +92,18 @@ app.get('/logout', function(req, res) {
     Users.findOne({ email: req.body.email }, function(err, user) {
         // Handle error: best practicies
         if (err) {
-          req.flash('error','Something bad happened! Please retry');
-          console.log('ERROR RESET PASSWORD:', err );
+          let msg = 'Something bad happened! Please retry';
+          console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+          req.flash('error', msg);
           return res.render('info.njk', {message: req.flash('error'), type: "danger"}); 
          
         }; 
 
         if (!user) {
-          req.flash('error', 'No account with that email address exists.');
-          return res.render('forgot.njk', {message: req.flash('error')});
+          let msg = 'No account with that email address exists.'; 
+          console.info(moment().format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
+          req.flash('info', 'No account with that email address exists.');
+          return res.render('forgot.njk', {message: req.flash('info')});
         } else {
           var token = lib.generateToken(20);
           user.resetPasswordToken = token;
@@ -110,8 +114,9 @@ app.get('/logout', function(req, res) {
           user.save(function(err) {
           
             if(err) {
-              req.flash('error','Something bad happened! Please retry');
-              console.log('ERROR RESET PASSWORD:', err );
+              let msg = 'Something bad happened! Please retry';
+              console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: user.save: '+err+' FLASH: '+msg);
+              req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
           
@@ -127,8 +132,9 @@ app.get('/logout', function(req, res) {
         
             transporter.sendMail(mailOptions, function(err, info){
                 if(err){
-                  req.flash('error','Something bad happened! I can not send the email. Please retry');
-                  console.log('ERROR RESET PASSWORD SEND EMAIL:', err );
+                  let msg = 'Something bad happened! I can not send the email. Please retry';
+                  console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: transporter.sendMail: '+err+' FLASH: '+msg);    
+                  req.flash('error',msg);
                   return res.render('info.njk', {message: req.flash('error'), type: "danger"});
                 } else {
                  console.log('Message reset password sent!', info);
@@ -152,8 +158,9 @@ app.get('/logout', function(req, res) {
     Users.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 
       if(err) {
-        req.flash('error','Something bad happened! Please retry');
-        console.log('ERROR RESET PASSWORD BY TOKEN:', err );
+        let msg = 'Something bad happened! Please retry';
+        req.flash('error', msg);
+        console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /reset" TOKEN: {"resetPasswordToken":"'+req.query.token+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       }
 

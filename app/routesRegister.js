@@ -14,6 +14,8 @@ var lib         = require('./libfunction');
 var mailfriend  = require('../config/mailFriend');
 var mailparent  = require('../config/mailParent');
 
+const moment        = require("moment");
+
 
 module.exports = function(app) {
 
@@ -61,24 +63,25 @@ app.post('/caps', function(req, res) {
 // =====================================
 //GET
   app.get('/validation', function(req,res){
-    
-    console.log('TOKEN VALIDATION GET: ', req.query.token);
+
+    console.info(moment().format()+' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"'+req.query.token+'"}');
   
     User.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() }}, function(err, user) {
 
       if (err) {
-        console.log('GET VALIDATION ERROR: ', err );
         req.flash('error','Token is invalid or has expired');
-        res.render('info.njk', {message: req.flash('error'), type: "danger"}); 
+        console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"'+req.query.token+'"} FUNCTION: User.findOne: '+err+' FLASH: '+req.flash('error'));
+        return res.render('info.njk', {message: req.flash('error'), type: "danger"}); 
+        
       }
       
-      //console.log('USER VALIATION GET: ', user)
-
       if (!user) {   
-        req.flash('error', 'Invitation is invalid or has expired.');
+        let msg = 'Invitation is invalid or has expired';
+        req.flash('info', msg);
+        console.info(moment().format()+' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"'+req.query.token+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
         res.render('info.njk', {message: req.flash('error'), type: "danger"});
       } else {
-        res.render('validation.njk', { prospect: user,  message: req.flash('validateMessage'), type: "warning" });
+        res.render('validation.njk', { prospect: user,  message: req.flash('validateMessage'), type: "info" });
       };
     });
   });
@@ -89,8 +92,9 @@ app.post('/caps', function(req, res) {
       
       if (err) {
         req.flash('error','Token is invalid or has expired');
+        console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"'+req.body.token+'"} FUNCTION: User.findOne: '+err+' FLASH: '+req.flash('error'));
         console.log('POST VALIDATION ERROR: ', err );
-        res.render('info.njk', {message: req.flash('error'), type: "danger"});
+        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       
       } else {
 
@@ -99,18 +103,18 @@ app.post('/caps', function(req, res) {
         //email validation
         if (!lib.emailValidation(req.body.email)) {
           req.flash('validateMessage','Please provide a valid email')
+          console.info(moment().format()+' [WARNING][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"'+req.body.email+'"} FLASH: '+req.flash('error'));
           return res.redirect("/validation?token="+req.body.token);
         } //end validation
 
         var common = new User();
-        user.password = common.generateHash(req.body.password)
-        user.name.first = lib.capitalizeFirstLetter(req.body.firstName)
-        user.name.last = lib.capitalizeFirstLetter(req.body.lastName)
+        user.password = common.generateHash(req.body.password);
+        user.name.first = lib.capitalizeFirstLetter(req.body.firstName);
         
         if (user.email !=  req.body.email) {
-          user.email = req.body.email
+          user.email = req.body.email;
         }
-        user.status = 'validated'
+        user.status = 'validated';
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
         user.booze += global.oneBottleBoozeEquivalent;
@@ -118,21 +122,19 @@ app.post('/caps', function(req, res) {
         user.save(function(err) {
 
           if(err) { 
-            console.log('ERROR VALIDATION UPDATE: ', err);
             req.flash('error', 'Something bad happened! Validation faild');
-            res.render('info.njk', {message: req.flash('error'), type: "danger"});
-          
+            console.error(moment().format()+' [ERROR][RECOVERY:YES] "POST /validation" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.save: '+err+' FLASH: '+req.flash('error'));
+            return res.render('info.njk', {message: req.flash('error'), type: "danger"});
           } else {
-          
             req.logIn(user, function(err) {
-              
               if(err) {
                 req.flash('error','Something bad happened! Login faild');
-                console.log('ERROR: ', err );
+                console.info(moment().format()+' [WARNING][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"'+req.body.email+'"} FLASH: '+req.flash('error'));
                 res.render('info.njk', {message: req.flash('error'), type: "danger"})
               } else {
                 console.log('POST VALIDATION SET: ', user )
                 req.flash('success', 'Validated and Logged'); 
+                console.info(moment().format()+' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"'+req.body.email+'"} FLASH: '+req.flash('success'));
                 res.render('profile.njk',{message: req.flash('success'),user: user, type: "success"})   
                } 
             });
@@ -211,11 +213,12 @@ app.post('/caps', function(req, res) {
 //GET
 	app.get('/recomm', lib.isLoggedIn, function(req,res) {
 
-    console.log("MIA MAIL:", req.user.email );
+    console.info(moment().format()+' [INFO][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")}');
+          
     // conto quanti amici ha già lo User
     Friend.countDocuments({ emailParent:req.user.email }, function (err, friends) {
       if (err) {
-        console.err(moment().format()+' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: Friend.countDocuments: '+err);
+        console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: Friend.countDocuments: '+err);
         req.flash('error', 'Something bad happened!');
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       } 
@@ -225,7 +228,7 @@ app.post('/caps', function(req, res) {
       User.findOne({ email: req.user.email }, function (err, user) {
         
         if (err) {
-          console.err(moment().format()+' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: User.findOne: '+err);
+          console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: User.findOne: '+err);
           req.flash('error', 'Something bad happened!');
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
         } 
@@ -261,8 +264,6 @@ app.post('/caps', function(req, res) {
 //POST
 	app.post('/recomm', lib.isLoggedIn, function(req, res) {
 
-    console.log('POST RECOMM FRIEND INVITED: ',req.session.friendsInvited );
-
     if (req.session.friendsInvited >= req.session.invitationAvailable) {
           req.flash('error',"You have no more invitations! Please buy more beer");
           res.render('friend.njk', {  message: req.flash('error'),
@@ -288,7 +289,7 @@ app.post('/caps', function(req, res) {
       newUser.save(function(err) {
   			if (err) {
   				req.flash('error','Something bad happened! Please try again');
-          console.err(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newUser.save: '+err);
+          console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newUser.save: '+err);
 
   				if (err.code === 11000) { //duplicate key: email
   					req.flash('error','That email is already taken, please try another');
@@ -311,12 +312,12 @@ app.post('/caps', function(req, res) {
 
           newFriend.save(function(err) {
             if (err) {
-              console.err(moment().format()+' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newFriend.save: '+err+' TODO: Cancellare in users {"_id":ObjectId("'+newUser.email+'")} se non fatto automaticamente');
+              console.error(moment().format()+' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newFriend.save: '+err+' TODO: Cancellare in users {"_id":ObjectId("'+newUser.email+'")} se non fatto automaticamente');
               req.flash('error','Something bad happened! Please try later');
               //remove Friend from User
   						User.findOneAndRemove({ 'email' :  newUser.email }, function(err){
                 if (err) { 
-                  console.err(moment().format()+' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newFriend.save: '+err+' TODO: Cancellare in users {"_id":ObjectId("'+newUser.email+'")}')
+                  console.error(moment().format()+' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("'+req.user._id+'")} FUNCTION: newFriend.save: '+err+' TODO: Cancellare in users {"_id":ObjectId("'+newUser.email+'")}')
                   req.flash('error', 'Something bad happened! Please try later');
                 }
               });

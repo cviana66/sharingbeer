@@ -3,9 +3,6 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-  <div class="row">
-    <div class="col-md-3 col-lg-4"></div>
-    <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Forgot Password</h3>
       <hr style="border-top: 1px solid #5375BD;">
       <!-- show any messages that come back with authentication -->
@@ -18,15 +15,14 @@
       <form role="form" action="/forgot" method="post">
         <div class="form-group">
           <label for="inputUsernameEmail" class="text-white col-form-label-lg">Email</label>
+          <div style="color:#ffc107; font-size:0.9em;" id="wrongMail"></div> 
           <input type="text" class="form-control" id="inputUsernameEmail" name="email" placeholder="your@email.address" autofocus>
         </div>
-        <button type="submit" class="btn btn-my btn-lg btn-block"">
-          Reset Password
-        </button>
+        <div style="margin-bottom: 40px;">
+          <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldLoginControl()">
+            Reset Password
+          </button>
+        </div>
       </form>
-      <br>
-    </div>
-    <div class="col-md-3 col-lg-4"></div>
-  </div>
 
 {% endblock %}

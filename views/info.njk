@@ -1,11 +1,6 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-md-3 col-lg-4"></div>
-    <div class="col-md-6 col-lg-4" style="background-color:#2A0009;border-radius:12px; ">
-
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Important info</h3>
       <hr style="border-top: 1px solid #5375BD;">
       
@@ -14,11 +9,6 @@
           <div class="alert alert-{{type}}">{{message}}</div>
         {% endfor %}
       {% endif %}
-
-    </div>
-  <div class="col-md-3 col-lg-4"></div>
-  </div>
-</div>
 
 {% endblock %}
 

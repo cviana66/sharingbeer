@@ -87,8 +87,9 @@ if (process.env.NODE_ENV== "development") {
 
 
 /*  =======================================================================
-/*  Logger in file                                                          
-/*  ======================================================================= */
+/*  Logger in file   DISATTIVATO perchè l'hosting HEROKU non lo permette
+/*  Attivato il servizio LogDNA                                                        
+/*  ======================================================================= 
 var log_file_action = fs.createWriteStream(__dirname + '/actionTODO.log', {flags : 'w'});
 var log_file_info = fs.createWriteStream(__dirname + '/applicationInfo.log', {flags : 'w'});
 console.log ('################### '+__dirname+' ###################');
@@ -104,7 +105,7 @@ console.info = function(d) {
   log_file_info.write(util.format(d) + '\n');
   log_stdout.write(util.format(d) + '\n');
 
-};
+}; */
 
 /**
  *  Define the application.
@@ -218,7 +219,7 @@ var SharingBeer = function() {
                             }));
         } else {
             self.app.set('trust proxy', 1); // trust first proxy
-            self.app.use(session({secret: '1234567890', 
+            self.app.use(session({secret: process.env.SESSION_SECRET, //modify: 18/02/2022
                               saveUninitialized: true,
                               resave: true,
                               cookie: { secure: true, // serve secure cookies
