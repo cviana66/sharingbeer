@@ -137,9 +137,10 @@ app.get('/logout', function(req, res) {
                   req.flash('error',msg);
                   return res.render('info.njk', {message: req.flash('error'), type: "danger"});
                 } else {
-                 console.log('Message reset password sent!', info);
-                 req.flash('loginMessage', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
-                 res.redirect('/login');
+                  let msg = 'Message reset password sent!';
+                  console.info(moment().format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
+                  req.flash('loginMessage', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+                  res.redirect('/login');
                 };
             });
           });
