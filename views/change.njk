@@ -1,16 +1,16 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Reset Password</h3>
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Change Password</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
       {% if message %}
         {% for message in message %}
-          <div class="alert alert-danger">{{message}}</div>
+          <div class="alert alert-{{type}}">{{message}}</div>
         {% endfor %}
       {% endif %}
 
-      <form role="form" autocomplete="off" action="/reset" method="post">
+      <form role="form" autocomplete="off" action="/change" method="post">
           <input type="hidden" name="token" value="{{token}}">
           <input type="hidden" name="email" id="email" value="{{email}}">
           <div class="form-group">
@@ -27,7 +27,7 @@
           </div>
           <div style="margin-bottom: 40px; margin-top:40px;">
             <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsResetControl()">
-              Update Password
+              Change Password
             </button>
           </div>
       </form>

@@ -31,6 +31,7 @@ function fieldsValidationControl() {
   };
 
   var pwd1 = document.getElementById("inputPassword").value;
+  var pwd2 = document.getElementById("confirmPassword").value;
   
   if(pwd1 != "") {
     if(pwd1.length < 6) {
@@ -81,6 +82,61 @@ function fieldsValidationControl() {
     return false;
   }
 
+  return true;
+}
+
+function fieldsResetControl() {
+  document.getElementById("wrongPwd").innerHTML = "";
+  document.getElementById("wrongPwd2").innerHTML = "";
+
+  var pwd1 = document.getElementById("inputPassword").value;
+  var pwd2 = document.getElementById("confirmPassword").value;
+  
+  if(pwd1 != "") {
+    if(pwd1.length < 6) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least six characters";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    if(pwd1 == email) {
+      document.getElementById("wrongPwd").innerHTML = "Password must be different from Username";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re1 = /[0-9]/;
+    if(!re1.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one number";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re2 = /[a-z]/;
+    if(!re2.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one lowercase letter";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re3 = /[A-Z]/;
+    if(!re3.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one uppercase letter";
+      document.getElementById("inputPassword").focus();
+      return false;
+    } 
+    var re4 = /\W|_/g;
+    if(!re4.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one special character";
+      document.getElementById("inputPassword").focus();
+      return false;
+    } 
+    if(pwd1!=pwd2) {
+      document.getElementById("wrongPwd2").innerHTML = "Password are different ";
+      document.getElementById("confirmPassword").focus();
+      return false;
+    }
+  } else {
+    document.getElementById("wrongPwd").innerHTML = "create a Password";
+    document.getElementById("inputPassword").focus();
+    return false;
+  }
   return true;
 }
 

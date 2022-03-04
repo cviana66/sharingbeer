@@ -60,12 +60,14 @@ module.exports = function(app, passport) {
           console.log('ERROR PROFILE FIND FRIENDS:', err );
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
         }
-
+        let msg = req.flash('success');
+        console.log('MESSAGGIO',msg );
         res.render('profile.njk', {
             user : req.user, // get the user out of session and pass to template
             numFriends  : friends.length,
             friendsMap  : friends,
-            message     : req.flash('success')
+            message     : msg,
+            type        : "info"
         });
     });
   });
@@ -154,8 +156,6 @@ app.get('/logout', function(req, res) {
 //GET
   app.get('/reset', function(req, res) {
 
-    console.log('GET RESET TOKEN: ', req.query.token);
-  
     Users.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 
       if(err) {
@@ -169,14 +169,14 @@ app.get('/logout', function(req, res) {
         req.flash('error', 'Password reset: token is invalid or has expired.');
         res.render('forgot.njk', {message: req.flash('error')});
       } else {
-        res.render('reset.njk', { user: req.user, token: req.query.token });
+        res.render('reset.njk', { token: req.query.token,
+                                  email: user.email 
+                                });
       };
     });
   });
 //POST
   app.post('/reset', function(req, res) {
-
-    console.log('POST RESET TOKEN: ', req.body.token);
 
     if (req.body.password != req.body.confirm) {
     
@@ -195,7 +195,7 @@ app.get('/logout', function(req, res) {
 
         if (!user) {
           req.flash('error', 'Password reset token is invalid or has expired.');
-          res.render('forgot.dust', {message: req.flash('error')});          
+          res.render('forgot.njk', {message: req.flash('error')});          
         } else {
 
           var common = new Users();
@@ -214,13 +214,68 @@ app.get('/logout', function(req, res) {
             req.logIn(user, function(err) {
               if(err) return console.log('ERROR: ', err);
               req.flash('success', 'Success! Your password has been changed.'); 
-              res.redirect('/profile')
+              res.redirect('profile')
             });
           });
         };
       });
     }
   });
+
+// =====================================
+// CHANGE PASSWORD =========== 04/3/2022
+// =====================================
+//GET
+  app.get('/change', lib.isLoggedIn, function(req, res) {
+
+    Users.findOne({ email: req.user.email }, function(err, user) {
+
+      if(err) {
+        let msg = 'Something bad happened! Please retry';
+        req.flash('error', msg);
+        console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /change" email: {"email":"'+req.user.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+      }
+      res.render('change.njk');
+    });
+  });
+//POST
+  app.post('/change', function(req, res) {
+
+    if (req.body.password != req.body.confirm) {
+    
+      req.flash('error', 'Password do not match');
+      res.render('Change.njk', {message: req.flash('error') });          
+    
+    } else {
+      
+      Users.findOne({ email: req.user.email }, function(err, user) {
+        
+        if(err) {
+          let msg = 'Something bad happened! Please retry';
+          req.flash('error', msg);
+          console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+          return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+        }
+
+        var common = new Users();
+        user.password = common.generateHash(req.body.password);
+        
+        user.save(function(err) {
+          
+          if(err) {
+            let msg = 'Something bad happened! Please retry';
+            req.flash('error', msg);
+            console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.email+'"} FUNCTION: Users.save: '+err+' FLASH: '+msg);
+            return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+          }
+
+          req.flash('success', 'Success! Your password has been changed.'); 
+          res.redirect('/profile')
+        });
+      });
+    }
+  });  
 
 // =====================================
 // FACEBOOK ROUTES =====================
@@ -244,7 +299,8 @@ app.get('/logout', function(req, res) {
 
     let msgFlash = req.flash('error');
     let msgError = error;
-    console.error(msgFlash);
+    console.log(msgFlash);
+    console.log(msgError)
     res.render('info.njk', {message: msgFlash, type: "danger"});
   });
 

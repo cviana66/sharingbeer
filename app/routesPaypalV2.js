@@ -19,6 +19,7 @@ module.exports = function(app) {
 
 app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) {
 
+// TODO ingaggiare la registrazione completa /Register
   var jsonsItems = new Array();
   var cart = req.session.cart; 
   req.session.order = {}; 

@@ -56,7 +56,7 @@
                 <label for="inputPassword" class="text-white col-form-label-lg">Crea una nuova Password</label>
                 <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p> 
                 <div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd"></div>
-                <input type="password" class="form-control" id="inputPassword" name="pwd1" required>
+                <input type="password" class="form-control" id="inputPassword" name="password" required>
               </div>
               <div class="form-check" style="margin:20px 0px 20px 0px" >
                 <div style="color:#ffc107; font-size:0.9em;" id="wrongAge"></div>
@@ -69,7 +69,7 @@
                 <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacy">Accetto le <a href="#" onclick="return openDocument('condizioniVendita')"> Condizioni generali di vendita </a> e l'informativa sulla <a href="#" onclick="return openDocument('privacy')"> Privacy </a> di Sharing Beer </label>
               </div>
               <div style="margin-top: 10px;">
-                <button type="submit" type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsValidationControl()"> Accetto l'invito </button>
+                <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsValidationControl()"> Accetto l'invito </button>
                 <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
               </div>
             </fieldset>
