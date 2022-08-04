@@ -39,7 +39,7 @@
     "minimatch": "^5.1.0",
     "minimist": "^1.2.6",
     "moment": "^2.29.4",
-    "mongoose": "^5.3.13",
+    "mongoose": "^6.4.6",
     "morgan": "^1.9.1",
     "mout": "^1.2.3",
     "nodemailer": "^6.4.16",
