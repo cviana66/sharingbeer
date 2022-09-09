@@ -19,7 +19,7 @@ const moment        = require("moment");
 
 // config and connect to our database
 const configDB = require('./config/database.js');
-mongoose.connect(configDB.url, {  useCreateIndex: true,
+mongoose.connect(configDB.url /*{  useCreateIndex: true,
                                   useNewUrlParser: true,
                                   useUnifiedTopology: true,
                                   useFindAndModify: false
@@ -28,8 +28,9 @@ mongoose.connect(configDB.url, {  useCreateIndex: true,
                                     reconnectTries: Number.MAX_VALUE,
                                     reconnectInterval: 1000,
                                     socketOptions: {keepAlive: 1, connectTimeoutMS: 30000} 
-                                  } */
-                                });
+                                  } 
+                                } */
+                                );
 const db = mongoose.connection;
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
@@ -180,7 +181,7 @@ var SharingBeer = function() {
         paypal.configure(configPayPal.api);
         
         db.on('error', err => {
-          console.err(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err);
+          console.error(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err);
         });
         
         db.once('open', function callback() {
