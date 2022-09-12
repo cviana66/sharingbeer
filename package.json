@@ -1,6 +1,12 @@
 {
   "name": "sharingbeer",
   "version": "1.0.0",
+  "builds": [
+      { "src": "server.js", "use": "@vercel/node" }
+   ],
+  "routes": [
+      { "src": "/(.*)", "dest": "/server.js" }
+   ],
   "description": " SharingBeer Application",
   "keywords": [
     "Node.js",
