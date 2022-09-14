@@ -1,9 +1,9 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Beer Shop</h3>
+      <h3 class="text-white text-center bg-dark">Beer Shop</h3>
       <hr style="border-top: 1px solid #5375BD;">
-      
+
       <div class="row">
       {% for prod in products %}
         <form method="POST" action="/shop">
@@ -37,5 +37,5 @@
 
     {% endfor %}
     </div>
-    
+
 {% endblock %}

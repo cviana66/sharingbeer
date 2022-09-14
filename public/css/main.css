@@ -19,9 +19,9 @@
 .arrows path {
   stroke: #5375BD;
   fill: transparent;
-  stroke-width: 1px;  
+  stroke-width: 1px;
   animation: arrow 2s infinite;
-  -webkit-animation: arrow 2s infinite; 
+  -webkit-animation: arrow 2s infinite;
 }
 
 @keyframes arrow
@@ -50,13 +50,13 @@
   -webkit-animation-delay:-0.5s; /* Safari 和 Chrome */
 }
 
-.arrows path.a3 { 
+.arrows path.a3 {
   animation-delay:0s;
   -webkit-animation-delay:0s; /* Safari 和 Chrome */
 }
 
 /*-----------------------
-/* Design Cookie Consent 
+/* Design Cookie Consent
 /*-----------------------*/
 #cookiePopup {
   background: white;
@@ -86,7 +86,7 @@ color: #4e4e4e;
 
 
 /*-----------------------
-/* Design Document display 
+/* Design Document display
 /*-----------------------*/
 
 .documentPopup {
@@ -160,3 +160,8 @@ color: #4e4e4e;
   user-select: none;
 }
 
+.bg-dark {
+  background: repeating-linear-gradient(135deg,#2A0009,#2A0009 3px,#480413 3px,#480413 6px);
+  margin:15px 0px 0px 0px;
+  border-radius:6px 6px 6px 6px;
+}

@@ -1,9 +1,9 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Your Friend </h3>
+      <h3 class="text-white text-center bg-dark">Your Friend </h3>
       <hr style="border-top: 1px solid #5375BD;">
-      
+
       {% if message %}
         {% for message in message %}
           <div class="alert alert-{{type}}">{{message}}</div>
@@ -11,7 +11,7 @@
       {% endif %}
 
       <div>
-        <p class="text-left text-white">Friends invited <span style="font-size:1.2em;">{{friendsInvited}}</span></p>    
+        <p class="text-left text-white">Friends invited <span style="font-size:1.2em;">{{friendsInvited}}</span></p>
         <div class="progress" style="margin-bottom:20px;">
           <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{friendsInvited}}" aria-valuemin="0" aria-valuemax="{{invitationAvailable}}" style="width:{{percentage}}%; background-color:#ffc85d">
           </div>
@@ -51,5 +51,5 @@
           </button>
         </div>
       </form>
-    
+
 {% endblock %}

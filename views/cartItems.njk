@@ -1,9 +1,9 @@
-    <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">You Cart</h3>
-    <hr style="border-top: 1px solid #5375BD;">   
-    
+    <h3 class="text-white text-center bg-dark">Your Cart</h3>
+    <hr style="border-top: 1px solid #5375BD;">
+
     {% for prod in cart.items %}
       <div class="row col-md-12 col-lg-12" >
-        
+
         <div class="col">
           <p class="text-white text-left"> {{prod.name}} : nome della biarra e caratteristiche varie</p>
         </div>
@@ -24,10 +24,10 @@
               </td>
             </tr>
             <tr>
-              <td rowspan="2"> 
+              <td rowspan="2">
                 <div>
                   <img class="img-responsive rounded mx-auto" src="http://placehold.it/80x100">
-                </div> 
+                </div>
               </td>
               <td>
                 <form method="POST" action="cart/plus">
@@ -40,7 +40,7 @@
                       <title>Plus</title>
                     </svg>
                   </button>
-                </form> 
+                </form>
               </td>
               <td>
                 <form method="POST" action="shop">
@@ -52,7 +52,7 @@
                       <title>Shop</title>
                     </svg>
                   </button>
-                </form> 
+                </form>
               </td>
             </tr>
             <tr>
@@ -83,23 +83,23 @@
             </tr>
             <tr>
               <td colspan="3">
-                <hr style="border-top: 1px solid #5375BD;"> 
+                <hr style="border-top: 1px solid #5375BD;">
               </td>
             </tr>
-          </table>  
+          </table>
         </div>
       </div>
-    {% endfor %}          
+    {% endfor %}
 
 
   {% if numProducts != 0 %}
-  
+
       <div>
-        <h4 class="text-center">Total</h4>            
+        <h4 class="text-center">Total</h4>
         <div>
-          <h4 class="text-center"><strong>€{{totalPrice}}</strong></h4>            
+          <h4 class="text-center"><strong>€{{totalPrice}}</strong></h4>
         </div>
-       
+
         <div id="paypal-button-container"></div>
 
         <script>
@@ -155,13 +155,13 @@
                   var errorDetail = Array.isArray(orderData.details) && orderData.details[0];
 
                   if (errorDetail && errorDetail.issue === 'INSTRUMENT_DECLINED') {
-                      return actions.restart(); 
+                      return actions.restart();
                       // EXPLAIN:
                       // Recoverable state, per:
                       // https://developer.paypal.com/docs/checkout/integration-features/funding-failure/
                   }
 
-                  if (errorDetail) {   
+                  if (errorDetail) {
                       var msg = 'Sorry, your transaction could not be processed.';
                       if (errorDetail.description) msg += '\n\n' + errorDetail.description;
                       if (orderData.debug_id) msg += ' (' + orderData.debug_id + ')';
@@ -199,12 +199,12 @@
         <br>
       </div>
 
-    
+
   {% else %}
     <div class="col">
         <h4><p class="text-white text-center">Cart is empty... Go! to </p></h4>
     </div>
-    
+
     <div class="col">
       <form method="GET" action="/shop">
         <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
@@ -214,4 +214,3 @@
      </form>
    </div>
   {% endif %}
-
