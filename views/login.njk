@@ -1,8 +1,8 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-  
-      <h3 class="text-white text-center" style="margin:15px 0px 0px 0px;">Please Log In</h3>
+
+      <h3 class="text-white text-center" style="background: repeating-linear-gradient(135deg,#2A0009,#2A0009 3px,#480413 3px,#480413 6px);margin:15px 0px 0px 0px;">Please Log In</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
       {% if message %}
@@ -10,11 +10,11 @@
           <div class="alert alert-warning">{{message}}</div>
         {% endfor %}
       {% endif %}
-    
+
       <form role="form" action="/login" method="post">
         <div class="form-group">
           <label  for="inputUsernameEmail" class="text-white col-form-label-lg">User</label>
-          <div style="color:#ffc107; font-size:0.9em;"" id="wrongMail"></div> 
+          <div style="color:#ffc107; font-size:0.9em;"" id="wrongMail"></div>
           <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{ user }}" placeholder="your@email.address" autofocus required >
         </div>
         <div class="form-group">
@@ -43,5 +43,5 @@
           <a href="#" class="btn btn-lg btn-info btn-block">Google</a>
         </div>
       </div-->
-    
+
 {% endblock %}

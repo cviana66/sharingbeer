@@ -13,12 +13,12 @@ const bodyParser    = require('body-parser');
 const session       = require('express-session');
 const paypal        = require('paypal-rest-sdk');
 const qr            = require('qr-image');
-const nunjucks      = require('nunjucks'); 
+const nunjucks      = require('nunjucks');
 const cons          = require('consolidate');
 const moment        = require("moment");
 const env           = require('node-env-file'); // si può usare anche il pkg dotenv
 
-//config environment variables
+// config environment variables
 env(__dirname + '/.env');
 
 // config and connect to our database
@@ -27,12 +27,12 @@ mongoose.connect(configDB.url /*{  useCreateIndex: true,
                                   useNewUrlParser: true,
                                   useUnifiedTopology: true,
                                   useFindAndModify: false
-                                  /*server: { 
+                                  /*server: {
                                     auto_reconnect: true,
                                     reconnectTries: Number.MAX_VALUE,
                                     reconnectInterval: 1000,
-                                    socketOptions: {keepAlive: 1, connectTimeoutMS: 30000} 
-                                  } 
+                                    socketOptions: {keepAlive: 1, connectTimeoutMS: 30000}
+                                  }
                                 } */
                                 );
 const db = mongoose.connection;
@@ -77,12 +77,12 @@ global.threeBottleBoozeEquivalent = 36;
 global.fourBottleBoozeEquivalent  = 48;
 
 global.mktBoozeXParent = 1;
-global.mktBoozeXfriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato 
+global.mktBoozeXFriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato
 global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent/global.mktBoozeXfriends;
 
 
 /*  =======================================================================
-/*  Settings Host                                                             
+/*  Settings Host
 /*  ======================================================================= */
 if (process.env.NODE_ENV== "development") {
   global.server = "http://localhost:8080";
@@ -93,20 +93,20 @@ if (process.env.NODE_ENV== "development") {
 
 /*  =======================================================================
 /*  Logger in file   DISATTIVATO perchè l'hosting HEROKU non lo permette
-/*  Attivato il servizio LogDNA                                                        
-/*  ======================================================================= 
+/*  Attivato il servizio LogDNA
+/*  =======================================================================
 var log_file_action = fs.createWriteStream(__dirname + '/actionTODO.log', {flags : 'w'});
 var log_file_info = fs.createWriteStream(__dirname + '/applicationInfo.log', {flags : 'w'});
 console.log ('################### '+__dirname+' ###################');
 
 var log_stdout = process.stdout;
 
-console.err = function(d) { 
+console.err = function(d) {
   log_file_action.write(util.format(d) + '\n');
   log_stdout.write(util.format(d) + '\n');
 };
 
-console.info = function(d) { 
+console.info = function(d) {
   log_file_info.write(util.format(d) + '\n');
   log_stdout.write(util.format(d) + '\n');
 
@@ -140,11 +140,11 @@ var SharingBeer = function() {
      */
     self.terminator = function(sig){
         if (typeof sig === "string") {
-            console.info(moment().format()+' [INFO] RECEIVED '+sig+': TERMINATING SHARINGBEER APP ...');           
+            console.info(moment().format()+' [INFO] RECEIVED '+sig+': TERMINATING SHARINGBEER APP ...');
             process.exit(1);
         }
-        console.info(moment().format()+' [INFO] NODE SERVER STOPPED!');           
-            
+        console.info(moment().format()+' [INFO] NODE SERVER STOPPED!');
+
     };
     /**
      *  Setup termination handlers (for exit and a list of signals).
@@ -178,19 +178,19 @@ var SharingBeer = function() {
     };
 
     /**
-     *  Initialize the server (express) 
+     *  Initialize the server (express)
      */
     self.initializeServer = function() {
         self.app = express();
         paypal.configure(configPayPal.api);
-        
+
         db.on('error', err => {
           console.error(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err);
         });
-        
+
         db.once('open', function callback() {
           console.info(moment().format()+' [INFO] MONGODB OPEN');
-        }); 
+        });
 
         // set up our express application
         self.app.use(cookieParser()); // read cookies (needed for auth)
@@ -211,15 +211,15 @@ var SharingBeer = function() {
 
         // required for passport and session for persistent login
         pass(passport);
-        
+
         console.info(moment().format()+' [INFO] ENVIRONMENT: '+self.app.get('env'));
 
         if (self.app.get('env') === 'development') {
             self.app.use(morgan('dev')); // log every request to the console
-            self.app.use(session({secret: process.env.SESSION_SECRET, 
+            self.app.use(session({secret: process.env.SESSION_SECRET,
                               saveUninitialized: true,
                               resave: true,
-                              cookie: { secure: false, 
+                              cookie: { secure: false,
                                         expires: 600000 }
                             }));
         } else {
@@ -234,9 +234,7 @@ var SharingBeer = function() {
 
         self.app.use(passport.initialize());
         self.app.use(passport.session()); // persistent login sessions
-        self.app.use(flash()); // use connect-flash for flash messages stored in session        
-
-    
+        self.app.use(flash()); // use connect-flash for flash messages stored in session
     };
 
     /**
@@ -250,8 +248,6 @@ var SharingBeer = function() {
         self.initializeServer();
         self.createRoutes();
     };
-
-
 
     /**
      *  Start the server (starts up the sample application).
@@ -271,12 +267,12 @@ var sb = new SharingBeer();
 sb.initialize();
 sb.start();
 
-/*  =========================================================================        
+/*  =========================================================================
     |                 NOTE DI FUNZIONAMENTO DI PROCESSO                     |
-    | 1) E'ad invito quindi non è disponibile la funzionalità di SIGN-UP    | 
+    | 1) E'ad invito quindi non è disponibile la funzionalità di SIGN-UP    |
 */
 
-/*  =========================================================================        
+/*  =========================================================================
     |                               TODO                                    |
-    | 1) Funzionalità amministrativa di cancellazione di un user            | 
+    | 1) Funzionalità amministrativa di cancellazione di un user            |
 */
