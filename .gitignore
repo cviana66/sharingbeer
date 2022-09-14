@@ -60,3 +60,7 @@ typings/
 # next.js build output
 .next
 node_modules
+
+#other
+migliorie.txt
+package.json.bk

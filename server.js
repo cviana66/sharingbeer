@@ -16,6 +16,10 @@ const qr            = require('qr-image');
 const nunjucks      = require('nunjucks'); 
 const cons          = require('consolidate');
 const moment        = require("moment");
+const env           = require('node-env-file'); // si può usare anche il pkg dotenv
+
+//config environment variables
+env(__dirname + '/.env');
 
 // config and connect to our database
 const configDB = require('./config/database.js');
@@ -83,7 +87,7 @@ global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent/global
 if (process.env.NODE_ENV== "development") {
   global.server = "http://localhost:8080";
 } else if (process.env.NODE_ENV == "production") {
-  global.server = "https://sharingbeer.herokuapp.com";
+  global.server = "https://www.sharingbeer.com/";
 }
 
 
