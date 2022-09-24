@@ -1,4 +1,23 @@
+
+
 {
+  "name": "sharingbeer",
+  "version": "1.0.0",
+  "description": " SharingBeer Application",
+  "keywords": [
+    "Node.js",
+    "application"
+  ],
+  "author": "CarloV <cviana66@gmail,com> (https://www.SharingBeer.com/)",
+  "homepage": "https://www.SharingBeer.com/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cviana66/sharingbeer.git"
+  },
+  "engines": {
+  "node": ">=14.x",
+  "npm": ">= 8.x"
+  },
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
     "bcrypt-nodejs": "^0.0.3",
@@ -19,5 +38,14 @@
     "passport-local": "^1.0.0",
     "paypal-rest-sdk": "^1.8.1",
     "qr-image": "^3.2.0"
-  }
+  },
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "bugs": {
+    "url": "https://github.com/cviana66/sharingbeer/issues"
+  },
+  "license": "ISC"
 }
