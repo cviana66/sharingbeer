@@ -64,3 +64,4 @@ node_modules
 #other
 migliorie.txt
 package.json.bk
+nodemon.json
