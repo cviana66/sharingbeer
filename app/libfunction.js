@@ -49,15 +49,15 @@ module.exports = {
 
                       if (typeOfMail == 'friend') {
                         var mailOptions = {
-                          from: 'sandboxae84de9ecb5141ce8ab958aee88eef7b.mailgun.org', // sender address
-                          to:  Email,    //'cviana66@gmail.com', // list of receivers
+                          from: 'invito-no-reply@sharingbeer.com', // sender address
+                          to: Email,    //'cviana66@gmail.com', // list of receivers
                           subject: userName + ' ' + userSurname + ' ti invita a bere birra Viana', // Subject line
                           html: mailfriend(Name, Email, Token, userName, userSurname, global.server)
                         }
                       } else {
 
                         var mailOptions = {
-                            from: 'sandboxae84de9ecb5141ce8ab958aee88eef7b.mailgun.org', // sender address
+                            from: 'invito-no-reply@sharingbeer.com', // sender address
                             to: userEmail, //'cviana66@gmail.com', // list of receivers
                             subject: 'Grazie dal Birrificio Viana', // Subject line
                             html: mailparent(Name, Email, userName, userEmail, global.server)
