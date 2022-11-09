@@ -27,7 +27,7 @@ module.exports = {
                   }
                   return retVal;
                  },
-  // route middleware to make sure a user is logged in 
+  // route middleware to make sure a user is logged in
   generatePassword: function generatePassword(n) {
                       var length = n,
                           charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
@@ -46,24 +46,24 @@ module.exports = {
 
                       console.log('MAIL TYPE: ', typeOfMail);
                       console.log("SERVER:", global.server);
-        
+
                       if (typeOfMail == 'friend') {
                         var mailOptions = {
-                          from: 'birrificio.viana@sharingbeer.com', // sender address
-                          to: 'cviana66@gmail.com', // list of receivers
+                          from: 'invito-no-reply@sharingbeer.com', // sender address
+                          to:  Email,    //'cviana66@gmail.com', // list of receivers
                           subject: userName + ' ' + userSurname + ' ti invita a bere birra Viana', // Subject line
-                          html: mailfriend(Name, Email, Token, userName, userSurname, global.server) 
-                        }   
+                          html: mailfriend(Name, Email, Token, userName, userSurname, global.server)
+                        }
                       } else {
 
                         var mailOptions = {
                             from: 'birrificio.viana@sharingbeer.com', // sender address
-                            to: 'cviana66@gmail.com', // list of receivers
+                            to: userEmail, //'cviana66@gmail.com', // list of receivers
                             subject: 'Grazie dal Birrificio Viana', // Subject line
                             html: mailparent(Name, Email, userName, userEmail, global.server)
                         }
                       }
-                      
+
                       //console.log(mailparent(Name, Email, userName, userEmail));
                       //console.log('friendMail: ' + friendEmail);
                       //console.log('friendPassword: ' + friendPassword);
@@ -99,7 +99,7 @@ module.exports = {
                     req.session.displayCart = displayCart;
                     req.session.totalPrc = displayCart.totalPrice = totalPrice.toFixed(2);
                     req.session.totalQty = totalQty;
-                    req.session.numProducts = Object.keys(cart).length; 
+                    req.session.numProducts = Object.keys(cart).length;
                   }
                 },
   emailValidation:  function emailValidation (email) {

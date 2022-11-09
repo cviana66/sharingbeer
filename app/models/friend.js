@@ -1,16 +1,16 @@
 // app/models/user.js
 // load the things we need
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 // define the schema for our user model
-var friendSchema = mongoose.Schema({
+const friendSchema = mongoose.Schema({
   id: {
     type: String,
-    required: '{PATH} is required.'
+    required: true
   },
   firstNameFriend: {
     type: String,
-    required: '{PATH} is required.',
+    required: true,
     unique: false
   },
   lastNameFriend: {
@@ -19,17 +19,14 @@ var friendSchema = mongoose.Schema({
   },
   emailParent: {
     type: String,
-    required: '{PATH} is required.',
+    required: true,
     unique: false
   },
   emailFriend: {
     type: String,
-    required: '{PATH} is required.',
+    required:true,
     unique: true
   }
 });
-
-//var Friend = mongoose.model('Friend', friendSchema);
-
 // create the model for users and expose it to our app
-module.exports = mongoose.model('Friend', friendSchema);
+module.exports = mongoose.model('Friends', friendSchema);

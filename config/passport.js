@@ -106,7 +106,9 @@ module.exports = function(passport) {
             User.findOne({ 'email' :  email }, function(err, user) {
                 // if there are any errors, return the error before anything else
                 if (err) {
-                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
+                    let msg = 'Something bad happened! There are problems with the network connection. Please try again later';
+                    req.flash('error', msg);
+                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /logn" email: {"email":"' + email + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);          
                     return done(err); 
                 }
 

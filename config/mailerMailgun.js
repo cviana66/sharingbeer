@@ -6,7 +6,7 @@ var mailgun           = require('nodemailer-mailgun-transport');
 
 console.log('Mailer: mailergun');
 
-// login
+// Access to mailgun free plan
 var transporter = nodemailer.createTransport(mailgun({
     service: 'Mailgun',
     auth: {

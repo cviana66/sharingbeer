@@ -1,0 +1,18 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+[branch "master"]
+[rhc]
+	app-id = 5684428f89f5cfb4c900011f
+	app-name = sb
+	domain-name = sharingbeer
+[remote "origin"]
+	url = https://github.com/cviana66/sharingbeer.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+	remote = origin
+	merge = refs/heads/master
+[credential]
+	helper = store

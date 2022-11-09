@@ -23,22 +23,11 @@ env(__dirname + '/.env');
 
 // config and connect to our database
 const configDB = require('./config/database.js');
-mongoose.connect(configDB.url /*{  useCreateIndex: true,
-                                  useNewUrlParser: true,
-                                  useUnifiedTopology: true,
-                                  useFindAndModify: false
-                                  /*server: {
-                                    auto_reconnect: true,
-                                    reconnectTries: Number.MAX_VALUE,
-                                    reconnectInterval: 1000,
-                                    socketOptions: {keepAlive: 1, connectTimeoutMS: 30000}
-                                  }
-                                } */
-                                );
+mongoose.connect(configDB.url);
 const db = mongoose.connection;
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
-const methodOverride  = require('method-override');
+//const methodOverride  = require('method-override'); //commentato in data 15/10/22 per capire se usato no
 
 // authentication ==============================================================
 const routesAuth      = require('./app/routesAuth.js');
@@ -201,7 +190,7 @@ var SharingBeer = function() {
         self.app.use(express.static(__dirname + '/public'));
 
         //use to ovwrride method in form: put, delete
-        self.app.use(methodOverride('_method'));
+        //self.app.use(methodOverride('_method')); //commentato in data 15/10/22 per capire se usato no
 
         //template engine
         nunjucks.configure('views', {

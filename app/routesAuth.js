@@ -1,11 +1,11 @@
 // app/routes.js
 
-var transporter   = require('../config/mailerMailgun');
+const transporter   = require('../config/mailerMailgun');
 
-var Friends       = require('../app/models/friend');
-var Users         = require('../app/models/user');
-var lib           = require('./libfunction');
-const moment      = require("moment");
+const Friends       = require('./models/friend');
+const Users         = require('./models/user');
+const lib           = require('./libfunction');
+const moment        = require('moment');
 
 module.exports = function(app, passport) {
 

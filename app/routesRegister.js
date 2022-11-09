@@ -31,7 +31,7 @@ module.exports = function(app) {
 
     app.post('/cities', function(req, res) {
         //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
-        //res.render('validation.dust', { message: req.flash('validation') }); 
+        //res.render('validation.dust', { message: req.flash('validation') });
         console.log("city : ", req.body.city);
         CityCap.find({
             'Comune': new RegExp('^' + req.body.city,"i")
@@ -45,7 +45,7 @@ module.exports = function(app) {
 
     app.post('/caps', function(req, res) {
         //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
-        //res.render('validation.dust', { message: req.flash('validation') }); 
+        //res.render('validation.dust', { message: req.flash('validation') });
         console.log("city : ", req.body.city);
         MultipleCap.find({
             'Comune': req.body.city
@@ -121,7 +121,7 @@ module.exports = function(app) {
             if (err) {
                 let msg = 'Token is invalid or has expired';
                 req.flash('error', msg);
-                console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.body.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+                console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN: {"resetPasswordToken":"' + req.body.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                 console.log('POST VALIDATION ERROR: ', err);
                 return res.render('info.njk', {
                     message: req.flash('error'),
@@ -130,7 +130,7 @@ module.exports = function(app) {
 
             } else {
 
-                // TODO Validare i dati inseriti lato SERVER perchè potrebbero essere stati disabilitati i Javascript lato CLIENT 
+                // TODO Validare i dati inseriti lato SERVER perchè potrebbero essere stati disabilitati i Javascript lato CLIENT
                 // FATTO solo per mail
 
                 //email validation
@@ -193,7 +193,7 @@ module.exports = function(app) {
     // =====================================
     // PAYMENT =============================
     // =====================================
-    //GET  
+    //GET
     app.get('/register', lib.isLoggedIn, function(req, res) {
 
         if (req.user.status == 'validated') {
@@ -213,7 +213,7 @@ module.exports = function(app) {
             res.redirect('/shop');
         }
     });
-    //POST   
+    //POST
     app.post('/register', lib.isLoggedIn, function(req, res, next) {
 
         User.findByIdAndUpdate(req.user._id, {
@@ -254,7 +254,7 @@ module.exports = function(app) {
     });
 
     // =====================================
-    // FRIEND =================== 24-12-2021 
+    // FRIEND =================== 24-12-2021
     //                            05-02-2022
     //                            12-02-2022 introddotto il logger
     // =====================================
@@ -294,7 +294,7 @@ module.exports = function(app) {
                 req.session.invitationAvailable = parseInt(user.possibleFriends, 10);
                 //numero di inviti disponibili
                 req.session.friendsInvited = parseInt(friends, 10);
-                //numero di amici già invitati 
+                //numero di amici già invitati
 
                 let error = "";
                 let controlSates = "";
@@ -436,7 +436,7 @@ module.exports = function(app) {
     })
     // visualizza in formato HTML la mail User
     app.get('/mailuser', function(req, res) {
-
+        console.log("SERVER:", global.server);
         res.send(mailparent('Name', 'Email', 'userName', 'userEmail', global.server))
 
     })
