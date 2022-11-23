@@ -1,6 +1,6 @@
 // app/routes.js
 
-const transporter   = require('../config/mailerMailgun');
+const transporter   = require('../config/mailer');
 
 const Friends       = require('./models/friend');
 const Users         = require('./models/user');

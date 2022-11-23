@@ -1,7 +1,7 @@
 //libfunction.js
 
 //email settings
-var transporter = require('../config/mailerMailgun');
+var transporter = require('../config/mailer');
 var mailfriend  = require('../config/mailFriend');
 var mailparent  = require('../config/mailParent');
 
@@ -42,7 +42,7 @@ module.exports = {
                             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
                           }
                          },
-  sendmailToPerson: function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail) {
+  sendmailToPerson: async function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail) {
 
                       console.log('MAIL TYPE: ', typeOfMail);
                       console.log("SERVER:", global.server);
@@ -58,24 +58,22 @@ module.exports = {
 
                         var mailOptions = {
                             from: 'invito-no-reply@sharingbeer.com', // sender address
-                            to: userEmail, //'cviana66@gmail.com', // list of receivers
+                            to: Email, //'cviana66@gmail.com', // list of receivers
                             subject: 'Grazie dal Birrificio Viana', // Subject line
                             html: mailparent(Name, Email, userName, userEmail, global.server)
                         }
                       }
-
-                      //console.log(mailparent(Name, Email, userName, userEmail));
-                      //console.log('friendMail: ' + friendEmail);
-                      //console.log('friendPassword: ' + friendPassword);
-                      //console.log('userEmail: ' + userEmail);
-
-                      transporter.sendMail(mailOptions, function(err, info){
-                          if(err){
-                            return console.log('ERROR: ', err);
-                          }else{
-                            console.log('MESSAGE SENT: ', info);
-                          };
-                      });
+                      // effettua l'invio della mail
+                      try {
+                        let info = await transporter.sendMail(mailOptions);
+                        console.log("MAIL INFO: ", info);
+                        return true;
+                      } catch (e) {
+                        console.log("MAIL ERROR: ",e);
+                        return e;
+                      } finally {
+                        console.log("sendMail");
+                      }
                   },
   retriveCart:  function retriveCart (req) {
                   //Retrieve the shopping cart from memory

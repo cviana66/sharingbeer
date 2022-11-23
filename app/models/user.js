@@ -1,39 +1,17 @@
-// app/models/user.js
-// load the things we need
-var mongoose = require('mongoose');
-var bcrypt = require('bcrypt-nodejs');
-
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
+const Schema = mongoose.Schema;
 // define the schema for our user model
-var userSchema = mongoose.Schema({
+const userSchema = new Schema({
 
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  inviteEmail: {
-    type: String,
-    required: true,
-    unique: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  status: {
-    type: String
-  },
-  name: {
-    first: {
-      type: String
-    },
-    last: {
-      type: String
-    },
-  },
-  fiscalCode: {
-    type: String
-  },
+  email:        { type: String, required: true, unique: true},
+  inviteEmail:  { type: String, required: true, unique: true},
+  password:     { type: String, required: true},
+  status:       { type: String},
+  name:   { first: {type: String},
+            last: {type: String},
+          },
+  fiscalCode: {type: String},
   mobilePrefix: {
     type: String
   },
@@ -47,7 +25,7 @@ var userSchema = mongoose.Schema({
   endDate: {
     type: Date
   },
-  possibleFriends: {
+  eligibleFriends: {
     type: Number,
     default: 0
   },

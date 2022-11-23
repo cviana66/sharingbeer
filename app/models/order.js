@@ -1,9 +1,8 @@
-// Require mongoose and mongoose schema
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 // Define order schema
-var OrderSchema = new Schema({
+const OrderSchema = new Schema({
     idUser      : { type: String, required: true },
     email       : { type: String, required: true },
     dateInsert  : { type: Date, required: true },

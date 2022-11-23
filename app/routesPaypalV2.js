@@ -12,7 +12,7 @@ module.exports = function(app) {
 // =====================================
 // PAYPAL ==============================
 // =====================================
- 
+
 // =====================================
 // Set up Transaction
 // =====================================
@@ -21,15 +21,15 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
 
 // TODO ingaggiare la registrazione completa /Register
   var jsonsItems = new Array();
-  var cart = req.session.cart; 
-  req.session.order = {}; 
+  var cart = req.session.cart;
+  req.session.order = {};
 
   if (!cart) {
       //TODO manage if not exist cart ????
       console.log("Cart not exist");
     } else {
-  
-      try { // Salva l'ordine 
+
+      try { // Salva l'ordine
 
           var newOrder = new Order();
 
@@ -41,12 +41,12 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
           newOrder.totalPrice = req.session.totalPrc;
 
           let saveOrder = await newOrder.save();
-          console.log("Mongoose saveOrder",saveOrder); 
+          console.log("Mongoose saveOrder",saveOrder);
 
           //save in session Order ID used after for return success payment
           req.session.order.id = saveOrder.id;
           console.log('SHARINGBEER ORDER ID :', req.session.order.id );
-   
+
         } catch (err) {
           console.log('Order save err', err);
           return res.sendStatus(500);
@@ -56,11 +56,11 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
 
           for (var item in cart) {
             if (cart[item].qty > 0) {
-              
+
               var subtotal = parseInt(cart[item].price);
 
               var newItem = new Item();
-              
+
               newItem.idOrder = req.session.order.id;
               newItem.idPrdoduct = cart[item].id;
               newItem.nameProduct = cart[item].name;
@@ -68,9 +68,9 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
               newItem.price = subtotal.toFixed(2);
 
               let saveItem = await newItem.save();
-               
+
             }
-          } 
+          }
           console.log('Items saved');
         } catch (err) {
             console.log('Items saved err', err);
@@ -81,7 +81,7 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
       console.log('INI Call PayPal to set up an authorization transaction');
 
       const request = new checkoutNodeJssdk.orders.OrdersCreateRequest();
-      
+
       request.prefer("return=representation");
       request.requestBody({
         intent: 'CAPTURE',
@@ -96,13 +96,13 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
       let order;
 
       try {
-        
+
         order = await payPalClient.client().execute(request);
-        
+
         const paypalOrderStatus =  order.result.status;
         const paypalOrderId = order.result.id;
         const sharinbeerOrderId = req.session.order.id
-        
+
         console.log('PAYPAL ORDER STATUS:',order.result.status);
         console.log('PAYPAL ORDER ID:', order.result.id);
         console.log('SHARINGBEER ORDER ID', req.session.order.id);
@@ -111,18 +111,18 @@ app.post('/create-paypal-transaction', lib.isLoggedIn, async function(req, res) 
 
           var payInfo = new PayInfo();
 
-          payInfo.idPay   = paypalOrderId; 
+          payInfo.idPay   = paypalOrderId;
           payInfo.idOrder = sharinbeerOrderId;
           payInfo.state   = paypalOrderStatus;
           payInfo.responseMsg = JSON.stringify(order);
-       
-          let infoPayment = await payInfo.save(); 
+
+          let infoPayment = await payInfo.save();
         } catch (err) {
           console.log('Paypal Info save err', err);
           return res.sendStatus(500);
         };
         console.log('Paypal Info saved');
-        
+
       } catch (err) {
         // 4. Handle any errors from the call
         console.error(err);
@@ -158,7 +158,7 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
     // 4. Save the capture ID to your database. Implement logic to save capture to your database for future reference.
     const paypalPaymentId     = capture.result.purchase_units[0].payments.captures[0].id;
     const sharigbeerOrderId   = req.session.order.id;
-    const paypalPaymentStatus = capture.result.purchase_units[0].payments.captures[0].status; 
+    const paypalPaymentStatus = capture.result.purchase_units[0].payments.captures[0].status;
     const paypalPayerId       = capture.result.payer.payer_id;
     const paypalCreateTime    = capture.result.purchase_units[0].payments.captures[0].create_time;
     const paypalUpdateTime    = capture.result.purchase_units[0].payments.captures[0].update_time;
@@ -172,13 +172,13 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
     req.session.totalPrc    = 0;
     req.session.numProducts = 0;
 
-    try { 
+    try {
 
       let infoPayment = await PayInfo.findOneAndUpdate({idOrder:sharigbeerOrderId},
-          { state:paypalPaymentStatus, 
-            responseMsg:captureStringify} 
-      );  
-     
+          { state:paypalPaymentStatus,
+            responseMsg:captureStringify}
+      );
+
     } catch {
       // TODO: scrivere su LOG per recuperare successivamente
       console.log('Save log after error -> PAYPAL orderID:',paypalOrderId);
@@ -188,7 +188,7 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
 
     var SharingbeerStatus="";
 
-    if (paypalPaymentStatus === 'COMPLETED')  { 
+    if (paypalPaymentStatus === 'COMPLETED')  {
       SharingbeerStatus = 'payed';
     } else {
       SharingbeerStatus = 'tobeVerify';
@@ -197,12 +197,12 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
     console.log('PAYMENT ...payments.captures: ', capture.result.purchase_units[0].payments.captures);
 
     try {
-      let updateOrder = await Order.findByIdAndUpdate(sharigbeerOrderId, 
+      let updateOrder = await Order.findByIdAndUpdate(sharigbeerOrderId,
         { $set: {
                   paypal: {
                           payOrderId    : paypalOrderId,
                           paymentId     : paypalPaymentId,
-                          payerId       : paypalPayerId, 
+                          payerId       : paypalPayerId,
                           state         : paypalPaymentStatus,
                           createTime    : String(paypalCreateTime),
                           updateTime    : String(paypalUpdateTime),
@@ -229,39 +229,41 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
 
           console.log("INVITI POSSIBILI:",invitiPossibili);
 
-          User.findByIdAndUpdate(req.user._id, 
-            { $set: { 
-                      possibleFriends : invitiPossibili
+          User.findByIdAndUpdate(req.user._id,
+            { $set: {
+                      eligibleFriends : invitiPossibili
                     }
-            }, 
+            },
             function (err, req) {
               if (err) {
-                console.log('User.findByIdAndUpdate', err);
-                //res.redirect('/???');
-                //return;
+                console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findByIdAndUpdate: ' + err + ' TODO: Aggionare in users il campo eligibleFriends di {"_id":ObjectId("' + newUser.email + '")} con il valore ' + invitiPossibili);
               }
           });
 
           //add Booze to friend parent
           User.findOne({'_id': req.user.idParent }, function(err, parent) {
-              
-                parent.booze += req.session.totalQty * global.mktBoozeXParent;            
+            let booze = req.session.totalQty * global.mktBoozeXParent;
+            if (err) {
+              console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOne: ' + err + ' TODO: Sommare in users > campo booze di {"_id":ObjectId("' + newUser.email + '")} con il valore ' + booze);
+            } else {
+                parent.booze += booze;
+
                 console.log('BOOZE', parent.booze);
-                
+
                 User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
                     if (err) {
                       console.log('error User.update', err);
-                      //res.redirect('/???');
+                      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOne: ' + err + ' TODO: Sommare in users > campo booze di {"_id":ObjectId("' + newUser.email + '")} con il valore ' + booze);
                       //return;
                     }
-                });            
-              
+                });
+            };
           });
         });
-        
+
         //res.redirect('/recomm')
         //console.log("Get Payment Response");
-        //console.log(JSON.stringify(payment));      
+        //console.log(JSON.stringify(payment));
       }
 
   } catch (err) {
@@ -271,7 +273,7 @@ app.post('/authorize-paypal-transaction', lib.isLoggedIn, async function(req, re
     return res.sendStatus(500);
   }
 
-  // 6. Return a successful response to the client 
+  // 6. Return a successful response to the client
   console.log('Return a successful response to the client \n',capture);
   res.status(200).json({orderData: capture});
 });

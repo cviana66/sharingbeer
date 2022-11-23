@@ -9,7 +9,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../app/models/user');
 
 //var transporter     = require('./mailerXOAuth2');
-var transporter = require('./mailerMailgun');
+var transporter = require('./mailer');
 
 // load the auth variables
 var configAuth = require('./auth');
@@ -60,10 +60,10 @@ module.exports = function(passport) {
                 // find a user whose email is the same as the forms email
                 // we are checking to see if the user trying to login already exists
                 User.findOne({ 'email' :  email }, function(err, user) {
-                    
+
                     // if there are any errors, return the error
                     if (err) { return done(err); }
-                    
+
                     // check to see if theres already a user with that email
                     if (user) {
                         return done(null, false, req.flash('signupMessage', 'That email is already taken.'));
@@ -100,7 +100,7 @@ module.exports = function(passport) {
         passReqToCallback : true // allows us to pass back the entire request to the callback
         },
         function(req, email, password, done) { // callback with email and password from our form
-            
+
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
             User.findOne({ 'email' :  email }, function(err, user) {
@@ -108,19 +108,19 @@ module.exports = function(passport) {
                 if (err) {
                     let msg = 'Something bad happened! There are problems with the network connection. Please try again later';
                     req.flash('error', msg);
-                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /logn" email: {"email":"' + email + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);          
-                    return done(err); 
+                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /logn" email: {"email":"' + email + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+                    return done(err);
                 }
 
                 // if no user is found, return the message
                 if (!user)
                     // req.flash is the way to set flashdata using connect-flash
-                    return done(null, false, req.flash('loginMessage', 'No user found.')); 
+                    return done(null, false, req.flash('loginMessage', 'No user found.'));
 
                 // if the user is found but the password is wrong, return the message
                 if (!user.validPassword(password))
                     // create the loginMessage and save it to session as flashdata
-                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); 
+                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
 
                 // all is well, return successful user
                 console.info(moment().format()+' [INFO] "/login" USERS_ID: {"_id":ObjectId("'+user._id+'")}');
@@ -128,8 +128,8 @@ module.exports = function(passport) {
                 /* if the user status  is "new" then it is the first access --> validation put status = confirmed
                 if (user.status == 'new') {
                     User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
-                        
-                        if (err) { 
+
+                        if (err) {
                             req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
                             return done(err) }
                         else {
@@ -138,21 +138,21 @@ module.exports = function(passport) {
                             User.findOne({'_id': user.idParent }, function(err, parent) {
                                 // if there are any errors, return the error
                                 if (err) {
-                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later'); 
-                                    return done(err); 
+                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
+                                    return done(err);
                                 }
 
                                 console.log('PARENT ID: ', parent._id);
 
                                 parent.booze += global.cost; //add Booze to Parent
-                                
+
                                 User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req, res) {
-                                  
-                                  if (err) { 
-                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later'); 
-                                    return done(err);      
+
+                                  if (err) {
+                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
+                                    return done(err);
                                     }
-                                });     
+                                });
                             });
                         };
                     });

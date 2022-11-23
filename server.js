@@ -21,10 +21,9 @@ const env           = require('node-env-file'); // si può usare anche il pkg do
 // config environment variables
 env(__dirname + '/.env');
 
-// config and connect to our database
-const configDB = require('./config/database.js');
-mongoose.connect(configDB.url);
-const db = mongoose.connection;
+// connect to our database
+const db = require('./config/database.js');
+
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
 //const methodOverride  = require('method-override'); //commentato in data 15/10/22 per capire se usato no
