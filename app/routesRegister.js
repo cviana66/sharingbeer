@@ -411,21 +411,16 @@ module.exports = function(app) {
           await newFriend.save(opts);
 
           // send email to Friend
-          let ret = await lib.sendmailToPerson(newUser.name.first, newUser.email, '', newUser.resetPasswordToken, req.user.name.first, req.user.name.last, req.user.email, 'friend')
-          console.log("ERR!!!: ",ret);
-          if (ret === true) {
-            // send email to user Parent
-            let ret = await lib.sendmailToPerson(req.user.name.first, req.user.email, '', '', newUser.name.first, '', newUser.email, 'parent')
-          } else {
-            console.log("GENERO ERRORE");
-            throw "Errore nell'invio mail"
-          }
+          await lib.sendmailToPerson(newUser.name.first, newUser.email, '', newUser.resetPasswordToken, req.user.name.first, req.user.name.last, req.user.email, 'friend')
+          await lib.sendmailToPerson(req.user.name.first, req.user.email, '', '', newUser.name.first, '', newUser.email, 'parent')
 
           await session.commitTransaction();
           await session.endSession();
 
         } catch (e) {
-          console.log("ERRORE TRANSAZIONE");
+          console.log("ERRORE TRANSAZIONE", e);
+          console.log("ERRORE CODE", e.code);
+
           await session.abortTransaction();
           await session.endSession();
           if (e.code === 11000) {

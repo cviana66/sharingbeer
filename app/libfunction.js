@@ -67,12 +67,9 @@ module.exports = {
                       try {
                         let info = await transporter.sendMail(mailOptions);
                         console.log("MAIL INFO: ", info);
-                        return true;
                       } catch (e) {
-                        console.log("MAIL ERROR: ",e);
-                        return e;
-                      } finally {
-                        console.log("sendMail");
+                        console.log("CODE: ", e.code);
+                        throw new Error(e);
                       }
                   },
   retriveCart:  function retriveCart (req) {
