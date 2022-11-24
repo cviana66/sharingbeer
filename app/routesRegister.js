@@ -307,6 +307,7 @@ module.exports = function(app) {
     // 24-12-2021
     // 05-02-2022
     // 12-02-2022 introddotto il logger
+    // 24-11-2022 uso della Trasaction
     // =====================================
     //GET
     app.get('/recomm', lib.isLoggedIn, function(req, res) {
@@ -417,140 +418,38 @@ module.exports = function(app) {
           await session.commitTransaction();
           await session.endSession();
 
+          req.session.friendsInvited += 1;
+          req.flash('message', 'You have added a new Friend');
+          res.render('friend.njk', {
+              message: req.flash('message'),
+              type: "info",
+              invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
+              friendsInvited: req.session.friendsInvited,
+              percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
+          });
+
         } catch (e) {
           console.log("ERRORE TRANSAZIONE", e);
-          console.log("ERRORE CODE", e.code);
-
           await session.abortTransaction();
           await session.endSession();
           if (e.code === 11000) {
             //duplicate key: email
             let msg = 'That email is already taken, please try another';
+            req.flash('error', msg);
+            res.render('friend.njk', {
+                message: req.flash('error'),
+                type: "warning",
+                invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
+                friendsInvited: req.session.friendsInvited,
+                percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
+            });
           } else {
             let msg = 'Something bad happened! Please try again';
+            req.flash('error', msg);
+            console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
+            return res.render('info.njk', {message: req.flash('error'), type: "danger"});
           }
-          res.render('friend.njk', {
-              message: req.flash('error'),
-              type: "warning",
-              invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-              friendsInvited: req.session.friendsInvited,
-              percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-          });
         }
-          /*  // creo nuovo user con i dati segnalati dal PARENT
-            var password = lib.generatePassword(6);
-            var newUser = new User();
-            // set the user's local credentials
-            newUser.email = req.body.email;
-            newUser.inviteEmail = req.body.email;
-            newUser.password = newUser.generateHash(password);
-            newUser.name.first = lib.capitalizeFirstLetter(req.body.firstName);
-            newUser.idParent = req.user._id;
-            //id parent
-            newUser.status = 'new';
-            // status
-            newUser.resetPasswordToken = lib.generateToken(20);
-            // token
-            newUser.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
-            // 1 hour * 24 * 365 = 1 anno
-
-            newUser.save(function(err) {
-                if (err) {
-                    let msg = 'Something bad happened! Please try again';
-                    req.flash('error', msg);
-                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: newUser.save: ' + err + ' FLASH: ' + msg);
-
-                if (e.code === 11000) {
-                        //duplicate key: email
-                        req.flash('error', 'That email is already taken, please try another');
-                    }
-
-                    res.render('friend.njk', {
-                        message: req.flash('error'),
-                        type: "warning",
-                        invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                        friendsInvited: req.session.friendsInvited,
-                        percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-                    });
-
-                } else {
-
-                    // Save a new friends in mongodb
-                    var newFriend = new Friend();
-                    newFriend.id = req.user._id;            // id parent
-                    newFriend.emailParent = req.user.email; // mail user
-                    newFriend.emailFriend = newUser.email;  // mail friend
-                    newFriend.firstNameFriend = newUser.name.first; //name's friend
-
-                    newFriend.save(function(err) {
-                        if (err) {
-                            console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: newFriend.save: ' + err + ' TODO: Cancellare in users {"_id":ObjectId("' + newUser.email + '")} se non fatto automaticamente');
-                            req.flash('error', 'Something bad happened! Please try later');
-                            //remove Friend from User
-                            User.findOneAndRemove({'email': newUser.email}, function(err) {
-                                if (err) {
-                                    console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOneAndRemove: ' + err + ' TODO: Cancellare in users {"_id":ObjectId("' + newUser.email + '")}')
-                                    req.flash('error', 'Something bad happened! Please try later');
-                                }
-                            });
-                            //render for message display
-                            res.render('friend.njk', {
-                                message: req.flash('error'),
-                                type: "error",
-                                invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                                friendsInvited: req.session.friendsInvited,
-                                percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-                            });
-                        } else {
-
-                            // send email to Friend
-                            if (lib.sendmailToPerson(newUser.name.first, newUser.email, '', newUser.resetPasswordToken, req.user.name.first, req.user.name.last, req.user.email, 'friend')==false){
-                              //rimuove l'amico segnalato che è stato inserito nel collection Users
-                              User.findOneAndRemove({'email': newUser.email}, function(err) {
-                                  if (err) {
-                                      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOneAndRemove: ' + err + ' TODO: Cancellare in users {"email":"' + newUser.email + '")}')
-                                      req.flash('error', 'Something bad happened! Please try later');
-                                  }
-                              });
-                              //rimuove l'amico dal collection Friends
-                              Frined.findOneAndRemove({'emailFriend': newUser.email}, function(err) {
-                                  if (err) {
-                                      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOneAndRemove: ' + err + ' TODO: Cancellare in friends {"emailFrined":"' + newUser.email + '")}')
-                                      req.flash('error', 'Something bad happened! Please try later');
-                                  }
-                              });
-                            } else {
-                              if (lib.sendmailToPerson(req.user.name.first, req.user.email, '', '', newUser.name.first, '', newUser.email, 'parent')==false) {
-                                //rimuove l'amico segnalato che è stato inserito nel collection Users
-                                User.findOneAndRemove({'email': newUser.email}, function(err) {
-                                    if (err) {
-                                        console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOneAndRemove: ' + err + ' TODO: Cancellare in users {"email":"' + newUser.email + '")}')
-                                        req.flash('error', 'Something bad happened! Please try later');
-                                    }
-                                });
-                                //rimuove l'amico dal collection Friends
-                                Frined.findOneAndRemove({'emailFriend': newUser.email}, function(err) {
-                                    if (err) {
-                                        console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOneAndRemove: ' + err + ' TODO: Cancellare in friends {"emailFrined":"' + newUser.email + '")}')
-                                        req.flash('error', 'Something bad happened! Please try later');
-                                    }
-                                });
-                              }
-                            }
-
-                            req.session.friendsInvited += 1;
-                            req.flash('message', 'You have added a new Friend');
-                            res.render('friend.njk', {
-                                message: req.flash('message'),
-                                type: "info",
-                                invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                                friendsInvited: req.session.friendsInvited,
-                                percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-                            });
-                        }
-                    })
-                }
-            }); */
     });
 
     // =====================================

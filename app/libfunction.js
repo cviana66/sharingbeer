@@ -68,7 +68,7 @@ module.exports = {
                         let info = await transporter.sendMail(mailOptions);
                         console.log("MAIL INFO: ", info);
                       } catch (e) {
-                        console.log("CODE: ", e.code);
+                        console.log("MAIL ERROR: ", e);
                         throw new Error(e);
                       }
                   },
