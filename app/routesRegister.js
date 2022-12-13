@@ -24,53 +24,22 @@ const assert = require('assert');
 
 module.exports = function(app) {
 
-  // TRANSACTION
-  app.get('/tran', lib.isLoggedIn, async (req,res) => {
-
-    console.log('transaction');
-
-    const session = await db.startSession();
-    session.startTransaction();
-
-    try {
-        const opts = { session };
-
-        const user = await User.findOneAndUpdate(
-                    { email: "cri@mail.mia" }, { $inc: { eligibleFriends : 10 } }, opts);
-        assert.ok(user.$session());
-
-        throw "Forzato Errore per testare il sistema";
-
-        await session.commitTransaction();
-
-        let doc = await User.findOne({ email: 'cri@mail.mia' });
-
-        console.log(doc);
-
-        await console.log('success');
-        req.flash('error',doc)
-        return res.render('info.njk', {
-            message: req.flash('error'),
-            type: "info"
-        });
-    } catch (error) {
-        await session.abortTransaction();
-        console.log('!!!!!error!!!!!!', error);
-        req.flash('error',error)
-        return res.render('info.njk', {
-            message: req.flash('error'),
-            type: "danger"
-        });
-    } finally {
-        await session.endSession();
-    }
-
-});
 
     // TESTING
     app.get('/test', function(req, res) {
-        res.render('test.dust')
+
+          res.render('testRegistration.njk', {
+              // get the user out of session and pass to template
+          });
     });
+
+    app.get('/qrq', function(req, res) {
+
+          res.render('square.njk', {
+              // get the user out of session and pass to template
+          });
+    });
+
     //===================================================
 
     // =====================================
@@ -84,9 +53,7 @@ module.exports = function(app) {
         CityCap.find({
             'Comune': new RegExp('^' + req.body.city,"i")
         }, function(err, city) {
-
             console.log("Got city : ", city);
-
             res.send(city)
         })
     });
@@ -193,7 +160,6 @@ module.exports = function(app) {
                 var U = new User();
                 user.password = U.generateHash(req.body.password);
                 user.name.first = lib.capitalizeFirstLetter(req.body.firstName);
-
                 if (user.email != req.body.email) {
                     user.email = req.body.email;
                 }
@@ -203,7 +169,6 @@ module.exports = function(app) {
                 user.booze += global.oneBottleBoozeEquivalent;
 
                 user.save(function(err) {
-
                     if (err) {
                         let msg = 'Something bad happened! Validation faild';
                         req.flash('error', msg);
@@ -240,7 +205,7 @@ module.exports = function(app) {
     });
 
     // =====================================
-    // PAYMENT =============================
+    // Registrazione come cliente
     // =====================================
     //GET
     app.get('/register', lib.isLoggedIn, function(req, res) {
@@ -251,15 +216,16 @@ module.exports = function(app) {
                 firstName: req.user.name.first,
                 lastName: req.user.name.last,
                 user: req.user,
+                numProducts : req.session.numProducts
                 // get the user out of session and pass to template
             });
 
         } else if (req.user.status == 'customer' && req.session.numProducts > 0) {
-            res.redirect('/paynow');
+            res.redirect('/cart');
 
         } else {
             console.log('User: ', req.user);
-            res.redirect('/shop');
+            res.redirect('/cart');
         }
     });
     //POST
@@ -468,4 +434,14 @@ module.exports = function(app) {
         res.send(mailparent('Name', 'Email', 'userName', 'userEmail', global.server))
 
     })
+
+    app.get('/infoMessage', (req, res) => {
+      let msg = req.query.msg;
+      let msgType = req.query.type;
+      req.flash('message', msg);
+      res.render('info.njk', {
+          message: req.flash('message'),
+          type: msgType
+      })
+    });
 }

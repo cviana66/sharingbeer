@@ -99,15 +99,17 @@
         <div>
           <h4 class="text-center"><strong>€{{totalPrice}}</strong></h4>
         </div>
-
+        <!--
+          HELP and DOC
+          https://developer.paypal.com/docs/checkout/standard/integrate/
+        -->
+        <!-- Set up a container element for the button -->
         <div id="paypal-button-container"></div>
-
         <script>
         // Render the PayPal button into #paypal-button-container
           paypal.Buttons({
-
-            // Call your server to set up the transaction
-            createOrder: function(data, actions) {
+            // Order is created on the server and the order id is returned
+            createOrder: (data, actions) => {
                 console.log('!!! createOrder !!!')
                 return fetch('/create-paypal-transaction', {
                     method: 'post'

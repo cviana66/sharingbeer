@@ -35,7 +35,7 @@
           <div ><label for="inputCity" class="text-white col-form-label-lg">Comune</label></div>
           <div style="color:yellow; font-size:80%;" id="wrongCity"></div>
           <input type="text" class="form-control" id="inputCity" value="{{city}}"
-           name="city" placeholder="" required autocomplete="off" oninput="selectCity(this.value)"/>
+           name="city" placeholder="" required oninput="selectCity(this.value)"/>
           <div class="w-100"></div>
           <div id="cities"></div>
         </div>
@@ -66,26 +66,46 @@
       <br>
 
 <script type="text/javascript">
-  /*==================================================================*/
-  /* GESTIONE della CITTA' e CAP con recupero da MONGODB              */
-  /*==================================================================*/
-
-  function hideMyselect(select) {
-     document.getElementById(select).style.visibility= 'hidden';
-     document.getElementById("inputCap").focus();
+/*==================================================================*/
+/* GESTIONE della CITTA' e CAP con recupero da MONGODB              */
+/* https://developer.snapappointments.com/bootstrap-select/         */
+/*==================================================================*/
+Element.prototype.remove = function() {
+      this.parentElement.removeChild(this);
+    };
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+  for(var i = this.length - 1; i >= 0; i--) {
+    if(this[i] && this[i].parentElement) {
+      this[i].parentElement.removeChild(this[i]);
+    }
   }
+};
 
-  function selectCap(selectCap) {
-      $("#myselectcaps").hide();
-      document.getElementById('inputCap').value = selectCap.value;
-  }
+function hideMyselect(select) {
+   document.getElementById(select).style.visibility= 'hidden';
+   document.getElementById("inputCap").focus();
+}
 
-  function selectCaps(selectCity) {
-    $('#myselect').hide();
-    document.getElementById("inputCity").value = selectCity.value;
+function selectCap() {
+  $("#myselectcaps").on("changed.bs.select", function(e, clickedIndex, isSelected, oldValue) {
+    var cap = $(this).find('option').eq(clickedIndex).text();
+    inputCap.value = cap;
+    $("#myselectcaps").selectpicker('hide');
+    document.getElementById("inputAddress").focus();
+  });
+}
+
+function selectCaps() {
+  $("#myselect").on("changed.bs.select", function(e, clickedIndex, isSelected, oldValue) {
+    var selectedD = $(this).find('option').eq(clickedIndex).text();
+    var city = selectedD.substring(0, selectedD.length - 4 );
+    inputCity.value = city;
+
+    $("#myselect").selectpicker('hide');
     document.getElementById("inputCap").focus();
-    let data = {};
-    data.city = selectCity.value;
+
+    var data = {};
+    data.city = city;
     /* Recuper i CAP della città selezionata da MongoDB */
     $.ajax({
       type: 'POST',
@@ -95,31 +115,35 @@
       success: function(res) {
         /* Creo la select option con elenco dei CAP se multipli e dinamicamente */
         if (typeof res !== 'undefined' && res.length > 0) {
-          let selectcaps = document.createElement('select'),
+          var selectcaps = document.createElement('select'),
               option= null,
-              size = res.length;
-
-          if ( size == 1 ) {
+              i = 0,
+              il = res.length;
+          if ( il == 1 ) {
             inputCap.value = res[0].CAP;
-            //document.getElementById("inputAddress").focus();
+            document.getElementById("inputAddress").focus();
           } else {
             selectcaps.setAttribute('id','myselectcaps');
-            selectcaps.setAttribute('class','form-control');
-            selectcaps.setAttribute('onchange','selectCap(this);');
+            selectcaps.setAttribute('class','form-control selectpicker');
+            selectcaps.setAttribute('onchange','if (this.selectedIndex) selectCap();');
 
-            if (size >= 10) size = 10;
-            selectcaps.setAttribute('size',size);
+            option = document.createElement('option');
+            option.text = 'Select a CAP';
+            selectcaps.appendChild(option);
 
-            for (var i=0; i < res.length; i += 1) {
+            for (; i < il; i += 1) {
               option = document.createElement('option');
               option.appendChild(document.createTextNode(res[i].CAP));
               selectcaps.appendChild(option);
             };
+
             $("#caps").html(selectcaps);
+            $("#myselectcaps").selectpicker('refresh');
           }
         } else {
           if (document.getElementById('myselectcaps') !=null) {
             document.getElementById('myselectcaps').remove();
+            $("#myselectcaps").selectpicker('destroy');
           }
         }
       },
@@ -127,79 +151,79 @@
         console.log("Error", e);
       }
     });
-  }
+  });
+}
 
-  function selectCity (v) {
-    var vl = v.toLowerCase();
-  /*  Per ottimizzare le chiamate al DB  solo le citta con 2 caratteri sono permesse */
-    if (vl.length > 2 || vl =='lu' || vl =='ne' || vl =='re' || vl =='ro') {
+function selectCity (v) {
+  var vl = v.toLowerCase();
+/*  Per ottimizzare le chiamate al DB  solo le citta con 2 caratteri sono permesse */
+  if (vl.length > 2 || vl =='lu' || vl =='ne' || vl =='re' || vl =='ro') {
 
-      var data = {};
-      data.city = v;
-  /* Seleziono la città con API che ricerca su MongoDB */
-      $.ajax({
-        type: 'POST',
-        dataType: 'json',
-        url: '/cities',
-        data: data,
-        success: function(res) {
-          if (typeof res !== 'undefined' && res.length > 0) {
-            /* Creo la select option con elenco delle città in modo dinamico */
-            var select = document.createElement('select'),
-                option= null;
+    var data = {};
+    data.city = v;
+/* Seleziono la città con API che ricerca su MongoDB */
+    $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      url: '/cities',
+      data: data,
+      success: function(res) {
+        if (typeof res !== 'undefined' && res.length > 0) {
+          /* Creo la select option con elenco delle città in modo dinamico */
+          var select = document.createElement('select'),
+              option= null,
+              i = 0,
+              il = res.length;
 
-            select.setAttribute('id','myselect');
-            select.setAttribute('class','form-control');
-            select.setAttribute('onchange','selectCaps(this);');
-            let size = res.length
-            if (size >= 10) size = 10;
-            select.setAttribute('size',size);
-            console.log('size=',size)
-            if (size < 2) {
-              size = 2;
-              select.setAttribute('size',size);
+          select.setAttribute('id','myselect');
+          select.setAttribute('class','form-control selectpicker dropup data-live-search="true"');
+          select.setAttribute('onchange','if (this.selectedIndex) selectCaps();');
+
+          option = document.createElement('option');
+          option.text = 'Select a City';
+          select.appendChild(option);
+
+          for (; i < il; i += 1) {
               option = document.createElement('option');
-              option.value = "";
-              option.appendChild(document.createTextNode(""));
+              option.appendChild(document.createTextNode(res[i].Comune+'('+res[i].Provincia+')'));
               select.appendChild(option);
-            }
+          };
 
-            for (var i = 0; i <res.length; i += 1) {
-                option = document.createElement('option');
-                option.value = res[i].Comune;
-                option.appendChild(document.createTextNode(res[i].Comune+'('+res[i].Provincia+')'));
-                select.appendChild(option);
-            };
+          $("#cities").html(select);
+          $("#myselect").selectpicker('refresh');
 
-            $("#cities").html(select);
-          } else {
+        } else {
 
-            if (document.getElementById('myselect') != null) {
-              document.getElementById('myselect').remove();
-            }
-            if (document.getElementById('myselectcaps') !=null) {
-              document.getElementById('myselectcaps').remove();
-            }
+          if (document.getElementById('myselect') != null) {
+            $("#myselect").selectpicker('destroy');
+            document.getElementById('myselect').remove();
           }
-          inputCap.value=null; //se modifico la città, setto a null il CAP
-        },
-
-        error: function (e) {
-          console.log("Error", e);
+          if (document.getElementById('myselectcaps') !=null) {
+            $("#myselectcaps").selectpicker('destroy');
+            document.getElementById('myselectcaps').remove();
+          }
         }
-      });
+      },
 
-    } else {
+      error: function (e) {
+        console.log("Error", e);
+      }
+    });
 
-      inputCap.value=null;
-      if (document.getElementById('myselect') != null) {
-        document.getElementById('myselect').remove();
-      }
-      if (document.getElementById('myselectcaps') !=null) {
-        document.getElementById('myselectcaps').remove();
-      }
+  } else {
+
+    inputCap.value=null;
+    if (document.getElementById('myselect') != null) {
+      $("#myselect").selectpicker('destroy');
+      document.getElementById('myselect').remove();
     }
-  };
+    if (document.getElementById('myselectcaps') !=null) {
+      $("#myselectcaps").selectpicker('destroy');
+      document.getElementById('myselectcaps').remove();
+    }
+  }
+};
+
 </script>
 
 {% endblock %}

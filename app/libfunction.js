@@ -1,9 +1,11 @@
 //libfunction.js
 
 //email settings
-var transporter = require('../config/mailer');
-var mailfriend  = require('../config/mailFriend');
-var mailparent  = require('../config/mailParent');
+const transporter = require('../config/mailer');
+const mailfriend  = require('../config/mailFriend');
+const mailparent  = require('../config/mailParent');
+
+const User  = require('../app/models/user');
 
 module.exports = {
 
@@ -75,7 +77,7 @@ module.exports = {
   retriveCart:  function retriveCart (req) {
                   //Retrieve the shopping cart from memory
                   var cart = req.session.cart,
-                  displayCart = {items: [], totalPrice: 0},
+                  cartItems = {items: [], totalPrice: 0, totalQty: 0},
                   totalPrice = 0,
                   totalQty = 0
 
@@ -85,16 +87,16 @@ module.exports = {
                     //Read the products for display
                     for (var item in cart) {
                       if (cart[item].qty > 0) {
-                        displayCart.items.push(cart[item]);
+                        cartItems.items.push(cart[item]);
                         totalPrice += (cart[item].qty * cart[item].price);
                         totalQty += cart[item].qty;
                       }
                     }
-                    console.log("NUMERO PEZZI:", totalQty);
-                    req.session.displayCart = displayCart;
-                    req.session.totalPrc = displayCart.totalPrice = totalPrice.toFixed(2);
-                    req.session.totalQty = totalQty;
+                    req.session.cartItems = cartItems;
+                    req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
+                    req.session.totalQty = cartItems.totalQty = totalQty;
                     req.session.numProducts = Object.keys(cart).length;
+                    console.log("CART: ",cartItems);
                   }
                 },
   emailValidation:  function emailValidation (email) {

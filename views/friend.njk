@@ -1,7 +1,7 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark">Your Friend </h3>
+      <h3 class="text-white text-center bg-dark"> Invita amici </h3>
       <hr style="border-top: 1px solid #5375BD;">
 
       {% if message %}
@@ -11,12 +11,12 @@
       {% endif %}
 
       <div>
-        <p class="text-left text-white">Friends invited <span style="font-size:1.2em;">{{friendsInvited}}</span></p>
+        <p class="text-left text-white"> Amici invitati <span style="font-size:1.2em;">{{friendsInvited}}</span></p>
         <div class="progress" style="margin-bottom:20px;">
           <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{friendsInvited}}" aria-valuemin="0" aria-valuemax="{{invitationAvailable}}" style="width:{{percentage}}%; background-color:#ffc85d">
           </div>
         </div>
-        <p class="text-right text-white"> Invitations available <span style="font-size:1.2em;">{{invitationAvailable}}</span></p>
+        <p class="text-right text-white"> Inviti disponibili <span style="font-size:1.2em;">{{invitationAvailable}}</span></p>
       </div>
 
       <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;;">
@@ -35,13 +35,13 @@
 
       <form role="form" action="/recomm" method="POST">
         <div class="form-group">
-          <label for="inputUsernameEmail" class="text-white col-form-label-lg">Email</label>
+          <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Email del tuo amico </label>
           <div style="color:#ffc107; font-size:80%;" id="wrongMail"></div>
           <input type="email" class="form-control" id="inputUsernameEmail"
           name="email" placeholder="your@email.address" autofocus required {{controlSates}}>
         </div>
         <div class="form-group">
-          <label for="inputUsernameEmail" class="text-white col-form-label-lg">Name</label>
+          <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Nome del tuo amico </label>
           <input type="text" class="form-control" id="inputFirsName"
           name="firstName" placeholder="First name" required {{controlSates}}>
         </div>

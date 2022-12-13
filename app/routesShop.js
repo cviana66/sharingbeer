@@ -11,7 +11,7 @@ module.exports = function(app) {
 // =============================================================================
 //GET
   app.get('/shop', lib.isLoggedIn, function (req,res) {
-    	
+
   	Product.find(function (err, prods) {
   		if (err) {
   			console.log(err);
@@ -19,44 +19,47 @@ module.exports = function(app) {
   		prods.forEach(function(prod) {
   			prod.prettyPrice = prod.prettyPrice();
   		});
-		
+
   		//mette in memoria i prodotti dal carrello
       lib.retriveCart(req);
 
 		  var model =  { products   : prods,                   //prodotti dello shop
   						       user       : req.user,                //utente loggato
   						       numProducts: req.session.numProducts, //numero di proodotti nel carrello visualizzato su main.dust
-  						       cart       : req.session.displayCart  //prodotti nel carrello
+  						       cart       : req.session.cartItems    //prodotti nel carrello
   					       };
       console.log("numero di prodotti in carrello: ",req.session.numProducts)
-      console.log("prodotti: ",req.session.displayCart)
   		res.render('shop.njk', model);
   	});
   });
 //POST
 	app.post('/shop', lib.isLoggedIn ,function (req, res) {
 
-		//Load (or initialize) the cart 
-		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart;
+		//Load (or initialize) the cart and session.cart
+		var cart = req.session.cart = req.session.cart || {};
 
-		//Read the incoming product data from shop.dust
+		//Read the incoming product data from shop.njk
 		var id = req.body.item_id;
-    console.log("ID: ",id);
+
+    console.log("productID: ",id);
 
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
 			if (err) {
-				console.log('SHOP POST Error adding product to cart: ', err);
-				res.redirect('/shop');
-				return;
+				//console.log('SHOP POST Error adding product to cart: ', err);
+				//res.redirect('/shop');
+				//return;
+        let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
+        req.flash('message', msg);
+        return res.render('info.njk', {
+            message: req.flash('message'),
+            type: "warning"
+        })
 			}
-
-			//Add or increase the product quantity in the shopping cart.
+			//Increase quantity or add the product in the shopping cart.
 			if (cart[id]) {
 				cart[id].qty++;
-			}
-			else {     //il prodotto è scelto per la prima volta
+			}	else {     //il prodotto è scelto per la prima volta
 				cart[id] = {
 					id : prod._id,
 					name: prod.name,
@@ -66,7 +69,6 @@ module.exports = function(app) {
 				};
 			}
 			req.session.numProducts = Object.keys(cart).length;
-      console.log("numero di prodotti in carrello: ",req.session.numProducts)
 
 			res.redirect('/shop');
 
@@ -83,23 +85,22 @@ module.exports = function(app) {
 
 		var model = { user       : req.user,
   						    numProducts: req.session.numProducts,
-  						    cart       : req.session.displayCart,
-                  totalPrice : req.session.totalPrc
+  						    cart       : req.session.cartItems,
+                  totalPrice : req.session.totalPrc,
+                  userStatus : req.user.status
   					    };
-
-    console.log('cart.cart:', req.session.displayCart);
 
   	res.render('cart.njk', model);
 	});
 //POST MINUS ===================================================================
 	app.post('/cart/minus', lib.isLoggedIn, function (req, res) {
-		//Load (or initialize) the cart 
+		//Load (or initialize) the cart
 		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart; 
+		var cart = req.session.cart;
 
 		//Read the incoming product data
 		var id = req.body.item_id;
-		
+
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
 			if (err) {
@@ -118,7 +119,7 @@ module.exports = function(app) {
 
 //POST PLUS ====================================================================
 	app.post('/cart/plus', lib.isLoggedIn, function (req, res) {
-		//Load (or initialize) the cart 
+		//Load (or initialize) the cart
 		req.session.cart = req.session.cart || {};
 		var cart = req.session.cart;
 
@@ -142,7 +143,7 @@ module.exports = function(app) {
 
 //POST DELETE ==================================================================
 	app.post('/cart/delete', lib.isLoggedIn, function (req, res) {
-		//Load (or initialize) the cart 
+		//Load (or initialize) the cart
 		req.session.cart = req.session.cart || {};
 		var cart = req.session.cart; //cart è l'oggetto sessione
 
@@ -168,7 +169,37 @@ module.exports = function(app) {
 
 		});
 	});
+/*
+  // GET ORDER ===========================================================================
+  app.get('/order', lib.isLoggedIn, function(req, res) {
+    Order.find({idUser:req.user._id}, function(err, orders) {
 
+      var displayOrder = {items: []};
+
+      if (err) {
+        var error = 'Something bad happened! Please try again.';
+        console.log("error code: ",err.code);
+      } else {
+
+        if (!orders) {
+          //TODO manahement if not exist order ????
+          console.log("Order not exist");
+        } else {
+        //Prepare JSON Items for transactions
+          for (var item in orders) {
+
+            if (orders[item].status != 'reserved') {
+              displayOrder.items.push(orders[item]);
+            }
+          }
+
+          var model = { order: displayOrder };
+          res.render('order.dust', model);
+        }
+      }
+
+    });
+*/
 // ========================= SHOP ADMIN ROUTE ==================================
 // =============================================================================
 // Add a new product to the database.

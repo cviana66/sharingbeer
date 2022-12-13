@@ -1,7 +1,7 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-  
+
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;"> La prima volta in Sharing Beer </h3>
       <hr style="border-top: 1px solid #5375BD">
       <!-- show any messages that come back with authentication -->
@@ -30,7 +30,15 @@
           <div class="flex-row">
             <div ><img class="mx-auto d-block" src="img/allegri_con_boccali.png" style="height:100%;width:100%;margin-bottom:30px"></div>
             <div class="align-self-center">
-              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai <span style="font-size:1.2em;"> 1 birra offerta </span> sull'acquisto di un packaging da 4 <span style="float:right;"><a href="#" onclick="return openDocument('infoValidation')"><svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#5375BD"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></a></span>
+              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai <span style="font-size:1.2em;"> 1 birra offerta </span> sull'acquisto di un packaging da 4
+                <span style="float:right;">
+                  <a href="#" onclick="return openDocument('infoValidation')">
+                    <svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#5375BD">
+                      <path d="M0 0h24v24H0z" fill="none"/>
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                  </a>
+                </span>
               </p>
             </div>
           </div>
@@ -42,9 +50,9 @@
           <form role="form" action="/validation" method="post" autocomplete="off">
             <fieldset>
               <div class="form-group">
-                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Email</label> 
+                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Email</label>
                 <div style="color:#ffc107; font-size:0.9em;" id="wrongMail"></div>
-                <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">l'email identifica sia l'utente per l'accesso che l'inidrizzo di posta. Questa proposta è quella dell'inivito. Se la modifichi deve essere una email personale valida e da te accessibile.</p>             
+                <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">questo è l'indirizzo email proposto dalla persona che ti ha invitato, se vuoi modificarlo ricorda che deve essere una mail valida e sarà il tuo utente per gli accessi futuri</p>
                 <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{prospect.email}}" placeholder="your@email.address">
               </div>
               <div class="form-group">
@@ -54,7 +62,7 @@
               </div>
               <div class="form-group">
                 <label for="inputPassword" class="text-white col-form-label-lg">Crea una nuova Password</label>
-                <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p> 
+                <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p>
                 <div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd"></div>
                 <input type="password" class="form-control" id="inputPassword" name="password" required>
               </div>
@@ -68,16 +76,22 @@
                 <input class="form-check-input" type="checkbox" value="" id="checkPrivacy" />
                 <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacy">Accetto le <a href="#" onclick="return openDocument('condizioniVendita')"> Condizioni generali di vendita </a> e l'informativa sulla <a href="#" onclick="return openDocument('privacy')"> Privacy </a> di Sharing Beer </label>
               </div>
-              <div style="margin-top: 10px;">
-                <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsValidationControl()"> Accetto l'invito </button>
+
+              <div style="margin-top:10px;margin-bottom:10px">
+                <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsValidationControl()">
+                  Accetto l'invito
+                </button>
                 <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
+              </div>
+              <div class="form-group">
+               <p class="text-white font-weight-light text-center" style="font-size:0.7em;">L'accettazione NON ha vincoli ne obblighi di acquisto</p>
               </div>
             </fieldset>
           </form>
           <br>
         </div>
       </div>
-    
+
       <!--div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
         <div class="card-body">
           <h3 class="card-title text-white font-weight-light"> Una birra offerta </h3>
@@ -102,6 +116,6 @@
           <p class="card-text text-white font-weight-light">partecipa alla produzione di una cotta imparado l'arte della birrificazione</p>
         </div>
       </div-->
-   
+
 
 {% endblock %}

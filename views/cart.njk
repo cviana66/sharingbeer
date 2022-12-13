@@ -1,6 +1,201 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
+    <h3 class="text-white text-center bg-dark">Il tuo Carrello</h3>
+    <hr style="border-top: 1px solid #5375BD;">
 
- {% include "cartItems.njk"%} 
+    {% for prod in cart.items %}
+      <div class="row col-md-12 col-lg-12" >
 
+        <div class="col">
+          <p class="text-white text-left"> {{prod.name}} : nome della biarra e caratteristiche varie</p>
+        </div>
+      </div>
+
+      <div class="row align-items-center">
+        <div class="col">
+          <table class="mx-auto" style="width:100%;">
+            <tr>
+              <td>
+                <p class="text-white text-center font-weight-bold">{{prod.qty}}</p>
+              </td>
+              <td>
+                <p class="text-white text-center font-weight-normal">x</p>
+              </td>
+              <td>
+                <p class="text-white text-center font-weight-bold">{{prod.prettyPrice}} </p>
+              </td>
+            </tr>
+            <tr>
+              <td rowspan="2">
+                <div>
+                  <img class="img-responsive rounded mx-auto" src="http://placehold.it/80x100">
+                </div>
+              </td>
+              <td>
+                <form method="POST" action="cart/plus">
+                  <input type="hidden" name="item_id" value="{{prod.id}}">
+                  <input type="hidden" name="_csrf" value="{{_csrf}}">
+                  <button class="btn btn-link" type="submit">
+                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
+                      <path fill="#fff" d="M17,13H13V17H11V13H7V11H11V7H13V11H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z">
+                      </path>
+                      <title>Plus</title>
+                    </svg>
+                  </button>
+                </form>
+              </td>
+              <td>
+                <form method="POST" action="shop">
+                  <input type="hidden" name="item_id" value="{{prod.id}}">
+                  <input type="hidden" name="_csrf" value="{{_csrf}}">
+                  <button class="btn btn-link" type="submit">
+                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
+                      <path fill="#fff" d="M12,3A3,3 0 0,0 9,6H15A3,3 0 0,0 12,3M19,6A2,2 0 0,1 21,8V20A2,2 0 0,1 19,22H5C3.89,22 3,21.1 3,20V8C3,6.89 3.89,6 5,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6H19M9,19L16.5,14L9,10V19Z"></path>
+                      <title>Shop</title>
+                    </svg>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <form method="POST" action="cart/minus">
+                  <input type="hidden" name="item_id" value="{{prod.id}}">
+                  <input type="hidden" name="_csrf" value="{{_csrf}}">
+                  <button class="btn btn-link" type="submit">
+                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
+                      <path fill="#fff" d="M17,13H7V11H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"></path>
+                      <title>Minus</title>
+                    </svg>
+                  </button>
+                </form>
+              </td>
+              <td>
+                <form method="POST" action="cart/delete">
+                  <input type="hidden" name="item_id" value="{{prod.id}}">
+                  <input type="hidden" name="_csrf" value="{_csrf}">
+                  <button class="btn btn-link" type="submit">
+                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
+                      <path fill="#fff" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"></path>
+                      <title>Delete</title>
+                    </svg>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3">
+                <hr style="border-top: 1px solid #5375BD;">
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    {% endfor %}
+
+
+  {% if numProducts != 0 %}
+
+      <div>
+        <h4 class="text-white text-center">Total</h4>
+        <div>
+          <h4 class="text-white text-center"><strong>€{{totalPrice}}</strong></h4>
+        </div>
+    {% if userStatus != 'customer' %}
+      <form role="form" action="/register" method="GET">
+      <div style="margin-bottom: 40px;">
+        <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+          Procedi con l'acquisto
+        </button>
+      </div>
+      </form>
+    {% else %}
+        <!--
+          HELP and DOC
+          https://developer.paypal.com/docs/checkout/standard/integrate/
+        -->
+        <!-- Set up a container element for the button -->
+        <div id="paypal-button-container"></div>
+        <script>
+        // Render the PayPal button into #paypal-button-container
+          paypal.Buttons({
+            // Order is created on the server and the order id is returned
+            createOrder: (data, actions) => {
+                return fetch('/api/orders', {
+                    method: 'post'
+                })
+                .then((res) => {
+                    console.log('createOrder.res->',res);
+                    if (!res.ok) {
+                      return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
+                    } else {
+                      return res.json();
+                    }
+                })
+                .then((orderId) => {
+                    console.log('PAYPAL ORDER ID: ',orderId.id)
+                    return orderId.id;
+                })
+                .catch((e) => {
+                  console.error(e);
+                  return window.location.href = ("/infomessage?msg=Pagamento non effettuato&type=info");
+                });
+            },
+            // Call your server to finalize the transaction
+            onApprove: function(data, actions) {
+              return fetch('/api/orders/'+ data.orderID +'/capture', {
+                method: 'post',
+                })
+                .then(function(res) {
+                  console.log('onApprove.res->',res);
+                  if (!res.ok) {
+                    return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
+                  } else {
+                    return res.json();
+                  }
+                })
+                .then(function(orderData) {
+                  console.log(
+                  "Capture result",
+                  orderData,
+                  JSON.stringify(orderData, null, 2)
+                  );
+                  var transaction = orderData.purchase_units[0].payments.captures[0];
+                    window.location.href = ("/infomessage?msg=Transaction " +
+                    transaction.status +
+                    ": " +
+                    transaction.id +
+                    '&type=info');
+                  });
+            },
+            onError: function (err) {
+                  window.location.href = ("/infomessage?msg=Paypal ha risposto in modo anomalo&type=danger");
+            },
+            style: {
+                layout:  'vertical',
+                height:   48,
+                color:   'blue',
+                shape:   'rect',
+                label:   'paypal'
+            },
+          })
+          .render('#paypal-button-container');
+        </script>
+        <br>
+      {% endif %}
+      </div>
+  {% else %}
+    <div class="col">
+        <h4><p class="text-white text-center">Cart is empty... Go! to </p></h4>
+    </div>
+
+    <div class="col">
+      <form method="GET" action="/shop">
+        <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+          <h4>Shop</h4>
+        </button>
+        <br>
+     </form>
+   </div>
+  {% endif %}
 {% endblock %}

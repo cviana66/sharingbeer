@@ -165,3 +165,30 @@ color: #4e4e4e;
   margin:15px 0px 0px 0px;
   border-radius:6px 6px 6px 6px;
 }
+
+.square {
+  border: 5px solid white;
+  position: relative;
+  width: 50%;
+}
+
+.square {
+
+    border: 5px solid white;
+
+    text-align: center;
+
+    width: 30vw;
+
+    height: 30vw;
+
+  }
+
+
+  .content {
+
+    font-size: 2em;
+
+    padding-top: 20%;
+
+  }

@@ -37,16 +37,16 @@ const routesShop      = require('./app/routesShop.js');
 // friends registration ========================================================
 const routesRegister  = require('./app/routesRegister.js');
 
-// paypal v1 ===================================================================
-const routesPayment   = require('./app/routesPayment.js');
-const configPayPal    = require('./config/paypal.js');
+// QRCode ===================================================================
+const routesPayment   = require('./app/routesQrcode.js');
 
 // paypal v2 ===================================================================
-const routesPaypal    = require('./app/routesPaypalV2');
+const routesPaypal    = require('./app/routesPaypal');
 
 // passport ====================================================================
 const pass            = require('./config/passport');
 
+global.debug = true;
 
 //global.cost = 3;
 
@@ -66,7 +66,7 @@ global.fourBottleBoozeEquivalent  = 48;
 
 global.mktBoozeXParent = 1;
 global.mktBoozeXFriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato
-global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent/global.mktBoozeXfriends;
+global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent / global.mktBoozeXFriends;
 
 
 /*  =======================================================================
@@ -75,7 +75,7 @@ global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent/global
 if (process.env.NODE_ENV== "development") {
   global.server = "http://localhost:8080";
 } else if (process.env.NODE_ENV == "production") {
-  global.server = "https://www.sharingbeer.com/";
+  global.server = "https://www.sharingbeer.com";
 }
 
 
@@ -170,7 +170,6 @@ var SharingBeer = function() {
      */
     self.initializeServer = function() {
         self.app = express();
-        paypal.configure(configPayPal.api);
 
         db.on('error', err => {
           console.error(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err);

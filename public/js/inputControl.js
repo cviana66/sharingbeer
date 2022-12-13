@@ -14,7 +14,7 @@ function fieldLoginControl(){
   } else {
     return false;
   }
-}; 
+};
 
 function fieldsValidationControl() {
   document.getElementById("wrongMail").innerHTML = "";
@@ -30,9 +30,17 @@ function fieldsValidationControl() {
     return false;
   };
 
-  var pwd1 = document.getElementById("inputPassword").value;
-  var pwd2 = document.getElementById("confirmPassword").value;
-  
+  let pwd1 = "";
+  let pwd2 = "";
+  if (document.getElementById("inputPassword") != null) {
+    pwd1 = document.getElementById("inputPassword").value;
+  }
+  if (document.getElementById("confirmPassword") != null) {
+    pwd2 = document.getElementById("confirmPassword").value;
+  } else { // per gestire il caso in cui non ci sia la PWD di conferma
+    pwd2 = pwd1
+  }
+
   if(pwd1 != "") {
     if(pwd1.length < 6) {
       document.getElementById("wrongPwd").innerHTML = "Password must contain at least six characters";
@@ -61,13 +69,13 @@ function fieldsValidationControl() {
       document.getElementById("wrongPwd").innerHTML = "Password must contain at least one uppercase letter";
       document.getElementById("inputPassword").focus();
       return false;
-    } 
+    }
     var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
       document.getElementById("wrongPwd").innerHTML = "Password must contain at least one special character";
       document.getElementById("inputPassword").focus();
       return false;
-    } 
+    }
   } else {
     document.getElementById("wrongPwd").innerHTML = "create a Password";
     document.getElementById("inputPassword").focus();
@@ -81,7 +89,6 @@ function fieldsValidationControl() {
     document.getElementById("wrongPrivacy").innerHTML = "spunta la casella di controllo per accettare le condizioni";
     return false;
   }
-
   return true;
 }
 
@@ -91,7 +98,7 @@ function fieldsResetControl() {
 
   var pwd1 = document.getElementById("inputPassword").value;
   var pwd2 = document.getElementById("confirmPassword").value;
-  
+
   if(pwd1 != "") {
     if(pwd1.length < 6) {
       document.getElementById("wrongPwd").innerHTML = "Password must contain at least six characters";
@@ -120,13 +127,13 @@ function fieldsResetControl() {
       document.getElementById("wrongPwd").innerHTML = "Password must contain at least one uppercase letter";
       document.getElementById("inputPassword").focus();
       return false;
-    } 
+    }
     var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
       document.getElementById("wrongPwd").innerHTML = "Password must contain at least one special character";
       document.getElementById("inputPassword").focus();
       return false;
-    } 
+    }
     if(pwd1!=pwd2) {
       document.getElementById("wrongPwd2").innerHTML = "Password are different ";
       document.getElementById("confirmPassword").focus();
@@ -149,21 +156,21 @@ function fieldsRegisterControl() {
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
   var submit = true;
-  
+
   if (phone == "" || !phone.match(phoneno)) {
     text = "Please provide a valid mobile phone. ";
     document.getElementById("wrongPhone").innerHTML = text;
     submit = false;
   } else {
     document.getElementById("wrongPhone").innerHTML = "";
-  } 
+  }
   if (city == "") {
     text = "Please provide a valid City";
     document.getElementById("wrongCity").innerHTML = text;
     submit = false;
   } else {
     document.getElementById("wrongCity").innerHTML = "";
-  } 
+  }
   if (cap == "" || !cap.match(capno)) {
     text = "Please provide a valid CAP ";
     document.getElementById("wrongCap").innerHTML = text;
