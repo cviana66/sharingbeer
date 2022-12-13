@@ -119,13 +119,17 @@ function selectCity (v) {
           select.setAttribute('id','myselect');
           select.setAttribute('class','form-control');
           select.setAttribute('onchange','selectCaps(this);');
+
+
           let size = res.length
           if (size >= 10) size = 10;
           select.setAttribute('size',size);
+          select.setAttribute('style','-webkit-appearance: menulist-button; height:'+22*size+'px;');
           console.log('size=',size)
           if (size < 2) {
             size = 2;
             select.setAttribute('size',size);
+            select.setAttribute('style','-webkit-appearance: menulist-button; height:'+22*size+'px;');
             option = document.createElement('option');
             option.value = "";
             option.appendChild(document.createTextNode(""));
