@@ -19,9 +19,6 @@ module.exports = function(app) {
 
 app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
 
-
-// TODO ingaggiare la registrazione completa /Register
-  //var jsonsItems = new Array();
   var cart = req.session.cart;
   req.session.order = {};
 
@@ -104,10 +101,10 @@ app.post('/api/orders/:orderID/capture', lib.isLoggedIn, async function(req, res
 /*
 
 
-    if (captureData.status === 'payed') {
+    if (captureData.status === 'COMPLETED') {
         // add Friends after buy
 
-        Order.countDocuments({ email:req.user.email, status:"payed" }, function (err, numberPurchases) {
+        Order.countDocuments({ email:req.user.email, status:"COMPLETED" }, function (err, numberPurchases) {
 
           // iniviti possibili = N° acquisiti / Booze destinatia al marketing per ogni PKGx4 aquistato
 
@@ -147,17 +144,7 @@ app.post('/api/orders/:orderID/capture', lib.isLoggedIn, async function(req, res
           });
         });
      }
-  } catch (err) {
-
-    // 5. Handle any errors from the call
-    console.error('Handle any errors from the call:',err);
-    return res.sendStatus(500);
-  }
-
-  // 6. Return a successful response to the client
-  console.log('Return a successful response to the client \n',capture);
-  res.status(200).json({orderData: capture});
-  */
+*/
 });
 
 } //FINE APP
