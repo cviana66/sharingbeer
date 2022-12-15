@@ -28,21 +28,24 @@ $('body').on('click','#myselect li a',function(){
 
 $('body').on('click','#myselectcaps li a',function(){
       console.log('CAP: ',$(this).text());
-      selectCap(this);
+      //selectCap(this);
+      $("#myselectcaps").hide();
+      $('#myselect').hide();
+      document.getElementById('inputCap').value = selectCap.text;
 });
-
+/*
 function selectCap(selectCap) {
     $("#myselectcaps").hide();
     document.getElementById('inputCap').value = selectCap.text;
 }
-
+*/
 function selectCaps(selectCity) {
   $('#myselect').hide();
   document.getElementById("inputCity").value = selectCity.text;
   document.getElementById("inputCap").focus();
   let data = {};
   data.city = selectCity.text;
-  /* Recuper i CAP della città selezionata da MongoDB */
+  /* Recuper i CAP della città seledocument.getElementById("inputCap").focus();zionata da MongoDB */
   $.ajax({
     type: 'POST',
     dataType: 'json',
@@ -55,14 +58,13 @@ function selectCaps(selectCity) {
         let size = res.length;
 
         if ( size == 1 ) {
-          inputCap.value = res[0].CAP;
+          document.getElementById("inputCap").value = res[0].CAP;
+          $("#myselectcaps").hide();
+          $('#myselect').hide();
         } else {
           selectcaps.setAttribute('id','myselectcaps');
           selectcaps.setAttribute('class','form-control');
           selectcaps.setAttribute('style','list-style-type: none;');
-
-          if (size >= 10) size = 10;
-          selectcaps.setAttribute('size',size);
 
           for (var i=0; i < res.length; i += 1) {
             option = document.createElement('li');
@@ -88,6 +90,7 @@ function selectCaps(selectCity) {
 }
 
 function selectCity (v) {
+  document.getElementById("inputCity").focus();
   var vl = v.toLowerCase();
 /*  Per ottimizzare le chiamate al DB  solo le citta con 2 caratteri sono permesse */
   if (vl.length > 2 || vl =='lu' || vl =='ne' || vl =='re' || vl =='ro') {
@@ -102,17 +105,13 @@ function selectCity (v) {
       data: data,
       success: function(res) {
         if (typeof res !== 'undefined' && res.length > 0) {
-          /* Creo la select option con elenco delle città in modo dinamico */
+          /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
           let select = document.createElement('ul');
           let size = res.length;
 
           select.setAttribute('id','myselect');
           select.setAttribute('class','form-control');
           select.setAttribute('style','list-style-type: none;');
-
-          if (size >= 10) size = 10;
-          select.setAttribute('size',size);
-          console.log('size=',size)
 
           for (var i = 0; i <res.length; i += 1) {
               let option = document.createElement('li');
@@ -123,11 +122,9 @@ function selectCity (v) {
               option.appendChild(a);
               select.appendChild(option);
           };
-
           $("#cities").html(select);
 
         } else {
-
           if (document.getElementById('myselect') != null) {
             document.getElementById('myselect').remove();
           }
@@ -135,17 +132,16 @@ function selectCity (v) {
             document.getElementById('myselectcaps').remove();
           }
         }
-        inputCap.value=null; //se modifico la città, setto a null il CAP
+        document.getElementById('inputCap').value = null
+        //inputCap.value=null; //se modifico la città, setto a null il CAP
       },
 
       error: function (e) {
         console.log("Error", e);
       }
     });
-
   } else {
-
-    inputCap.value=null;
+    document.getElementById('inputCap').value = null
     if (document.getElementById('myselect') != null) {
       document.getElementById('myselect').remove();
     }
