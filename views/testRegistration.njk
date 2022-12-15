@@ -19,11 +19,7 @@
 
 $('body').on('click','#myselect li a',function(){
       console.log('COMUNE di ',$(this).text());
-      //var comune = $(this).text();
-      //$('#inputCity').val(comune);
-      //console.log('this',this);
       selectCaps(this);
-      //var comune = null;
 });
 
 $('body').on('click','#myselectcaps li a',function(){
@@ -33,12 +29,7 @@ $('body').on('click','#myselectcaps li a',function(){
       $('#myselect').hide();
       document.getElementById('inputCap').value = selectCap.text;
 });
-/*
-function selectCap(selectCap) {
-    $("#myselectcaps").hide();
-    document.getElementById('inputCap').value = selectCap.text;
-}
-*/
+
 function selectCaps(selectCity) {
   $('#myselect').hide();
   document.getElementById("inputCity").value = selectCity.text;
