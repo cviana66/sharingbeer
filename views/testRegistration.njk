@@ -10,50 +10,38 @@
         {% endfor %}
       {% endif %}
 
-      <form role="form" action="/register" method="post">
 
-
-        <div class="form-group">
-          <div ><label for="inputCity" class="text-white col-form-label-lg">Comune</label></div>
-          <div style="color:yellow; font-size:80%;" id="wrongCity"></div>
-          <input type="text" class="form-control" id="inputCity" value="{{city}}"
-           name="city" placeholder="" autocomplete="off" required oninput="selectCity(this.value)"/>
-          <div class="w-100"></div>
-          <div id="cities"></div>
-        </div>
-
-        <div class="form-group">
-          <div "><label for="inputCap" class="text-white col-form-label-lg">CAP</label></div>
-          <div style="color:yellow; font-size:80%;" id="wrongCap"></div>
-          <input type="text" class="form-control" id="inputCap" value="{{cap}}" name="cap" required readonly>
-          <div class="w-100"></div>
-          <div id="caps"></div>
-        </div>
-
-      </form>
-      <br>
 
 <script type="text/javascript">
 /*==================================================================*/
 /* GESTIONE della CITTA' e CAP con recupero da MONGODB              */
 /*==================================================================*/
 
-function hideMyselect(select) {
-   document.getElementById(select).style.visibility= 'hidden';
-   document.getElementById("inputCap").focus();
-}
+$('body').on('click','#myselect li a',function(){
+      console.log('COMUNE di ',$(this).text());
+      //var comune = $(this).text();
+      //$('#inputCity').val(comune);
+      //console.log('this',this);
+      selectCaps(this);
+      //var comune = null;
+});
+
+$('body').on('click','#myselectcaps li a',function(){
+      console.log('CAP: ',$(this).text());
+      selectCap(this);
+});
 
 function selectCap(selectCap) {
     $("#myselectcaps").hide();
-    document.getElementById('inputCap').value = selectCap.value;
+    document.getElementById('inputCap').value = selectCap.text;
 }
 
 function selectCaps(selectCity) {
   $('#myselect').hide();
-  document.getElementById("inputCity").value = selectCity.value;
+  document.getElementById("inputCity").value = selectCity.text;
   document.getElementById("inputCap").focus();
   let data = {};
-  data.city = selectCity.value;
+  data.city = selectCity.text;
   /* Recuper i CAP della città selezionata da MongoDB */
   $.ajax({
     type: 'POST',
@@ -63,26 +51,28 @@ function selectCaps(selectCity) {
     success: function(res) {
       /* Creo la select option con elenco dei CAP se multipli e dinamicamente */
       if (typeof res !== 'undefined' && res.length > 0) {
-        let selectcaps = document.createElement('select'),
-            option= null,
-            size = res.length;
+        let selectcaps = document.createElement('ul');
+        let size = res.length;
 
         if ( size == 1 ) {
           inputCap.value = res[0].CAP;
-          //document.getElementById("inputAddress").focus();
         } else {
           selectcaps.setAttribute('id','myselectcaps');
           selectcaps.setAttribute('class','form-control');
-          selectcaps.setAttribute('onchange','selectCap(this);');
+          selectcaps.setAttribute('style','list-style-type: none;');
 
           if (size >= 10) size = 10;
           selectcaps.setAttribute('size',size);
 
           for (var i=0; i < res.length; i += 1) {
-            option = document.createElement('option');
-            option.appendChild(document.createTextNode(res[i].CAP));
+            option = document.createElement('li');
+            a = document.createElement('a');
+            a.textContent = res[i].CAP;
+            a.setAttribute('href',"javascript:void(0)");
+            option.appendChild(a);
             selectcaps.appendChild(option);
           };
+
           $("#caps").html(selectcaps);
         }
       } else {
@@ -113,37 +103,29 @@ function selectCity (v) {
       success: function(res) {
         if (typeof res !== 'undefined' && res.length > 0) {
           /* Creo la select option con elenco delle città in modo dinamico */
-          var select = document.createElement('select'),
-              option= null;
+          let select = document.createElement('ul');
+          let size = res.length;
 
           select.setAttribute('id','myselect');
           select.setAttribute('class','form-control');
-          select.setAttribute('onchange','selectCaps(this);');
+          select.setAttribute('style','list-style-type: none;');
 
-
-          let size = res.length
           if (size >= 10) size = 10;
           select.setAttribute('size',size);
-          select.setAttribute('style','-webkit-appearance: menulist-button; height:'+22*size+'px;');
           console.log('size=',size)
-          if (size < 2) {
-            size = 2;
-            select.setAttribute('size',size);
-            select.setAttribute('style','-webkit-appearance: menulist-button; height:'+22*size+'px;');
-            option = document.createElement('option');
-            option.value = "";
-            option.appendChild(document.createTextNode(""));
-            select.appendChild(option);
-          }
 
           for (var i = 0; i <res.length; i += 1) {
-              option = document.createElement('option');
-              option.value = res[i].Comune;
-              option.appendChild(document.createTextNode(res[i].Comune+'('+res[i].Provincia+')'));
+              let option = document.createElement('li');
+              a = document.createElement('a');
+              //a.textContent = res[i].Comune+'('+res[i].Provincia+')';
+              a.textContent = res[i].Comune;
+              a.setAttribute('href',"javascript:void(0)");
+              option.appendChild(a);
               select.appendChild(option);
           };
 
           $("#cities").html(select);
+
         } else {
 
           if (document.getElementById('myselect') != null) {
@@ -172,7 +154,29 @@ function selectCity (v) {
     }
   }
 };
-
 </script>
+
+<form role="form" action="/register" method="post">
+
+
+  <div class="form-group">
+    <div ><label for="inputCity" class="text-white col-form-label-lg">Comune</label></div>
+    <div style="color:yellow; font-size:80%;" id="wrongCity"></div>
+    <input type="text" class="form-control" id="inputCity" value="{{city}}"
+     name="city" placeholder="" autocomplete="off" required oninput="selectCity(this.value)"/>
+    <div class="w-100"></div>
+    <div id="cities"></div>
+  </div>
+
+  <div class="form-group">
+    <div "><label for="inputCap" class="text-white col-form-label-lg">CAP</label></div>
+    <div style="color:yellow; font-size:80%;" id="wrongCap"></div>
+    <input type="text" class="form-control" id="inputCap" value="{{cap}}" name="cap" required readonly>
+    <div class="w-100"></div>
+    <div id="caps"></div>
+  </div>
+
+</form>
+<br>
 
 {% endblock %}

@@ -33,6 +33,13 @@ module.exports = function(app) {
           });
     });
 
+    app.get('/test2', function(req, res) {
+
+          res.render('testRegistration2.njk', {
+              // get the user out of session and pass to template
+          });
+    });
+
     app.get('/qrq', function(req, res) {
 
           res.render('square.njk', {
