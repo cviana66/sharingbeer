@@ -18,6 +18,9 @@ const cons          = require('consolidate');
 const moment        = require("moment");
 const env           = require('node-env-file'); // si può usare anche il pkg dotenv
 
+const fastcsv       = require("fast-csv");
+
+
 // config environment variables
 env(__dirname + '/.env');
 
@@ -38,7 +41,7 @@ const routesShop      = require('./app/routesShop.js');
 const routesRegister  = require('./app/routesRegister.js');
 
 // QRCode ===================================================================
-const routesPayment   = require('./app/routesQrcode.js');
+const routesQrcode   = require('./app/routesQrcode.js');
 
 // paypal v2 ===================================================================
 const routesPaypal    = require('./app/routesPaypal');
@@ -51,14 +54,14 @@ global.debug = true;
 //global.cost = 3;
 
 /*  =======================================================================
-/*  Settings Booze
+    Settings Booze
 
     1 bottiglia ogni  12  booze
     2 bottiglie ogni  24  booze
     3 bottiglie ogni  36  booze
     4 bottiglie ogni  48  booze
 
-/*  ======================================================================= */
+   ======================================================================= */
 global.oneBottleBoozeEquivalent   = 12;
 global.twoBottleBoozeEquivalent   = 24;
 global.threeBottleBoozeEquivalent = 36;
@@ -115,7 +118,7 @@ var SharingBeer = function() {
     /**
      *  Set up server IP address and port # using env variables/defaults.
      */
-    self.setupVariables = function() {
+    self.setupVariables = function() {const moment = require("moment");
         //  Set the environment variables we need.
         self.port = process.env.PORT;
         console.info(moment().format()+' [INFO] SERVER PORT: '+self.port);
@@ -160,8 +163,8 @@ var SharingBeer = function() {
     self.createRoutes = function() {
         routesAuth(self.app, passport);
         routesShop(self.app);
-        routesRegister(self.app);
-        routesPayment(self.app, paypal, qr, fs);
+        routesRegister(self.app, db, moment, mongoose, fastcsv, fs, util);
+        routesQrcode(self.app, qr);
         routesPaypal(self.app);
     };
 

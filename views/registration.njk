@@ -18,7 +18,7 @@
         </div>
         <div class="form-group">
           <input type="text" class="form-control" id="inputLastName" value="{{lastName}}"
-           name="lastName" placeholder="Cognome">
+           name="lastName" placeholder="Cognome" autofocus required>
         </div>
         <div class="form-group">
           <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div>
@@ -28,7 +28,7 @@
               <span class="input-group-text" id="basic-addon1">+39</span>
             </div>
             <input type="text" class="form-control" id="inputMobile" value="{{mobile}}"
-             name="mobile" placeholder="" autofocus required>
+             name="mobile" placeholder="" required>
           </div>
         </div>
         <div class="form-group">
@@ -79,7 +79,7 @@ $('body').on('click','#myselectcaps li a',function(){
       //selectCap(this);
       $("#myselectcaps").hide();
       $('#myselect').hide();
-      document.getElementById('inputCap').value = selectCap.text;
+      document.getElementById('inputCap').value = $(this).text();
 });
 
 function selectCaps(selectCity) {

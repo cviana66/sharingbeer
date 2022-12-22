@@ -2,7 +2,7 @@
 // ATTENZIONE!!!! Modulo utilizzato solo per la parte QrCode //
 ///////////////////////////////////////////////////////////////
 
-module.exports = function(app, paypal, qr, fs) {
+module.exports = function(app, qr) {
 
   var lib     = require('./libfunction');
 /*

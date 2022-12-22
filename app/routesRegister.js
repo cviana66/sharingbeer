@@ -7,6 +7,7 @@
 var User = require('../app/models/user');
 var Friend = require('../app/models/friend');
 var CityCap = require('../app/models/cityCap');
+var CityIstat = require('../app/models/cityIstat');
 var MultipleCap = require('../app/models/multipleCap');
 var Address = require('../app/models/address')
 var bcrypt = require('bcrypt-nodejs');
@@ -16,53 +17,86 @@ var lib = require('./libfunction');
 var mailfriend = require('../config/mailFriend');
 var mailparent = require('../config/mailParent');
 
-const moment = require("moment");
-const db = require('../config/database.js');
-const mongoose = require('mongoose');
+const https = require('https');
 
-const assert = require('assert');
+//const assert = require('assert');
 
-module.exports = function(app) {
-
+module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
     // TESTING
     app.get('/test', function(req, res) {
-
-          res.render('testRegistration.njk', {
-              // get the user out of session and pass to template
-          });
-    });
-
-    app.get('/test2', function(req, res) {
-
-          res.render('testRegistration2.njk', {
-              // get the user out of session and pass to template
+          req.session.elements = [];
+          res.render('testRegistrationV2.njk', {
           });
     });
 
     app.get('/qrq', function(req, res) {
-
           res.render('square.njk', {
-              // get the user out of session and pass to template
           });
     });
 
-    //===================================================
+// =====================================
+// API =================================
+// =====================================
+//https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv
+//https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx
 
-    // =====================================
-    // API =================================
-    // =====================================
+    app.post('/overpass/:istat', function(req, res) {
+
+      option = '[out:json][timeout:10];'+
+               'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.params.istat+'"];' +
+               'way(area)[highway][name];'+
+               'for (t["name"])(make x name=_.val;out;);'
+
+      const url = 'https://overpass-api.de/api/interpreter?data='+option;
+
+      console.log(option);
+
+      const request = https.request(url, (response) => {
+          let data = '';
+          response.on('data', (chunk) => {
+              data = data + chunk.toString();
+          });
+
+          response.on('end', () => {
+              const parseJSON = JSON.parse(data);
+              const elements = parseJSON.elements;
+              req.session.elements = elements;
+              console.log(req.session.elements);
+              res.send('{"status":"200", "statusText":"OK"}');
+
+          });
+      })
+      request.on('error', (error) => {
+          console.log('An error', error);
+            res.send('{"status":"500","statusText":'+error+'"}');
+      });
+      request.end()
+    });
+
+    app.post('/streets', function(req, res) {
+        var rates = req.session.elements;
+        var index, value, result;
+        var newArr = [];
+        for (index = 0; index < rates.length; ++index) {
+            name = rates[index].tags.name.toLowerCase();
+            if (name.indexOf(req.body.street.toLowerCase()) != -1) {
+                newArr.push(rates[index].tags.name);
+            }
+        }
+        res.send(newArr);
+    });
 
     app.post('/cities', function(req, res) {
-        //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
-        //res.render('validation.dust', { message: req.flash('validation') });
+        req.session.elements = [];
         console.log("city : ", req.body.city);
-        CityCap.find({
-            'Comune': new RegExp('^' + req.body.city,"i")
-        }, function(err, city) {
-            console.log("Got city : ", city);
-            res.send(city)
-        })
+        CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},
+                     null,
+                     {sort: {Comune: 1}},
+                     function(err, city) {
+                       console.log("Got city : ", city);
+                       res.send(city)
+                     })
     });
 
     app.post('/caps', function(req, res) {
@@ -73,18 +107,56 @@ module.exports = function(app) {
             'Comune': req.body.city
         }).sort('CAP').exec(function(err, caps) {
             if (caps.length == 0) {
-                CityCap.find({
-                    'Comune': req.body.city
-                }, function(err, cap) {
-                    console.log('CAP: ', cap);
-                    res.send(cap)
-                })
+                CityCap.find({'Comune': req.body.city},
+                              null,
+                              {sort: {Comune: 1}},
+                              function(err, cap) {
+                                  console.log('CAP: ', cap);
+                                  res.send(cap)
+                              });
             } else {
                 console.log('CAPS: ', caps);
                 res.send(caps)
             }
         });
     });
+
+//------------------------------------------------------------------------------
+// UTILITY per importare i Comuni Italiani
+//------------------------------------------------------------------------------
+    app.get('/importCityIstat/:csvname', (req,res,next) => {
+      console.log('PARAM: ',req.params.csvname);
+      let stream = fs.createReadStream('./data/'+ req.params.csvname +'.csv');
+      let csvData = [];
+      let csvStream = fastcsv
+        .parse()
+        .on("data", function(data) {
+          csvData.push({
+            Istat: data[0],
+            Comune: data[1],
+            ZonaGeo: data[2],
+            Regione: data[3],
+            Provincia: data[4],
+            SiglaAuto: data[5],
+            CodCatasto: data[6]
+          });
+        })
+        .on("end", function() {
+          // remove the first line: header
+          csvData.shift();
+
+          console.log(csvData);
+
+          CityIstat.insertMany(csvData, (err, res) => {
+            if (err) throw err;
+            numDocInserted = res.length;
+            console.log('Inserted: '+ res.length);
+          });
+
+       });
+       stream.pipe(csvStream);
+       res.send('Collection CityIstat');
+     });
 
     // =====================================
     // TOKEN VALIDATION ========= 05-01-2022
@@ -100,25 +172,22 @@ module.exports = function(app) {
                 $gt: Date.now()
             }
         }, function(err, user) {
-
             if (err) {
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired'
                 req.flash('error', msg);
                 console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                 return res.render('info.njk', {
                     message: req.flash('error'),
-                    type: "danger"
+                    type: "warming"
                 });
-
             }
-
             if (!user) {
                 let msg = 'Invito non più valido o scaduto'; //Invitation is invalid or has expired';
                 req.flash('info', msg);
                 console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                 res.render('info.njk', {
                     message: req.flash('info'),
-                    type: "danger"
+                    type: "warning"
                 });
             } else {
                 res.render('validation.njk', {
@@ -132,14 +201,12 @@ module.exports = function(app) {
     });
     //POST
     app.post('/validation', function(req, res) {
-
         User.findOne({
             resetPasswordToken: req.body.token,
             resetPasswordExpires: {
                 $gt: Date.now()
             }
         }, function(err, user) {
-
             if (err) {
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
                 req.flash('error', msg);
@@ -149,7 +216,6 @@ module.exports = function(app) {
                     message: req.flash('error'),
                     type: "danger"
                 });
-
             } else {
 
                 // TODO Validare i dati inseriti lato SERVER perchè potrebbero essere stati disabilitati i Javascript lato CLIENT
@@ -173,13 +239,14 @@ module.exports = function(app) {
                 user.status = 'validated';
                 user.resetPasswordToken = undefined;
                 user.resetPasswordExpires = undefined;
+                ///////////////////////////////////////////////
                 user.booze += global.oneBottleBoozeEquivalent;
-
+                ///////////////////////////////////////////////
                 user.save(function(err) {
                     if (err) {
                         let msg = 'Something bad happened! Validation faild';
                         req.flash('error', msg);
-                        console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + err + ' FLASH: ' + msg);
+                        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + err + ' FLASH: ' + msg);
                         return res.render('info.njk', {
                             message: req.flash('error'),
                             type: "danger"
@@ -198,7 +265,7 @@ module.exports = function(app) {
                                 let msg = 'Invito accettato e autenticato'; //'Validated and Logged';
                                 req.flash('success', msg);
                                 console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
-                                res.render('profile.njk', {
+                                res.render('shop.njk', {
                                     message: req.flash('success'),
                                     user: user,
                                     type: "success"

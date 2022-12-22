@@ -19,7 +19,7 @@
 
 $('body').on('click','#myselect li a',function(){
       console.log('COMUNE di ',$(this).text());
-      selectCaps(this);
+      selectCaps(this.text);
 });
 
 $('body').on('click','#myselectcaps li a',function(){
@@ -27,15 +27,16 @@ $('body').on('click','#myselectcaps li a',function(){
       //selectCap(this);
       $("#myselectcaps").hide();
       $('#myselect').hide();
-      document.getElementById('inputCap').value = selectCap.text;
+      document.getElementById('inputCap').value = $(this).text();
 });
 
 function selectCaps(selectCity) {
+  console.log('CITTA: ',selectCity);
   $('#myselect').hide();
-  document.getElementById("inputCity").value = selectCity.text;
+  document.getElementById("inputCity").value = selectCity;
   document.getElementById("inputCap").focus();
   let data = {};
-  data.city = selectCity.text;
+  data.city = selectCity;
   /* Recuper i CAP della città seledocument.getElementById("inputCap").focus();zionata da MongoDB */
   $.ajax({
     type: 'POST',
@@ -99,6 +100,12 @@ function selectCity (v) {
           /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
           let select = document.createElement('ul');
           let size = res.length;
+          let citta = document.getElementById("inputCity").value.toLowerCase();
+          console.log('citta=',citta);
+          console.log('Comune',res[0].Comune.toLowerCase());
+
+          if (size == 1 && citta == res[0].Comune.toLowerCase()) selectCaps(res[0].Comune);
+          //this.text=res[0].Comune;
 
           select.setAttribute('id','myselect');
           select.setAttribute('class','form-control');
