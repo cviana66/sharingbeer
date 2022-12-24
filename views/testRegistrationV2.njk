@@ -37,14 +37,18 @@ $('body').on('click','#myselectcaps li a',function(){
 });
 */
 function setValueCity(comune, provincia, istat) {
-  $('#myselect').hide();
+  if (document.getElementById('myselect') != null) {
+    document.getElementById('myselect').remove();
+  };
   document.getElementById("inputCity").value = comune;
   document.getElementById("inputProvincia").value = provincia;
   listOfStreets(comune,istat);
 }
 
 function setValueStreet(via) {
-  $('#myselectstreet').hide();
+  if (document.getElementById('myselectstreet') != null) {
+    document.getElementById('myselectstreet').remove();
+  };
   console.log('SETVALUESTREET');
   document.getElementById("inputStreet").value = via;
 }
@@ -103,7 +107,9 @@ function selectCaps(selectCity) {
 function listOfStreets(citta,istat) {
   console.log('CITTA: ',citta);
   console.log('ISTAT: ',istat);
-  $('#myselect').hide();
+  if (document.getElementById('myselect') != null) {
+    document.getElementById('myselect').remove();
+  };
   document.getElementById("inputCity").value = citta;
   document.getElementById("inputStreet").focus();
   document.getElementById('inputStreet').removeAttribute('readonly');
@@ -131,7 +137,7 @@ function selectCity(v) {
   if (vl.length > 2 || vl =='lu' || vl =='ne' || vl =='re' || vl =='ro') {
 
     var data = {};
-    data.city = v;
+    data.city = vl;
 /* Seleziono la città con API che ricerca su MongoDB */
     $.ajax({
       type: 'POST',
@@ -203,9 +209,6 @@ function selectCity(v) {
     if (document.getElementById('myselect') != null) {
       document.getElementById('myselect').remove();
     }
-    //if (document.getElementById('myselectcaps') !=null) {
-    //  document.getElementById('myselectcaps').remove();
-    //}
     if (document.getElementById('myselectstreet') !=null) {
       document.getElementById('myselectstreet').remove();
     }
@@ -216,7 +219,7 @@ function selectStreet (v) {
   let vl = v.toLowerCase();
   if (vl.length > 2) {
     let data = {};
-    data.street = v;
+    data.street = vl;
     $.ajax({
       type: 'POST',
       dataType: 'json',
