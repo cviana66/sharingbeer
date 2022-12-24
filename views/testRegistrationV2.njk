@@ -131,14 +131,11 @@ function listOfStreets(citta,istat) {
 }
 
 function selectCity(v) {
-
   let vl = v.toLowerCase();
   document.getElementById('inputStreet').setAttribute('readonly', true);
   if (vl.length > 2 || vl =='lu' || vl =='ne' || vl =='re' || vl =='ro') {
-
     var data = {};
     data.city = vl;
-/* Seleziono la città con API che ricerca su MongoDB */
     $.ajax({
       type: 'POST',
       dataType: 'json',
@@ -159,6 +156,9 @@ function selectCity(v) {
           if (size == 1 && citta == city) {
             document.getElementById("inputCity").value = res[0].Comune;
             document.getElementById("inputProvincia").value = res[0].Provincia;
+            if (document.getElementById('myselect') != null) {
+              document.getElementById('myselect').remove();
+            }
             listOfStreets(res[0].Comune,res[0].Istat);
             return;
           }
@@ -185,9 +185,6 @@ function selectCity(v) {
           if (document.getElementById('myselect') != null) {
             document.getElementById('myselect').remove();
           }
-          //if (document.getElementById('myselectcaps') !=null) {
-          //  document.getElementById('myselectcaps').remove();
-          //}
           if (document.getElementById('myselectstreet') !=null) {
             document.getElementById('myselectstreet').remove();
           }
@@ -240,6 +237,9 @@ function selectStreet (v) {
 //------------------------------------------------------------------------------
           if (size == 1 && via == street) {
             document.getElementById("inputStreet").value = res[0];
+            if (document.getElementById('myselectstreet') != null) {
+              document.getElementById('myselectstreet').remove();
+            }
             setValueStreet(res[0]);
             return
           }
