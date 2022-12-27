@@ -192,7 +192,6 @@ function selectCity(v) {
         //document.getElementById('inputCap').value = null;
         document.getElementById('inputProvincia').value = null;
         document.getElementById('inputStreet').value = null;
-
       },
 
       error: function (e) {
@@ -200,15 +199,18 @@ function selectCity(v) {
       }
     });
   } else {
+    console.log('vl.length = ',vl.length);
     //document.getElementById('inputCap').value = null;
     document.getElementById('inputProvincia').value = null;
     document.getElementById('inputStreet').value = null;
     if (document.getElementById('myselect') != null) {
       document.getElementById('myselect').remove();
-    }
+    };
     if (document.getElementById('myselectstreet') !=null) {
       document.getElementById('myselectstreet').remove();
-    }
+    };
+    if (vl.length==0) window.location.reload();
+
   }
 };
 
