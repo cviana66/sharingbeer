@@ -43,7 +43,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
     app.post('/overpass/:istat', function(req, res) {
 
-      option = '[out:json][timeout:10];'+
+      option = '[out:json];'+
                'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.params.istat+'"];' +
                'way(area)[highway][name];'+
                'for (t["name"])(make x name=_.val;out;);'
@@ -87,7 +87,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
         res.send(newArr);
     });
 
-    app.post('/cities', function(req, res) {
+    app.post('/cities',  function(req, res) {
         req.session.elements = [];
         console.log("city : ", req.body.city);
         CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},

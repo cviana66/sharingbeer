@@ -150,8 +150,7 @@ function fieldsResetControl() {
 function fieldsRegisterControl() {
   var phone = document.getElementById("inputMobile").value.replace(/\W+/g, '');
   var city = document.getElementById("inputCity").value;
-  var cap = document.getElementById("inputCap").value;
-  var address = document.getElementById("inputAddress").value;
+  var address = document.getElementById("inputStreet").value;
   var numciv = document.getElementById("inputNumciv").value;
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
@@ -171,19 +170,12 @@ function fieldsRegisterControl() {
   } else {
     document.getElementById("wrongCity").innerHTML = "";
   }
-  if (cap == "" || !cap.match(capno)) {
-    text = "Please provide a valid CAP ";
-    document.getElementById("wrongCap").innerHTML = text;
-    submit = false;
-  } else {
-    document.getElementById("wrongCap").innerHTML = "";
-  }
   if (address == "") {
     text = "Please provide a valid address";
-    document.getElementById("wrongAddress").innerHTML = text;
+    document.getElementById("wrongStreet").innerHTML = text;
     submit = false;
   } else {
-    document.getElementById("wrongAddress").innerHTML = "";
+    document.getElementById("wrongStreet").innerHTML = "";
   }
   if (numciv == "") {
     text = "Please provide a valid Civic Number";
