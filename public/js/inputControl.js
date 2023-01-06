@@ -150,43 +150,64 @@ function fieldsResetControl() {
 function fieldsRegisterControl() {
   var phone = document.getElementById("inputMobile").value.replace(/\W+/g, '');
   var city = document.getElementById("inputCity").value;
+  var province = document.getElementById("inputProvincia").value;
   var address = document.getElementById("inputStreet").value;
   var numciv = document.getElementById("inputNumciv").value;
+  var cognome = document.getElementById("inputLastName").value;
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
   var submit = true;
 
+  if (cognome == "") {
+    text = "Inserire il Cognome. ";
+    document.getElementById("wrongLastName").innerHTML = text;
+    document.getElementById("inputLastName").focus();
+    return false;
+  } else {
+    document.getElementById("wrongLastName").innerHTML = "";
+    document.getElementById("inputLastName").value = cognome.charAt(0).toUpperCase() + cognome.slice(1);
+  } 
   if (phone == "" || !phone.match(phoneno)) {
-    text = "Please provide a valid mobile phone. ";
+    text = "Inserire numero di telefono cellulare corretto";
     document.getElementById("wrongPhone").innerHTML = text;
-    submit = false;
+    document.getElementById("inputMobile").focus();
+    return false;
   } else {
     document.getElementById("wrongPhone").innerHTML = "";
   }
-  if (city == "") {
-    text = "Please provide a valid City";
+  if (city == "" || document.getElementById('myselectcity') != null) {
+    text = "Inserire o selezionare la Città";
     document.getElementById("wrongCity").innerHTML = text;
-    submit = false;
+    document.getElementById("inputCity").focus();
+    return false;
   } else {
     document.getElementById("wrongCity").innerHTML = "";
   }
-  if (address == "") {
-    text = "Please provide a valid address";
+  if (province == "") {
+    text = "Inserire la Provincia";
+    document.getElementById("wrongProvincia").innerHTML = text;
+    document.getElementById("inputProvincia").focus();
+    return false;
+  } else {
+    document.getElementById("wrongProvincia").innerHTML = "";
+  }
+  if (address == "" || document.getElementById("myselectstreet") !=null) {
+    text = "Inserire o selezionare l'indirizzo ";
     document.getElementById("wrongStreet").innerHTML = text;
-    submit = false;
+    document.getElementById("inputStreet").focus();
+    return false;
   } else {
     document.getElementById("wrongStreet").innerHTML = "";
   }
   if (numciv == "") {
-    text = "Please provide a valid Civic Number";
+    text = "Inserire il Numero Civico";
     document.getElementById("wrongNumciv").innerHTML = text;
-    submit = false;
+    document.getElementById("inputNumciv").focus();
+    return false;
   } else {
     document.getElementById("wrongNumciv").innerHTML = "";
   }
-  if (submit) {
-    return true;
-  } else {
-    return false;
-  }
+  
+  return true;
+   
 };

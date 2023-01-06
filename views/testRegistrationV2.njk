@@ -21,6 +21,7 @@
            name="firstName" placeholder="Nome" readonly>
         </div>
         <div class="form-group">
+          <div style="color:yellow; font-size:80%;" id="wrongLastName"></div>
           <input type="text" class="form-control" id="inputLastName" value="{{lastName}}"
            name="lastName" placeholder="Cognome" autofocus required>
         </div>
@@ -54,7 +55,7 @@
       <div class="form-group">
         <div ><label for="inputStreet" class="text-white col-form-label-lg">Indirizzo</label></div>
         <div style="color:yellow; font-size:80%;" id="wrongStreet"></div>
-        <input type="text" class="form-control" id="inputStreet" value="" name="street" required readonly
+        <input type="text" class="form-control" id="inputStreet" value="" name="street" required readonly autocomplete="off"
         oninput="selectStreet(this.value)">
         <div class="w-100"></div>
         <div id="streets"></div>
@@ -62,7 +63,7 @@
       <div class="form-group">
         <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div>
         <div style="color:yellow; font-size:80%;" id="wrongNumciv"></div>
-        <input type="text" class="form-control" id="inputNumciv" value="" name="number" required>
+        <input type="text" class="form-control" id="inputNumciv" value="" name="number" required readonly>
       </div>
         <br>
         <div>
@@ -94,12 +95,14 @@ function setValueStreet(via) {
   document.getElementById('inputNumciv').removeAttribute('readonly');
   document.getElementById("inputNumciv").focus();
 }
-
+//********************************************************************
+// DATA LA CITTA E IL CODICE ISTAT RECUPERA LE VIE DA OPENSTREETMAP
+//********************************************************************
 async function listOfStreets(citta,istat) {
   console.log('CITTA: ',citta);
   console.log('ISTAT: ',istat);
-  if (document.getElementById('myselect') != null) {
-    document.getElementById('myselect').remove();
+  if (document.getElementById('myselectcity') != null) {
+    document.getElementById('myselectcity').remove();
   };
   document.getElementById("inputCity").value = citta;
   let data = {};
@@ -115,7 +118,7 @@ async function listOfStreets(citta,istat) {
       response = res;
     },
     error: function (e) {
-      console.log("ErrorListOfStreets", e);
+      console.log("ErrorListOfStreets", e.responseText);
       response = e;
     }
   });
@@ -123,8 +126,6 @@ async function listOfStreets(citta,istat) {
 };
 
 function selectStreet (v) {
-  document.getElementById('inputNumciv').value = null;
-  document.getElementById("inputNumciv").setAttribute('readonly', true);
   let vl = v.toLowerCase();
   if (vl.length > 3) {
     let data = {};
@@ -135,8 +136,11 @@ function selectStreet (v) {
       url: '/streets',
       data: data,
       success: function(res) {
+        
         if (typeof res !== 'undefined' && res.length > 0 &&  document.getElementById("inputStreet").value.length > 1) {
           /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
+          document.getElementById("inputNumciv").setAttribute('readonly', true);
+          document.getElementById('inputNumciv').value = null;
           let select = document.createElement('ul');
           let size = res.length;
           let via = document.getElementById("inputStreet").value.toLowerCase();
@@ -193,20 +197,30 @@ function selectStreet (v) {
 
 //----------------------------CITY-------------------------------------
 
+//*******************************************************
+// DATA LA CITTA' SELEZIONA LE VIE
+//*******************************************************
 async function setValueCity(comune, provincia, istat) {
   document.getElementById("inputCity").setAttribute('readonly', true);
   document.getElementById("inputNumciv").setAttribute('readonly', true);
-  if (document.getElementById('myselect') != null) {
-    document.getElementById('myselect').remove();
+  if (document.getElementById('myselectcity') != null) {
+    document.getElementById('myselectcity').remove();
   };
   document.getElementById("inputCity").value = comune;
   document.getElementById("inputProvincia").value = provincia;
 
   document.getElementById("loading").style.display = 'block';
-  let res = await listOfStreets(comune,istat);
-  document.getElementById("loading").style.display = 'none';
 
+  try {
+    //*******************************************************
+    let res = await listOfStreets(comune,istat);
+    //*******************************************************
+  } catch (e) {
+    console.log('!!!!!!!!!!!!GETIRE ERRORE listOfStreets !!!!!!!!!!!!!!!!!',e);
+    document.getElementById('inputNumciv').removeAttribute('readonly');
+  }
   console.log('RES: ',res);
+  document.getElementById("loading").style.display = 'none';
   document.getElementById("inputStreet").focus();
   document.getElementById('inputStreet').removeAttribute('readonly');
   document.getElementById('inputCity').removeAttribute('readonly');
@@ -231,7 +245,9 @@ async function listOfCities(v) {
   });
   return response;
 };
-
+//*******************************************************
+// GESTIONE FORM DI INSERIMENTO E RICERCA DELLA CITTA'
+//*******************************************************
 async function selectCity(v) {  
   document.getElementById('inputProvincia').value = null;
   document.getElementById('inputStreet').setAttribute('readonly', true);
@@ -240,25 +256,37 @@ async function selectCity(v) {
   document.getElementById('inputNumciv').value = null;
   
   if (v.length > 2 || v =='lu' || v =='ne' || v =='re' || v =='ro') {
-
-    res = await listOfCities(v); 
-    
+    //*******************************************************
+    // RICERCA LE CITTA' A PARTIRE DALLA STRINGA INSERITA 
+    //*******************************************************
+    try {
+      res = await listOfCities(v);  
+    } catch (e){
+      console.log('!!!!!!!!!!!!GETIRE ERRORE listOfCities !!!!!!!!!!!!!!!!!');
+      document.getElementById("inputProvincia").removeAttribute('readonly');
+      document.getElementById("inputStreet").removeAttribute('readonly');
+      document.getElementById("inputNumciv").removeAttribute('readonly');
+      return;
+    }
+     
+    //*******************************************************
     if (typeof res !== 'undefined' && res.length > 0 && document.getElementById("inputCity").value.length > 1) {
       /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
       let select = document.createElement('ul');
-      let size = res.length;
       let citta = document.getElementById("inputCity").value.toLowerCase();
       let city = res[0].Comune.toLowerCase()
 
-      if (size == 1 && citta == city) {
+      if (res.length == 1 && citta == city) {
         document.getElementById("inputCity").value = res[0].Comune;
         document.getElementById("inputProvincia").value = res[0].Provincia;
-        if (document.getElementById('myselect') != null) {
-          document.getElementById('myselect').remove();
+        if (document.getElementById('myselectcity') != null) {
+          document.getElementById('myselectcity').remove();
         };
+        //*********************************************************
         setValueCity(res[0].Comune, res[0].Provincia, res[0].Istat);
+        //*********************************************************
       } else {
-        select.setAttribute('id','myselect');
+        select.setAttribute('id','myselectcity');
         select.setAttribute('class','form-control');
         select.setAttribute('style','list-style-type: none;');
 
@@ -267,7 +295,9 @@ async function selectCity(v) {
           a = document.createElement('a');
           a.textContent = res[i].Comune;
           a.setAttribute('href',"javascript:void(0)");
+          //*******************************************************
           a.setAttribute('onclick',"setValueCity('"+res[i].Comune +"','"+res[i].Provincia+"','"+res[i].Istat+"')");
+          //*******************************************************
           option.appendChild(a);
           select.appendChild(option);
         };
@@ -278,16 +308,16 @@ async function selectCity(v) {
       }
 
     } else {
-      if (document.getElementById('myselect') != null) {
-        document.getElementById('myselect').remove();
+      if (document.getElementById('myselectcity') != null) {
+        document.getElementById('myselectcity').remove();
       }
       if (document.getElementById('myselectstreet') !=null) {
         document.getElementById('myselectstreet').remove();
       }      
     }
   } else {
-    if (document.getElementById('myselect') != null) {
-      document.getElementById("myselect").remove();
+    if (document.getElementById('myselectcity') != null) {
+      document.getElementById("myselectcity").remove();
     };    
     if (document.getElementById('myselectstreet') !=null) {
       document.getElementById('myselectstreet').remove();
@@ -295,7 +325,5 @@ async function selectCity(v) {
   }
 };
 </script>
-
-
 
 {% endblock %}

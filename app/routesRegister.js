@@ -50,23 +50,28 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
       const url = 'https://overpass-api.de/api/interpreter?data='+option;
 
-      console.log(option);
+      console.log('OVERPASS: ',option);
 
       const request = https.request(url, (response) => {
-          let data = '';
+          let data = ''; //////// inserire/tolgiere  > per creare/eliminare errore
           response.on('data', (chunk) => {
               data = data + chunk.toString();
           });
-
-          response.on('end', () => {
-              const parseJSON = JSON.parse(data);
-              const elements = parseJSON.elements;
-              req.session.elements = elements;
-              console.log(req.session.elements);
-              res.send('{"status":"200", "statusText":"OK"}');
-
-          });
-      })
+          
+              response.on('end', () => {
+                try {
+                  const parseJSON = JSON.parse(data);
+                  const elements = parseJSON.elements;
+                  req.session.elements = elements;
+                  console.log(req.session.elements);
+                  res.send('{"status":"200", "statusText":"OK"}');
+                } catch (e) {
+                  console.log('Error', e);
+                  res.send('{"status":"500","statusText":'+e+'"}'); 
+                }
+              });
+          
+      });
       request.on('error', (error) => {
           console.log('An error', error);
             res.send('{"status":"500","statusText":'+error+'"}');
@@ -89,6 +94,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
     app.post('/cities',  function(req, res) {
         req.session.elements = [];
+        //throw('Genera ERRORE');
         console.log("city : ", req.body.city);
         CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},
                      null,

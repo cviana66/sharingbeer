@@ -96,8 +96,8 @@ function setValueStreet(via) {
 async function listOfStreets(citta,istat) {
   console.log('CITTA: ',citta);
   console.log('ISTAT: ',istat);
-  if (document.getElementById('myselect') != null) {
-    document.getElementById('myselect').remove();
+  if (document.getElementById('myselectcity') != null) {
+    document.getElementById('myselectcity').remove();
   };
   document.getElementById("inputCity").value = citta;
   let data = {};
@@ -194,8 +194,8 @@ function selectStreet (v) {
 async function setValueCity(comune, provincia, istat) {
   document.getElementById("inputCity").setAttribute('readonly', true);
   document.getElementById("inputNumciv").setAttribute('readonly', true);
-  if (document.getElementById('myselect') != null) {
-    document.getElementById('myselect').remove();
+  if (document.getElementById('myselectcity') != null) {
+    document.getElementById('myselectcity').remove();
   };
   document.getElementById("inputCity").value = comune;
   document.getElementById("inputProvincia").value = provincia;
@@ -251,12 +251,12 @@ async function selectCity(v) {
       if (size == 1 && citta == city) {
         document.getElementById("inputCity").value = res[0].Comune;
         document.getElementById("inputProvincia").value = res[0].Provincia;
-        if (document.getElementById('myselect') != null) {
-          document.getElementById('myselect').remove();
+        if (document.getElementById('myselectcity') != null) {
+          document.getElementById('myselectcity').remove();
         };
         setValueCity(res[0].Comune, res[0].Provincia, res[0].Istat);
       } else {
-        select.setAttribute('id','myselect');
+        select.setAttribute('id','myselectcity');
         select.setAttribute('class','form-control');
         select.setAttribute('style','list-style-type: none;');
 
@@ -276,16 +276,16 @@ async function selectCity(v) {
       }
 
     } else {
-      if (document.getElementById('myselect') != null) {
-        document.getElementById('myselect').remove();
+      if (document.getElementById('myselectcity') != null) {
+        document.getElementById('myselectcity').remove();
       }
       if (document.getElementById('myselectstreet') !=null) {
         document.getElementById('myselectstreet').remove();
       }      
     }
   } else {
-    if (document.getElementById('myselect') != null) {
-      document.getElementById("myselect").remove();
+    if (document.getElementById('myselectcity') != null) {
+      document.getElementById("myselectcity").remove();
     };    
     if (document.getElementById('myselectstreet') !=null) {
       document.getElementById('myselectstreet').remove();
