@@ -26,7 +26,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
   								<p> <span style="font-style:oblique;font-weight:normal">' + userName + ' ' + userSurname + '</span> ti offre una <span style="font-style:oblique;font-weight:normal"> Birra Viana</span>, la prima Real Ale Italiana da condividere.</p> \
-  								<p>Vuoi saperne di più? Usa l&apos;invito personale che <span style="font-style:oblique;font-weight:normal">' + userName + '</span> ti ha riservato per entrare in <a href="https://sharingbeer.herokuapp.com/validation?token='+friendToken+'" target="_blank"> SharingBeer. </a> \
+  								<p>Vuoi saperne di più? Usa l&apos;invito personale che <span style="font-style:oblique;font-weight:normal">' + userName + '</span> ti ha riservato per entrare in <a href="'+server+'/validation?token='+friendToken+'" target="_blank"> SharingBeer. </a> \
   								<div align="center"> \
   								<a href="'+server+'/validation?token='+friendToken+'"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \

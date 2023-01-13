@@ -168,7 +168,7 @@ function fieldsRegisterControl() {
     document.getElementById("inputLastName").value = cognome.charAt(0).toUpperCase() + cognome.slice(1);
   } 
   if (phone == "" || !phone.match(phoneno)) {
-    text = "Inserire numero di telefono cellulare corretto";
+    text = "Inserire un numero di telefono cellulare valido";
     document.getElementById("wrongPhone").innerHTML = text;
     document.getElementById("inputMobile").focus();
     return false;

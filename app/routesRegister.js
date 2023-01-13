@@ -35,6 +35,11 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           });
     });
 
+    app.get('/redirect', function(req, res) {
+        req.flash('info', 'SHOP');
+        res.redirect('/shop');
+    });
+
 // =====================================
 // API =================================
 // =====================================
@@ -242,9 +247,15 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                 if (user.email != req.body.email) {
                     user.email = req.body.email;
                 }
-                user.status = 'validated';
-                user.resetPasswordToken = undefined;
-                user.resetPasswordExpires = undefined;
+                
+                console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                console.log('!!!!!!!!!!! ATTENZIONE !!!! CODICE COMMENTATO !!!!');
+                console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                
+                //user.status = 'validated';
+                //user.resetPasswordToken = undefined;
+                //user.resetPasswordExpires = undefined;
+
                 ///////////////////////////////////////////////
                 user.booze += global.oneBottleBoozeEquivalent;
                 ///////////////////////////////////////////////

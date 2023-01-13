@@ -6,7 +6,7 @@
 
       {% if message %}
         {% for message in message %}
-          <div class="alert alert-{{type}}">{{message}}</div>
+          <div class="alert alert-{{type}} autofocus">{{message}}</div>
         {% endfor %}
       {% endif %}
 
@@ -38,7 +38,7 @@
           <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Email del tuo amico </label>
           <div style="color:#ffc107; font-size:80%;" id="wrongMail"></div>
           <input type="email" class="form-control" id="inputUsernameEmail"
-          name="email" placeholder="your@email.address" autofocus required {{controlSates}}>
+          name="email" placeholder="your@email.address" {% if message=='' %} autofocus {% endif %} required {{controlSates}}>
         </div>
         <div class="form-group">
           <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Nome del tuo amico </label>

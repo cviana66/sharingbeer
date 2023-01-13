@@ -26,7 +26,8 @@ module.exports = function(app) {
 		  var model =  { products   : prods,                   //prodotti dello shop
   						       user       : req.user,                //utente loggato
   						       numProducts: req.session.numProducts, //numero di proodotti nel carrello visualizzato su main.dust
-  						       cart       : req.session.cartItems    //prodotti nel carrello
+  						       cart       : req.session.cartItems,   //prodotti nel carrello
+                     message    : req.flash('info')
   					       };
       console.log("numero di prodotti in carrello: ",req.session.numProducts)
   		res.render('shop.njk', model);

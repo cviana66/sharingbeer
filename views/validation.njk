@@ -1,13 +1,12 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;"> La prima volta in Sharing Beer </h3>
+      <h3 class="text-white text-center bg-dark"> La prima volta in Sharing Beer </h3>
       <hr style="border-top: 1px solid #5375BD">
       <!-- show any messages that come back with authentication -->
       {% if message %}
         {% for message in message %}
-          <div class="alert alert-{{type}}">{{message}}</div>
+          <div class="alert alert-{{type}}" autofocus>{{message}}</div>
         {% endfor %}
       {% endif %}
 
@@ -17,14 +16,14 @@
         <p class="lead text-white text-center" style="font-size:1.7em">Prova la <img style="vertical-align: baseline" height="32" src="/img/birra_viana.png"> </p>
         <!--hr  style="border-top: 1px solid #903246"-->
       </header>
-
+    <a href="#section2">  
       <svg class="arrows">
               <path class="a1" d="M0 0 L30 32 L60 0"></path>
               <path class="a2" d="M0 20 L30 52 L60 20"></path>
               <path class="a3" d="M0 40 L30 72 L60 40"></path>
       </svg>
-
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;;">
+    </a>  
+      <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;" id="section2">
         <div class="card-body">
           <h3 class="card-title text-white font-weight-light text-center"> Una Birra offerta </h3>
           <div class="flex-row">
@@ -47,7 +46,7 @@
 
       <div class="row">
         <div class="col-12" >
-          <form role="form" action="/validation" method="post" autocomplete="off">
+          <form role="form" action="/validation" method="post">
             <fieldset>
               <div class="form-group">
                 <label class="text-white col-form-label-lg" for="inputUsernameEmail">Email</label>
@@ -64,7 +63,7 @@
                 <label for="inputPassword" class="text-white col-form-label-lg">Crea una nuova Password</label>
                 <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p>
                 <div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd"></div>
-                <input type="password" class="form-control" id="inputPassword" name="password" required>
+                <input type="password" class="form-control" id="inputPassword" name="password" autocomplete="new-password" value="" required>
               </div>
               <div class="form-check" style="margin:20px 0px 20px 0px" >
                 <div style="color:#ffc107; font-size:0.9em;" id="wrongAge"></div>
