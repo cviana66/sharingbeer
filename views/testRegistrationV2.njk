@@ -14,20 +14,20 @@
         <img  src="img/ajax-loader-1.gif" alt="Loading..." />
       </div>
 
-      <form role="form" action="/register" method="post">
+      <form role="form" action="/register" method="post" id="registration">
         <div class="form-group">
           <label for="inputUsernameEmail" class="text-white col-form-label-lg">Nome e Cognome</label>
           <input type="text" class="form-control" id="inputFirsName" value="{{firstName}}"
            name="firstName" placeholder="Nome" readonly>
         </div>
         <div class="form-group">
-          <div style="color:yellow; font-size:80%;" id="wrongLastName"></div>
+          <div class="input-error" id="wrongLastName"></div>
           <input type="text" class="form-control" id="inputLastName" value="{{lastName}}"
            name="lastName" placeholder="Cognome" autofocus required>
         </div>
         <div class="form-group">
           <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div>
-          <div style="color:yellow; font-size:80%;" id="wrongPhone"></div>
+          <div class="input-error" id="wrongPhone"></div>
           <div class="input-group mb-2">
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon1">+39</span>
@@ -38,7 +38,7 @@
         </div>
         <div class="form-group">
           <div ><label for="inputCity" class="text-white col-form-label-lg">Città</label></div>
-          <div style="color:yellow; font-size:80%;" id="wrongCity"></div>
+          <div class="input-error" id="wrongCity"></div>
           <input type="text" class="form-control" id="inputCity" value="{{city}}"
            name="city" placeholder="" required autocomplete="off" oninput="selectCity(this.value)"/>
           <div class="w-100"></div>
@@ -47,14 +47,14 @@
        
         <div class="form-group">
         <div><label for="inputProvincia" class="text-white col-form-label-lg">Provincia</label></div>
-        <div style="color:yellow; font-size:80%;" id="wrongProvincia"></div>
+        <div class="input-error" id="wrongProvincia"></div>
         <input type="text" class="form-control" id="inputProvincia" value="" name="Provincia" required readonly>
         <div class="w-100"></div>
         <div id="provincia"></div>
       </div>
       <div class="form-group">
         <div ><label for="inputStreet" class="text-white col-form-label-lg">Indirizzo</label></div>
-        <div style="color:yellow; font-size:80%;" id="wrongStreet"></div>
+        <div class="input-error" id="wrongStreet"></div>
         <input type="text" class="form-control" id="inputStreet" value="" name="street" required readonly autocomplete="off"
         oninput="selectStreet(this.value)">
         <div class="w-100"></div>
@@ -62,7 +62,7 @@
       </div>
       <div class="form-group">
         <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div>
-        <div style="color:yellow; font-size:80%;" id="wrongNumciv"></div>
+        <div class="input-error" id="wrongNumciv"></div>
         <input type="text" class="form-control" id="inputNumciv" value="" name="number" required readonly>
       </div>
         <br>
@@ -104,6 +104,7 @@ async function listOfStreets(citta,istat) {
   if (document.getElementById('myselectcity') != null) {
     document.getElementById('myselectcity').remove();
   };
+  document.getElementById("wrongCity").innerHTML = "";
   document.getElementById("inputCity").value = citta;
   let data = {};
   let response;
@@ -208,6 +209,9 @@ async function setValueCity(comune, provincia, istat) {
   };
   document.getElementById("inputCity").value = comune;
   document.getElementById("inputProvincia").value = provincia;
+  document.getElementById("wrongProvincia").innerHTML = "";
+  document.getElementById("wrongStreet").innerHTML = "";
+  document.getElementById("wrongNumciv").innerHTML = "";
 
   document.getElementById("loading").style.display = 'block';
 
@@ -216,7 +220,6 @@ async function setValueCity(comune, provincia, istat) {
     let res = await listOfStreets(comune,istat);
     //*******************************************************
   } catch (e) {
-    console.log('!!!!!!!!!!!!GETIRE ERRORE listOfStreets !!!!!!!!!!!!!!!!!',e);
     document.getElementById('inputNumciv').removeAttribute('readonly');
   }
   console.log('RES: ',res);
@@ -257,15 +260,44 @@ async function selectCity(v) {
   
   if (v.length > 2 || v =='lu' || v =='ne' || v =='re' || v =='ro') {
     //*******************************************************
-    // RICERCA LE CITTA' A PARTIRE DALLA STRINGA INSERITA 
+    // RICERCA LE CITTA' A PARTIRE DALLA STRINGA INSERITA
     //*******************************************************
     try {
       res = await listOfCities(v);  
+      document.getElementById("wrongProvincia").innerHTML = "";
+      document.getElementById("wrongStreet").innerHTML = "";
+      document.getElementById("wrongNumciv").innerHTML = "";
+
+      //passo nella pagina l'informazione che la ricerca della città ha funzionato
+      if (document.getElementsByName("hiddenListOfCities").length == 0 ) {
+        var input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("id","hiddenListOfCities");
+        input.setAttribute("name", "hiddenListOfCities");
+        input.setAttribute("value", "OK");
+        console.log('INPUT: ',input);
+        //append to form element that you want .
+        document.getElementById("registration").appendChild(input);
+      }
     } catch (e){
-      console.log('!!!!!!!!!!!!GETIRE ERRORE listOfCities !!!!!!!!!!!!!!!!!');
       document.getElementById("inputProvincia").removeAttribute('readonly');
       document.getElementById("inputStreet").removeAttribute('readonly');
       document.getElementById("inputNumciv").removeAttribute('readonly');
+
+      document.getElementById("wrongProvincia").innerHTML = "";
+      document.getElementById("wrongStreet").innerHTML = "";
+      document.getElementById("wrongNumciv").innerHTML = "";
+
+      if (document.getElementsByName("hiddenListOfCities").length == 0 ) {
+        var input = document.createElement("input");
+        input.setAttribute("type", "hidden");
+        input.setAttribute("id","hiddenListOfCities");
+        input.setAttribute("name", "hiddenListOfCities");
+        input.setAttribute("value", "KO");
+        console.log('INPUT: ',input);
+        //append to form element that you want .
+        document.getElementById("registration").appendChild(input);
+      }
       return;
     }
      

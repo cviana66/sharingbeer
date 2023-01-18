@@ -157,14 +157,20 @@ function fieldsRegisterControl() {
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
   var submit = true;
+  // init messaggi di warning
+  document.getElementById("wrongLastName").innerHTML = "";
+  document.getElementById("wrongPhone").innerHTML = "";
+  document.getElementById("wrongCity").innerHTML = "";
+  document.getElementById("wrongProvincia").innerHTML = "";
+  document.getElementById("wrongStreet").innerHTML = "";
+  document.getElementById("wrongNumciv").innerHTML = "";
 
   if (cognome == "") {
     text = "Inserire il Cognome. ";
     document.getElementById("wrongLastName").innerHTML = text;
     document.getElementById("inputLastName").focus();
     return false;
-  } else {
-    document.getElementById("wrongLastName").innerHTML = "";
+  } else {    
     document.getElementById("inputLastName").value = cognome.charAt(0).toUpperCase() + cognome.slice(1);
   } 
   if (phone == "" || !phone.match(phoneno)) {
@@ -172,40 +178,43 @@ function fieldsRegisterControl() {
     document.getElementById("wrongPhone").innerHTML = text;
     document.getElementById("inputMobile").focus();
     return false;
-  } else {
-    document.getElementById("wrongPhone").innerHTML = "";
   }
+  // se la lista di città risultante dalla selezione fatta nella pagina registration.njk
+  // javascript async function selectCity(v) è diversa da NULL e la città è blank allora
+  // no si è digitato correttamente il noem della città o selezionata la città dalla lista
+  // proposta 
   if (city == "" || document.getElementById('myselectcity') != null) {
     text = "Inserire o selezionare la Città";
     document.getElementById("wrongCity").innerHTML = text;
     document.getElementById("inputCity").focus();
     return false;
-  } else {
-    document.getElementById("wrongCity").innerHTML = "";
+  }
+  // se il campo HIDDEN hiddenListOfCities è presente perchè creato nel javascript della
+  // pagina registration.njk a seguito di corretto funzionamento di ricerca allora
+  // se non si ha valorizzata la provincia è perchè il nome della città è inesistente
+  if (province == "" &&  document.getElementById("hiddenListOfCities").value == "OK") {
+    text = "Inserire o selezionare una Città esistente";
+    document.getElementById("wrongCity").innerHTML = text;
+    document.getElementById("inputCity").focus();
+    return false;
   }
   if (province == "") {
     text = "Inserire la Provincia";
     document.getElementById("wrongProvincia").innerHTML = text;
     document.getElementById("inputProvincia").focus();
     return false;
-  } else {
-    document.getElementById("wrongProvincia").innerHTML = "";
   }
   if (address == "" || document.getElementById("myselectstreet") !=null) {
     text = "Inserire o selezionare l'indirizzo ";
     document.getElementById("wrongStreet").innerHTML = text;
     document.getElementById("inputStreet").focus();
     return false;
-  } else {
-    document.getElementById("wrongStreet").innerHTML = "";
   }
   if (numciv == "") {
     text = "Inserire il Numero Civico";
     document.getElementById("wrongNumciv").innerHTML = text;
     document.getElementById("inputNumciv").focus();
     return false;
-  } else {
-    document.getElementById("wrongNumciv").innerHTML = "";
   }
   
   return true;

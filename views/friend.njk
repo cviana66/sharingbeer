@@ -36,7 +36,7 @@
       <form role="form" action="/recomm" method="POST">
         <div class="form-group">
           <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Email del tuo amico </label>
-          <div style="color:#ffc107; font-size:80%;" id="wrongMail"></div>
+          <div class="input-error" id="wrongMail"></div>
           <input type="email" class="form-control" id="inputUsernameEmail"
           name="email" placeholder="your@email.address" {% if message=='' %} autofocus {% endif %} required {{controlSates}}>
         </div>

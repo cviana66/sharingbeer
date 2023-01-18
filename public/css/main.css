@@ -2,6 +2,12 @@ html {
   scroll-behavior: smooth;
 }
 
+.input-error {
+  color:#ffc107;  
+  font-size:0.9em;
+  margin-bottom:5px;
+}
+
 .arrows {
   width: 60px;
   height: 72px;
