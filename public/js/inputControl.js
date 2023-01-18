@@ -25,7 +25,7 @@ function fieldsValidationControl() {
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var email = document.getElementById("inputUsernameEmail").value;
   if(email =="" || !re.test(String(email))) {
-    document.getElementById("wrongMail").innerHTML = "Please provide a valid email.";
+    document.getElementById("wrongMail").innerHTML = "Inserisci una Email valida";
     document.getElementById("inputUsernameEmail").focus();
     return false;
   };
@@ -43,50 +43,50 @@ function fieldsValidationControl() {
 
   if(pwd1 != "") {
     if(pwd1.length < 6) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least six characters";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve essere di almeno 6 caratteri";
       document.getElementById("inputPassword").focus();
       return false;
     }
     if(pwd1 == email) {
-      document.getElementById("wrongPwd").innerHTML = "Password must be different from Username";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve essere dfferente dall'Email";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re1 = /[0-9]/;
     if(!re1.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one number";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un numero";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re2 = /[a-z]/;
     if(!re2.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one lowercase letter";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera minuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re3 = /[A-Z]/;
     if(!re3.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one uppercase letter";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera maiuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one special character";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
     }
   } else {
-    document.getElementById("wrongPwd").innerHTML = "create a Password";
+    document.getElementById("wrongPwd").innerHTML = "Crea una nuova Password";
     document.getElementById("inputPassword").focus();
     return false;
   }
   if(!document.getElementById('checkAge').checked) {
-    document.getElementById("wrongAge").innerHTML = "spunta la casella di controllo solo se hai più di 18 anni";
+    document.getElementById("wrongAge").innerHTML = "Spunta la casella di controllo solo se hai più di 18 anni";
     return false;
   }
   if(!document.getElementById('checkPrivacy').checked) {
-    document.getElementById("wrongPrivacy").innerHTML = "spunta la casella di controllo per accettare le condizioni";
+    document.getElementById("wrongPrivacy").innerHTML = "Spunta la casella di controllo per accettare le Condizioni";
     return false;
   }
   return true;
@@ -101,46 +101,46 @@ function fieldsResetControl() {
 
   if(pwd1 != "") {
     if(pwd1.length < 6) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least six characters";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve essere di almeno 6 caratteri";
       document.getElementById("inputPassword").focus();
       return false;
     }
     if(pwd1 == email) {
-      document.getElementById("wrongPwd").innerHTML = "Password must be different from Username";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve essere dfferente dall'Email";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re1 = /[0-9]/;
     if(!re1.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one number";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un numero";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re2 = /[a-z]/;
     if(!re2.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one lowercase letter";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera minuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re3 = /[A-Z]/;
     if(!re3.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one uppercase letter";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera maiuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "Password must contain at least one special character";
+      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
     }
     if(pwd1!=pwd2) {
-      document.getElementById("wrongPwd2").innerHTML = "Password are different ";
+      document.getElementById("wrongPwd2").innerHTML = "Le Password inserite sono differenti ";
       document.getElementById("confirmPassword").focus();
       return false;
     }
   } else {
-    document.getElementById("wrongPwd").innerHTML = "create a Password";
+    document.getElementById("wrongPwd").innerHTML = "Crea una nuova Password";
     document.getElementById("inputPassword").focus();
     return false;
   }
