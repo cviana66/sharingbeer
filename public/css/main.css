@@ -3,8 +3,7 @@ html {
 }
 
 .input-error {
-  color:#ffc107;
-  /*font-family: Arial;*/  
+  color:#ffc107; 
   font-size:1rem;
   margin-bottom:5px;
 }

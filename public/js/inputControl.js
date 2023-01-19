@@ -158,12 +158,12 @@ function fieldsRegisterControl() {
   var capno = /^\d{5}$/;
   var submit = true;
   // init messaggi di warning
-  document.getElementById("wrongLastName").innerHTML = "";
-  document.getElementById("wrongPhone").innerHTML = "";
-  document.getElementById("wrongCity").innerHTML = "";
-  document.getElementById("wrongProvincia").innerHTML = "";
-  document.getElementById("wrongStreet").innerHTML = "";
-  document.getElementById("wrongNumciv").innerHTML = "";
+  if (document.getElementById("wrongLastName") != null) document.getElementById("wrongLastName").innerHTML = "";
+  if (document.getElementById("wrongPhone") != null) document.getElementById("wrongPhone").innerHTML = "";
+  if (document.getElementById("wrongCity") != null) document.getElementById("wrongCity").innerHTML = "";
+  if (document.getElementById("wrongProvincia") != null) document.getElementById("wrongProvincia").innerHTML = "";
+  if (document.getElementById("wrongStreet") != null) document.getElementById("wrongStreet").innerHTML = "";
+  if (document.getElementById("wrongNumciv") != null) document.getElementById("wrongNumciv").innerHTML = "";
 
   if (cognome == "") {
     text = "Inserire il Cognome. ";

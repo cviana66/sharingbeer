@@ -247,14 +247,15 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                 if (user.email != req.body.email) {
                     user.email = req.body.email;
                 }
-                
+                /*
                 console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
                 console.log('!!!!!!!!!!! ATTENZIONE !!!! CODICE COMMENTATO !!!!');
+                console.log('!!!!!!!!!!!!       NON DA PRODUZIONE  !!!!!!!!!!!!');
                 console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                
-                //user.status = 'validated';
-                //user.resetPasswordToken = undefined;
-                //user.resetPasswordExpires = undefined;
+                */
+                user.status = 'validated';
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpires = undefined;
 
                 ///////////////////////////////////////////////
                 user.booze += global.oneBottleBoozeEquivalent;
@@ -280,13 +281,9 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                                 })
                             } else {
                                 let msg = 'Invito accettato e autenticato'; //'Validated and Logged';
-                                req.flash('success', msg);
+                                req.flash('info', msg);
                                 console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
-                                res.render('shop.njk', {
-                                    message: req.flash('success'),
-                                    user: user,
-                                    type: "success"
-                                })
+                                res.redirect('/shop');
                             }
                         });
                     }
