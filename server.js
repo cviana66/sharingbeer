@@ -206,12 +206,15 @@ var SharingBeer = function() {
 
         if (self.app.get('env') === 'development') {
             self.app.use(morgan('dev')); // log every request to the console
-            self.app.use(session({secret: process.env.SESSION_SECRET,
-                              saveUninitialized: true,
-                              resave: true,
-                              cookie: { secure: false,
-                                        expires: 600000 }
-                            }));
+            self.app.use(session({
+              name: '_sb',
+              secret: process.env.SESSION_SECRET,
+              saveUninitialized: true,
+              resave: true,
+              cookie: { secure: false,
+                        expires: 600000 },
+              cookie: { sameSite: 'strict' } //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+            }));
         } else {
             self.app.set('trust proxy', 1); // trust first proxy
             self.app.use(session({secret: process.env.SESSION_SECRET, //modify: 18/02/2022
