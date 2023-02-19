@@ -209,8 +209,8 @@ var SharingBeer = function() {
             self.app.use(session({
               name: '_sb',
               secret: process.env.SESSION_SECRET,
-              saveUninitialized: true,
-              resave: true,
+              saveUninitialized: false,
+              resave: false,
               cookie: { secure: false,
                         expires: 600000 },
               cookie: { sameSite: 'strict' } //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
@@ -218,7 +218,7 @@ var SharingBeer = function() {
         } else {
             self.app.set('trust proxy', 1); // trust first proxy
             self.app.use(session({secret: process.env.SESSION_SECRET, //modify: 18/02/2022
-                              saveUninitialized: true,
+                              saveUninitialized: false,
                               resave: true,
                               cookie: { secure: true, // serve secure cookies
                                         expires: 600000 }
