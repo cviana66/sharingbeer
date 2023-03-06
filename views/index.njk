@@ -1,7 +1,15 @@
-{% extends "layouts/main.njk" %} {% block body %}
+{% extends "layouts/main.njk" %} 
+{% block body %}
 
 <h3 class="text-white text-center bg-dark"> Sharing Beer</h3>
 <hr style="border-top: 1px solid #5375BD;">
 
-<!-- CAROUSEL -->
-{% include "layouts/carousel.njk"%} {% endblock %}
+{% if message %}
+  {% for message in message %}
+    <div class="alert alert-{{type}}">{{message}}</div>
+  {% endfor %}
+{% endif %}
+
+<div ><img class="mx-auto d-block" src="img/logoBirraViana.png" style="height:100%;width:100%;margin-bottom:10px"></div>
+
+{% endblock %}
