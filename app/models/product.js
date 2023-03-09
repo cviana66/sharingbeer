@@ -6,7 +6,10 @@ var Schema = mongoose.Schema;
 var ProductSchema = new Schema({
 
   name: { type: String, required: true },
-  price: { type: Number}
+  price: { type: Number, required: true },
+  linkImage: {type: String, required: true},
+  description: {type: String},
+  quantity: { type: String}
 
 /*
   make: { type: String},

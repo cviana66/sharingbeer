@@ -1,7 +1,7 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark">Please Log In</h3>
+      <h3 class="text-white text-center bg-dark">Area Clienti</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
       {% if message %}
@@ -12,7 +12,7 @@
 
       <form role="form" action="/login" method="post">
         <div class="form-group">
-          <label  for="inputUsernameEmail" class="text-white col-form-label-lg">User</label>
+          <label  for="inputUsernameEmail" class="text-white col-form-label-lg">Utente</label>
           <div class="input-error" id="wrongMail"></div>
           <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{ user }}" placeholder="your@email.address" autofocus required >
         </div>
@@ -21,11 +21,11 @@
           <input type="password" class="form-control" id="inputPassword" name="password">
         </div>
         <div>
-          <a class="text-right nav-link" href="/forgot">Forgot password?</a>
+          <a class="text-right nav-link" href="/forgot">Password dimenticata?</a>
         </div>
         <div style="margin-bottom: 40px;">
           <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return fieldLoginControl()">
-            Log In
+            Accedi
           </button>
         </div>
       </form>
