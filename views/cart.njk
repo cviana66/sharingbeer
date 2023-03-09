@@ -101,7 +101,9 @@
         <div>
           <h4 class="text-white text-center"><strong>€{{totalPrice}}</strong></h4>
         </div>
-    {% if userStatus != 'customer' %}
+    
+    {% if (userStatus != 'customer') or (nextStep != 'payment') %}
+    
       <form role="form" action="/register" method="GET">
       <div style="margin-bottom: 40px;">
         <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
@@ -186,7 +188,7 @@
       </div>
   {% else %}
     <div class="col">
-        <h4><p class="text-white text-center">Cart is empty... Go! to </p></h4>
+        <h4><p class="text-white text-center">Il carrello è vuoto... Vai allo </p></h4>
     </div>
 
     <div class="col">
