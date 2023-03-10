@@ -16,13 +16,14 @@
             <div class="card h-100 border-1" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
               <a href="#"><img class="card-img-top" src="{{prod.linkImage}}" alt=""></a>
               <div class=" card-body">
-                <h4 class="card-title text-white text-left">
+                <h3 class="card-title text-white text-left">
                   {{prod.name}}
-                </h4>
+                </h3>
                 <p class="text-white font-weight-light text-left">{{prod.quantity}}</p>
                 <div style="margin: 0px 0px 10px 0px;">
                   <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-                    {{prod.prettyPrice}} Aggiungi al Carrello
+                    <div>{{prod.prettyPrice}}</div>
+                    <div>Aggiungi al Carrello</div>
                   </button>
                 </div>
                 <div class="align-self-center">

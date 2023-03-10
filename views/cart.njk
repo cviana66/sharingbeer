@@ -7,7 +7,8 @@
       <div class="row col-md-12 col-lg-12" >
 
         <div class="col">
-          <p class="text-white text-left"> {{prod.name}} : nome della biarra e caratteristiche varie</p>
+           <h5 class="card-title text-white text-left">{{prod.name}}</h5>
+           <p class="text-white text-left"> {{prod.quantity}}</p>
         </div>
       </div>
 
@@ -28,7 +29,7 @@
             <tr>
               <td rowspan="2">
                 <div>
-                  <img class="img-responsive rounded mx-auto" src="http://placehold.it/80x100">
+                  <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100" height="100">
                 </div>
               </td>
               <td>
@@ -188,9 +189,8 @@
       </div>
   {% else %}
     <div class="col">
-        <h4><p class="text-white text-center">Il carrello è vuoto... Vai allo </p></h4>
+        <h4><p class="text-white text-center">Il carrello è vuoto...</p></h4>
     </div>
-
     <div class="col">
       <form method="GET" action="/shop">
         <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
