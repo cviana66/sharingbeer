@@ -27,7 +27,8 @@ module.exports = function(app) {
   						       user       : req.user,                //utente loggato
   						       numProducts: req.session.numProducts, //numero di proodotti nel carrello visualizzato su main.dust
   						       cart       : req.session.cartItems,   //prodotti nel carrello
-                     message    : req.flash('info')
+                     message    : req.flash('info'),
+                     type       : "info"
   					       };
       console.log("numero di prodotti in carrello: ",req.session.numProducts)
   		res.render('shop.njk', model);
@@ -36,6 +37,8 @@ module.exports = function(app) {
 //POST
 	app.post('/shop', lib.isLoggedIn ,function (req, res) {
 
+    //Settings session.nextStep che guida il processo per arrivare al pagamento
+    req.session.nextStep = 'address'; 
 		//Load (or initialize) the cart and session.cart
 		var cart = req.session.cart = req.session.cart || {};
 
@@ -64,6 +67,8 @@ module.exports = function(app) {
 				cart[id] = {
 					id : prod._id,
 					name: prod.name,
+          linkImage: prod.linkImage,
+          quantity: prod.quantity,
 					price: prod.price.toFixed(2),
 					prettyPrice: prod.prettyPrice(),
 					qty: 1
@@ -88,7 +93,8 @@ module.exports = function(app) {
   						    numProducts: req.session.numProducts,
   						    cart       : req.session.cartItems,
                   totalPrice : req.session.totalPrc,
-                  userStatus : req.user.status
+                  userStatus : req.user.status,
+                  nextStep   : req.session.nextStep
   					    };
 
   	res.render('cart.njk', model);
