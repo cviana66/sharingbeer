@@ -1,14 +1,10 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Important info</h3>
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Importante</h3>
       <hr style="border-top: 1px solid #5375BD;">
       
-      {% if message %}
-        {% for message in message %}
-          <div class="alert alert-{{type}}">{{message}}</div>
-        {% endfor %}
-      {% endif %}
-
+          <div class="alert alert-info">Fabio è stato invitato!</div>
+      
 {% endblock %}
 

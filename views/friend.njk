@@ -34,13 +34,15 @@
       </div>
 
       <form role="form" action="/recomm" method="POST">
-        <div class="form-group">
+        <!--div class="form-group">
           <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Email del tuo amico </label>
           <div class="input-error" id="wrongMail"></div>
           <input type="email" class="form-control" id="inputUsernameEmail"
           name="email" placeholder="your@email.address" {% if message=='' %} autofocus {% endif %} required {{controlSates}}>
-        </div>
+        </div-->
+
         <div class="form-group">
+
           <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Nome del tuo amico </label>
           <input type="text" class="form-control" id="inputFirsName"
           name="firstName" placeholder="First name" required {{controlSates}}>
