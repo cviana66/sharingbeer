@@ -14,8 +14,8 @@
         <form method="POST" action="/shop">
           <input type="hidden" name="item_id" value="{{prod.id}}">
             <div class="card h-100 border-1" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
-              <a href="#"><img class="card-img-top" src="{{prod.linkImage}}" alt=""></a>
               <div class=" card-body">
+                <div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
                 <h3 class="card-title text-white text-left">
                   {{prod.name}}
                 </h3>
