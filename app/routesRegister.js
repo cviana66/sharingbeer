@@ -30,6 +30,11 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           });
     });
 
+    app.get('/share', function(req, res) {
+          res.render('share.njk', {
+          });
+    });
+
     app.get('/qrq', function(req, res) {
           res.render('square.njk', {
           });
@@ -38,6 +43,10 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     app.get('/redirect', function(req, res) {
         req.flash('info', 'SHOP');
         res.redirect('/shop');
+    });
+    app.get('/redirectType', function(req, res) {
+        req.flash('info', 'SHOP');
+        res.redirect('/shop/warning');
     });
 
 // =====================================
@@ -309,7 +318,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
             });
 
         } else if (req.user.status == 'customer' && req.session.numProducts > 0) {
-            res.redirect('/cart');
+            res.redirect('/addresses');
 
         } else {
             console.log('User: ', req.user);
@@ -317,43 +326,63 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
         }
     });
     //POST
-    app.post('/register', lib.isLoggedIn, function(req, res, next) {
-
-        User.findByIdAndUpdate(req.user._id, {
-            $set: {
-                mobilePrefix: '+39',
-                mobileNumber: lib.capitalizeFirstLetter(req.body.mobile),
-                status: 'customer'// to change in 'customer' after session  of testing
-            }
-        }, function(err, req) {
-            if (err) {
+    app.post('/register', lib.isLoggedIn, async function(req, res, next) {
+        try {
+            console.log('ID: ',req.user._id);
+            const doc = await User.findById(req.user._id);
+            //console.log('FORM Register: ',doc);     //TODO fare il controllo di inserimento se l'arreay è vuota
+            doc.name.first              = req.body.firstName;
+            doc.name.last               = req.body.lastName;
+            doc.status                  = 'customer'; // to change in 'customer' after session  of testing
+            doc.addresses.push({
+                                first           : req.body.firstName,     
+                                last            : req.body.lastName,
+                                mobilePrefix    : '+39',
+                                mobileNumber    : req.body.mobile,
+                                city            : req.body.city, 
+                                province        : req.body.provincia,
+                                address         : req.body.street,
+                                numciv          : req.body.numberciv,
+                                main            : 'yes',
+                                preference      : 'yes'
+            });
+            await doc.save();
+            res.redirect('/addresses');
+        } catch(err) {
                 console.log('error', err);
                 req.flash('error', 'The application has encountered an unknown error.It doesn\'t appear to have affected your data, but our technical staff have been automatically notified and will be looking into this with the utmost urgency.');
                 res.render('info.njk', {
                     message: req.flash('error'),
                     type: "danger"
                 });
-                return;
-            }
-        });
+        }
+    });
 
-        var adrs = new Address();
-        adrs.id = req.user._id
-        adrs.address.address = req.body.address;
-        adrs.address.number = req.body.number;
-        adrs.address.town = req.body.city;
-        adrs.cap = req.body.cap;
+    app.get('/addresses',lib.isLoggedIn, async function(req, res) {
+        // TODO:
+        //  1. elencare in schede gli indirizzi già presenti e permetterne la selezione
+        //  2. permettere l'inserimento di un nuovo indirizzo
+        //  3. richiamare cart con il riepilogo 
+        try {
+            const doc = await User.findById(req.user._id);         
+            console.log('DOC:', doc )
 
-        adrs.save(function(err) {
-            if (err) {
-                console.log("ERROR: ", err);
-                req.flash('error', 'Something bad happened! Please try again');
-            } else {
-                req.user.status = 'customer'
-                if (req.user.status == 'customer' && req.session.numProducts > 0)
-                    res.redirect('/paynow');
-            }
-        });
+            res.render('addresses.njk', {
+                firstName: req.user.name.first,
+                lastName: req.user.name.last,
+                user: req.user,
+                numProducts : req.session.numProducts
+            });
+
+        } catch (err) {
+            console.log('error', err);
+            req.flash('error', err) 
+            res.render('info.njk', {
+                message: req.flash('error'),
+                type: "danger"
+            });
+        }
+
     });
 
     // =====================================
@@ -398,7 +427,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
                 // controllo che ci siano ancora inviti diposnibili
                 if (req.session.friendsInvited >= req.session.invitationAvailable) {
-                    req.flash('info', "You have no more invitations! Please buy more beer");
+                    req.flash('info', "Purtropo non hai inviti disponibili! Acquista per ricevere nuoi Punti Invitamici");
                     controlSates = "disabled";
                     flag = "true";
                 }
@@ -421,7 +450,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
         // controllo che ci siano ancora inviti diposnibili
         if (req.session.friendsInvited >= req.session.invitationAvailable) {
-            req.flash('error', "You have no more invitations! Please buy more beer");
+            req.flash('error', "Purtropo non hai inviti disponibili! Acquista per ricevere nuoi Punti Invitamici");
             return res.render('friend.njk', {
                 message: req.flash('error'),
                 type: "warning",

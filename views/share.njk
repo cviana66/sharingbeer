@@ -1,0 +1,29 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Importante</h3>
+      <hr style="border-top: 1px solid #5375BD;">
+      
+          <p class="result" style="color: white"></p>
+
+  <script type="text/javascript">
+    let shareData = {
+    title: "MDN",
+    text: "Learn web development on MDN!",
+    url: "https://developer.mozilla.org"
+  };
+
+  const resultPara = document.querySelector(".result");
+
+  if (!navigator.canShare) {
+    resultPara.textContent = "navigator.canShare() not supported.";
+  } else if (navigator.canShare(shareData)) {
+    resultPara.textContent =
+      "navigator.canShare() supported. We can use navigator.share() to send the data.";
+  } else {
+    resultPara.textContent = "Specified data cannot be shared.";
+  }
+  </script>
+      
+{% endblock %}
+
