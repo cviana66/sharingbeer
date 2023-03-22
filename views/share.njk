@@ -1,29 +1,56 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Importante</h3>
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;"></h3>
       <hr style="border-top: 1px solid #5375BD;">
-      
-          <p class="result" style="color: white"></p>
 
-  <script type="text/javascript">
-    let shareData = {
-    title: "MDN",
-    text: "Learn web development on MDN!",
-    url: "https://developer.mozilla.org"
-  };
+    <p><button type="submit" class="btn btn-my btn-lg btn-block" id="sharebutton" onclick="return share()">Share MDN!</button></p>
 
-  const resultPara = document.querySelector(".result");
+    <p class="text-white text-center"> oppure <br> copia il testo e usalo per invitare il tuo amico</p>
+    <input type="text" value="Hello World" id="myInput" readonly>
+    <button type="submit" class="btn btn-my btn-lg btn-block" id="copybutton" onclick="return copy()">Copia</button>
 
-  if (!navigator.canShare) {
-    resultPara.textContent = "navigator.canShare() not supported.";
-  } else if (navigator.canShare(shareData)) {
-    resultPara.textContent =
-      "navigator.canShare() supported. We can use navigator.share() to send the data.";
-  } else {
-    resultPara.textContent = "Specified data cannot be shared.";
-  }
-  </script>
+    <p class="result text-white text-center"></p>
+
+    <script  type="text/javascript">
+      function share() {
+        let shareData = {
+          title: 'MDN',
+          text: 'Learn web development on MDN!',
+          url: 'https://developer.mozilla.org',
+        }
+
+        resultPara = document.querySelector('.result');
+        if (navigator.canShare) {
+          navigator.share(shareData)
+            .then(() =>
+              resultPara.textContent = 'MDN shared successfully'
+            )
+            .catch((e) =>
+              resultPara.textContent = 'Error: ' + e
+            )
+        } else {
+          resultPara.textContent = "Use email client.";
+          window.location.href = "mailto:?subject=Ciao&body={{htmlMail}}";
+
+        }
+      }
+
+      function copy() {
+        // Get the text field
+        var copyText = document.getElementById("myInput");
+
+        // Select the text field
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(copyText.value);
+        
+        // Alert the copied text
+        alert("Copied the text: " + copyText.value);
+}
+    </script>
       
 {% endblock %}
 

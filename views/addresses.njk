@@ -1,7 +1,7 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark">Dati Registrazione</h3>
+      <h3 class="text-white text-center bg-dark">Consegna presso...</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
       {% if message %}
@@ -10,22 +10,21 @@
         {% endfor %}
       {% endif %}
       
+      <div class="card" style="background-color:#2A0009;border-color:#903246;">
+        <div class="card-body text-white font-weight-light text-justify">
+            <span style="font-size:1.1em;">Scegli o inseisci l'indirizzo di consegna</span> 
+        </div>
+      </div>
+
       <div id="loading">
         <img  src="img/ajax-loader-1.gif" alt="Loading..." />
       </div>
 
-      <div class="card" style="background-color:#2A0009;border-color:#903246;">
-        <div class="card-body text-white font-weight-light text-justify">
-            <span style="font-size:1.1em;">Completa con i tuoi dati personali </span> 
-        </div>
-      </div>
-
-      <form role="form" action="/register" method="post" id="registration">
+      <form role="form" action="/register" method="post" id="addresses">
         <div class="form-group">
           <label for="inputUsernameEmail" class="text-white col-form-label-lg">Nome e Cognome</label>
-          <div class="input-error" id="wrongFirstName"></div>
           <input type="text" class="form-control" id="inputFirstName" value="{{firstName}}"
-           name="firstName" placeholder="Nome" >
+           name="firstName" placeholder="Nome" required>
         </div>
         <div class="form-group">
           <div class="input-error" id="wrongLastName"></div>
@@ -55,7 +54,7 @@
         <div class="form-group">
         <div><label for="inputProvincia" class="text-white col-form-label-lg">Provincia</label></div>
         <div class="input-error" id="wrongProvincia"></div>
-        <input type="text" class="form-control" id="inputProvincia" value="" name="provincia" required readonly>
+        <input type="text" class="form-control" id="inputProvincia" value="" name="Provincia" required readonly>
         <div class="w-100"></div>
         <div id="provincia"></div>
       </div>
@@ -70,7 +69,7 @@
       <div class="form-group">
         <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div>
         <div class="input-error" id="wrongNumciv"></div>
-        <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" required readonly>
+        <input type="text" class="form-control" id="inputNumciv" value="" name="number" required readonly>
       </div>
         <br>
         <div>

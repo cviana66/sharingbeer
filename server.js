@@ -212,16 +212,17 @@ var SharingBeer = function() {
               saveUninitialized: false,
               resave: false,
               cookie: { secure: false,
-                        expires: 600000 },
-              cookie: { sameSite: 'strict' } //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                        expires: 600000,
+                        sameSite: 'strict'} //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
             }));
         } else {
-            self.app.set('trust proxy', 1); // trust first proxy
+            self.app.set('trust proxy', true); // trust first proxy
             self.app.use(session({secret: process.env.SESSION_SECRET, //modify: 18/02/2022
                               saveUninitialized: false,
-                              resave: true,
+                              resave: false,
                               cookie: { secure: true, // serve secure cookies
-                                        expires: 600000 }
+                                        expires: 600000,
+                                        sameSite: 'strict'} //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                             }));
         }
 

@@ -11,24 +11,24 @@ const userSchema = new Schema({
   name:   { first: {type: String},
             last: {type: String},
           },
-  fiscalCode: {type: String},
-  mobilePrefix: {
-    type: String
-  },
-  mobileNumber: {
-    type: String
-  },
+  addresses : [{  first       : {type: String},
+                  last        : {type: String},
+                  mobilePrefix: {type: String},
+                  mobileNumber: {type: String},
+                  city        : {type: String},
+                  province    : {type: String},
+                  address     : {type: String},
+                  numciv      : {type: String},
+                  main        : {type: String}, // usato per definire quale il principale yes/no
+                  preference  : {type: String}  // flag di quale è l'ultimo scelto yes/no
+              }],
+  fiscalCode: {type: String},  
   initDate: {
     type: Date,
     default: Date.now
   },
-  endDate: {
-    type: Date
-  },
-  eligibleFriends: {
-    type: Number,
-    default: 0
-  },
+  endDate: { type: Date},
+  eligibleFriends: {type: Number, default: 0},
   facebook: {
     id: String,
     token: String,
@@ -47,17 +47,9 @@ const userSchema = new Schema({
     email: String,
     name: String
   },
-  idParent: {
-    type: String
-  },
-  booze: {
-    type: Number,
-    default: 0
-  },
-  boozeXfriend: {
-    type: Number,
-    default: 0
-  },
+  idParent      : {type: String},
+  booze         : {type: Number, default: 0},
+  boozeXfriend  : {type: Number, default: 0},
   resetPasswordToken: String,
   resetPasswordExpires: Date
 });

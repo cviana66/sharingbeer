@@ -10,7 +10,7 @@ module.exports = function(app) {
 // GET SHOP ====================================================================
 // =============================================================================
 //GET
-  app.get('/shop', lib.isLoggedIn, function (req,res) {
+  app.get('/shop', /*lib.isLoggedIn,*/ function (req,res) {
 
   	Product.find(function (err, prods) {
   		if (err) {

@@ -154,6 +154,7 @@ function fieldsRegisterControl() {
   var address = document.getElementById("inputStreet").value;
   var numciv = document.getElementById("inputNumciv").value;
   var cognome = document.getElementById("inputLastName").value;
+  var nome = document.getElementById("inputFirstName").value;
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
   var submit = true;
@@ -165,8 +166,16 @@ function fieldsRegisterControl() {
   if (document.getElementById("wrongStreet") != null) document.getElementById("wrongStreet").innerHTML = "";
   if (document.getElementById("wrongNumciv") != null) document.getElementById("wrongNumciv").innerHTML = "";
 
+  if (nome == "") {
+    text = "Inserire il Nome";
+    document.getElementById("wrongFirstName").innerHTML = text;
+    document.getElementById("inputFirstName").focus();
+    return false;
+  } else {    
+    document.getElementById("inputFirstName").value = nome.charAt(0).toUpperCase() + nome.slice(1);
+  } 
   if (cognome == "") {
-    text = "Inserire il Cognome. ";
+    text = "Inserire il Cognome";
     document.getElementById("wrongLastName").innerHTML = text;
     document.getElementById("inputLastName").focus();
     return false;
