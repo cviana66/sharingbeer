@@ -21,7 +21,7 @@ const env           = require('node-env-file'); // si può usare anche il pkg do
 const fastcsv       = require("fast-csv");
 
 
-// config environment variables
+// config environment variables /
 env(__dirname + '/.env');
 
 // connect to our database

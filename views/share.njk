@@ -1,56 +1,38 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
+	
+  <h3 class="text-white text-center bg-dark"> Un nuovo amico </h3>
+  <hr style="border-top: 1px solid #5375BD;">
 
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;"></h3>
-      <hr style="border-top: 1px solid #5375BD;">
-
-    <p><button type="submit" class="btn btn-my btn-lg btn-block" id="sharebutton" onclick="return share()">Share MDN!</button></p>
-
-    <p class="text-white text-center"> oppure <br> copia il testo e usalo per invitare il tuo amico</p>
-    <input type="text" value="Hello World" id="myInput" readonly>
-    <button type="submit" class="btn btn-my btn-lg btn-block" id="copybutton" onclick="return copy()">Copia</button>
-
-    <p class="result text-white text-center"></p>
-
-    <script  type="text/javascript">
-      function share() {
-        let shareData = {
-          title: 'MDN',
-          text: 'Learn web development on MDN!',
-          url: 'https://developer.mozilla.org',
-        }
-
-        resultPara = document.querySelector('.result');
-        if (navigator.canShare) {
-          navigator.share(shareData)
-            .then(() =>
-              resultPara.textContent = 'MDN shared successfully'
-            )
-            .catch((e) =>
-              resultPara.textContent = 'Error: ' + e
-            )
-        } else {
-          resultPara.textContent = "Use email client.";
-          window.location.href = "mailto:?subject=Ciao&body={{htmlMail}}";
-
-        }
-      }
-
-      function copy() {
-        // Get the text field
-        var copyText = document.getElementById("myInput");
-
-        // Select the text field
-        copyText.select();
-        copyText.setSelectionRange(0, 99999); // For mobile devices
-
-        // Copy the text inside the text field
-        navigator.clipboard.writeText(copyText.value);
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
+    <div class="card-body">
+	<h5 class="card-title" style="color:#FFBB35">Importante</h5>
+      <div class="flex-row">
+        <div class="align-self-center">
+          <p class="text-white font-weight-light text-justify">
+            Abbiamo inviato al tuo indirizzo email il messaggio con il link e il codice che il tuo 
+            amico {{firstName}} deve usare per accedere in SharinBeer. <br><br>
+		    Se l'invito lo hai già condiviso ti ricordiamo che ad ogni suo acquisto ricevi punti 
+		    Pinta pr ottenere sconti fino al 50% sui tuoi acquisti. <br><br>
+		    Tienili sotto controllo!
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% if flag %}
         
-        // Alert the copied text
-        alert("Copied the text: " + copyText.value);
-}
-    </script>
+   <form role="form" action="/recomm" method="GET">
+	   <div style="margin-bottom: 40px;">
+		   <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+			   Invita un'altro amico'
+           </button>
+      </div>
+   </form>
+        
+  {% endif %}
+    
       
 {% endblock %}
+
 

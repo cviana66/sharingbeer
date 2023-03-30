@@ -1,0 +1,104 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+  <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Condividi l'invito</h3>
+  <hr style="border-top: 1px solid #5375BD;">
+  
+  <h5 class="card-title text-white">Messaggio di invito</h5> 
+  <div  class="card">  
+    <div class="card-body">        
+      <input type="hidden" id="custId" name="custId" value="{{msgHtml}}{{token}}">
+      <p class="card-text text-center font-italic" id="htmlText"></p>
+    </div>
+  </div> 
+  <div style="margin-top: 20px;margin-bottom: 20px">
+    <button type="submit" class="btn btn-my btn-lg btn-block" id="sharebutton" onclick="return share('{{firstName}}','{{token}}','{{msgHtml}}')">Invialo al tuo amico</button>
+  </div>
+  <!--div style="margin-top: 20px;margin-bottom: 20px">  
+    <p class="text-white text-center"> oppure <br> copia il messaggio e usalo per invitare il tuo amico</p>
+    <button type="submit" class="btn btn-my btn-lg btn-block" id="copybutton" onclick="return copy('{{msgText}}','{{token}}')">Copia il messagio</button>
+  </div-->
+
+<script  type="text/javascript">
+
+  const msgHtml = document.getElementById("custId").value;
+  document.getElementById("htmlText").innerHTML = msgHtml;
+
+  function share(firstName,token,msgHtml) {
+    let shareData = {
+      title: 'Birrificio Viana',
+      text: 'Ciao '+ name + ' , ti mando il link con il codice invito per eccedere in Sharingbeer dove potrai acquistare Birra Viana',
+      url: 'https://sharingbeer.it/validation?token='+token
+    }
+    
+    if (navigator.canShare) {
+      navigator.share(shareData)
+        .then(() =>
+          resultPara.textContent = 'MDN shared successfully'
+        )
+        .catch((e) =>
+          resultPara.textContent = 'Error: ' + e
+        )
+    } else {
+      //apre il client di posta
+      window.location.href = "mailto:?subject=Ciao "+firstName+"&body="+encodeURIComponent(msgHtml+token);
+      //redirige alla pagina infomessage in modalità POST
+      post('/infomessage',{msg:'Hai scelto di condividere il messaggio via mail.\n \
+                                Ti abbiamo inviato anche una mail al tuo indirizzo con il riepilogo dell\'invito.',
+                           type:'info'});
+      //((return window.location.href = "/infomessage?msg=Grazie per aver invitato. hai usato il tuo client mail. Inviata email al tuo indirizzo&type=info"; 
+    }
+  }
+
+  function copy(msgText,token) {
+    console.log(msgText);
+    // Get the text field
+    //let copyText = document.getElementById("custId").value);
+
+    // Select the text field
+    //copyText.select();
+    //copyText.setSelectionRange(0, 99999); // For mobile devices
+
+    // Copy the text inside the text field
+    
+    navigator.clipboard.writeText(msgText+token);
+    
+    // Alert the copied text
+    return window.location.href = "/infomessage?msg=Grazie per aver invitato. hai copiato il testo. Inviata email al tuo indirizzo&type=info"; 
+    //infomessage?msg=Testo copiato: "+msgText+token"&type=info";
+    //alert("Copied the text: " + msgText+token);
+  }
+
+  /**
+  * sends a request to the specified url from a form. this will change the window location.
+  * @param {string} path the path to send the post request to
+  * @param {object} params the parameters to add to the url
+  * @param {string} [method=post] the method to use on the form
+  */
+  function post(path, params, method='post') {
+
+  // The rest of this code assumes you are not using a library.
+  // It can be made less verbose if you use one.
+  const form = document.createElement('form');
+  form.method = method;
+  form.action = path;
+
+  for (const key in params) {
+    if (params.hasOwnProperty(key)) {
+      const hiddenField = document.createElement('input');
+      hiddenField.type = 'hidden';
+      hiddenField.name = key;
+      hiddenField.value = params[key];
+
+      form.appendChild(hiddenField);
+    }
+  }
+
+  document.body.appendChild(form);
+  form.submit();
+}
+</script>
+      
+{% endblock %}
+
+

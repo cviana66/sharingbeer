@@ -6,9 +6,8 @@
       
       {% if message %}
         {% for message in message %}
-          <div class="alert alert-{{type}}">{{message}}</div>
+          <div class="alert alert-{{type}}">{{message | striptags(true) | escape | nl2br}}</div>
         {% endfor %}
       {% endif %}
 
 {% endblock %}
-

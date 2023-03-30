@@ -16,6 +16,7 @@ var lib = require('./libfunction');
 
 var mailfriend = require('../config/mailFriend');
 var mailparent = require('../config/mailParent');
+var mailinvite = require('../config/mailInvite');
 
 const https = require('https');
 
@@ -31,8 +32,9 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     });
 
     app.get('/share', function(req, res) {
+          console.log("FISRT NAME: ",req.body.firstName);
           res.render('share.njk', {
-                firstName : encodeURIComponent("Ciao \n come stai")
+                firstName : req.body.firstName // encodeURIComponent("Ciao \n come stai")
           });
     });
 
@@ -396,7 +398,6 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     //GET
     app.get('/recomm', lib.isLoggedIn, function(req, res) {
 
-        console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")}');
 
         // conto quanti amici ha già lo User
         Friend.countDocuments({ emailParent: req.user.email }, function(err, numFriends) {
@@ -425,23 +426,26 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                 let error = "";
                 let controlSates = "";
                 let flag = "false";
-
+                
                 // controllo che ci siano ancora inviti diposnibili
                 if (req.session.friendsInvited >= req.session.invitationAvailable) {
-                    req.flash('info', "Purtropo non hai inviti disponibili! Acquista per ricevere nuoi Punti Invitamici");
+                    req.flash('info', "Non hai inviti disponibili!");
+                    req.flash('info', "Acquista un box4beer per avere un nuovo invito");                    
                     controlSates = "disabled";
                     flag = "true";
                 }
 
+                
                 res.render('friend.njk', {
                     controlSates: controlSates,
                     flag: flag,
                     message: req.flash('info'),
-                    type: "warning",
+                    type: "info",
                     user: req.user,
                     invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
                     friendsInvited: req.session.friendsInvited,
-                    percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable) //numProducts : req.session.numProducts
+                    percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
+                    token: lib.generateToken(20)    
                 });
             });
         });
@@ -470,58 +474,58 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           // creo nuovo user con i dati segnalati dal PARENT
           var password = lib.generatePassword(6);
           const newUser = await new User();
+          const nome = lib.capitalizeFirstLetter(req.body.firstName)
           // set the user's local credentials
           newUser.password = newUser.generateHash(password);
-          newUser.name.first = lib.capitalizeFirstLetter(req.body.firstName);
+          newUser.name.first = nome;
           newUser.idParent = req.user._id;
           //id parent
           newUser.status = 'new';
           // status
-          newUser.resetPasswordToken = lib.generateToken(20);
+          let token = req.body.token;
+          newUser.email = token+"@sb.sb";
+          newUser.inviteEmail = token+"@sb.sb";
           // token
           newUser.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
           // 1 hour in secondi * 24 * 365 = 1 anno
 
-          await newUser.save(opts);
+    //await newUser.save(opts);
 
           // Save a new friends in mongodb
           var newFriend = new Friend();
           newFriend.id = req.user._id;            // id parent
           newFriend.emailParent = req.user.email; // mail parent
+          newFriend.emailFriend = token+"@sb.sb";  // mail friend
           newFriend.firstNameFriend = newUser.name.first; //name's friend
 
-          await newFriend.save(opts);
+    //await newFriend.save(opts);
+
+          // send email to Friend
+          await lib.sendmailToPerson(req.user.name.first, req.user.email, '', token, newUser.name.first, '', newUser.email, 'invite')
+
           await session.commitTransaction();
           await session.endSession();
 
           req.session.friendsInvited += 1;
-          req.flash('message', 'Ottimo, hai invitato un nuovo amico ed ora dovrà accettarlo. Ad ogni suo acquisto, per sempre, accumulerai puti Pinta per sconti fino al 50%');
+          let flag = false;
+          if (req.session.friendsInvited < req.session.invitationAvailable) {
+			  flag= true;
+		  }
+            
           res.render('share.njk', {
               message: req.flash('message'),
-              type: "info"
+              type: "info",
+              firstName: nome,
+              flag: flag             
           });
-
+          
         } catch (e) {
-          console.log("ERRORE TRANSAZIONE", e);
-          await session.abortTransaction();
-          await session.endSession();
-          if (e.code === 11000) {
-            //duplicate key: email
-            let msg = 'That email is already taken, please try another';
-            req.flash('error', msg);
-            res.render('friend.njk', {
-                message: req.flash('error'),
-                type: "warning",
-                invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                friendsInvited: req.session.friendsInvited,
-                percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-            });
-          } else {
+            await session.abortTransaction();
+            await session.endSession();
             let msg = 'Something bad happened! Please try again';
             req.flash('error', msg);
             console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
-          }
         }
     });
 
@@ -629,15 +633,29 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
     })
     // visualizza in formato HTML la mail User
-    app.get('/mailuser', function(req, res) {
+    app.get('/mailparent', function(req, res) {
         console.log("SERVER:", global.server);
         res.send(mailparent('Name', 'Email', 'userName', 'userEmail', global.server))
-
     })
+
+    app.get('/mailinvite', function(req, res) {
+        console.log("SERVER:", global.server);
+        res.send(mailinvite('Name', 'Email', 'Token', 'userName', 'userEmail', global.server))
+    })    
 
     app.get('/infoMessage', (req, res) => {
       let msg = req.query.msg;
       let msgType = req.query.type;
+      req.flash('message', msg);
+      res.render('info.njk', {
+          message: req.flash('message'),
+          type: msgType
+      })
+    });
+
+    app.post('/infoMessage', (req, res) => {
+      let msg = req.body.msg;
+      let msgType = req.body.type;
       req.flash('message', msg);
       res.render('info.njk', {
           message: req.flash('message'),
