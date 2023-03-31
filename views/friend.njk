@@ -55,25 +55,25 @@
     } else {
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
       let htmlText = "Ciao "+firstName+", </br> ti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% su acquisto di un Box6beer </br></br>https://sharingbeer.it/validation?token="+token;
-  /*    let textText = "Ciao "+firstName+", ti mando il link con il codice invito per eccedere in Sharingbeer dove potrai acquistare Birra Viana https://sharingbeer.it/validation?token=";
+      let textText = "Ciao "+firstName+", ti mando il link con il codice invito per eccedere in Sharingbeer dove potrai acquistare Birra Viana https://sharingbeer.it/validation?token=";
    */   
       let shareData = {
-        title: 'Birrificio Viana',
-        text: 'Ciao '+ firstName + ' , ti mando il link con il codice invito per eccedere in Sharingbeer dove potrai acquistare Birra Viana',
+        title: 'Birrificio Viana - Codice invito SharingBeer',
+        text: textText,
         url: 'https://sharingbeer.it/validation?token='+token
       }
     
       if (navigator.canShare) {
         navigator.share(shareData)
           .then(() =>
-            resultPara.textContent = 'MDN shared successfully'
+            post('/recomm',{name:firstName,token:token})
           )
           .catch((e) =>
             resultPara.textContent = 'Error: ' + e
           )
       } else {
         //apre il client di posta
-        window.location.href = "mailto:?subject=Ciao "+firstName+" - Codice invito SharingBeer&body="+encodeURIComponent(htmlText);
+        window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(htmlText);
         //redirige alla pagina recomm POST
         post('/recomm',{name:firstName,token:token});
       }
