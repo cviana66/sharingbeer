@@ -43,11 +43,19 @@
           Crea l'invito e condividilo
         </button>
       </div>
+
+      <div id="loading">
+        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
+      </div>
   
 
 <script  type="text/javascript">
 
-  async function share(token,parentName,server) {
+  document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("loading").style.display = 'none';
+  });
+
+   async function share(token,parentName,server) {
     if (document.getElementById("inputFirstName").value == "") {
       let text = "Inserire il Nome";
       document.getElementById("wrongFirstName").innerHTML = text;
@@ -55,16 +63,18 @@
     } else {
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
       let htmlText = "Ciao "+firstName+", </br> ti mando il link con il codice invito per accedere in Sharingbeer.it dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% su acquisto di un Box6beer </br></br>"+server+"/validation?token="+token+"</br></br>"+parentName;
-      let textText = "Ciao "+firstName+",\nti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana.\nHai uno sconto del X% su acquisto di un Box6beer\n";
+      let textText = "Ciao "+firstName+",\nti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana.\nHai uno sconto del X% su acquisto di un Box6beer\n\n"+server+"/validation?token="+token;
     
       let shareData = {
         title: 'Birrificio Viana - Codice invito SharingBeer',
-        text: textText,
-        url: token
+        text: textText
       }
       if (navigator.canShare) {
         try {
-            await navigator.share(shareData);
+            navigator.share(shareData);
+            document.getElementById("loading").style.display = 'block';
+            await new Promise(r => setTimeout(r, 3000));
+            document.getElementById("loading").style.display = 'none';
             post('/recomm',{firstName:firstName,token:token});
         } catch (e) {
             post('/infomessage',{msg:"Pagamento non effettuato", type:"error", err:e});
