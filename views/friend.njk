@@ -36,7 +36,7 @@
         <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Nome del tuo amico </label>
         <div class="input-error" id="wrongFirstName"></div>
         <input type="text" class="form-control" id="inputFirstName" value=""
-        name="firstName" placeholder="Nome" required {{controlSates}} autofocus>
+        name="firstName" placeholder="Nome" required {{controlSates}} >
       </div>
       <div style="margin-bottom: 40px; margin-top: 40px;">
         <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
@@ -47,7 +47,7 @@
 
 <script  type="text/javascript">
 
-  function share(token,parentName,server) {
+  async function share(token,parentName,server) {
     if (document.getElementById("inputFirstName").value == "") {
       let text = "Inserire il Nome";
       document.getElementById("wrongFirstName").innerHTML = text;
@@ -55,22 +55,20 @@
     } else {
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
       let htmlText = "Ciao "+firstName+", </br> ti mando il link con il codice invito per accedere in Sharingbeer.it dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% su acquisto di un Box6beer </br></br>"+server+"/validation?token="+token+"</br></br>"+parentName;
-      let textText = "Ciao "+firstName+",\n ti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana. \n Hai uno sconto del X% su acquisto di un Box6beer \n";
+      let textText = "Ciao "+firstName+",\nti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana.\nHai uno sconto del X% su acquisto di un Box6beer\n";
     
       let shareData = {
         title: 'Birrificio Viana - Codice invito SharingBeer',
         text: textText,
         url: token
       }
-    
       if (navigator.canShare) {
-        navigator.share(shareData)
-          .then(() =>
-            post('/recomm',{firstName:firstName,token:token})
-          )
-          .catch((e) =>
-            resultPara.textContent = 'Error: ' + e
-          )
+        try {
+            await navigator.share(shareData);
+            post('/recomm',{firstName:firstName,token:token});
+        } catch (e) {
+            post('/infomessage',{msg:"Pagamento non effettuato", type:"error", err:e});
+        }
       } else {
         //apre il client di posta
         window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(htmlText);
