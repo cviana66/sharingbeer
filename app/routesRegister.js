@@ -402,7 +402,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
         // conto quanti amici ha già lo User
         Friend.countDocuments({ emailParent: req.user.email }, function(err, numFriends) {
             if (err) {
-                console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: Friend.countDocuments: ' + err);
+                console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
                 req.flash('error', 'Something bad happened!');
                 return res.render('info.njk', {
                     message: req.flash('error'),
@@ -412,7 +412,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
             // recupero le informazioni dell'utente
             User.findOne({ email: req.user.email }, function(err, user) {
                 if (err) {
-                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: User.findOne: ' + err);
+                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: User.findOne: ' + err);
                     req.flash('error', 'Something bad happened!');
                     return res.render('info.njk', {
                         message: req.flash('error'),
@@ -435,7 +435,6 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                     flag = "true";
                 }
 
-                
                 res.render('friend.njk', {
                     controlSates: controlSates,
                     flag: flag,
@@ -445,7 +444,9 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                     invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
                     friendsInvited: req.session.friendsInvited,
                     percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
-                    token: lib.generateToken(20)    
+                    token: lib.generateToken(20),
+                    parentName: req.user.name.first,
+                    server: global.server
                 });
             });
         });
@@ -475,34 +476,35 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           var password = lib.generatePassword(6);
           const newUser = await new User();
           const nome = lib.capitalizeFirstLetter(req.body.firstName)
+          console.log('NOME: ',nome);
           // set the user's local credentials
           newUser.password = newUser.generateHash(password);
           newUser.name.first = nome;
           newUser.idParent = req.user._id;
           //id parent
-          newUser.status = 'new';
-          // status
+          newUser.status = 'new';  // status
           let token = req.body.token;
           newUser.email = token+"@sb.sb";
           newUser.inviteEmail = token+"@sb.sb";
-          // token
-          newUser.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
+          newUser.resetPasswordToken = token; // token
           // 1 hour in secondi * 24 * 365 = 1 anno
-
-    //await newUser.save(opts);
-
+          newUser.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
+/*******/
+		  await newUser.save(opts);
+/*******/
           // Save a new friends in mongodb
           var newFriend = new Friend();
-          newFriend.id = req.user._id;            // id parent
-          newFriend.emailParent = req.user.email; // mail parent
-          newFriend.emailFriend = token+"@sb.sb";  // mail friend
-          newFriend.firstNameFriend = newUser.name.first; //name's friend
-
-    //await newFriend.save(opts);
-
-          // send email to Friend
+          newFriend.id = req.user._id;	// id parent
+          newFriend.emailParent = req.user.email;	// mail parent
+          newFriend.emailFriend = token+"@sb.sb";	// mail friend
+          newFriend.firstNameFriend = newUser.name.first;	//name's friend
+/*******/
+		  await newFriend.save(opts);
+/*******/
+           
+/*******/ //send email to Friend         
           await lib.sendmailToPerson(req.user.name.first, req.user.email, '', token, newUser.name.first, '', newUser.email, 'invite')
-
+/*******/
           await session.commitTransaction();
           await session.endSession();
 
@@ -511,10 +513,8 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           if (req.session.friendsInvited < req.session.invitationAvailable) {
 			  flag= true;
 		  }
-            
+          
           res.render('share.njk', {
-              message: req.flash('message'),
-              type: "info",
               firstName: nome,
               flag: flag             
           });
@@ -640,7 +640,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
     app.get('/mailinvite', function(req, res) {
         console.log("SERVER:", global.server);
-        res.send(mailinvite('Name', 'Email', 'Token', 'userName', 'userEmail', global.server))
+        res.send(mailinvite('Name', 'Email', 'Token', 'userName', global.server))
     })    
 
     app.get('/infoMessage', (req, res) => {

@@ -39,7 +39,7 @@
         name="firstName" placeholder="Nome" required {{controlSates}} autofocus>
       </div>
       <div style="margin-bottom: 40px; margin-top: 40px;">
-        <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}')">
+        <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
           Crea l'invito e condividilo
         </button>
       </div>
@@ -47,26 +47,26 @@
 
 <script  type="text/javascript">
 
-  function share(token) {
+  function share(token,parentName,server) {
     if (document.getElementById("inputFirstName").value == "") {
       let text = "Inserire il Nome";
       document.getElementById("wrongFirstName").innerHTML = text;
       document.getElementById("inputFirstName").focus();
     } else {
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
-      let htmlText = "Ciao "+firstName+", </br> ti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% su acquisto di un Box6beer </br></br>https://sharingbeer.it/validation?token="+token;
-      let textText = "Ciao "+firstName+", ti mando il link con il codice invito per eccedere in Sharingbeer dove potrai acquistare Birra Viana https://sharingbeer.it/validation?token=";
-   */   
+      let htmlText = "Ciao "+firstName+", </br> ti mando il link con il codice invito per accedere in Sharingbeer.it dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% su acquisto di un Box6beer </br></br>"+server+"/validation?token="+token+"</br></br>"+parentName;
+      let textText = "Ciao "+firstName+", ti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana. Hai uno sconto del X% su acquisto di un Box6beer";
+    
       let shareData = {
         title: 'Birrificio Viana - Codice invito SharingBeer',
         text: textText,
-        url: 'https://sharingbeer.it/validation?token='+token
+        url: token
       }
     
       if (navigator.canShare) {
         navigator.share(shareData)
           .then(() =>
-            post('/recomm',{name:firstName,token:token})
+            post('/recomm',{firstName:firstName,token:token})
           )
           .catch((e) =>
             resultPara.textContent = 'Error: ' + e
@@ -75,7 +75,7 @@
         //apre il client di posta
         window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(htmlText);
         //redirige alla pagina recomm POST
-        post('/recomm',{name:firstName,token:token});
+        post('/recomm',{firstName:firstName,token:token});
       }
     }
   }
