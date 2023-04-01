@@ -71,13 +71,12 @@
       }
       if (navigator.canShare) {
         try {
-            navigator.share(shareData);
             document.getElementById("loading").style.display = 'block';
-            await new Promise(r => setTimeout(r, 3000));
+            await navigator.share(shareData);
             document.getElementById("loading").style.display = 'none';
             post('/recomm',{firstName:firstName,token:token});
         } catch (e) {
-            post('/infomessage',{msg:"Pagamento non effettuato", type:"error", err:e});
+            post('/infomessage',{msg:"messaggio non inviato: "+e, type:"warning", err:e});
         }
       } else {
         //apre il client di posta
