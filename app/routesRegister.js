@@ -649,17 +649,20 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
       req.flash('message', msg);
       res.render('info.njk', {
           message: req.flash('message'),
-          type: msgType
+          type: msgType,
       })
     });
 
     app.post('/infoMessage', (req, res) => {
       let msg = req.body.msg;
       let msgType = req.body.type;
+      let err = req.body.err;
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+err+' FLASH: '+msg);
       req.flash('message', msg);
       res.render('info.njk', {
           message: req.flash('message'),
-          type: msgType
+          type: msgType,
+          err: err
       })
     });
 }

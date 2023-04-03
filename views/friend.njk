@@ -76,7 +76,7 @@
             document.getElementById("loading").style.display = 'none';
             post('/recomm',{firstName:firstName,token:token});
         } catch (e) {
-            post('/infomessage',{msg:"messaggio non inviato: "+e, type:"warning", err:e});
+            post('/infomessage',{msg:"Condivisione non avvenuta", type:"warning", err:e});
         }
       } else {
         //apre il client di posta
