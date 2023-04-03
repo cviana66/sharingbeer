@@ -63,11 +63,12 @@
     } else {
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
       let htmlText = "Ciao "+firstName+", </br> ti mando il link con il codice invito per accedere in Sharingbeer.it dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% su acquisto di un Box6beer </br></br>"+server+"/validation?token="+token+"</br></br>"+parentName;
-      let textText = "Ciao "+firstName+",\nti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana.\nHai uno sconto del X% su acquisto di un Box6beer\n\n"+server+"/validation?token="+token;
+      let textText = "Ciao "+firstName+",\nti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana.\nHai uno sconto del X% su acquisto di un Box6beer\n\n";
     
       let shareData = {
         title: 'Birrificio Viana - Codice invito SharingBeer',
-        text: textText
+        text: textText,
+        url: server+"/validation?token="+token
       }
       if (navigator.canShare) {
         try {
