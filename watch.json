@@ -8,12 +8,14 @@
   "restart": {
     "exclude": [
       "^public/",
-      "^dist/"
+      "^dist/",
+      "^view/"
     ],
     "include": [
       "\\.js$",
       "\\.coffee$",
-      "\\.json"
+      "\\.json",
+      "\\.njk"
     ]
   },
   "throttle": 100

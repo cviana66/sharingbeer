@@ -187,8 +187,6 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     //GET
     app.get('/validation', function(req, res) {
 
-        console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"}');
-
         User.findOne({
             resetPasswordToken: req.query.token,
             resetPasswordExpires: {
@@ -204,6 +202,13 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                     type: "warming"
                 });
             }
+        /************************************************************************************************************
+         *                                              IMPORTANTE
+         *  Quando la pagin la pagina friend.njk efettua la chiamata navigator.share() 
+         *  avviene il test del link specifcato con conseuente chiamata in GET del /validation e
+         *  non essendo ancora salvato lo User il log riporta "Invito non più valido o scaduto" 
+         *  che non rappresenta un vero errore. 
+        /************************************************************************************************************/
             if (!user) {
                 let msg = 'Invito non più valido o scaduto'; //Invitation is invalid or has expired';
                 req.flash('info', msg);
@@ -430,7 +435,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                 // controllo che ci siano ancora inviti diposnibili
                 if (req.session.friendsInvited >= req.session.invitationAvailable) {
                     req.flash('info', "Non hai inviti disponibili!");
-                    req.flash('info', "Acquista un box4beer per avere un nuovo invito");                    
+                    req.flash('info', "Acquista un Box4beer per avere un nuovo invito");                    
                     controlSates = "disabled";
                     flag = "true";
                 }
@@ -456,7 +461,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
         // controllo che ci siano ancora inviti diposnibili
         if (req.session.friendsInvited >= req.session.invitationAvailable) {
-            req.flash('error', "Purtropo non hai inviti disponibili! Acquista per ricevere nuoi Punti Invitamici");
+            req.flash('error', "Purtropo non hai inviti disponibili! Acquista per ricevere nuovi Punti Invitamici");
             return res.render('friend.njk', {
                 message: req.flash('error'),
                 type: "warning",
@@ -657,7 +662,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
       let msg = req.body.msg;
       let msgType = req.body.type;
       let err = req.body.err;
-      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+err+' FLASH: '+msg);
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
       req.flash('message', msg);
       res.render('info.njk', {
           message: req.flash('message'),

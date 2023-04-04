@@ -62,8 +62,8 @@
       document.getElementById("inputFirstName").focus();
     } else {
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
-      let htmlText = "Ciao "+firstName+", </br> ti mando il link con il codice invito per accedere in Sharingbeer.it dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% su acquisto di un Box6beer </br></br>"+server+"/validation?token="+token+"</br></br>"+parentName;
-      let textText = "Ciao "+firstName+",\nti mando il link con il codice invito per eccedere in Sharingbeer.it dove potrai acquistare Birra Viana.\nHai uno sconto del X% su acquisto di un Box6beer\n\n";
+      let htmlText = "Ciao "+firstName+", </br> sotto trovi il link con il codice invito per accedere in SharingBeer dove potrai acquistare Birra Viana.</br> Hai uno sconto del X% sull\'acquisto di un Box4beer </br></br>"+server+"/validation?token="+token+"</br></br>"+parentName;
+      let textText = "Ciao "+firstName+",\nsotto trovi il link con il codice invito per eccedere in SharingBeer dove potrai acquistare Birra Viana.\nHai uno sconto del X% sull\'acquisto di un Box4beer\n\n";
     
       let shareData = {
         title: 'Birrificio Viana - Codice invito SharingBeer',
@@ -73,11 +73,15 @@
       if (navigator.canShare) {
         try {
             document.getElementById("loading").style.display = 'block';
-            await navigator.share(shareData);
+            a = await navigator.share(shareData);
             document.getElementById("loading").style.display = 'none';
-            post('/recomm',{firstName:firstName,token:token});
+            if (a == undefined) {
+              post('/recomm',{firstName:firstName,token:token});
+            } else {
+              throw new Error ('SHARE FALLITO = '+a);
+            }
         } catch (e) {
-            post('/infomessage',{msg:"Condivisione non avvenuta", type:"warning", err:e});
+            post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito ", type:"warning", err:e});
         }
       } else {
         //apre il client di posta
@@ -117,7 +121,6 @@
         form.appendChild(hiddenField);
       }
     }
-
     document.body.appendChild(form);
     form.submit();
   }
