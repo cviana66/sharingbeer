@@ -13,12 +13,18 @@ html {
   color:#ffc107; 
   font-size:1rem;
   margin-bottom:5px;
-  animation: blinker 2s linear 5;
+  animation-name: blinker;
+  animation-duration: 2s; 
+  animation-timing-function; linear; 
+  animation-delay: 2s; 
+  animation-iteration-count: 5;
+  animation-delay: 3s;
+
 }
 
 @keyframes blinker {
   50% {
-    opacity: 0.2;
+    opacity: 0;
   }
 }
 
