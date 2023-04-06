@@ -1,6 +1,7 @@
 {
   "short_name": "SharingBeer",
   "name": "Birra Viana by SharigBeer",
+  "start_url": "https://sharingbeer.it"
   "icons": [
     {
       "src": "img/favicon192.png",
