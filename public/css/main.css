@@ -13,21 +13,21 @@ html {
   color:#ffc107; 
   font-size:1rem;
   margin-bottom:5px;
-  animation-name: blinker;
+/*  animation-name: blinker;
   animation-duration: 2s; 
   animation-timing-function; linear; 
   animation-delay: 2s; 
   animation-iteration-count: 5;
   animation-delay: 3s;
-
+*/
 }
-
+/*
 @keyframes blinker {
   50% {
     opacity: 0;
   }
 }
-
+*/
 .arrows {
   width: 60px;
   height: 72px;
@@ -108,69 +108,18 @@ color: #4e4e4e;
 /* Design Document display popup
 /*-------------------------------*/
 
-.documentPopup {
-  display: none;
-  position: fixed;
-  z-index: 50;
-  left: 0px; right: 0px;
-  top: 0px; bottom: 0px;
-  background-color: #2A0009;
-  overflow-y:scroll;
-}
-
-.documentPopup p{
-  padding: 25px;
-  font-size: 14px;
-}
-
-.documentPopup h1,h2,h3,h4{
-  padding: 15px;
-}
-
-.documentPopup button{
-  width: 100%;
-  /*border: navajowhite;*/
-  background: #097fb7;
-  padding: 5px;
-  border-radius: 10px;
-  color: white;
-}
-
-#myBtn {
-  display: none; /* Hidden by default */
-  position: fixed; /* Fixed/sticky position */
-  top: 0px; /* Place the button at the top of the page */
-  right: 0px; /* Place the button 30px from the right */
-  z-index: 99; /* Make sure it does not overlap */
-  border: none; /* Remove borders */
-  outline: none; /* Remove outline */
-  cursor: pointer; /* Add a mouse pointer on hover */
-  background-color: #2A0009;
-}
-
 .infoPopup {
   display: none;
   position: fixed;
-  width: 250px;
-  height: auto;
+  width: 80%;
+  height: 70%;
   z-index: 50;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   background-color: #2A0009;
   border: 1px solid #5375BD;
-}
-
-.infoPopup p{
-  padding: 15px;
-  font-size: 14px;
-}
-
-.infoPopup h1,h2,h3,h4{
-  padding: 15px;
+  overflow-y:auto;
 }
 
 .blur.active {

@@ -9,6 +9,10 @@
           <div class="alert alert-{{type}}">{{message}}</div>
         {% endfor %}
       {% endif %}
+
+      <div id="loading">
+        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
+      </div>
       
       <div class="card" style="background-color:#2A0009;border-color:#903246;">
         <div class="card-body text-white font-weight-light text-justify">
@@ -16,13 +20,10 @@
         </div>
       </div>
 
-      <div id="loading">
-        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
-      </div>
-
       <form role="form" action="/register" method="post" id="addresses">
         <div class="form-group">
           <label for="inputUsernameEmail" class="text-white col-form-label-lg">Nome e Cognome</label>
+          <div class="input-error" id="wrongFirstName"></div>
           <input type="text" class="form-control" id="inputFirstName" value="{{firstName}}"
            name="firstName" placeholder="Nome" required>
         </div>
@@ -283,7 +284,7 @@ async function selectCity(v) {
         input.setAttribute("value", "OK");
         console.log('INPUT: ',input);
         //append to form element that you want .
-        document.getElementById("registration").appendChild(input);
+        document.getElementById("addresses").appendChild(input);
       }
     } catch (e){
       document.getElementById("inputProvincia").removeAttribute('readonly');
@@ -302,7 +303,7 @@ async function selectCity(v) {
         input.setAttribute("value", "KO");
         console.log('INPUT: ',input);
         //append to form element that you want .
-        document.getElementById("registration").appendChild(input);
+        document.getElementById("addresses").appendChild(input);
       }
       return;
     }

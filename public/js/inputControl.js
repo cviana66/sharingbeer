@@ -1,11 +1,14 @@
 /* inputControl.js */
+const iwar = '<svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24px" viewBox="0 0 24 24" width="30px" fill="#ffc107"> \
+             <g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M12,5.99L19.53,19H4.47L12,5.99 M12,2L1,21h22L12,2L12,2z"/> \
+             <polygon points="13,16 11,16 11,18 13,18"/><polygon points="13,10 11,10 11,15 13,15"/></g></g></g></svg>';
 
 function fieldLoginControl(){
   var email = document.getElementById("inputUsernameEmail").value;
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var submit = true;
   if (email == "" || !re.test(String(email))) {
-    text = "Please provide a valid email.";
+    text = iwar+"Please provide a valid email.";
     document.getElementById("wrongMail").innerHTML = text;
     submit = false;
   }
@@ -24,8 +27,8 @@ function fieldsValidationControl() {
 
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var email = document.getElementById("inputUsernameEmail").value;
-  if(email =="" || !re.test(String(email))) {
-    document.getElementById("wrongMail").innerHTML = "Inserisci una Email valida";
+  if(email =="" || !re.test(String(email))) {    
+    document.getElementById("wrongMail").innerHTML = iwar+"Inserisci una Email valida";
     document.getElementById("inputUsernameEmail").focus();
     return false;
   };
@@ -43,50 +46,50 @@ function fieldsValidationControl() {
 
   if(pwd1 != "") {
     if(pwd1.length < 6) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve essere di almeno 6 caratteri";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve essere di almeno 6 caratteri";
       document.getElementById("inputPassword").focus();
       return false;
     }
     if(pwd1 == email) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve essere dfferente dall'Email";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve essere dfferente dall'Email";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re1 = /[0-9]/;
     if(!re1.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un numero";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un numero";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re2 = /[a-z]/;
     if(!re2.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera minuscola";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno una lettera minuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re3 = /[A-Z]/;
     if(!re3.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera maiuscola";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno una lettera maiuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un carattere speciale";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
     }
   } else {
-    document.getElementById("wrongPwd").innerHTML = "Crea una nuova Password";
+    document.getElementById("wrongPwd").innerHTML = iwar+"Crea una nuova Password";
     document.getElementById("inputPassword").focus();
     return false;
   }
   if(!document.getElementById('checkAge').checked) {
-    document.getElementById("wrongAge").innerHTML = "Spunta la casella di controllo solo se hai più di 18 anni";
+    document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella di controllo solo se hai più di 18 anni";
     return false;
   }
   if(!document.getElementById('checkPrivacy').checked) {
-    document.getElementById("wrongPrivacy").innerHTML = "Spunta la casella di controllo per accettare le Condizioni";
+    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella di controllo per accettare le Condizioni";
     return false;
   }
   return true;
@@ -101,46 +104,46 @@ function fieldsResetControl() {
 
   if(pwd1 != "") {
     if(pwd1.length < 6) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve essere di almeno 6 caratteri";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve essere di almeno 6 caratteri";
       document.getElementById("inputPassword").focus();
       return false;
     }
     if(pwd1 == email) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve essere dfferente dall'Email";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve essere dfferente dall'Email";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re1 = /[0-9]/;
     if(!re1.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un numero";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un numero";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re2 = /[a-z]/;
     if(!re2.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera minuscola";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno una lettera minuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re3 = /[A-Z]/;
     if(!re3.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno una lettera maiuscola";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno una lettera maiuscola";
       document.getElementById("inputPassword").focus();
       return false;
     }
     var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
-      document.getElementById("wrongPwd").innerHTML = "La Password deve contenere almeno un carattere speciale";
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
     }
     if(pwd1!=pwd2) {
-      document.getElementById("wrongPwd2").innerHTML = "Le Password inserite sono differenti ";
+      document.getElementById("wrongPwd2").innerHTML = iwar+"Le Password inserite sono differenti ";
       document.getElementById("confirmPassword").focus();
       return false;
     }
   } else {
-    document.getElementById("wrongPwd").innerHTML = "Crea una nuova Password";
+    document.getElementById("wrongPwd").innerHTML = iwar+"Crea una nuova Password";
     document.getElementById("inputPassword").focus();
     return false;
   }
@@ -159,6 +162,7 @@ function fieldsRegisterControl() {
   var capno = /^\d{5}$/;
   var submit = true;
   // init messaggi di warning
+  if (document.getElementById("wrongFirstName") != null) document.getElementById("wrongFirstName").innerHTML = "";
   if (document.getElementById("wrongLastName") != null) document.getElementById("wrongLastName").innerHTML = "";
   if (document.getElementById("wrongPhone") != null) document.getElementById("wrongPhone").innerHTML = "";
   if (document.getElementById("wrongCity") != null) document.getElementById("wrongCity").innerHTML = "";
@@ -167,62 +171,70 @@ function fieldsRegisterControl() {
   if (document.getElementById("wrongNumciv") != null) document.getElementById("wrongNumciv").innerHTML = "";
 
   if (nome == "") {
-    text = "Inserire il Nome";
+    text = iwar+"Inserire il Nome";
     document.getElementById("wrongFirstName").innerHTML = text;
     document.getElementById("inputFirstName").focus();
+    document.getElementById("wrongFirstName").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   } else {    
     document.getElementById("inputFirstName").value = nome.charAt(0).toUpperCase() + nome.slice(1);
   } 
   if (cognome == "") {
-    text = "Inserire il Cognome";
+    text = iwar+"Inserire il Cognome";
     document.getElementById("wrongLastName").innerHTML = text;
     document.getElementById("inputLastName").focus();
+    document.getElementById("wrongLastName").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   } else {    
     document.getElementById("inputLastName").value = cognome.charAt(0).toUpperCase() + cognome.slice(1);
   } 
   if (phone == "" || !phone.match(phoneno)) {
-    text = "Inserire un numero di telefono cellulare valido";
+    text = iwar+"Inserire un numero di telefono cellulare valido";
     document.getElementById("wrongPhone").innerHTML = text;
     document.getElementById("inputMobile").focus();
+    document.getElementById("wrongPhone").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
-  // se la lista di città risultante dalla selezione fatta nella pagina registration.njk
+  // se la lista di città risultante dalla selezione fatta nella pagina registration.njk o addresses.njk
   // javascript async function selectCity(v) è diversa da NULL e la città è blank allora
-  // no si è digitato correttamente il noem della città o selezionata la città dalla lista
+  // non si è digitato correttamente il nome della città o selezionata la città dalla lista
   // proposta 
-  if (city == "" || document.getElementById('myselectcity') != null) {
-    text = "Inserire o selezionare la Città";
+  if (city == "" || document.getElementById('myselectcity') != null || document.getElementById("hiddenListOfCities") === null || document.getElementById("hiddenListOfCities") === undefined) {
+    text = iwar+"Inserire o selezionare la Città";
     document.getElementById("wrongCity").innerHTML = text;
     document.getElementById("inputCity").focus();
+    document.getElementById("wrongCity").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
   // se il campo HIDDEN hiddenListOfCities è presente perchè creato nel javascript della
   // pagina registration.njk a seguito di corretto funzionamento di ricerca allora
   // se non si ha valorizzata la provincia è perchè il nome della città è inesistente
   if (province == "" &&  document.getElementById("hiddenListOfCities").value == "OK") {
-    text = "Inserire o selezionare una Città esistente";
+    text = iwar+"Inserire o selezionare una Città esistente";
     document.getElementById("wrongCity").innerHTML = text;
     document.getElementById("inputCity").focus();
+    document.getElementById("wrongCity").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
   if (province == "") {
-    text = "Inserire la Provincia";
+    text = iwar+"Inserire la Provincia";
     document.getElementById("wrongProvincia").innerHTML = text;
     document.getElementById("inputProvincia").focus();
+    document.getElementById("wrongProvincia").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
   if (address == "" || document.getElementById("myselectstreet") !=null) {
-    text = "Inserire o selezionare l'indirizzo ";
+    text = iwar+"Inserire o selezionare l'indirizzo ";
     document.getElementById("wrongStreet").innerHTML = text;
     document.getElementById("inputStreet").focus();
+    document.getElementById("wrongStreet").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
   if (numciv == "") {
-    text = "Inserire il Numero Civico";
+    text = iwar+"Inserire il Numero Civico";
     document.getElementById("wrongNumciv").innerHTML = text;
     document.getElementById("inputNumciv").focus();
+    document.getElementById("").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
   
