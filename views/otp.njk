@@ -1,0 +1,43 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+      <h3 class="text-white text-center bg-dark"> Verifica indirizzo e-mail </h3>
+      <hr style="border-top: 1px solid #5375BD">
+      <!-- show any messages that come back with authentication -->
+      {% if message %}
+        {% for message in message %}
+          <div class="alert alert-{{type}}" autofocus>{{message}}</div>
+        {% endfor %}
+      {% endif %}
+
+      <header class="jumbotron" style="background-color:#2A0009; padding-top: 0px;  padding-bottom: 0px;  margin-bottom: 0px;">
+        <p class="lead text-white text-justify">Ti abbiamo inviato una email con il codice di verifica </p>
+        <p class="lead text-white text-center" style="font-size:1.7em">Prova la <img style="vertical-align: baseline" height="32" src="/img/birra_viana.png"> </p>
+        <!--hr  style="border-top: 1px solid #903246"-->
+      
+      <div class="row">
+        <div class="col-12" >
+          <form role="form" action="/validation" method="post">
+            <fieldset>
+              <div class="form-group">
+                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Email</label>
+                <div class="input-error" id="wrongMail"></div>
+                <!--p class="text-white font-weight-light text-justify" style="font-size:0.7rem;">questo è l'indirizzo email proposto dalla persona che ti ha invitato, se vuoi modificarlo ricorda che deve essere una mail valida e sarà il tuo utente per gli accessi futuri</p-->
+                <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="your@email.address">
+              </div>
+              <div class="form-group">
+                <label class="text-white col-form-label-lg" for="inputOTP">Inserisci il codice</label>
+                <input type="text" class="form-control" id="inputOTP" value="" required>
+              </div>
+              
+              <div style="margin-top:10px;margin-bottom:10px">
+                <button type="submit" class="btn btn-my btn-lg btn-block">
+                  Conferma
+                </button>
+            </fieldset>
+          </form>
+          <br>
+        </div>
+      </div>
+
+{% endblock %}

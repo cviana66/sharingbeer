@@ -1,0 +1,23 @@
+{% extends "layouts/main.njk" %} 
+{% block body %}
+
+<h3 class="text-white text-center bg-dark"> Sharing Beer</h3>
+<hr style="border-top: 1px solid #5375BD;">
+
+{% if message %}
+  {% for message in message %}
+    <div class="alert alert-{{type}}">{{message}}</div>
+  {% endfor %}
+{% endif %}
+
+<!--div>
+  <video width="250" controls autoplay>
+    <source src="video/BiarraViannaColor_Final_Logo.mp4" type="video/mp4">
+  </video>
+</div-->
+
+<div class="embed-responsive embed-responsive-16by9">
+  <video class="embed-responsive-item" src="video/BiarraViannaColor_Final_Logo.mp4" controls autoplay="true" muted></video>
+</div>
+
+{% endblock %}

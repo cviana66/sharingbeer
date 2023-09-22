@@ -30,8 +30,8 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
 							<div style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-align:left;color:#222541;margin-top:10px;background-color:#F5F5F5;border-radius:6px; padding:10px 5px 15px 20px"> \
 								<p>Ciao ' +friendName+ ', </p> \
 								<p> ti mando il link con il codice invito per accedere in Sharingbeer.it dove potrai acquistare Birra Viana. </p> \
+								<p> ' +server+ '/validation?token=' +token+ ' </p> \
 								<p> Hai uno sconto del X% sull&#8217;acquisto di un Box6beer. </p> \
-						        <p> ' +server+ '/validation?token=' +token+ ' </p> \
 								<p> ' +parentName+ ' </p> \
 							</div> \
 							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \

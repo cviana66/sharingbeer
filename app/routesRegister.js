@@ -17,6 +17,7 @@ var lib = require('./libfunction');
 var mailfriend = require('../config/mailFriend');
 var mailparent = require('../config/mailParent');
 var mailinvite = require('../config/mailInvite');
+var mailconferme = require('../config/mailConferme');
 
 const https = require('https');
 
@@ -50,6 +51,13 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     app.get('/redirectType', function(req, res) {
         req.flash('info', 'SHOP');
         res.redirect('/shop/warning');
+    });
+
+    app.get('/testflash', function(req,res) {
+      let msg = 'Email Verificata. Utente validato e autenticato';
+      req.flash('info', msg);
+      console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
+      res.redirect('/shop');
     });
 
 // =====================================
@@ -192,43 +200,166 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
             resetPasswordExpires: {
                 $gt: Date.now()
             }
-        }, function(err, user) {
+        }, async function(err, user) {
             if (err) {
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired'
                 req.flash('error', msg);
                 console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                 return res.render('info.njk', {
-                    message: req.flash('error'),
-                    type: "warming"
-                });
+                                message: req.flash('error'),
+                                type: "warning"
+                        });
             }
-        /************************************************************************************************************
-         *                                              IMPORTANTE
-         *  Quando la pagin la pagina friend.njk efettua la chiamata navigator.share() 
-         *  avviene il test del link specifcato con conseuente chiamata in GET del /validation e
-         *  non essendo ancora salvato lo User il log riporta "Invito non più valido o scaduto" 
-         *  che non rappresenta un vero errore. 
-        /************************************************************************************************************/
+
+        /*===========================================================================================
+          |                                              IMPORTANTE
+          |  Quando la pagina friend.njk efettua la chiamata navigator.share() 
+          |  avviene il test del link specifcato con conseuente chiamata in GET del /validation e
+          |  non essendo ancora salvato lo User il log riporta "Invito non più valido o scaduto" 
+          |  che non rappresenta un vero errore. 
+          ===========================================================================================*/
+
             if (!user) {
                 let msg = 'Invito non più valido o scaduto'; //Invitation is invalid or has expired';
-                req.flash('info', msg);
+                req.flash('warning', msg);
                 console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
-                res.render('info.njk', {
-                    message: req.flash('info'),
-                    type: "warning"
-                });
+                return res.render('info.njk', {
+                                    message: req.flash('warning'),
+                                    type: "warning"
+                                  });
             } else {
-                res.render('validation.njk', {
-                    prospect: user,
-                    message: req.flash('validateMessage'),
-                    type: "info"
+              if (user.status == 'new') {
+                res.render('validation.njk', {prospect: user,});
+              } else if (user.status == 'waiting') { 
+                //START TRANSACTION
+                const session = await db.startSession();
+                session.startTransaction();
+                const opts = { session };
+                try {
+                  //user.status = 'validated';
+                  //user.resetPasswordToken = undefined;
+                  //user.resetPasswordExpires = undefined;
+                  await user.save(opts);
+
+                  await session.commitTransaction();
+
+                } catch (e) {
+                  console.log("errore: ",e)
+                  
+                  await session.abortTransaction();
+                  
+                  let msg = 'Spaicente ma qualche cosa non ha funzionato! Riprova ad effetuare la validazione della mail';
+                  req.flash('error', msg);
+                  console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
+                  return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+
+                } finally {
+                  await session.endSession();
+                }
+                req.logIn(user, function(err) {
+                  if (err) {
+                      let msg = 'Spaicente ma qualche cosa non ha funzionato! Riprova a fare il Login';
+                      req.flash('error', msg);
+                      console.info(moment().format() + ' [WARNING][RECOVERY:NO] "GET /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
+                      res.render('info.njk', {message: req.flash('error'), type: "danger"});
+                  } else {
+                      let msg = 'Email Verificata';
+                      let msg1 = 'Utente validato e autenticato';
+                      req.flash('info', msg);
+                      req.flash('info', msg1);
+                      console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL: {"email":"' + req.user.email + '"} FLASH: ' + msg+msg1);
+                      res.redirect('/shop');
+                  }
                 });
-            }
-            ;
+              }
+            };
         });
     });
     //POST
     app.post('/validation', function(req, res) {
+    
+        User.findOne({
+          resetPasswordToken: req.body.token,
+          resetPasswordExpires: {$gt: Date.now()}
+        }, async function(err, user) {
+            if (err || user.status != 'new') {
+                let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
+                req.flash('error', msg);
+                console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN: {"resetPasswordToken":"' + req.body.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+                console.log('POST VALIDATION ERROR: ', err);
+                return res.render('info.njk', {
+                    message: req.flash('error'),
+                    type: "danger"
+                });
+            } else {
+                //start email validation
+                if (!lib.emailValidation(req.body.email)) {
+                    let msg = 'Indirizzo mail non valido'; //'Please provide a valid email';
+                    req.flash('validateMessage', msg)
+                    console.info(moment().format() + ' [WARNING][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
+                    return res.redirect("/validation?token=" + req.body.token);
+                }
+                //end email validation
+
+                //START TRANSACTION
+                const session = await db.startSession();
+                session.startTransaction();
+
+                const friend = await Friend.findOne({ emailFriend: req.body.token+'@sb.sb' }).session(session);
+
+                try {
+                  const token = lib.generateToken(20);
+                  const opts = { session };
+                  //const filter = { resetPasswordToken: req.body.token };
+                  //const doc = await User.findOne(filter);
+                  friend.emailFriend = req.body.email;
+                  friend.firstNameFriend = lib.capitalizeFirstLetter(req.body.firstName);
+                  await friend.save(opts);
+                  user.email = req.body.email;
+                  user.password = user.generateHash(req.body.password);
+                  user.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
+                  user.resetPasswordToken = token
+                  user.status = "waiting"
+                  await user.save(opts);
+
+                  await lib.sendmailToPerson(req.body.firstName,req.body.email, '', token, req.body.firstName, '', req.body.email, 'conferme');
+
+                  await session.commitTransaction();
+
+                  let msg = 'Inviata email di verifica'; //'Validated and Logged';
+                  req.flash('info', msg);
+                  console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
+                  res.render('info.njk', {message: req.flash('info'), type: "info"});
+
+                  console.log("mandata MAIL per la validazione dell'indirizzo mail e inserire utente in in Users");
+                } catch (e) {
+                  console.log("errore: ",e)
+                  
+                  if (e.code === 11000) {
+                    let msg = 'Indirizzo e-mail già registrato';
+                    req.flash('validateMessage', msg);
+                    console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FUNCTION: User.save: ' + err +' FLASH: ' + msg);
+                    res.redirect("/validation?token=" + req.body.token);
+                  } else {
+                    let msg = 'Spaicente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';      
+                    req.flash('error', msg);
+                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + err + ' FLASH: ' + msg);
+                    return res.render('info.njk', {
+                        message: req.flash('error'),
+                        type: "danger"
+                    })              
+                  }
+
+                } finally {
+                  await session.endSession();
+                }
+            }
+          });
+      });
+
+
+/* app.post('/validation', function(req, res) {
+        req.session.token = eq.body.token;
         User.findOne({
             resetPasswordToken: req.body.token,
             resetPasswordExpires: {
@@ -258,34 +389,45 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                 }
                 //end email validation
 
-                var U = new User();
-                user.password = U.generateHash(req.body.password);
-                user.name.first = lib.capitalizeFirstLetter(req.body.firstName);
-                if (user.email != req.body.email) {
-                    user.email = req.body.email;
-                }
-                /*
-                console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                console.log('!!!!!!!!!!! ATTENZIONE !!!! CODICE COMMENTATO !!!!');
-                console.log('!!!!!!!!!!!!       NON DA PRODUZIONE  !!!!!!!!!!!!');
-                console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                */
-                user.status = 'validated';
-                user.resetPasswordToken = undefined;
-                user.resetPasswordExpires = undefined;
+                req.session.password = req.body.password; 
+                req.session.firstName = req.body.firstName
+                req.session.email = req.body.email
+
+                ////var U = new User();
+                ////user.password = U.generateHash(req.body.password);
+                ////user.name.first = lib.capitalizeFirstLetter(req.body.firstName);
+                ////if (user.email != req.body.email) {
+                ////    user.email = req.body.email;
+                ////}
+                
+                //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                //console.log('!!!!!!!!!!! ATTENZIONE !!!! CODICE COMMENTATO !!!!');
+                //console.log('!!!!!!!!!!!!       NON DA PRODUZIONE  !!!!!!!!!!!!');
+                //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+                
+                ////user.status = 'validated';
+                ////user.resetPasswordToken = undefined;
+                ////user.resetPasswordExpires = undefined;
 
                 ///////////////////////////////////////////////
                 user.booze += global.oneBottleBoozeEquivalent;
                 ///////////////////////////////////////////////
                 user.save(function(err) {
                     if (err) {
-                        let msg = 'Something bad happened! Validation faild';
-                        req.flash('error', msg);
-                        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + err + ' FLASH: ' + msg);
-                        return res.render('info.njk', {
-                            message: req.flash('error'),
-                            type: "danger"
-                        });
+                        if (err.code === 11000) {
+                          let msg = 'Indirizzo e-mail già registrato';
+                          req.flash('validateMessage', msg);
+                          console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FUNCTION: User.save: ' + err +' FLASH: ' + msg);
+                          res.redirect("/validation?token=" + req.body.token);
+                        } else { 
+                          let msg = 'Something bad happened! Validation faild';
+                          req.flash('error', msg);
+                          console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + err + ' FLASH: ' + msg);
+                          return res.render('info.njk', {
+                              message: req.flash('error'),
+                              type: "danger"
+                          })
+                        }
                     } else {
                         req.logIn(user, function(err) {
                             if (err) {
@@ -297,6 +439,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                                     type: "danger"
                                 })
                             } else {
+                              //TODO: mandare mail con valore OTP da inserire in pagina ad HOC 
                                 let msg = 'Invito accettato e autenticato'; //'Validated and Logged';
                                 req.flash('info', msg);
                                 console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
@@ -308,6 +451,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
             }
         })
     });
+*/
 
     // =====================================
     // Registrazione come cliente
@@ -316,7 +460,6 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     app.get('/register', lib.isLoggedIn, function(req, res) {
 
         if (req.user.status == 'validated') {
-
             res.render('registration.njk', {
                 firstName: req.user.name.first,
                 lastName: req.user.name.last,
@@ -435,7 +578,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                 // controllo che ci siano ancora inviti diposnibili
                 if (req.session.friendsInvited >= req.session.invitationAvailable) {
                     req.flash('info', "Non hai inviti disponibili!");
-                    req.flash('info', "Acquista un Box4beer per avere un nuovo invito");                    
+                    req.flash('info', "Acquista un Box6beer per avere un nuovo invito");                    
                     controlSates = "disabled";
                     flag = "true";
                 }
@@ -485,8 +628,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           // set the user's local credentials
           newUser.password = newUser.generateHash(password);
           newUser.name.first = nome;
-          newUser.idParent = req.user._id;
-          //id parent
+          newUser.idParent = req.user._id; //id parent
           newUser.status = 'new';  // status
           let token = req.body.token;
           newUser.email = token+"@sb.sb";
@@ -495,7 +637,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           // 1 hour in secondi * 24 * 365 = 1 anno
           newUser.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
 /*******/
-		  await newUser.save(opts);
+		      await newUser.save(opts);
 /*******/
           // Save a new friends in mongodb
           var newFriend = new Friend();
@@ -504,10 +646,10 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           newFriend.emailFriend = token+"@sb.sb";	// mail friend
           newFriend.firstNameFriend = newUser.name.first;	//name's friend
 /*******/
-		  await newFriend.save(opts);
+		      await newFriend.save(opts);
 /*******/
            
-/*******/ //send email to Friend         
+/*******/ //send email to Parent         
           await lib.sendmailToPerson(req.user.name.first, req.user.email, '', token, newUser.name.first, '', newUser.email, 'invite')
 /*******/
           await session.commitTransaction();
@@ -516,8 +658,8 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           req.session.friendsInvited += 1;
           let flag = false;
           if (req.session.friendsInvited < req.session.invitationAvailable) {
-			  flag= true;
-		  }
+			     flag= true;
+		      }
           
           res.render('share.njk', {
               firstName: nome,
@@ -630,6 +772,13 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     // =====================================
     // Utility =============================
     // =====================================
+    // visualizza in formato HTML la mail conferma
+    app.get('/mailconferme', function(req, res) {
+
+        console.log("SERVER:", global.server);
+        res.send(mailconferme('Name', 'Email', 'Token', 'userName', 'userSurname', global.server))
+
+    })
     // visualizza in formato HTML la mail Friend
     app.get('/mailfriend', function(req, res) {
 
@@ -669,5 +818,9 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           type: msgType,
           err: err
       })
+    });
+
+    app.get('/videoPromo', (req, res) => {
+          res.render('video.njk')
     });
 }

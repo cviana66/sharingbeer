@@ -1,0 +1,48 @@
+digraph {
+    label="SharingBeer"
+
+    subgraph cluster_autenticazione {
+          label="Autenticazione"
+          info1 [shape=record
+            label="{  {File Node: | routesAuth.js}|
+                      {File FronEnd: | login.njk}|
+                      {Routes: | /login}|
+                      {Descrizione: | Autenticazione attraverso mail}| 
+                      {Evoluzione: | effettuare login usando\n- Numero mobile\n- Altri provider come google, facebook, etc} 
+                          }"];
+          image1 [shape=none, fixedsize=false image="/media/share_master/carlo/Save/Documenti/Birra/screenshot/Schermata del 2023-05-25 15-33-55.png"];
+    
+    }
+
+    subgraph cluster_shopping {
+          label="Shopping"
+          info2 [ shape=record 
+            label=" { {File Node: | routesShop.js}|
+                      {File FronEnd: | shop.njk}|
+                      {Routes: | /shop}|
+                      {Descrizione: | Negozio on-line}| 
+                      {Evoluzione: | nd} 
+                    }" ];
+
+          image2 [shape=none, fixedsize=false image="/media/share_master/carlo/Save/Documenti/Birra/screenshot/Schermata del 2023-05-29 15-35-25.png"];
+    
+    }
+
+    subgraph cluster_cart {
+          label="Cart"
+          info3 [ shape=record 
+            label=" { {File Node: | routesShop.js}|
+                      {File FronEnd: | cart.njk}|
+                      {Routes: | /cart}|
+                      {Descrizione: | Carrello acquisti}| 
+                      {Evoluzione: | nd} 
+                    }" ];
+
+          image3 [shape=none, fixedsize=false image="/media/share_master/carlo/Save/Documenti/Birra/screenshot/Schermata del 2023-07-31 17-16-50.png"];
+    
+    }
+
+    image1 -> image2
+
+}
+

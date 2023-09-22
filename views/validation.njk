@@ -25,11 +25,11 @@
     </a>  
       <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;" id="section2">
         <div class="card-body">
-          <h3 class="card-title text-white font-weight-light text-center"> Una Birra offerta </h3>
+          <h3 class="card-title text-white font-weight-light text-center"> Invito </h3>
           <div class="flex-row">
-            <div ><img class="mx-auto d-block" src="img/allegri_con_boccali.png" style="height:100%;width:100%;margin-bottom:30px"></div>
+            <div ><img class="mx-auto d-block" src="img/invito.png" style="height:100%;width:100%;margin-bottom:30px"></div>
             <div class="align-self-center">
-              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai <span style="font-size:1.2em;"> uno scoto dell'X%  </span> sull'acquisto di un packaging da 4
+              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai <span style="font-size:1.2em;"> uno sconto dell'X%  </span> sull'acquisto di un box6beer
                 <span style="float:right;">
                   <a href="#" onclick="return openDocument('infoValidation.njk')">
                     <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="30px" viewBox="0 0 24 24" width="30px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>
@@ -46,10 +46,15 @@
           <form role="form" action="/validation" method="post">
             <fieldset>
               <div class="form-group">
-                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Email</label>
+                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Indirizzo Email</label>
                 <div class="input-error" id="wrongMail"></div>
                 <!--p class="text-white font-weight-light text-justify" style="font-size:0.7rem;">questo è l'indirizzo email proposto dalla persona che ti ha invitato, se vuoi modificarlo ricorda che deve essere una mail valida e sarà il tuo utente per gli accessi futuri</p-->
-                <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="your@email.address">
+                <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="your@email.address" required>
+              </div>
+              <div class="form-group">
+                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Conferma indirizzo Email</label>
+                <div class="input-error" id="wrongControlMail"></div>
+                <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value="" placeholder="your@email.address" required>
               </div>
               <div class="form-group">
                 <label class="text-white col-form-label-lg" for="inputUserName">Nome</label>

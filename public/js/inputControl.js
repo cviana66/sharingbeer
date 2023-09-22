@@ -24,14 +24,23 @@ function fieldsValidationControl() {
   document.getElementById("wrongPwd").innerHTML = "";
   document.getElementById("wrongPrivacy").innerHTML = "";
   document.getElementById("wrongAge").innerHTML = "";
+  document.getElementById("wrongControlMail").innerHTML = "";
 
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var email = document.getElementById("inputUsernameEmail").value;
+  var controlEmail = document.getElementById("inputControlUsernameEmail").value;
+  
   if(email =="" || !re.test(String(email))) {    
     document.getElementById("wrongMail").innerHTML = iwar+"Inserisci una Email valida";
     document.getElementById("inputUsernameEmail").focus();
     return false;
   };
+  if(email != controlEmail) {
+    document.getElementById("wrongControlMail").innerHTML = iwar+"Indirizzo email di conferma differente";
+    document.getElementById("inputControlUsernameEmail").focus();
+    return false;
+  }
+
 
   let pwd1 = "";
   let pwd2 = "";

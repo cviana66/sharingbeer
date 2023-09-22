@@ -30,7 +30,7 @@ module.exports = function(app) {
                      message    : req.flash('info'),
                      type       : "info"
   					       };
-      console.log("numero di prodotti in carrello: ",req.session.numProducts)
+      //console.log("numero di prodotti in carrello: ",req.session.numProducts)
   		res.render('shop.njk', model);
   	});
   });
