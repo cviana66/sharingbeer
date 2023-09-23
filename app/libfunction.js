@@ -53,28 +53,28 @@ module.exports = {
 
                       if (typeOfMail == 'friend') {
                         var mailOptions = {
-                          from: 'birrificioviana@gmail.com', // sender address
+                          from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
                           to: Email,    //'cviana66@gmail.com', // list of receivers
                           subject: userName + ' ' + userSurname + ' ti invita a bere birra Viana', // Subject line
                           html: mailfriend(Name, Email, Token, userName, userSurname, global.server)
                         }
                       } else if  (typeOfMail == 'parent') {
                         var mailOptions = {
-                            from: 'birrificioviana@gmail.com', // sender address
+                            from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
                             to: Email, //'cviana66@gmail.com', // list of receivers
                             subject: 'Grazie dal Birrificio Viana', // Subject line
                             html: mailparent(Name, Email, userName, userEmail, global.server)
                         }
                       } else if  (typeOfMail == 'invite') {
                         var mailOptions = {
-                            from: 'birrificioviana@gmail.com', // sender address
+                            from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
                             to: Email, //'cviana66@gmail.com', // list of receivers
                             subject: 'Grazie dal Birrificio Viana', // Subject line
                             html: mailinvite(Name, Email, Token, userName, global.server)
                         }
                       } else if  (typeOfMail == 'conferme') {
                         var mailOptions = {
-                            from: 'birrificioviana@gmail.com', // sender address
+                            from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
                             to: Email, //'cviana66@gmail.com', // list of receivers
                             subject: 'Conferma email - Birrificio Viana', // Subject line
                             html: mailconferme(Name, Email, Token, userName, global.server)

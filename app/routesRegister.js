@@ -357,102 +357,6 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           });
       });
 
-
-/* app.post('/validation', function(req, res) {
-        req.session.token = eq.body.token;
-        User.findOne({
-            resetPasswordToken: req.body.token,
-            resetPasswordExpires: {
-                $gt: Date.now()
-            }
-        }, function(err, user) {
-            if (err) {
-                let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
-                req.flash('error', msg);
-                console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN: {"resetPasswordToken":"' + req.body.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
-                console.log('POST VALIDATION ERROR: ', err);
-                return res.render('info.njk', {
-                    message: req.flash('error'),
-                    type: "danger"
-                });
-            } else {
-
-                // TODO Validare i dati inseriti lato SERVER perchè potrebbero essere stati disabilitati i Javascript lato CLIENT
-                // FATTO solo per mail
-
-                //email validation
-                if (!lib.emailValidation(req.body.email)) {
-                    let msg = 'Indirizzo Email non valido'; //'Please provide a valid email';
-                    req.flash('validateMessage', msg)
-                    console.info(moment().format() + ' [WARNING][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
-                    return res.redirect("/validation?token=" + req.body.token);
-                }
-                //end email validation
-
-                req.session.password = req.body.password; 
-                req.session.firstName = req.body.firstName
-                req.session.email = req.body.email
-
-                ////var U = new User();
-                ////user.password = U.generateHash(req.body.password);
-                ////user.name.first = lib.capitalizeFirstLetter(req.body.firstName);
-                ////if (user.email != req.body.email) {
-                ////    user.email = req.body.email;
-                ////}
-                
-                //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                //console.log('!!!!!!!!!!! ATTENZIONE !!!! CODICE COMMENTATO !!!!');
-                //console.log('!!!!!!!!!!!!       NON DA PRODUZIONE  !!!!!!!!!!!!');
-                //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-                
-                ////user.status = 'validated';
-                ////user.resetPasswordToken = undefined;
-                ////user.resetPasswordExpires = undefined;
-
-                ///////////////////////////////////////////////
-                user.booze += global.oneBottleBoozeEquivalent;
-                ///////////////////////////////////////////////
-                user.save(function(err) {
-                    if (err) {
-                        if (err.code === 11000) {
-                          let msg = 'Indirizzo e-mail già registrato';
-                          req.flash('validateMessage', msg);
-                          console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FUNCTION: User.save: ' + err +' FLASH: ' + msg);
-                          res.redirect("/validation?token=" + req.body.token);
-                        } else { 
-                          let msg = 'Something bad happened! Validation faild';
-                          req.flash('error', msg);
-                          console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + err + ' FLASH: ' + msg);
-                          return res.render('info.njk', {
-                              message: req.flash('error'),
-                              type: "danger"
-                          })
-                        }
-                    } else {
-                        req.logIn(user, function(err) {
-                            if (err) {
-                                let msg = 'Something bad happened! Login faild';
-                                req.flash('error', msg);
-                                console.info(moment().format() + ' [WARNING][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
-                                res.render('info.njk', {
-                                    message: req.flash('error'),
-                                    type: "danger"
-                                })
-                            } else {
-                              //TODO: mandare mail con valore OTP da inserire in pagina ad HOC 
-                                let msg = 'Invito accettato e autenticato'; //'Validated and Logged';
-                                req.flash('info', msg);
-                                console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
-                                res.redirect('/shop');
-                            }
-                        });
-                    }
-                });
-            }
-        })
-    });
-*/
-
     // =====================================
     // Registrazione come cliente
     // =====================================
@@ -653,7 +557,6 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           await lib.sendmailToPerson(req.user.name.first, req.user.email, '', token, newUser.name.first, '', newUser.email, 'invite')
 /*******/
           await session.commitTransaction();
-          await session.endSession();
 
           req.session.friendsInvited += 1;
           let flag = false;
@@ -668,11 +571,13 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           
         } catch (e) {
             await session.abortTransaction();
-            await session.endSession();
-            let msg = 'Something bad happened! Please try again';
+            
+            let msg = 'Spaicente ma qualche cosa non ha funzionato!';
             req.flash('error', msg);
             console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+        } finally {
+            await session.endSession();
         }
     });
 

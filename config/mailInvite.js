@@ -35,7 +35,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
 								<p> ' +parentName+ ' </p> \
 							</div> \
 							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
-								<p>Grazie per bere Birra Viana e far conoscere Sharingbeer.it </br>Mi raccomando, bevi in modo responsabile :)</p> \
+								<p>Grazie per bere Birra Viana e far conoscere Sharingbeer </br>Mi raccomando, bevi in modo responsabile :)</p> \
 							</div>  \
 							<div align="left"> \
 							  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/cellphone-android.png" height="24" width="24"> \
