@@ -329,14 +329,14 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 
                   await lib.sendmailToPerson(req.body.firstName,req.body.email, '', token, req.body.firstName, '', req.body.email, 'conferme');
 
-                  await session.commitTransaction();
 
                   let msg = 'Inviata email di verifica'; //'Validated and Logged';
                   console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
 
-                  res.render('emailValidation.njk', { email: req.user.email});
+                  res.render('emailValidation.njk', { email: req.body.email});
 
-                  console.log("mandata MAIL per la validazione dell'indirizzo mail e inserire utente in in Users");
+                  await session.commitTransaction();
+
                 } catch (e) {
                   console.log("errore: ",e)
                   
@@ -577,7 +577,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
         } catch (e) {
             await session.abortTransaction();
             
-            let msg = 'Spaicente ma qualche cosa non ha funzionato!';
+            let msg = 'Spiacente ma qualche cosa non ha funzionato!';
             req.flash('error', msg);
             console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
