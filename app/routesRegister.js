@@ -60,6 +60,11 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
       res.redirect('/shop');
     });
 
+    app.get('/testConferme', function(req,res) {
+      res.render('conferme.njk', { email: 'indirizzo@email.mio'});  
+    });
+    
+
 // =====================================
 // API =================================
 // =====================================
@@ -260,15 +265,14 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                   if (err) {
                       let msg = 'Spaicente ma qualche cosa non ha funzionato! Riprova a fare il Login';
                       req.flash('error', msg);
-                      console.info(moment().format() + ' [WARNING][RECOVERY:NO] "GET /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
+                      console.info(moment().format() + ' [WARNING][RECOVERY:NO] "GET /validation" EMAIL: {"resetPasswordToken":"' + req.user.email + '"} FLASH: ' + msg);
                       res.render('info.njk', {message: req.flash('error'), type: "danger"});
                   } else {
                       let msg = 'Email Verificata';
-                      let msg1 = 'Utente validato e autenticato';
-                      req.flash('info', msg);
-                      req.flash('info', msg1);
-                      console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL: {"email":"' + req.user.email + '"} FLASH: ' + msg+msg1);
-                      res.redirect('/shop');
+                      let msg1 = 'Utente validato e autenticato';                      
+                      console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL: {"email":"' + req.user.email + '"} FLASH: ' + msg+" "+msg1);
+                      
+                      res.render('conferme.njk', { email: req.user.email});
                   }
                 });
               }
