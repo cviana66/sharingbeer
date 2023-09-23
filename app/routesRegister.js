@@ -60,8 +60,8 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
       res.redirect('/shop');
     });
 
-    app.get('/testConferme', function(req,res) {
-      res.render('conferme.njk', { email: 'indirizzo@email.mio'});  
+    app.get('/emailvalidation', function(req,res) {
+      res.render('emailValidation.njk', { email: 'indirizzo@email.mio'});  
     });
     
 
@@ -286,7 +286,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
           resetPasswordToken: req.body.token,
           resetPasswordExpires: {$gt: Date.now()}
         }, async function(err, user) {
-            if (err || user.status != 'new') {
+            if (err || user == null) { 
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
                 req.flash('error', msg);
                 console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN: {"resetPasswordToken":"' + req.body.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
@@ -295,6 +295,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                     message: req.flash('error'),
                     type: "danger"
                 });
+
             } else {
                 //start email validation
                 if (!lib.emailValidation(req.body.email)) {
@@ -331,9 +332,9 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                   await session.commitTransaction();
 
                   let msg = 'Inviata email di verifica'; //'Validated and Logged';
-                  req.flash('info', msg);
                   console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"resetPasswordToken":"' + req.body.email + '"} FLASH: ' + msg);
-                  res.render('info.njk', {message: req.flash('info'), type: "info"});
+
+                  res.render('emailValidation.njk', { email: req.user.email});
 
                   console.log("mandata MAIL per la validazione dell'indirizzo mail e inserire utente in in Users");
                 } catch (e) {
