@@ -16,13 +16,13 @@ const qr            = require('qr-image');
 const nunjucks      = require('nunjucks');
 const cons          = require('consolidate');
 const moment        = require("moment");
-const env           = require('node-env-file'); // si può usare anche il pkg dotenv
+//const env           = require('node-env-file'); // si può usare anche il pkg dotenv
 
 const fastcsv       = require("fast-csv");
 
 
 // config environment variables /
-env(__dirname + '/.env');
+//env(__dirname + '/.env');
 
 // connect to our database
 const db = require('./config/database.js');
@@ -202,9 +202,9 @@ var SharingBeer = function() {
         // required for passport and session for persistent login
         pass(passport);
 
-        console.info(moment().format()+' [INFO] ENVIRONMENT: '+self.app.get('env'));
+        console.info(moment().format()+' [INFO] ENVIRONMENT: '+process.env.NODE_ENV);
 
-        if (self.app.get('env') === 'development') {
+        if (process.env.NODE_ENV === 'development') {
             self.app.use(morgan('dev')); // log every request to the console
             self.app.use(session({
               name: '_sb',

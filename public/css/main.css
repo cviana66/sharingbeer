@@ -1,5 +1,15 @@
 html {
   scroll-behavior: smooth;
+  /*font-family: "myFont", "Bitstream Vera Serif", serif;*/
+}
+
+.btn-my{
+  background-color:#5375BD;
+  color: #fff;
+}
+.btn-my:hover{
+  background-color: #1140A4;
+  color: #fff;
 }
 
 .center {
@@ -167,4 +177,14 @@ color: #4e4e4e;
 
 #loading img {
   margin-top: 40%;
+}
+
+@font-face {
+    font-family: myFont;
+    src: url("/font/bauserif.ttf");
+}
+
+
+.sb-font {
+    font-family: myFont;
 }

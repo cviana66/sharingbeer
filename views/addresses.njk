@@ -14,15 +14,31 @@
         <img  src="img/ajax-loader-1.gif" alt="Loading..." />
       </div>
       
-      <div class="card" style="background-color:#2A0009;border-color:#903246;">
-        <div class="card-body text-white font-weight-light text-justify">
-            <span style="font-size:1.1em;">Scegli o inseisci l'indirizzo di consegna</span> 
-            {%for address in addresses %}
-              <div> {{address}} {{address.address}} </div>
-
-            {%endfor%}
+      <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
+        <div class="card-body">
+          <span style="font-size:1.1em;">Scegli o inseisci l'indirizzo di consegna</span>
         </div>
       </div>
+
+        
+             
+          {%for address in addresses %}
+          
+          <div class="card text-white" style="background-color:#2A0009;border-color:#903246;max-width:18rem;margin-bottom:10px;">
+            <div class="card-body">
+              <p class="card-title">{{address.first}} {{address.last}}</p>
+              <h5 class="card-text">{{address.city}}, {{address.address}} {{address.numciv}}</h5>
+              <p class="card-text">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
+              <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
+                Seleziona e procedi
+              </button>
+            </div>
+          </div>
+            
+
+          {%endfor%}
+        
+      
 
       <form role="form" action="/register" method="post" id="addresses">
         <div class="form-group">
@@ -74,12 +90,12 @@
       <div class="form-group">
         <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div>
         <div class="input-error" id="wrongNumciv"></div>
-        <input type="text" class="form-control" id="inputNumciv" value="" name="number" required readonly>
+        <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" required readonly>
       </div>
         <br>
         <div>
           <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return fieldsRegisterControl()">
-            Save
+            Salva e procedi
           </button>
         </div>
       </form>
