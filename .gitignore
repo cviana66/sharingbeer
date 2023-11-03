@@ -57,6 +57,11 @@ typings/
 # dotenv environment variables file
 .env
 
+# Fly
+.dockerignore
+Dockerfile
+fly.toml
+
 # next.js build output
 .next
 node_modules
