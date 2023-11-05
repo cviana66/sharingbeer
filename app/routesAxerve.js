@@ -18,7 +18,7 @@ var users;
         method: 'POST',
         headers: {
           "Content-Type": "application/json",  
-          "Authorization": "apikey R0VTUEFZNjMzODgjI0VzZXJjZW50ZSBUZXN0IGRpIFZJQU5BIyMyNS8xMC8yMDIzIDExOjI1OjAy"
+          "Authorization": process.env.APIKEY
         },
         body: JSON.stringify({  
           "shopLogin": "GESPAY63388",
