@@ -40,11 +40,14 @@ const routesShop      = require('./app/routesShop.js');
 // friends registration ========================================================
 const routesRegister  = require('./app/routesRegister.js');
 
-// QRCode ===================================================================
+// QRCode ======================================================================
 const routesQrcode   = require('./app/routesQrcode.js');
 
 // paypal v2 ===================================================================
 const routesPaypal    = require('./app/routesPaypal');
+
+// Axereve =====================================================================
+const routesAxerve    = require('./app/routesAxerve');
 
 // passport ====================================================================
 const pass            = require('./config/passport');
@@ -166,6 +169,7 @@ var SharingBeer = function() {
         routesRegister(self.app, db, moment, mongoose, fastcsv, fs, util);
         routesQrcode(self.app, qr);
         routesPaypal(self.app);
+        routesAxerve(self.app);
     };
 
     /**

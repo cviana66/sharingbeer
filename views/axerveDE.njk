@@ -1,0 +1,39 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Axerve..</h3>
+      <hr style="border-top: 1px solid #5375BD;">
+
+    <table width="100%" align="center">
+      <tr>
+        <td width="60%">paymentID</td>
+        <td width="40%"><input type="text" id="ID" value="{{paymentID}}"></td>
+      </tr>
+      <tr>
+        <td width="60%">paymentToken</td>
+        <td width="40%"><input type="text" id="token" value="{{paymentToken}}"></td>
+      </tr>
+    </table>
+
+    <input type="button" onClick="validateData()" value="GO">
+
+    <script script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
+    <script type="text/javascript">
+      function validateData() {
+        var pToken = document.getElementById("token").value;
+        var pID = document.getElementById("ID").value;
+        console.log("token= ",pToken);
+        console.log("ID= ",pID);
+
+        axerve.lightBox.shop = "GESPAY63388";
+        axerve.lightBox.open(pID, pToken, callbackAxerve);
+                
+      }
+
+      function callbackAxerve(response) {
+        console.log("FINE: ",response); 
+      }
+    </script>
+  
+{% endblock %}
+        

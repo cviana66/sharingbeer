@@ -12,8 +12,8 @@ const OrderSchema = new Schema({
     totalPrice  : { type: Number},
     totalQty    : { type: Number},
     items : [
-      { productId : {type: String},
-        productName : {type: String},
+      { id : {type: String},
+        name : {type: String},
         price : {type: Number},
         qty   : {type: Number},
       }

@@ -20,6 +20,7 @@ module.exports = function(app) {
 app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
 
   var cart = req.session.cart;
+  console.log(cart);
   req.session.order = {};
 
   try {
