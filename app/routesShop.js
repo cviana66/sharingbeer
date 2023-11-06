@@ -14,7 +14,12 @@ module.exports = function(app) {
 
   	Product.find(function (err, prods) {
   		if (err) {
-  			console.log(err);
+  			let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
+        req.flash('message', msg);
+        return res.render('info.njk', {
+            message: req.flash('message'),
+            type: "warning"
+        })
   		}
   		prods.forEach(function(prod) {
   			prod.prettyPrice = prod.prettyPrice();
@@ -25,8 +30,8 @@ module.exports = function(app) {
 
 		  var model =  { products   : prods,                   //prodotti dello shop
   						       user       : req.user,                //utente loggato
-  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello visualizzato su main.dust
-  						       cart       : req.session.cartItems,   //prodotti nel carrello
+  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello
+  						       //cart       : req.session.cartItems,   //prodotti nel carrello
                      message    : req.flash('info'),
                      type       : "info"
   					       };
@@ -41,11 +46,10 @@ module.exports = function(app) {
     req.session.nextStep = 'address'; 
 		//Load (or initialize) the cart and session.cart
 		var cart = req.session.cart = req.session.cart || {};
-
 		//Read the incoming product data from shop.njk
 		var id = req.body.item_id;
 
-    console.log("productID: ",id);
+    //console.log("productID: ",id);
 
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
@@ -63,7 +67,7 @@ module.exports = function(app) {
 			//Increase quantity or add the product in the shopping cart.
 			if (cart[id]) {
 				cart[id].qty++;
-			}	else {     //il prodotto è scelto per la prima volta
+			}	else { //il prodotto è scelto per la prima volta
 				cart[id] = {
 					id : prod._id,
 					name: prod.name,
@@ -75,7 +79,6 @@ module.exports = function(app) {
 				};
 			}
 			req.session.numProducts = Object.keys(cart).length;
-
 			res.redirect('/shop');
 
 		});

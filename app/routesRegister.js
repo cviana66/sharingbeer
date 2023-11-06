@@ -368,19 +368,18 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     app.get('/register', lib.isLoggedIn, function(req, res) {
 
         if (req.user.status == 'validated') {
-            res.render('registration.njk', {
-                firstName: req.user.name.first,
-                lastName: req.user.name.last,
-                user: req.user,
-                numProducts : req.session.numProducts
-                // get the user out of session and pass to template
-            });
+            var model = { firstName: req.user.name.first,
+                          lastName: req.user.name.last,
+                          user: req.user,
+                          numProducts : req.session.numProducts
+                        }
+            res.render('registration.njk', model);
 
         } else if (req.user.status == 'customer' && req.session.numProducts > 0) {
             res.redirect('/addresses');
 
         } else {
-            console.log('User: ', req.user);
+            console.log('User: ', req.user); //TODO: gestire il caso anomalo con un messaggio di warning e loggare
             res.redirect('/cart');
         }
     });

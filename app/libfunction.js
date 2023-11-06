@@ -111,7 +111,7 @@ module.exports = {
                     req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
                     req.session.totalQty = cartItems.totalQty = totalQty;
                     req.session.numProducts = Object.keys(cart).length;
-                    console.log("cartItems: ",cartItems);
+                    //console.log("cartItems: ",cartItems);
                   }
                 },
   emailValidation:  function emailValidation (email) {
