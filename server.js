@@ -22,7 +22,7 @@ const fastcsv       = require("fast-csv");
 
 
 // config environment variables /
-//env(__dirname + '/.env'); prova Carlo
+//env(__dirname + '/.env'); prova Ale Ale
 
 // connect to our database
 const db = require('./config/database.js');
