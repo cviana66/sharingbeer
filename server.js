@@ -1,28 +1,29 @@
 #!/bin/env node
 
-const express  = require('express');
-const fs       = require('fs');
-const util     = require('util');
-const mongoose = require('mongoose');
-const passport = require('passport');
-const flash    = require('connect-flash');
+const express  = require('express');                // Express. https://expressjs.com/
+const fs       = require('fs');                     // File System. https://nodejs.org/api/fs.html
+const util     = require('util');                   // Utilità. https://nodejs.org/api/util.html
+const mongoose = require('mongoose');               // Gestione MongoDB. https://mongoosejs.com/docs/
+const MongoStore    = require("connect-mongo");
+const passport = require('passport');               // Autenticazione. https://www.passportjs.org
+const flash    = require('connect-flash');          // Gestione messaggi in sessione. https://www.npmjs.com/package/connect-flash
 
-const morgan        = require('morgan');
-const cookieParser  = require('cookie-parser');
-const bodyParser    = require('body-parser');
-const session       = require('express-session');
-const paypal        = require('paypal-rest-sdk');
-const qr            = require('qr-image');
-const nunjucks      = require('nunjucks');
-const cons          = require('consolidate');
-const moment        = require("moment");
-//const env           = require('node-env-file'); // si può usare anche il pkg dotenv
+const morgan        = require('morgan');            // LOGGER. https://www.npmjs.com/package/morgan
+const cookieParser  = require('cookie-parser');     // Gestione Cookies. https://www.npmjs.com/package/cookie-parser
+const bodyParser    = require('body-parser');       // Parser info body prima di route. https://www.npmjs.com/package/body-parser
+const session       = require('express-session');   // Gestione sessione. https://www.npmjs.com/package/express-session
+const paypal        = require('paypal-rest-sdk');   // PayPal
+const qr            = require('qr-image');          // Generazione QR Code. https://www.npmjs.com/package/qr-image
+const nunjucks      = require('nunjucks');          // Template per Javascript. https://mozilla.github.io/nunjucks/
+//const cons          = require('consolidate');       // Consolida il framework da utilizzare per package. NON USATO?. https://github.com/tj/consolidate.js
+const moment        = require("moment");            // Formattazione delle date. https://www.npmjs.com/package/moment
+//const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
 
-const fastcsv       = require("fast-csv");
+const fastcsv       = require("fast-csv");          // Gestione dei file CSV. https://c2fo.github.io/fast-csv/docs/introduction/getting-started
 
 
 // config environment variables /
-//env(__dirname + '/.env'); prova Ale Ale
+//env(__dirname + '/.env');
 
 // connect to our database
 const db = require('./config/database.js');
@@ -213,20 +214,22 @@ var SharingBeer = function() {
             self.app.use(session({
               name: '_sb',
               secret: process.env.SESSION_SECRET,
-              saveUninitialized: false,
+              saveUninitialized: true,
               resave: false,
               cookie: { secure: false,
                         expires: 600000,
-                        sameSite: 'strict'} //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                        sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+              store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
             }));
         } else {
             self.app.set('trust proxy', true); // trust first proxy
             self.app.use(session({secret: process.env.SESSION_SECRET, //modify: 18/02/2022
-                              saveUninitialized: false,
+                              saveUninitialized: true,
                               resave: false,
                               cookie: { secure: true, // serve secure cookies
                                         expires: 600000,
-                                        sameSite: 'strict'} //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                                        sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                              store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                             }));
         }
 
