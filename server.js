@@ -26,7 +26,12 @@ const fastcsv       = require("fast-csv");          // Gestione dei file CSV. ht
 //env(__dirname + '/.env');
 
 // connect to our database
-const db = require('./config/database.js');
+//const db = require('./config/database.js');
+
+const db = mongoose.connect(process.env.MONGODB_URL, 
+  { useNewUrlParser: true, 
+    useUnifiedTopology: true }
+).then(m => m.connection.getClient())
 
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
@@ -178,7 +183,7 @@ var SharingBeer = function() {
      */
     self.initializeServer = function() {
         self.app = express();
-
+/*
         db.on('error', err => {
           console.error(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err);
         });
@@ -186,7 +191,7 @@ var SharingBeer = function() {
         db.once('open', function callback() {
           console.info(moment().format()+' [INFO] MONGODB OPEN');
         });
-
+*/
         // set up our express application
         self.app.use(cookieParser()); // read cookies (needed for auth)
         self.app.use(bodyParser.json({limit: '50mb'}));
@@ -219,7 +224,15 @@ var SharingBeer = function() {
               cookie: { secure: false,
                         expires: 600000,
                         sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
-              store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
+              //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
+              store: MongoStore.create({
+                clientPromise: db,
+                dbName: "dbm1",
+                stringify: false,
+                autoRemove: 'interval',
+                autoRemoveInterval: 1
+              })
+
             }));
         } else {
             self.app.set('trust proxy', true); // trust first proxy
@@ -229,7 +242,14 @@ var SharingBeer = function() {
                               cookie: { secure: true, // serve secure cookies
                                         expires: 600000,
                                         sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
-                              store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
+                              //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
+                              store: MongoStore.create({
+                                clientPromise: db,
+                                dbName: "dbm1",
+                                stringify: false,
+                                autoRemove: 'interval',
+                                autoRemoveInterval: 1
+                              })
                             }));
         }
 
