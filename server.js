@@ -28,11 +28,18 @@ const fastcsv       = require("fast-csv");          // Gestione dei file CSV. ht
 // connect to our database
 //const db = require('./config/database.js');
 
-const db = mongoose.connect(process.env.MONGODB_URL, 
-  { useNewUrlParser: true, 
-    useUnifiedTopology: true }
-).then(m => m.connection.getClient())
-
+// Mongoose Connection
+const  db = mongoose
+  .connect(process.env.MONGODB_URL, { 
+    useNewUrlParser: true, 
+    useUnifiedTopology: true 
+  })
+  .then((connection) => {
+    console.info(moment().format()+' [INFO] MONGODB OPEN');
+    return connection
+  })
+  .then(mongoClient => mongoClient.connection.getClient())    
+  .catch(err => console.error(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err));
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
 //const methodOverride  = require('method-override'); //commentato in data 15/10/22 per capire se usato no
@@ -230,7 +237,7 @@ var SharingBeer = function() {
                 dbName: "dbm1",
                 stringify: false,
                 autoRemove: 'interval',
-                autoRemoveInterval: 1
+                autoRemoveInterval: 2 // emoving expired sessions, using defined interval in minutes
               })
 
             }));
@@ -248,7 +255,7 @@ var SharingBeer = function() {
                                 dbName: "dbm1",
                                 stringify: false,
                                 autoRemove: 'interval',
-                                autoRemoveInterval: 1
+                                autoRemoveInterval: 2 // emoving expired sessions, using defined interval in minutes
                               })
                             }));
         }
