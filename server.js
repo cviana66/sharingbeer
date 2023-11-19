@@ -29,6 +29,7 @@ const fastcsv       = require("fast-csv");          // Gestione dei file CSV. ht
 //const db = require('./config/database.js');
 
 // Mongoose Connection
+mongoose.set('strictQuery', false);
 const  db = mongoose
   .connect(process.env.MONGODB_URL, { 
     useNewUrlParser: true, 
