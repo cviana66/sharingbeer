@@ -255,7 +255,7 @@ var SharingBeer = function() {
                               //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                               store: MongoStore.create({
                                 clientPromise: db,
-                                dbName: "dbm1",
+                                dbName: "cluster0",
                                 stringify: false,
                                 autoRemove: 'interval',
                                 autoRemoveInterval: 2 // emoving expired sessions, using defined interval in minutes
