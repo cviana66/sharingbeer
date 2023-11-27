@@ -13,8 +13,8 @@
     "url": "git+https://github.com/cviana66/sharingbeer.git"
   },
   "engines": {
-    "node": ">=16.14.2",
-    "npm": ">=8.19.1"
+    "node": "^16.14.2",
+    "npm": "^8.5.0"
   },
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",
