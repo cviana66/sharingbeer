@@ -40,7 +40,8 @@ const  db = mongoose
     return connection
   })
   .then(mongoClient => mongoClient.connection.getClient())    
-  .catch(err => console.error(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err));
+  .catch(err => console.error(moment().format()+' [ERROR] MONGODB CONNECTION: '+err));
+
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
 //const methodOverride  = require('method-override'); //commentato in data 15/10/22 per capire se usato no
@@ -92,12 +93,13 @@ global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent / glob
 /*  =======================================================================
 /*  Settings Host
 /*  ======================================================================= */
+/*
 if (process.env.NODE_ENV== "development") {
   global.server = "http://localhost:8080";
 } else if (process.env.NODE_ENV == "production") {
   global.server = "https://sharingbeer.it";
 }
-
+*/
 
 /*  =======================================================================
 /*  Logger in file   DISATTIVATO perchè l'hosting HEROKU non lo permette
@@ -137,7 +139,7 @@ var SharingBeer = function() {
      */
     self.setupVariables = function() {const moment = require("moment");
         //  Set the environment variables we need.
-        self.port = process.env.PORT;
+        self.port = process.env.PORT || 3000;
         console.info(moment().format()+' [INFO] SERVER PORT: '+self.port);
     };
 
@@ -180,7 +182,7 @@ var SharingBeer = function() {
     self.createRoutes = function() {
         routesAuth(self.app, passport);
         routesShop(self.app);
-        routesRegister(self.app, db, moment, mongoose, fastcsv, fs, util);
+        routesRegister(self.app, moment, mongoose, fastcsv, fs, util);
         routesQrcode(self.app, qr);
         routesPaypal(self.app);
         routesAxerve(self.app);
@@ -284,7 +286,7 @@ var SharingBeer = function() {
     self.start = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, function() {
-          console.info(moment().format()+' [INFO] NODE SERVER STARTED, PORT: '+self.port);
+          console.info(moment().format()+' [INFO] NODE SERVER STARTED');
         });
     };
 

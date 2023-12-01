@@ -23,7 +23,7 @@ const https = require('https');
 
 //const assert = require('assert');
 
-module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
+module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
     // TESTING
     app.get('/test', function(req, res) {
@@ -305,6 +305,13 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                     return res.redirect("/validation?token=" + req.body.token);
                 }
                 //end email validation
+                
+                let server;
+                if (process.env.NODE_ENV== "development") {
+                  server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+                } else {
+                  server = req.protocol+'://'+req.hostname;
+                }
 
                 //START TRANSACTION
                 const session = await db.startSession();
@@ -327,7 +334,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                   user.status = "waiting"
                   await user.save(opts);
 
-                  await lib.sendmailToPerson(req.body.firstName,req.body.email, '', token, req.body.firstName, '', req.body.email, 'conferme');
+                  await lib.sendmailToPerson(req.body.firstName,req.body.email, '', token, req.body.firstName, '', req.body.email, 'conferme',server);
                   let msg = 'Inviata email di verifica'; //'Validated and Logged';
                   console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
 
@@ -494,7 +501,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                     controlSates = "disabled";
                     flag = "true";
                 }
-
+                console.log("URL: ", req.protocol+'://'+req.hostname);
                 res.render('friend.njk', {
                     controlSates: controlSates,
                     flag: flag,
@@ -506,7 +513,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                     percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
                     token: lib.generateToken(20),
                     parentName: req.user.name.first,
-                    server: global.server
+                    server: req.protocol+'://'+req.hostname
                 });
             });
         });
@@ -526,8 +533,14 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
                 percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
             });
         }
+        let server;
+        if (process.env.NODE_ENV== "development") {
+          server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+        } else {
+          server = req.protocol+'://'+req.hostname;
+        }
         //START TRANSACTION
-        const session = await db.startSession();
+        const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
@@ -563,7 +576,7 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
 /*******/
            
 /*******/ //send email to Parent         
-          await lib.sendmailToPerson(req.user.name.first, req.user.email, '', token, newUser.name.first, '', newUser.email, 'invite')
+          await lib.sendmailToPerson(req.user.name.first, req.user.email, '', token, newUser.name.first, '', newUser.email, 'invite',server)
 /*******/
           await session.commitTransaction();
 
@@ -688,27 +701,42 @@ module.exports = function(app, db, moment, mongoose, fastcsv, fs, util) {
     // =====================================
     // visualizza in formato HTML la mail conferma
     app.get('/mailconferme', function(req, res) {
-
-        console.log("SERVER:", global.server);
-        res.send(mailconferme('Name', 'Email', 'Token', 'userName', 'userSurname', global.server))
-
+      if (process.env.NODE_ENV == "development") {
+        let server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        let server = req.protocol+'://'+req.hostname;
+      } 
+      res.send(mailconferme('Name', 'Email', 'Token', 'userName', 'userSurname', server))
     })
+
     // visualizza in formato HTML la mail Friend
     app.get('/mailfriend', function(req, res) {
-
-        console.log("SERVER:", global.server);
-        res.send(mailfriend('Name', 'Email', 'Token', 'userName', 'userSurname', global.server))
+      if (process.env.NODE_ENV== "development") {
+        let server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        let server = req.protocol+'://'+req.hostname;
+      }
+      res.send(mailfriend('Name', 'Email', 'Token', 'userName', 'userSurname', server))
 
     })
     // visualizza in formato HTML la mail User
     app.get('/mailparent', function(req, res) {
-        console.log("SERVER:", global.server);
-        res.send(mailparent('Name', 'Email', 'userName', 'userEmail', global.server))
+      if (process.env.NODE_ENV== "development") {
+        let server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        let server = req.protocol+'://'+req.hostname;
+      }
+      res.send(mailparent('Name', 'Email', 'userName', 'userEmail', server))
     })
 
     app.get('/mailinvite', function(req, res) {
-        console.log("SERVER:", global.server);
-        res.send(mailinvite('Name', 'Email', 'Token', 'userName', global.server))
+      let server;
+      if (process.env.NODE_ENV== "development") {
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        server = req.protocol+'://'+req.hostname;
+      }
+      res.send(mailinvite('Name', 'Email', 'Token', 'userName', server))
     })    
 
     app.get('/infoMessage', (req, res) => {

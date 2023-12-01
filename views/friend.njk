@@ -88,7 +88,9 @@
         }
       } else {
         //apre il client di posta
+        document.getElementById("loading").style.display = 'block';
         window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);
+        document.getElementById("loading").style.display = 'none';
         //redirige alla pagina recomm POST
         post('/recomm',{firstName:firstName,token:token});
       }
