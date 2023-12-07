@@ -8,7 +8,7 @@ function fieldLoginControl(){
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var submit = true;
   if (email == "" || !re.test(String(email))) {
-    text = iwar+"Please provide a valid email.";
+    text = iwar+"Indirizzo mail non valido.";
     document.getElementById("wrongMail").innerHTML = text;
     submit = false;
   }

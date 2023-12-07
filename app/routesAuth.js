@@ -7,6 +7,8 @@ const Users         = require('./models/user');
 const lib           = require('./libfunction');
 const moment        = require('moment');
 
+var mailvalidatemail = require('../config/mailValidateMail');
+
 module.exports = function(app, passport) {
 
 // =====================================
@@ -100,7 +102,7 @@ app.get('/logout', function(req, res, next) {
     Users.findOne({ email: req.body.email }, function(err, user) {
         // Handle error: best practicies
         if (err) {
-          let msg = 'Something bad happened! Please retry';
+          let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
           console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
           req.flash('error', msg);
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
@@ -108,10 +110,10 @@ app.get('/logout', function(req, res, next) {
         };
 
         if (!user) {
-          let msg = 'No account with that email address exists.';
+          let msg = 'Nessun utente è registrato con l\'indirizzo email '+ req.body.email;
           console.info(moment().format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
-          req.flash('info', 'No account with that email address exists.');
-          return res.render('forgot.njk', {message: req.flash('info')});
+          req.flash('info', msg);
+          return res.render('forgot.njk', {message: req.flash('info'), type: "warning"});
         } else {
           var token = lib.generateToken(20);
           user.resetPasswordToken = token;
@@ -119,22 +121,41 @@ app.get('/logout', function(req, res, next) {
 
           console.log('POST FORGOT USER: ',user)
 
-          user.save(function(err) {
+          user.save(async function(err) {
 
             if(err) {
-              let msg = 'Something bad happened! Please retry';
+              let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
               console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: user.save: '+err+' FLASH: '+msg);
               req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
-
-            var mailOptions = {
+            let server;
+            if (process.env.NODE_ENV == "development") {
+              server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+            } else {
+              server = req.protocol+'://'+req.hostname;
+            } 
+            try {
+              await lib.sendmailToPerson('',user.email,'',token,'','','','reset',server);
+              let msg = '!';
+              console.info(moment().format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
+              req.flash('loginMessage', 'Il messaggio con le istruzioni per reimpostare la password è stato inviato a ' + user.email );
+              res.redirect('/login');
+            } catch (e) {
+              let msg = 'Spiacente ma qualche cosa non ha funzionato nell\'invio dell\'email. Per cortesia riprova';
+              console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: transporter.sendMail: '+err+' FLASH: '+msg);
+              req.flash('error',msg);
+              return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+            }
+            
+            /*var mailOptions = {
               to: user.email,
-              from: 'info@sharingbeer.com',
+              from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com',
               subject: 'SharingBeer Password Reset',
-              text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+              text: 'Ciao, hai ricevuto questa mail perchè Tu (o qualcuno altro) ha richiesto di reimpostare la password del Tuo account\n\n' +
+                
                 'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-                'https://' + req.headers.host + '/reset?token=' + token + '\n\n' +
+                server + '/reset?token=' + token + '\n\n' +
                 'If you did not request this, please ignore this email and your password will remain unchanged.\n'
             };
 
@@ -150,7 +171,7 @@ app.get('/logout', function(req, res, next) {
                   req.flash('loginMessage', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
                   res.redirect('/login');
                 };
-            });
+            }); */
           });
         };
       });
@@ -165,14 +186,14 @@ app.get('/logout', function(req, res, next) {
     Users.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 
       if(err) {
-        let msg = 'Something bad happened! Please retry';
+        let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
         req.flash('error', msg);
         console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /reset" TOKEN: {"resetPasswordToken":"'+req.query.token+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       }
 
       if (!user) {
-        req.flash('error', 'Password reset: token is invalid or has expired.');
+        req.flash('error', 'Token non più valido o scaduto.');
         res.render('forgot.njk', {message: req.flash('error')});
       } else {
         res.render('reset.njk', { token: req.query.token,
@@ -181,12 +202,12 @@ app.get('/logout', function(req, res, next) {
       };
     });
   });
-//POST
+//POST 
   app.post('/reset', function(req, res) {
 
     if (req.body.password != req.body.confirm) {
 
-      req.flash('error', 'Password do not match');
+      req.flash('error', 'Le password non corrispondono');
       res.render('reset.njk', {message: req.flash('error'), token:req.body.token });
 
     } else {
@@ -194,13 +215,13 @@ app.get('/logout', function(req, res, next) {
       Users.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
 
         if(err) {
-          req.flash('error','Something bad happened! Please retry');
+          req.flash('error','Spiacente, si è verificato un errore inatteso! Per cortesia riprova');
           console.log('ERROR RESET PASSWORD BY TOKEN:', err );
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
         }
 
         if (!user) {
-          req.flash('error', 'Password reset token is invalid or has expired.');
+          req.flash('error', 'Token non più valido o scaduto.');
           res.render('forgot.njk', {message: req.flash('error')});
         } else {
 
@@ -212,14 +233,14 @@ app.get('/logout', function(req, res, next) {
           user.save(function(err) {
 
             if(err) {
-              req.flash('error','Something bad happened! Please retry');
+              req.flash('error','Spiacente, si è verificato un errore inatteso! Per cortesia riprova');
               console.log('ERROR RESET PASSWORD BY TOKEN:', err );
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
 
             req.logIn(user, function(err) {
               if(err) return console.log('ERROR: ', err);
-              req.flash('success', 'Success! Your password has been changed.');
+              req.flash('success', 'Perfetto! La tua password è stata cambianta.');
               res.redirect('profile')
             });
           });
@@ -309,5 +330,17 @@ app.get('/logout', function(req, res, next) {
     console.log(msgError)
     res.render('info.njk', {message: msgFlash, type: "danger"});
   });
+
+  //UTILITY
+ app.get('/mailvalidatemail', function(req, res) {
+      let server;
+      if (process.env.NODE_ENV == "development") {
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        server = req.protocol+'://'+req.hostname;
+      } 
+      res.send(mailvalidatemail('Token', server))
+    }) 
+
 
 };

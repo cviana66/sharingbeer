@@ -6,6 +6,7 @@ const mailfriend  = require('../config/mailFriend');
 const mailparent  = require('../config/mailParent');
 const mailinvite  = require('../config/mailInvite');
 const mailconferme  = require('../config/mailConferme');
+const mailvalidatemail  = require('../config/mailValidateMail');
 
 const User  = require('../app/models/user');
 
@@ -79,6 +80,13 @@ module.exports = {
                             subject: 'Conferma email - Birrificio Viana', // Subject line
                             html: mailconferme(Name, Email, Token, userName, server)
                         }
+                      } else if  (typeOfMail == 'reset') {
+                        var mailOptions = {
+                            from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
+                            to: Email, //'cviana66@gmail.com', // list of receivers
+                            subject: 'Imposta nuova password - Birrificio Viana', // Subject line
+                            html: mailvalidatemail(Token, server)
+                        }  
                       }
                       // effettua l'invio della mail
                       try {

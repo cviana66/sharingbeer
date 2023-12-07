@@ -22,6 +22,38 @@ const userSchema = new Schema({
                   main        : {type: String}, // usato per definire quale il principale yes/no
                   preference  : {type: String}  // flag di quale è l'ultimo scelto yes/no
               }],
+  friends : [{
+                //id: {type: String, required: true},
+                firstNameFriend: {type: String, required: true, unique: false},
+                lastNameFriend: {type: String, unique: false},
+                //emailParent: {type: String, required: true, unique: false},
+                emailFriend: {type: String, required:true, unique: true}
+            }],
+  orders: [{
+              userId      : { type: String, required: true },
+              //email       : { type: String, required: true },
+              dateInsert  : { type: Date, required: true },
+              status      : { type: String, required: true},
+              idPayment   : { type: String},
+              discount    : { type: Number},
+              totalPrice  : { type: Number},
+              totalQty    : { type: Number},
+              items : [{ 
+                  id : {type: String},
+                  name : {type: String},
+                  price : {type: Number},
+                  qty   : {type: Number},                
+              }],
+              paypal : {
+                  orderId        : { type: String},
+                  transactionId  : { type: String},
+                  createTime     : { type: String},
+                  updateTime     : { type: String},
+                  totalAmount    : { type: String},
+                  currencyAmount : { type: String},
+                  infoPayment    : { type: String}
+              }
+          }],
   fiscalCode: {type: String},  
   initDate: {
     type: Date,
@@ -29,24 +61,6 @@ const userSchema = new Schema({
   },
   endDate: { type: Date},
   eligibleFriends: {type: Number, default: 0},
-  facebook: {
-    id: String,
-    token: String,
-    email: String,
-    name: String
-  },
-  twitter: {
-    id: String,
-    token: String,
-    displayName: String,
-    username: String
-  },
-  google: {
-    id: String,
-    token: String,
-    email: String,
-    name: String
-  },
   idParent      : {type: String},
   booze         : {type: Number, default: 0},
   boozeXfriend  : {type: Number, default: 0},
