@@ -93,7 +93,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   const parseJSON = JSON.parse(data);
                   const elements = parseJSON.elements;
                   req.session.elements = elements;
-                  console.log(req.session.elements);
+                  //console.log(req.session.elements);
                   res.send('{"status":"200", "statusText":"OK"}');
                 } catch (e) {
                   console.log('Error', e);
@@ -103,7 +103,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           
       });
       request.on('error', (error) => {
-          console.log('An error', error);
+          console.log('Error', error);
             res.send('{"status":"500","statusText":'+error+'"}');
       });
       request.end()
@@ -125,12 +125,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.post('/cities',  function(req, res) {
         req.session.elements = [];
         //throw('Genera ERRORE');
-        console.log("city : ", req.body.city);
+        //console.log("city : ", req.body.city);
         CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},
                      null,
                      {sort: {Comune: 1}},
                      function(err, city) {
-                       console.log("Got city : ", city);
+                       //console.log("Got city : ", city);
                        res.send(city)
                      })
     });
@@ -138,7 +138,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.post('/caps', function(req, res) {
         //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
         //res.render('validation.dust', { message: req.flash('validation') });
-        console.log("city : ", req.body.city);
+        //console.log("city : ", req.body.city);
         MultipleCap.find({
             'Comune': req.body.city
         }).sort('CAP').exec(function(err, caps) {
@@ -237,7 +237,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 res.render('validation.njk', {prospect: user,});
               } else if (user.status == 'waiting') { 
                 //START TRANSACTION
-                const session = await db.startSession();
+                const session = await mongoose.startSession();
                 session.startTransaction();
                 const opts = { session };
                 try {
@@ -314,7 +314,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 }
 
                 //START TRANSACTION
-                const session = await db.startSession();
+                const session = await mongoose.startSession();
                 session.startTransaction();
 
                 const friend = await Friend.findOne({ emailFriend: req.body.token+'@sb.sb' }).session(session);
@@ -352,7 +352,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                     console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
                     res.redirect("/validation?token=" + req.body.token);
                   } else {
-                    let msg = 'Spaicente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';      
+                    let msg = 'Spiacente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';      
                     req.flash('error', msg);
                     console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
                     return res.render('info.njk', {
@@ -621,7 +621,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             });
         }
         //START TRANSACTION
-        const session = await db.startSession();
+        const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
@@ -701,30 +701,33 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     // =====================================
     // visualizza in formato HTML la mail conferma
     app.get('/mailconferme', function(req, res) {
+      let server;
       if (process.env.NODE_ENV == "development") {
-        let server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
       } else {
-        let server = req.protocol+'://'+req.hostname;
+        server = req.protocol+'://'+req.hostname;
       } 
       res.send(mailconferme('Name', 'Email', 'Token', 'userName', 'userSurname', server))
     })
 
     // visualizza in formato HTML la mail Friend
     app.get('/mailfriend', function(req, res) {
+      let server;
       if (process.env.NODE_ENV== "development") {
-        let server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
       } else {
-        let server = req.protocol+'://'+req.hostname;
+        server = req.protocol+'://'+req.hostname;
       }
       res.send(mailfriend('Name', 'Email', 'Token', 'userName', 'userSurname', server))
 
     })
     // visualizza in formato HTML la mail User
     app.get('/mailparent', function(req, res) {
+      let server;
       if (process.env.NODE_ENV== "development") {
-        let server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
       } else {
-        let server = req.protocol+'://'+req.hostname;
+        server = req.protocol+'://'+req.hostname;
       }
       res.send(mailparent('Name', 'Email', 'userName', 'userEmail', server))
     })
@@ -737,7 +740,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         server = req.protocol+'://'+req.hostname;
       }
       res.send(mailinvite('Name', 'Email', 'Token', 'userName', server))
-    })    
+    })   
 
     app.get('/infoMessage', (req, res) => {
       let msg = req.query.msg;

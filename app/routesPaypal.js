@@ -10,7 +10,7 @@ module.exports = function(app) {
 
 // =====================================
 // PAYPAL ==============================
-// https://www.nodejsera.com/paypal-payment-integration-using-nodejs-part1.html
+// https://www.nodejsera.com/paypal-payment-integration-using-nodejs-part1.html --> valido per la versione v1
 // =====================================
 
 // =====================================
@@ -26,7 +26,7 @@ app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
   try {
     ////////////////////////////////////////////////////////
     // Call PayPal to set up an authorization transaction //
-    // and create paypal Order                            //
+    // and create paypal Order  - Versione V2             //
     ////////////////////////////////////////////////////////
 
     const order = await paypal.createOrder(req);
