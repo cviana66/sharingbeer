@@ -4,7 +4,21 @@
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Axerve..</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
+      {% if message %}
+        {% for message in message %}
+          <div class="alert alert-{{type}}">{{message}}</div>
+        {% endfor %}
+      {% endif %}
+
     <table width="100%" align="center">
+      <tr>
+        <td width="60%" class="text-white text-center">Importo da pagare in €</td>
+        <td width="40%"><input type="text" id="amountEur" value="{{amount}}"></td>
+      </tr>
+      <tr>
+        <td width="60%" class="text-white text-center">ID transazione SB</td>
+        <td width="40%"><input type="text" id="transactionID" value="{{transactionID}}"></td>
+      </tr>
       <tr>
         <td width="60%">paymentID</td>
         <td width="40%"><input type="text" id="ID" value="{{paymentID}}"></td>
@@ -15,23 +29,68 @@
       </tr>
     </table>
 
-    <input type="button" onClick="validateData()" value="GO">
+    <!-- <input type="button" onClick="validateData()" value="GO"> -->
+    <input type="button" onClick="insertData()" value="Vai">
 
     <script script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
     <script type="text/javascript">
+      validateData();
+      
+      function insertData() {
+        var pAmountEur = document.getElementById("amountEur").value;
+        var pTransactionID = document.getElementById("transactionID").value;
+
+        post('/axerve_new', {'amountEur': pAmountEur, 'transactionID': pTransactionID});
+                
+      }
+
       function validateData() {
         var pToken = document.getElementById("token").value;
         var pID = document.getElementById("ID").value;
         console.log("token= ",pToken);
         console.log("ID= ",pID);
 
-        axerve.lightBox.shop = "GESPAY63388";
-        axerve.lightBox.open(pID, pToken, callbackAxerve);
-                
+        if (pToken != "" && pID != "") {
+          axerve.lightBox.shop = "{{shopLogin}}";
+          axerve.lightBox.open(pID, pToken, pCallback);
+        }
+        return;
       }
 
-      function callbackAxerve(response) {
-        console.log("FINE: ",response); 
+      function pCallback(response) {
+        console.log(response);
+        
+        let error = JSON.stringify(Object.values(response)[0]);
+        let result = Object.values(response)[2];
+        //alert('Hai controllato i log?');
+        post('/axerve_new', {'error': error, 'result': result});
+      }
+
+      /**
+      * sends a request to the specified url from a form. this will change the window location.
+      * @param {string} path the path to send the post request to
+      * @param {object} params the parameters to add to the url
+      * @param {string} [method=post] the method to use on the form
+      */
+      function post(path, params, method='post') {
+
+        // The rest of this code assumes you are not using a library.
+        // It can be made less verbose if you use one.
+        const form = document.createElement('form');
+        form.method = method;
+        form.action = path;
+
+        for (const key in params) {
+          if (params.hasOwnProperty(key)) {
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = key;
+            hiddenField.value = params[key];
+            form.appendChild(hiddenField);
+          }
+        }
+        document.body.appendChild(form);
+        form.submit();
       }
     </script>
   

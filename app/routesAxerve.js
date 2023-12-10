@@ -9,37 +9,8 @@ var users;
 
 //GET
   app.get('/axerve_new', function(req, res) {
+    res.render('axerveDE.njk');
 
-    const amount=1;
-    const currency='EUR';
-
-    fetch('https://sandbox.gestpay.net/api/v1/payment/create/',
-      {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",  
-          "Authorization": process.env.APIKEY
-        },
-        body: JSON.stringify({  
-          "shopLogin": "GESPAY63388",
-          "amount": amount,
-          "currency": currency,
-          'shopTransactionID' : 'TEST-ONE'
-        })
-      }
-    ).then(function(result) {
-      console.log("result: ",result);
-      return result.json();
-    }).then(function(data) {
-      console.log("data: ",data);
-      if(data.error.code !== "0") {
-        alert(data.error.description)
-      } else {
-        dParsed = data;
-        res.render('axerveDE.njk', {'paymentID':dParsed.payload.paymentID, 'paymentToken': dParsed.payload.paymentToken});
-      }
-    })
-    .catch(console.error);
   });
 
 //GET
@@ -97,23 +68,59 @@ var users;
   });
 
 //POST
-  app.post('/axerve', function(req, res) {
-    res.post('https://sandbox.gestpay.net/api/v1/payment/create/');
+  app.post('/axerve_new', function(req, res) {
 
-    res.render('axerve.njk');
-    });
+    var amount = req.body.amountEur;
+    var transactionID = req.body.transactionID;
+    var error = req.body.error;
+    var result = req.body.result;
 
-// =====================================
-// PASSPORT ERROR HANDLE ==== 18/12/2021
-// =====================================
-  app.use( function(error, req, res, next) {
-  // Error gets here
+    if (error != undefined) {
+      var errorParse = JSON.parse(error);
+      var errorDesc = errorParse.description;
 
-    let msgFlash = req.flash('error');
-    let msgError = error;
-    console.log(msgFlash);
-    console.log(msgError)
-    res.render('info.njk', {message: msgFlash, type: "danger"});
+      console.log('errorDesc: ', errorDesc);
+
+      req.flash('error', errorDesc);
+      
+      return res.render('axerveDE.njk', {'amount':amount, 'transactionID':transactionID, message: req.flash('error'), type: "warning"});
+
+    }
+
+    const currency='EUR';
+    const shopLogin="GESPAY63388";
+
+    fetch('https://sandbox.gestpay.net/api/v1/payment/create/',
+      {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",  
+          "Authorization": process.env.APIKEY
+        },
+        body: JSON.stringify({  
+          "shopLogin": shopLogin,
+          "amount": amount,
+          "currency": currency,
+          'shopTransactionID' : transactionID
+        })
+      }
+    ).then(function(result) {
+      console.log("result: ",result);
+      return result.json();
+
+    }).then(function(data) {
+      console.log("data: ",data);
+      if(data.error.code !== "0") {
+        req.flash('error', data.error.description);
+        return res.render('axerveDE.njk', {'amount':amount, 'transactionID':transactionID, message: req.flash('error'), type: "danger"});
+
+      } else {
+        dParsed = data;
+        return res.render('axerveDE.njk', {'shopLogin':shopLogin, 'paymentID':dParsed.payload.paymentID, 'paymentToken': dParsed.payload.paymentToken});
+      }
+    })
+
+    .catch(console.error);
   });
 
 };

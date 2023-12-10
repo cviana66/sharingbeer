@@ -21,7 +21,7 @@
       </div>
 
         
-             
+      <form role="form" action="/axerve_new" method="post" id="selectedAddress">       
           {%for address in addresses %}
           
           <div class="card text-white" style="background-color:#2A0009;border-color:#903246;max-width:18rem;margin-bottom:10px;">
@@ -34,10 +34,9 @@
               </button>
             </div>
           </div>
-            
 
           {%endfor%}
-        
+      </form>    
       
 
       <form role="form" action="/register" method="post" id="addresses">
