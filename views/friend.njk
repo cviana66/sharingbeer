@@ -22,11 +22,10 @@
       <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
         <div class="card-body">
           <div class="flex-row">
-            <!--h3 class="card-title text-white font-weight-light text-center"> Invita i tuoi amici a bere birra Viana e ottieni ad ogni loro acquisto punti Booze che ti fanno bere gratis </h3-->
             <div ><img class="mx-auto d-block" src="img/cincin.png" style="height:100%;width:100%;margin-bottom:10px"></div>
             <div class="align-self-center">
               <p class="text-white font-weight-light text-justify">
-                <span style="font-size:1.2em;">invita i tuoi amici </span> a bere <span class="sb-font" style="font-size:1.5em;color:#FF9139; ">birra Viana</span> e ottieni ad ogni loro acquisto punti <span  style="font-size:1.2em;"> Pinta </span> per <span  style="font-size:1.5em;"> sconti fino al 50%!</span><span style="float:right;"><a href="#" onclick="return openDocument('infoFriend.njk')"><svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#5375BD"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></a></span>
+                <span style="font-size:1.2em;">invita i tuoi amici </span> a bere <span class="sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span> e ottieni ad ogni loro acquisto punti <span  style="font-size:1.2em;"> Pinta </span> per <span  style="font-size:1.5em;"> sconti fino al 50%!</span><span style="float:right;"><a href="#" onclick="return openDocument('infoFriend.njk')"><svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#5375BD"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></a></span>
               </p>
             </div>
           </div>
@@ -66,7 +65,7 @@
         in /config/mailInvite c'è il testo della mail che verrà inviato al Parent e che contiene
         anche il testo per il Friend. Tale testo deve combaciare con quanto impostato nella variabile textText
       */
-      let textText = "Ciao "+firstName+",\n\nti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.\n\n"+server+"/validation?token="+token+"\n\nHai uno sconto del X% sull\'acquisto di un Box6Beer\n\n"+parentName;
+      let textText = "Ciao "+firstName+",\n\nti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.\n\n"+server+"/validation?token="+token+"\n\n"+parentName;
     
       let shareData = {
         title: 'Birrificio Viana - Codice invito SharingBeer',
@@ -88,9 +87,9 @@
         }
       } else {
         //apre il client di posta
-        document.getElementById("loading").style.display = 'block';
+        
         window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);
-        document.getElementById("loading").style.display = 'none';
+
         //redirige alla pagina recomm POST
         post('/recomm',{firstName:firstName,token:token});
       }

@@ -3,27 +3,35 @@ const bcrypt = require('bcrypt-nodejs');
 const Schema = mongoose.Schema;
 // define the schema for our user model
 const userSchema = new Schema({
+  account: {  name: { first: {type: String},
+                      last: {type: String},
+                    },
+              email           : { type: String, required: true, unique: true},
+              invitetionEmail : { type: String, required: true, unique: true},
+              password        : { type: String, required: true},
+              status          : { type: String, required: true},
+              fiscalCode      : {type: String},  
+              eligibleFriends : {type: Number, default: 0},
+              idParent        : {type: String, required: true, unique: true}, //id della persona che ha fatto l'invito
+              booze           : {type: Number, default: 0},
+              boozeXfriend    : {type: Number, default: 0},
 
-  email:        { type: String, required: true, unique: true},
-  inviteEmail:  { type: String, required: true, unique: true},
-  password:     { type: String, required: true},
-  status:       { type: String},
-  name:   { first: {type: String},
-            last: {type: String},
-          },
-  addresses : [{  first       : {type: String},
-                  last        : {type: String},
+            },
+  addresses : [{  name: { first: {type: String},
+                          last: {type: String},
+                        },
                   mobilePrefix: {type: String},
                   mobileNumber: {type: String},
                   city        : {type: String},
                   province    : {type: String},
                   address     : {type: String},
-                  numciv      : {type: String},
-                  main        : {type: String}, // usato per definire quale il principale yes/no
-                  preference  : {type: String}  // flag di quale è l'ultimo scelto yes/no
+                  houseNumber : {type: String},
+                  main        : {type: String}, // inserito all'atto della registrazine
+                  preferred   : {type: String}  // preferito nelle spedizioni
               }],
-  friends : [{
-                //id: {type: String, required: true},
+  friends : [{  name: { first: {type: String},
+                          last: {type: String},
+                      },
                 firstNameFriend: {type: String, required: true, unique: false},
                 lastNameFriend: {type: String, unique: false},
                 //emailParent: {type: String, required: true, unique: false},
@@ -53,17 +61,7 @@ const userSchema = new Schema({
                   currencyAmount : { type: String},
                   infoPayment    : { type: String}
               }
-          }],
-  fiscalCode: {type: String},  
-  initDate: {
-    type: Date,
-    default: Date.now
-  },
-  endDate: { type: Date},
-  eligibleFriends: {type: Number, default: 0},
-  idParent      : {type: String},
-  booze         : {type: Number, default: 0},
-  boozeXfriend  : {type: Number, default: 0},
+          }], 
   resetPasswordToken: String,
   resetPasswordExpires: Date
 });

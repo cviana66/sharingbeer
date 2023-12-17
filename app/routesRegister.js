@@ -501,7 +501,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                     controlSates = "disabled";
                     flag = "true";
                 }
-                console.log("URL: ", req.protocol+'://'+req.hostname);
+
+                let server;
+                if (process.env.NODE_ENV== "development") {
+                  server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+                } else {
+                  server = req.protocol+'://'+req.hostname;
+                }
                 res.render('friend.njk', {
                     controlSates: controlSates,
                     flag: flag,
@@ -513,7 +519,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                     percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
                     token: lib.generateToken(20),
                     parentName: req.user.name.first,
-                    server: req.protocol+'://'+req.hostname
+                    parentEmail: req.user.email,
+                    server: server
                 });
             });
         });
