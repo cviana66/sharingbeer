@@ -211,7 +211,7 @@ var SharingBeer = function() {
 
         console.info(moment().format()+' [INFO] ENVIRONMENT: '+process.env.NODE_ENV);
 
-        if (process.env.NODE_ENV === 'development') {
+        if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
             self.app.use(morgan('dev')); // log every request to the console
             self.app.use(session({
               name: '_sb',
