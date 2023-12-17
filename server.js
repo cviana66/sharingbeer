@@ -3,7 +3,7 @@
 const express  = require('express');                // Express. https://expressjs.com/
 const fs       = require('fs');                     // File System. https://nodejs.org/api/fs.html
 const util     = require('util');                   // Utilità. https://nodejs.org/api/util.html
-const mongoose = require('mongoose');               // Gestione MongoDB. https://mongoosejs.com/docs/
+//const mongoose = require('mongoose');               // Gestione MongoDB. https://mongoosejs.com/docs/
 const MongoStore    = require("connect-mongo");
 const passport = require('passport');               // Autenticazione. https://www.passportjs.org
 const flash    = require('connect-flash');          // Gestione messaggi in sessione. https://www.npmjs.com/package/connect-flash
@@ -25,23 +25,10 @@ const fastcsv       = require("fast-csv");          // Gestione dei file CSV. ht
 // config environment variables /
 //env(__dirname + '/.env');
 
-// connect to our database
-//const db = require('./config/database.js');
-
-// Mongoose Connection
-mongoose.set('strictQuery', false);
-const  db = mongoose
-  .connect(process.env.MONGODB_URL, { 
-    useNewUrlParser: true, 
-    useUnifiedTopology: true 
-  })
-  .then((connection) => {
-    console.info(moment().format()+' [INFO] MONGODB OPEN');
-    return connection
-  })
-  .then(mongoClient => mongoClient.connection.getClient())    
-  .catch(err => console.error(moment().format()+' [ERROR] MONGODB CONNECTION: '+err));
-
+//=================================================
+// Connect to our database
+const mongoose = require('./config/database.js');
+//=================================================
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)
 //const methodOverride  = require('method-override'); //commentato in data 15/10/22 per capire se usato no
@@ -236,7 +223,7 @@ var SharingBeer = function() {
                         sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
               //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
               store: MongoStore.create({
-                clientPromise: db,
+                client: mongoose.connection.getClient(),
                 dbName: "dbm1",
                 stringify: false,
                 autoRemove: 'interval',
@@ -254,7 +241,7 @@ var SharingBeer = function() {
                                         sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                               //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                               store: MongoStore.create({
-                                clientPromise: db,
+                                client: mongoose.connection.getClient(),
                                 dbName: "cluster0",
                                 stringify: false,
                                 autoRemove: 'interval',
