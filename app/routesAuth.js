@@ -65,7 +65,7 @@ module.exports = function(app, passport) {
         let msg = req.flash('success');
         console.log('MESSAGGIO',msg );
         res.render('profile.njk', {
-            user : req.user, // get the user out of session and pass to template
+            user : req.user.local, // get the user out of session and pass to template
             numFriends  : friends.length,
             friendsMap  : friends,
             message     : msg,
@@ -136,10 +136,10 @@ app.get('/logout', function(req, res, next) {
               server = req.protocol+'://'+req.hostname;
             } 
             try {
-              await lib.sendmailToPerson('',user.email,'',token,'','','','reset',server);
+              await lib.sendmailToPerson('',user.local.email,'',token,'','','','reset',server);
               let msg = '!';
               console.info(moment().format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
-              req.flash('loginMessage', 'Il messaggio con le istruzioni per reimpostare la password è stato inviato a ' + user.email );
+              req.flash('loginMessage', 'Il messaggio con le istruzioni per reimpostare la password è stato inviato a ' + user.local.email );
               res.redirect('/login');
             } catch (e) {
               let msg = 'Spiacente ma qualche cosa non ha funzionato nell\'invio dell\'email. Per cortesia riprova';
@@ -149,7 +149,7 @@ app.get('/logout', function(req, res, next) {
             }
             
             /*var mailOptions = {
-              to: user.email,
+              to: user.local.email,
               from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com',
               subject: 'SharingBeer Password Reset',
               text: 'Ciao, hai ricevuto questa mail perchè Tu (o qualcuno altro) ha richiesto di reimpostare la password del Tuo account\n\n' +
@@ -168,7 +168,7 @@ app.get('/logout', function(req, res, next) {
                 } else {
                   let msg = 'Message reset password sent!';
                   console.info(moment().format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
-                  req.flash('loginMessage', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+                  req.flash('loginMessage', 'An e-mail has been sent to ' + user.local.email + ' with further instructions.');
                   res.redirect('/login');
                 };
             }); */
@@ -197,7 +197,7 @@ app.get('/logout', function(req, res, next) {
         res.render('forgot.njk', {message: req.flash('error')});
       } else {
         res.render('reset.njk', { token: req.query.token,
-                                  email: user.email
+                                  email: user.local.email
                                 });
       };
     });
@@ -226,9 +226,9 @@ app.get('/logout', function(req, res, next) {
         } else {
 
           var common = new Users();
-          user.password = common.generateHash(req.body.password);
-          user.resetPasswordToken = undefined;
-          user.resetPasswordExpires = undefined;
+          user.local.password = common.generateHash(req.body.password);
+          user.local.resetPasswordToken = undefined;
+          user.local.resetPasswordExpires = undefined;
 
           user.save(function(err) {
 
@@ -255,12 +255,12 @@ app.get('/logout', function(req, res, next) {
 //GET
   app.get('/change', lib.isLoggedIn, function(req, res) {
 
-    Users.findOne({ email: req.user.email }, function(err, user) {
+    Users.findOne({ email: req.user.local.email }, function(err, user) {
 
       if(err) {
         let msg = 'Something bad happened! Please retry';
         req.flash('error', msg);
-        console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /change" email: {"email":"'+req.user.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+        console.error(moment().format()+' [ERROR][RECOVERY:NO] "GET /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       }
       res.render('change.njk');
@@ -276,24 +276,24 @@ app.get('/logout', function(req, res, next) {
 
     } else {
 
-      Users.findOne({ email: req.user.email }, function(err, user) {
+      Users.findOne({ email: req.user.local.email }, function(err, user) {
 
         if(err) {
           let msg = 'Something bad happened! Please retry';
           req.flash('error', msg);
-          console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+          console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
         }
 
         var common = new Users();
-        user.password = common.generateHash(req.body.password);
+        user.local.password = common.generateHash(req.body.password);
 
         user.save(function(err) {
 
           if(err) {
             let msg = 'Something bad happened! Please retry';
             req.flash('error', msg);
-            console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.email+'"} FUNCTION: Users.save: '+err+' FLASH: '+msg);
+            console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.save: '+err+' FLASH: '+msg);
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
           }
 

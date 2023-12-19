@@ -201,10 +201,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.get('/validation', function(req, res) {
 
         User.findOne({
-            resetPasswordToken: req.query.token,
-            resetPasswordExpires: {
-                $gt: Date.now()
-            }
+            'local.resetPasswordToken': req.query.token,
+            'local.resetPasswordExpires': { $gt: Date.now() }
         }, async function(err, user) {
             if (err) {
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired'
@@ -233,17 +231,17 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                                     type: "warning"
                                   });
             } else {
-              if (user.status == 'new') {
-                res.render('validation.njk', {prospect: user,});
-              } else if (user.status == 'waiting') { 
-                //START TRANSACTION
+              if (user.local.status == 'new') {
+                res.render('validation.njk', {prospect: user.local,});
+              } else if (user.local.status == 'waiting') { 
+                //START TRANSACTION.local
                 const session = await mongoose.startSession();
                 session.startTransaction();
                 const opts = { session };
                 try {
-                  user.status = 'validated';
-                  user.resetPasswordToken = undefined;
-                  user.resetPasswordExpires = undefined;
+                  user.local.status = 'validated';
+                  user.local.resetPasswordToken = undefined;
+                  user.local.resetPasswordExpires = undefined;
                   await user.save(opts);
 
                   await session.commitTransaction();
@@ -283,8 +281,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.post('/validation', function(req, res) {
     
         User.findOne({
-          resetPasswordToken: req.body.token,
-          resetPasswordExpires: {$gt: Date.now()}
+          'local.resetPasswordToken': req.body.token,
+          'local.resetPasswordExpires': {$gt: Date.now()}
         }, async function(err, user) {
             if (err || user == null) { 
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
@@ -317,7 +315,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 const session = await mongoose.startSession();
                 session.startTransaction();
 
-                const friend = await Friend.findOne({ emailFriend: req.body.token+'@sb.sb' }).session(session);
+                const friend = await Friend.findOne({ 'emailFriend': req.body.token+'@sb.sb' }).session(session);
 
                 try {
                   const token = lib.generateToken(20);
@@ -327,11 +325,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   friend.emailFriend = req.body.email;
                   friend.firstNameFriend = lib.capitalizeFirstLetter(req.body.firstName);
                   await friend.save(opts);
-                  user.email = req.body.email;
-                  user.password = user.generateHash(req.body.password);
-                  user.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
-                  user.resetPasswordToken = token
-                  user.status = "waiting"
+                  user.local.email = req.body.email;
+                  user.local.password = user.generateHash(req.body.password);
+                  user.local.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
+                  user.local.resetPasswordToken = token
+                  user.local.status = "waiting"
                   await user.save(opts);
 
                   await lib.sendmailToPerson(req.body.firstName,req.body.email, '', token, req.body.firstName, '', req.body.email, 'conferme',server);
@@ -374,15 +372,15 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     //GET
     app.get('/register', lib.isLoggedIn, function(req, res) {
 
-        if (req.user.status == 'validated') {
-            var model = { firstName: req.user.name.first,
-                          lastName: req.user.name.last,
+        if (req.user.local.status == 'validated') {
+            var model = { firstName: req.user.local.name.first,
+                          lastName: req.user.local.name.last,
                           user: req.user,
                           numProducts : req.session.numProducts
                         }
             res.render('registration.njk', model);
 
-        } else if (req.user.status == 'customer' && req.session.numProducts > 0) {
+        } else if (req.user.local.status == 'customer' && req.session.numProducts > 0) {
             res.redirect('/addresses');
 
         } else {
@@ -394,12 +392,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.post('/register', lib.isLoggedIn, async function(req, res, next) {
         try {
             console.log('ID: ',req.user._id);
-            const doc = await User.findById(req.user._id);
-            //console.log('FORM Register: ',doc);     //TODO fare il controllo di inserimento se l'arreay è vuota
-            doc.name.first              = req.body.firstName;
-            doc.name.last               = req.body.lastName;
-            doc.status                  = 'customer'; // to change in 'customer' after session  of testing
-            doc.addresses.push({
+            const user = await User.findById(req.user._id);
+            //console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
+            user.local.name.first              = req.body.firstName;
+            user.local.name.last               = req.body.lastName;
+            user.local.status                  = 'customer'; // to change in 'customer' after session  of testing
+            user.addresses.push({
                                 first           : req.body.firstName,     
                                 last            : req.body.lastName,
                                 mobilePrefix    : '+39',
@@ -411,7 +409,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                                 main            : 'yes',
                                 preference      : 'yes'
             });
-            await doc.save();
+            await user.save();
             res.redirect('/addresses');
         } catch(err) {
                 console.log('error', err);
@@ -433,10 +431,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             console.log('DOC:', doc )
 
             res.render('addresses.njk', {
-                addresses : req.user.addresses,
-                firstName: req.user.name.first,
-                lastName: req.user.name.last,
-                user: req.user,
+                addresses   : req.user.addresses,
+                firstName   : req.user.local.name.first,
+                lastName    : req.user.local.name.last,
+                user        : req.user,
                 numProducts : req.session.numProducts
             });
 
@@ -463,7 +461,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
 
         // conto quanti amici ha già lo User
-        Friend.countDocuments({ emailParent: req.user.email }, function(err, numFriends) {
+        Friend.countDocuments({ emailParent: req.user.local.email }, function(err, numFriends) {
             if (err) {
                 console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
                 req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
@@ -475,7 +473,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 });
             }
             // recupero le informazioni dell'utente
-            User.findOne({ email: req.user.email }, function(err, user) {
+            User.findOne({ 'local.email': req.user.local.email }, function(err, user) {
                 if (err) {
                     console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: User.findOne: ' + err);
                     req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
@@ -487,8 +485,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                     });
                 }
 
-                req.session.invitationAvailable = parseInt(user.eligibleFriends, 10); //numero di inviti disponibili = amici ammissibili
-                req.session.friendsInvited = parseInt(numFriends, 10);                //numero di amici già invitati
+                req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); //numero di inviti disponibili = amici ammissibili
+                req.session.friendsInvited = parseInt(numFriends, 10);                      //numero di amici già invitati
 
                 let error = "";
                 let controlSates = "";
@@ -513,13 +511,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                     flag: flag,
                     message: req.flash('info'),
                     type: "info",
-                    user: req.user,
+                    user: req.user.local,
                     invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
                     friendsInvited: req.session.friendsInvited,
                     percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
-                    token: lib.generateToken(20),
-                    parentName: req.user.name.first,
-                    parentEmail: req.user.email,
+                    //token: lib.generateToken(20),
+                    parentName: req.user.local.name.first,
+                    parentEmail: req.user.local.email,
                     server: server
                 });
             });
@@ -554,37 +552,37 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           const opts = { session };
 
           // creo nuovo user con i dati segnalati dal PARENT
-          var password = lib.generatePassword(6);
-          const newUser = await new User();
-          const nome = lib.capitalizeFirstLetter(req.body.firstName)
-          console.log('NOME: ',nome);
-          // set the user's local credentials
-          newUser.password = newUser.generateHash(password);
-          newUser.name.first = nome;
-          newUser.idParent = req.user._id; //id parent
-          newUser.status = 'new';  // status
-          let token = req.body.token;
-          newUser.email = token+"@sb.sb";
-          newUser.inviteEmail = token+"@sb.sb";
-          newUser.resetPasswordToken = token; // token
-          // 1 hour in secondi * 24 * 365 = 1 anno
-          newUser.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
-/*******/
+          const newUser   = await new User();
+          const password  = lib.generatePassword(6);
+          
+          const firstName = lib.capitalizeFirstLetter(req.body.firstName);
+          const token     = lib.generateToken(20);
+          console.log('TOKEN: ',token);
+          
+          // Set the newUser's local credentials
+          newUser.local.password        = newUser.generateHash(password);
+          newUser.local.name.first      = firstName;
+          newUser.local.idParent        = req.user.id; //id parent
+          newUser.local.status          = 'new';  // status
+          newUser.local.email           = token+"@sb.sb";
+          newUser.local.token           = token;
+          newUser.local.resetPasswordToken   = token; 
+          newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
+          
 		      await newUser.save(opts);
-/*******/
-          // Save a new friends in mongodb
-          var newFriend = new Friend();
-          newFriend.id = req.user._id;	// id parent
-          newFriend.emailParent = req.user.email;	// mail parent
-          newFriend.emailFriend = token+"@sb.sb";	// mail friend
-          newFriend.firstNameFriend = newUser.name.first;	//name's friend
-/*******/
-		      await newFriend.save(opts);
-/*******/
-           
-/*******/ //send email to Parent         
-          await lib.sendmailToPerson(req.user.name.first, req.user.email, '', token, newUser.name.first, '', newUser.email, 'invite',server)
-/*******/
+
+          // Push a new Friend in Parent
+          const user = await User.findById(req.user.id);
+          user.friends.push({ 'name.first'  : firstName,
+                              'token'       : token,
+                              'status'      : 'new'                              
+          });
+
+          await user.save(opts);
+
+          //send email to Parent         
+          await lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
+
           await session.commitTransaction();
 
           req.session.friendsInvited += 1;
@@ -594,8 +592,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 		      }
           
           res.render('share.njk', {
-              firstName: nome,
-              flag: flag             
+              friendName: firstName,
+              parentName: req.user.local.name.first,
+              flag      : flag,
+              token     : token,
+              server    : server        
           });
           
         } catch (e) {
@@ -638,17 +639,17 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           var password = lib.generatePassword(6);
           const newUser = await new User();
           // set the user's local credentials
-          newUser.email = req.body.email;
-          newUser.inviteEmail = req.body.email;
-          newUser.password = newUser.generateHash(password);
-          newUser.name.first = lib.capitalizeFirstLetter(req.body.firstName);
-          newUser.idParent = req.user._id;
+          newUser.local.email = req.body.email;
+          newUser.local.invitationEmail = req.body.email;
+          newUser.local.password = newUser.generateHash(password);
+          newUser.local.name.first = lib.capitalizeFirstLetter(req.body.firstName);
+          newUser.local.idParent = req.user._id;
           //id parent
-          newUser.status = 'new';
+          newUser.local.status = 'new';
           // status
-          newUser.resetPasswordToken = lib.generateToken(20);
+          newUser.local.resetPasswordToken = lib.generateToken(20);
           // token
-          newUser.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
+          newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
           // 1 hour in secondi * 24 * 365 = 1 anno
 
           await newUser.save(opts);

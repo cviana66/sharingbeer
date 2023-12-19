@@ -227,7 +227,7 @@ var SharingBeer = function() {
                 dbName: "dbm1",
                 stringify: false,
                 autoRemove: 'interval',
-                autoRemoveInterval: 2 // emoving expired sessions, using defined interval in minutes
+                autoRemoveInterval: 1 // removing expired sessions, using defined interval in minutes
               })
 
             }));

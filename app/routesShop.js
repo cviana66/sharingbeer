@@ -92,11 +92,11 @@ module.exports = function(app) {
 		//Retrieve the shopping cart from session
 		lib.retriveCart(req);
 
-		var model = { user       : req.user,
+		var model = { user       : req.user.local,
   						    numProducts: req.session.numProducts,
   						    cart       : req.session.cartItems,
                   totalPrice : req.session.totalPrc,
-                  userStatus : req.user.status,
+                  userStatus : req.user.local.status,
                   nextStep   : req.session.nextStep
   					    };
 
