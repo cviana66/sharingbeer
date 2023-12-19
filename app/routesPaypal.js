@@ -37,7 +37,7 @@ app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
     var newOrder = new Order();
 
     newOrder.userId = req.user._id;
-    newOrder.email  = req.user.email;
+    newOrder.email  = req.user.local.email;
     newOrder.dateInsert = Date.now();
     newOrder.status = order.status;
     //newOrder.discount = 0;
@@ -105,7 +105,7 @@ app.post('/api/orders/:orderID/capture', lib.isLoggedIn, async function(req, res
     if (captureData.status === 'COMPLETED') {
         // add Friends after buy
 
-        Order.countDocuments({ email:req.user.email, status:"COMPLETED" }, function (err, numberPurchases) {
+        Order.countDocuments({ email:req.user.local.email, status:"COMPLETED" }, function (err, numberPurchases) {
 
           // iniviti possibili = N° acquisiti / Booze destinatia al marketing per ogni PKGx4 aquistato
 
@@ -120,7 +120,7 @@ app.post('/api/orders/:orderID/capture', lib.isLoggedIn, async function(req, res
             },
             function (err, req) {
               if (err) {
-                console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findByIdAndUpdate: ' + err + ' TODO: Aggionare in users il campo eligibleFriends di {"_id":ObjectId("' + newUser.email + '")} con il valore ' + invitiPossibili);
+                console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findByIdAndUpdate: ' + err + ' TODO: Aggionare in users il campo eligibleFriends di {"_id":ObjectId("' + newUser.local.email + '")} con il valore ' + invitiPossibili);
               }
           });
 
@@ -128,7 +128,7 @@ app.post('/api/orders/:orderID/capture', lib.isLoggedIn, async function(req, res
           User.findOne({'_id': req.user.idParent }, function(err, parent) {
             let booze = req.session.totalQty * global.mktBoozeXParent;
             if (err) {
-              console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOne: ' + err + ' TODO: Sommare in users > campo booze di {"_id":ObjectId("' + newUser.email + '")} con il valore ' + booze);
+              console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOne: ' + err + ' TODO: Sommare in users > campo booze di {"_id":ObjectId("' + newUser.local.email + '")} con il valore ' + booze);
             } else {
                 parent.booze += booze;
 
@@ -137,7 +137,7 @@ app.post('/api/orders/:orderID/capture', lib.isLoggedIn, async function(req, res
                 User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req) {
                     if (err) {
                       console.log('error User.update', err);
-                      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOne: ' + err + ' TODO: Sommare in users > campo booze di {"_id":ObjectId("' + newUser.email + '")} con il valore ' + booze);
+                      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /authorize-paypal-transaction" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} FUNCTION: findOne: ' + err + ' TODO: Sommare in users > campo booze di {"_id":ObjectId("' + newUser.local.email + '")} con il valore ' + booze);
                       //return;
                     }
                 });

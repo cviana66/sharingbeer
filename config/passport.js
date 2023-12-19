@@ -9,7 +9,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var User = require('../app/models/user');
 
 //var transporter     = require('./mailerXOAuth2');
-var transporter = require('./mailer');
+//var transporter = require('./mailer');
 
 // date and time utility
 const moment  = require("moment");
@@ -56,7 +56,7 @@ module.exports = function(passport) {
                 console.log("signup");
                 // find a user whose email is the same as the forms email
                 // we are checking to see if the user trying to login already exists
-                User.findOne({ 'email' :  email }, function(err, user) {
+                User.findOne({ 'local.email' :  email }, function(err, user) {
 
                     // if there are any errors, return the error
                     if (err) { return done(err); }
@@ -70,8 +70,8 @@ module.exports = function(passport) {
                         var newUser = new User();
 
                         // set the user's local credentials
-                        newUser.email    = email;
-                        newUser.password = newUser.generateHash(password);
+                        newUser.local.email    = email;
+                        newUser.local.password = newUser.generateHash(password);
 
                         // save the user
                         newUser.save(function(err) {
@@ -100,7 +100,7 @@ module.exports = function(passport) {
 
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
-            User.findOne({ 'email' :  email }, function(err, user) {
+            User.findOne({ 'local.email' :  email }, function(err, user) {
                 // if there are any errors, return the error before anything else
                 if (err) {
                     let msg = 'Something bad happened! There are problems with the network connection. Please try again later';
@@ -110,20 +110,24 @@ module.exports = function(passport) {
                 }
 
                 // if no user is found, return the message
-                if (!user)
+                if (!user) {
+                    console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /logn" User Not Found"');
                     // req.flash is the way to set flashdata using connect-flash
-                    return done(null, false, req.flash('loginMessage', 'No user found.'));
+                    return done(null, false, req.flash('loginMessage', 'Utente sconosciuto'));
+                }
 
                 // if the user is found but the password is wrong, return the message
-                if (!user.validPassword(password))
+                if (!user.validPassword(password)) {
+                    console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /logn" Wrong Password');
                     // create the loginMessage and save it to session as flashdata
-                    return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.'));
+                    return done(null, false, req.flash('loginMessage', 'La password è errata'));
+                }
 
                 // all is well, return successful user
                 console.info(moment().format()+' [INFO] "/login" USERS_ID: {"_id":ObjectId("'+user._id+'")}');
 
                 /* if the user status  is "new" then it is the first access --> validation put status = confirmed
-                if (user.status == 'new') {
+                if (user.local.status == 'new') {
                     User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
 
                         if (err) {
