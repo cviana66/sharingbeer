@@ -56,7 +56,7 @@ module.exports = function(passport) {
                 console.log("signup");
                 // find a user whose email is the same as the forms email
                 // we are checking to see if the user trying to login already exists
-                User.findOne({ 'local.email' :  email }, function(err, user) {
+                User.findOne({ 'local.email' :  email.toLowerCase() }, function(err, user) {
 
                     // if there are any errors, return the error
                     if (err) { return done(err); }
@@ -100,7 +100,7 @@ module.exports = function(passport) {
 
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
-            User.findOne({ 'local.email' :  email }, function(err, user) {
+            User.findOne({ 'local.email' :  email.toLowerCase() }, function(err, user) {
                 // if there are any errors, return the error before anything else
                 if (err) {
                     let msg = 'Something bad happened! There are problems with the network connection. Please try again later';

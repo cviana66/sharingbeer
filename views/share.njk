@@ -10,7 +10,7 @@
       <div class="flex-row">
         <div class="align-self-center">
           <p class="text-white font-weight-light text-justify">
-            Abbiamo inviato al tuo indirizzo email il messaggio di invito per <b> {{friendName}} </b> e che potrai inviare se non ancora codiviso. </p>
+            Abbiamo inviato al tuo indirizzo email il messaggio di invito per <b> {{firstName}} </b> e che potrai inviare se non ancora codiviso. </p>
 		      <p class="text-white font-weight-light text-left"> Grazie per bere </p>
           <p class="text-white font-weight-light text-center"> <span class="sb-font" style="font-size:1.5em;color:#FF9139;">birra Viana</span> </p>          
           <p class="text-white font-weight-light text-left"> e far conoscere </p>
@@ -32,84 +32,6 @@
         
   {% endif %}
     
-  <div id="loading">
-    <img  src="img/ajax-loader-1.gif" alt="Loading..." />
-  </div>
-
-<script  type="text/javascript">
-
-  document.addEventListener("DOMContentLoaded", function() {
-      document.getElementById("loading").style.display = 'none';
-      share('{{token}}','{{parentName}}','{{server}}','{{friendName}}') 
-  });
-
-  async function share(token,parentName,server,firstName) {
-      /*
-        in /config/mailInvite c'è il testo della mail che verrà inviato al Parent e che contiene
-        anche il testo per il Friend. Tale testo deve combaciare con quanto impostato nella variabile textText
-      */
-      let textText = "Ciao "+firstName+",\n\nti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.\n\n"+server+"/validation?token="+token+"\n\n"+parentName;
-    
-      let shareData = {
-            title: 'Birrificio Viana - Codice invito SharingBeer',
-            text: textText
-          }
-      if (navigator.canShare) {
-        try {
-            document.getElementById("loading").style.display = 'block';
-            a = await navigator.share(shareData);
-            document.getElementById("loading").style.display = 'none';
-            if (a == undefined) {
-              console.log('navigator.share evailable')
-            } else {
-              throw new Error ('SHARE FALLITO = '+a);
-            }
-        } catch (e) {
-            post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito ", type:"warning", err:e});
-            console.log("Condivisione non avvenuta: ", e);
-        }
-      } else {
-        //apre il client di posta
-        
-        window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);
-
-      }
-    }
-
-  function capitalizeFirstLetter(string) {
-    if (typeof(string) != "undefined") {
-      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    }
-  }
-
-  /**
-  * sends a request to the specified url from a form. this will change the window location.
-  * @param {string} path the path to send the post request to
-  * @param {object} params the parameters to add to the url
-  * @param {string} [method=post] the method to use on the form
-  */
-  function post(path, params, method='post') {
-
-    // The rest of this code assumes you are not using a library.
-    // It can be made less verbose if you use one.
-    const form = document.createElement('form');
-    form.method = method;
-    form.action = path;
-
-    for (const key in params) {
-      if (params.hasOwnProperty(key)) {
-        const hiddenField = document.createElement('input');
-        hiddenField.type = 'hidden';
-        hiddenField.name = key;
-        hiddenField.value = params[key];
-        form.appendChild(hiddenField);
-      }
-    }
-    document.body.appendChild(form);
-    form.submit();
-  }  
-</script>
- 
       
 {% endblock %}
 

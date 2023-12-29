@@ -591,7 +591,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 			     flag= true;
 		      }
           
-          res.render('share.njk', {
+          res.render('shareShare.njk', {
               friendName: firstName,
               parentName: req.user.local.name.first,
               flag      : flag,
