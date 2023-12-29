@@ -1,0 +1,112 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+	
+  <h3 class="text-white text-center bg-dark"> Codice Invito </h3>
+  <hr style="border-top: 1px solid #5375BD;">
+
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
+    <div class="card-body">
+	<h5 class="card-title" style="color:#FFBB35">Importante</h5>
+      <div class="flex-row">
+        <div class="align-self-center">
+          <p class="text-white font-weight-light text-justify">
+             {{server}} {{token}}
+          </p>  
+        </div>
+      </div>
+    </div>
+  </div>
+  {% if flag %}
+        
+   <form role="form" action="/recomm" method="GET">
+	   <div style="margin-bottom: 40px;">
+		   <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
+			   Condividi il codice
+           </button>
+      </div>
+   </form>
+        
+  {% endif %}
+    
+  <div id="loading">
+    <img  src="img/ajax-loader-1.gif" alt="Loading..." />
+  </div>
+
+<script  type="text/javascript">
+
+  document.addEventListener("DOMContentLoaded", function() {
+      document.getElementById("loading").style.display = 'none';
+  });
+
+  async function share(token,parentName,server,firstName) {
+      /*
+        in /config/mailInvite c'è il testo della mail che verrà inviato al Parent e che contiene
+        anche il testo per il Friend. Tale testo deve combaciare con quanto impostato nella variabile textText
+      */
+      let textText = "Ciao "+firstName+",\n\nti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.\n\n"+server+"/validation?token="+token+"\n\n"+parentName;
+    
+      let shareData = {
+            title: 'Birrificio Viana - Codice invito SharingBeer',
+            text: textText,
+            url: ""
+          }
+      if (navigator.canShare(shareData)) {
+        try {
+            document.getElementById("loading").style.display = 'block';
+            a = await navigator.share(shareData);
+            document.getElementById("loading").style.display = 'none';
+            /*if (a == undefined) {
+              console.log('navigator.share evailable')
+            } else {
+              throw new Error ('SHARE FALLITO = '+a);
+            }*/
+        } catch (e) {
+            post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito ", type:"warning", err:e});
+            console.log("Condivisione non avvenuta: ", e);
+        }
+      } else {
+        //apre il client di posta
+        
+        window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);
+
+      }
+    }
+
+  function capitalizeFirstLetter(string) {
+    if (typeof(string) != "undefined") {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+  }
+
+  /**
+  * sends a request to the specified url from a form. this will change the window location.
+  * @param {string} path the path to send the post request to
+  * @param {object} params the parameters to add to the url
+  * @param {string} [method=post] the method to use on the form
+  */
+  function post(path, params, method='post') {
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less verbose if you use one.
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = path;
+
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        const hiddenField = document.createElement('input');
+        hiddenField.type = 'hidden';
+        hiddenField.name = key;
+        hiddenField.value = params[key];
+        form.appendChild(hiddenField);
+      }
+    }
+    document.body.appendChild(form);
+    form.submit();
+  }  
+</script>
+ 
+      
+{% endblock %}
+
+
