@@ -2,6 +2,8 @@ const lib           = require('./libfunction');
 const https         = require("https");  
 const fetch         = require("node-fetch");
 
+const {transMsg}    = require("./msgHandler");
+
 module.exports = function(app) {
 
 var counter;
@@ -105,18 +107,23 @@ var users;
         })
       }
     ).then(function(result) {
-      console.log("result: ",result);
+      //console.log("result: ",result);
       return result.json();
 
-    }).then(function(data) {
+    }).then(async function(data) {
       console.log("data: ",data);
+      
       if(data.error.code !== "0") {
-        req.flash('error', data.error.description);
+        const translatedMsg = data.error.description;
+        //const translatedMsg = await transMsg(data.error.description, 'fr'); //PROVA traduzione su server
+                
+        req.flash('error', translatedMsg);
+
         return res.render('axerveDE.njk', {'amount':amount, 'transactionID':transactionID, message: req.flash('error'), type: "danger"});
 
       } else {
         dParsed = data;
-        return res.render('axerveDE.njk', {'shopLogin':shopLogin, 'paymentID':dParsed.payload.paymentID, 'paymentToken': dParsed.payload.paymentToken});
+        res.render('axerveDE.njk', {'shopLogin':shopLogin, 'paymentID':dParsed.payload.paymentID, 'paymentToken': dParsed.payload.paymentToken});
       }
     })
 
