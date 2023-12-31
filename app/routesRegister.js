@@ -427,9 +427,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         //  2. permettere l'inserimento di un nuovo indirizzo
         //  3. richiamare cart con il riepilogo 
         try {
-            const doc = await User.findById(req.user._id);         
-            console.log('DOC:', doc )
-
+            const doc = await User.findOne({'_id': mongoose.Types.ObjectId(req.user.id), 'friends.status':'new'});         
+            console.log('DOC -->: ', doc.friends);
+            //console.log('req.user.addresses --> ', req.user.friends)
+            //console.log("N. Friends: ", req.user.friends.length)
             res.render('addresses.njk', {
                 addresses   : req.user.addresses,
                 firstName   : req.user.local.name.first,
@@ -461,32 +462,18 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
 
         // conto quanti amici ha già lo User
-        Friend.countDocuments({ emailParent: req.user.local.email }, function(err, numFriends) {
+        User.findOne({'_id': mongoose.Types.ObjectId(req.user.id), 'friends.status':'new'}, function(err, user) {
             if (err) {
                 console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
                 req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                req.flash('error', 'Riprova ad effettuare l\'invito');
-                req.flash('error', 'Esamineremo il problema con la massima urgenza!');
                 return res.render('info.njk', {
                     message: req.flash('error'),
                     type: "danger"
                 });
-            }
-            // recupero le informazioni dell'utente
-            User.findOne({ 'local.email': req.user.local.email }, function(err, user) {
-                if (err) {
-                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: User.findOne: ' + err);
-                    req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                    req.flash('error', 'Riprova ad effettuare l\'invito');
-                    req.flash('error', 'Esamineremo il problema con la massima urgenza!');
-                    return res.render('info.njk', {
-                        message: req.flash('error'),
-                        type: "danger"
-                    });
-                }
+            } else {
 
                 req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); //numero di inviti disponibili = amici ammissibili
-                req.session.friendsInvited = parseInt(numFriends, 10);                      //numero di amici già invitati
+                req.session.friendsInvited = parseInt(user.friends.length, 10);             //numero di amici già invitati
 
                 let error = "";
                 let controlSates = "";
@@ -495,7 +482,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 // controllo che ci siano ancora inviti diposnibili
                 if (req.session.friendsInvited >= req.session.invitationAvailable) {
                     req.flash('info', "Non hai inviti disponibili!");
-                    req.flash('info', "Acquista un BoxNbeer per avere un nuovo invito");                    
+                    req.flash('info', "Acquista un beerBox per avere un nuovo invito");                    
                     controlSates = "disabled";
                     flag = "true";
                 }
@@ -520,7 +507,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                     parentEmail: req.user.local.email,
                     server: server
                 });
-            });
+            };
         });
     });
     //POST
@@ -580,33 +567,40 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
           await user.save(opts);
 
+          //throw new Error('ERROR in RECOMM generato da me');
+
           //send email to Parent         
-          await lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
+          //await lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
 
           await session.commitTransaction();
 
           req.session.friendsInvited += 1;
           let flag = false;
           if (req.session.friendsInvited < req.session.invitationAvailable) {
-			     flag= true;
+			     flag = true;
 		      }
           
-          res.render('shareShare.njk', {
+          res.send({
               friendName: firstName,
               parentName: req.user.local.name.first,
               flag      : flag,
               token     : token,
-              server    : server        
-          });
+              server    : server,
+              ok        : true       
+          })
           
         } catch (e) {
             await session.abortTransaction();
+            console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
+            return res.status(500).send({err:e, ok:false})
+        }
+            
+/*
             req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-            req.flash('error', 'Riprova ad effettuare l\'invito');
-            req.flash('error', 'Esamineremo il problema con la massima urgenza!');
             console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
-        } finally {
+ */
+         finally {
             await session.endSession();
         }
     });
@@ -771,6 +765,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           type: msgType,
           err: err
       })
+    });
+
+    app.post('/infoShare', (req,res) => {
+       res.render('share.njk', {
+              firstName   : req.body.firstName,
+              flag        : req.body.flag
+          });
     });
 
     app.get('/videoPromo', (req, res) => {

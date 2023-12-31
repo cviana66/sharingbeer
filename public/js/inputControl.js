@@ -10,12 +10,9 @@ function fieldLoginControl(){
   if (email == "" || !re.test(String(email))) {
     text = iwar+"Indirizzo mail non valido.";
     document.getElementById("wrongMail").innerHTML = text;
-    submit = false;
-  }
-  if (submit) {
-    return true;
-  } else {
     return false;
+  } else {
+    return true;
   }
 };
 
