@@ -83,23 +83,13 @@
             console.log('textText -->', textText)
             let shareData = {
               title: 'Birrificio Viana - Codice invito SharingBeer',
-              text: textText,
-              url: "" // server+"/validation?token="+token
+              text: textText
+              //url: server+"/validation?token="+token
             }
             if (navigator.canShare) {
-              try {
-                  document.getElementById("loading").style.display = 'block';
-                  a = await navigator.share(shareData);
-                  document.getElementById("loading").style.display = 'none';
-                  if (a == undefined) {
-                    //post('/recomm',{firstName:firstName,token:token});
-                    console.log('A --> ',a)
-                  } else {
-                    throw new Error ('SHARE FALLITO = '+a);
-                  }
-              } catch (e) {
-                  post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito 1", type:"warning", err:e});
-              }
+              document.getElementById("loading").style.display = 'block';
+              await navigator.share(shareData);
+              document.getElementById("loading").style.display = 'none';
             } else {                        
               window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);           
               post('/infoShare',{firstName:data.friendName,flag:data.flag});
