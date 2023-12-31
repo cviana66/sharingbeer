@@ -90,6 +90,7 @@
               document.getElementById("loading").style.display = 'block';
               await navigator.share(shareData);
               document.getElementById("loading").style.display = 'none';
+              post('/infoShare',{firstName:data.friendName,flag:data.flag});
             } else {                        
               window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);           
               post('/infoShare',{firstName:data.friendName,flag:data.flag});
