@@ -47,7 +47,7 @@ const routesQrcode   = require('./app/routesQrcode.js');
 // paypal v2 ===================================================================
 const routesPaypal    = require('./app/routesPaypal');
 
-// Axereve =====================================================================
+// Axerve ======================================================================
 const routesAxerve    = require('./app/routesAxerve');
 
 // passport ====================================================================
@@ -55,6 +55,9 @@ const pass            = require('./config/passport');
 
 // transMsgPost=================================================================
 const {transMsgPost}  = require('./app/msgHandler');
+
+// transMsgPost=================================================================
+const geoCoordHandler = require('./app/geoCoordHandler');
 
 global.debug = true;
 
@@ -176,6 +179,7 @@ var SharingBeer = function() {
         routesPaypal(self.app);
         routesAxerve(self.app);
         transMsgPost(self.app);
+        geoCoordHandler(self.app);
     };
 
     /**
