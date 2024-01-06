@@ -4,6 +4,12 @@
       <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Axerve..</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
+      {% if message %}
+        {% for message in message %}
+          <div class="alert alert-{{type}}">{{message}}</div>
+        {% endfor %}
+      {% endif %}
+
     <table width="100%" align="center">
       <tr>
         <td width="60%" class="text-white text-center">Importo da pagare in €</td>
@@ -49,6 +55,7 @@
           axerve.lightBox.open(pID, pToken, pCallback);
         }
         return;
+<<<<<<< HEAD
       }
 
       function pCallback(response) {
@@ -60,6 +67,19 @@
         post('/axerve_new', {'error': error, 'result': result});
       }
 
+=======
+      }
+
+      function pCallback(response) {
+        console.log(response);
+        
+        let error = JSON.stringify(Object.values(response)[0]);
+        let result = Object.values(response)[2];
+        //alert('Hai controllato i log?');
+        post('/axerve_new', {'error': error, 'result': result});
+      }
+
+>>>>>>> newdbstruct
       /**
       * sends a request to the specified url from a form. this will change the window location.
       * @param {string} path the path to send the post request to

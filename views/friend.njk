@@ -61,39 +61,47 @@
       document.getElementById("inputFirstName").focus();
     } else {
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
-      /*
-        in /config/mailInvite c'è il testo della mail che verrà inviato al Parent e che contiene
-        anche il testo per il Friend. Tale testo deve combaciare con quanto impostato nella variabile textText
-      */
-      let textText = "Ciao "+firstName+",\n\nti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.\n\n"+server+"/validation?token="+token+"\n\n"+parentName;
-    
-      let shareData = {
-        title: 'Birrificio Viana - Codice invito SharingBeer',
-        text: textText,
-        //url: server+"/validation?token="+token
-      }
-      if (navigator.canShare) {
-        try {
-            document.getElementById("loading").style.display = 'block';
-            a = await navigator.share(shareData);
-            document.getElementById("loading").style.display = 'none';
-            if (a == undefined) {
-              post('/recomm',{firstName:firstName,token:token});
-            } else {
-              throw new Error ('SHARE FALLITO = '+a);
-            }
-        } catch (e) {
-            post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito ", type:"warning", err:e});
+      
+      fetch('/recomm',
+        {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({  
+            "firstName": firstName,
+          })
         }
-      } else {
-        //apre il client di posta
-        
-        window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);
+      ).then(function(result) 
+        {
+          return result.json();
+        }
+      ).then( async function(data) 
+        {
+          if (data.ok) {            
+            let textText = "Ciao "+data.friendName+",\n\nti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
+            console.log('textText -->', textText)
+            let shareData = {
+              title: 'Birrificio Viana - Codice invito SharingBeer',
+              text: textText
+              //url: server+"/validation?token="+token
+            }
+            if (navigator.canShare) {
+              document.getElementById("loading").style.display = 'block';
+              await navigator.share(shareData);
+              document.getElementById("loading").style.display = 'none';
+              post('/infoShare',{firstName:data.friendName,flag:data.flag});
+            } else {                        
+              window.location.href = "mailto:?subject=Birrificio Viana - Codice invito SharingBeer&body="+encodeURIComponent(textText);           
+              post('/infoShare',{firstName:data.friendName,flag:data.flag});
+            }
+          } else {
+              post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito 2", type:"warning", err:data.err});
+          }
+        }
 
-        //redirige alla pagina recomm POST
-        post('/recomm',{firstName:firstName,token:token});
-      }
-    }
+      ).catch (console.error);
+    } 
   }
 
   function capitalizeFirstLetter(string) {

@@ -3,6 +3,42 @@ html {
   /*font-family: "myFont", "Bitstream Vera Serif", serif;*/
 }
 
+/* Animate DIV */
+.animate-div {
+  animation: my-animation 0.7s ease-in-out;
+}
+@keyframes my-animation {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(350px)
+  }
+}
+/*-------------*/
+
+.badge {
+  padding-left: 10px;
+  padding-right: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.label-warning[href],
+.badge-warning[href] {
+  background-color: #c67605;
+}
+#lblCartCount {
+    font-size: 16px;
+    background: #1140A4;
+    color: #fff;
+    padding: 0 8px;
+    vertical-align: top;
+    margin-left: -22px; 
+}
+
+
 .btn-my{
   background-color:#5375BD;
   color: #fff;

@@ -69,7 +69,8 @@ module.exports = function(app, passport) {
             numFriends  : friends.length,
             friendsMap  : friends,
             message     : msg,
-            type        : "info"
+            type        : "info",
+            numProducts: req.session.numProducts, //numero di proodotti nel carrello
         });
     });
   });

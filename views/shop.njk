@@ -21,7 +21,7 @@
                 </h3>
                 <p class="text-white font-weight-light text-left">{{prod.quantity}}</p>
                 <div style="margin: 0px 0px 10px 0px;">
-                  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+                  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv()">
                     <div>{{prod.prettyPrice}}</div>
                     <div>Aggiungi al Carrello</div>
                   </button>
@@ -42,5 +42,12 @@
       <p>Non ci sono prodotti :(<br> <a href="/products">Aggiungi</a></p>
 
     {% endfor %}
+
+<script type="text/javascript">
+  let content = document.getElementById("carrello");
+  function animateDiv() {
+    document.querySelector('#carrello').classList.add('animate-div');
+  }
+</script>
 
 {% endblock %}

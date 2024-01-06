@@ -107,6 +107,7 @@ var users;
         })
       }
     ).then(function(result) {
+      
       //console.log("result: ",result);
       return result.json();
 
@@ -119,11 +120,13 @@ var users;
                 
         req.flash('error', translatedMsg);
 
+
         return res.render('axerveDE.njk', {'amount':amount, 'transactionID':transactionID, message: req.flash('error'), type: "danger"});
 
       } else {
         dParsed = data;
         res.render('axerveDE.njk', {'shopLogin':shopLogin, 'paymentID':dParsed.payload.paymentID, 'paymentToken': dParsed.payload.paymentToken});
+
       }
     })
 
