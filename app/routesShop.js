@@ -67,6 +67,7 @@ module.exports = function(app) {
 			//Increase quantity or add the product in the shopping cart.
 			if (cart[id]) {
 				cart[id].qty++;
+				req.session.numProducts++;
 			}	else { //il prodotto è scelto per la prima volta
 				cart[id] = {
 					id : prod._id,
@@ -77,8 +78,8 @@ module.exports = function(app) {
 					prettyPrice: prod.prettyPrice(),
 					qty: 1
 				};
+				req.session.numProducts++;
 			}
-			req.session.numProducts = Object.keys(cart).length;
 			res.redirect('/shop');
 
 		});
@@ -121,6 +122,7 @@ module.exports = function(app) {
   			//decrement the product quantity in the shopping cart.
   			if (cart[id].qty > 1) {
   				cart[id].qty--;
+  				req.session.numProducts--;
   			}
       }
   			res.redirect('/cart');
@@ -142,9 +144,9 @@ module.exports = function(app) {
 				res.redirect('/shop');
 				return;
 			} else {
-  			//Add or increase the product quantity in the shopping cart.
   			if (cart[id]) {
   				cart[id].qty++;
+  				req.session.numProducts++;
   			}
       }
 			res.redirect('/cart');
@@ -167,16 +169,12 @@ module.exports = function(app) {
 				res.redirect('/shop');
 				return;
 			} else {
-  			//Add or increase the product quantity in the shopping cart.
   			if (cart[id]) {
   				delete req.session.cart[id];
+  				req.session.numProducts=0;
   			}
       }
-
-			req.session.numProducts = Object.keys(cart).length;
-
 			res.redirect('/cart');
-
 		});
 	});
 /*

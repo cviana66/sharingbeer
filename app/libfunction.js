@@ -17,10 +17,8 @@ module.exports = {
 
                   // if user is authenticated in the session, carry on
                   if (req.isAuthenticated())  {                    
-                      console.log("AUTENTICATO")
                       return next();
                   }
-
                   // if they aren't redirect them to the home page
                   res.redirect('/login');
               },
@@ -102,26 +100,25 @@ module.exports = {
   retriveCart:  function retriveCart (req) {
                   //Retrieve the shopping cart from memory
                   var cart = req.session.cart,
-                  cartItems = {items: [], totalPrice: 0, totalQty: 0},
-                  totalPrice = 0,
-                  totalQty = 0
+                      cartItems = {items: [], totalPrice: 0, totalQty: 0},
+                      totalPrice = 0,
+                      totalQty = 0
+                  req.session.numProducts = 0;
 
                   if (!cart) {
                     req.session.numProducts = 0;
                   } else {
-                    //Read the products for display
                     for (var item in cart) {
                       if (cart[item].qty > 0) {
                         cartItems.items.push(cart[item]);
                         totalPrice += (cart[item].qty * cart[item].price);
                         totalQty += cart[item].qty;
+                        req.session.numProducts += cart[item].qty;
                       }
                     }
                     req.session.cartItems = cartItems;
                     req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
                     req.session.totalQty = cartItems.totalQty = totalQty;
-                    req.session.numProducts = Object.keys(cart).length;
-                    //console.log("cartItems: ",cartItems);
                   }
                 },
   emailValidation:  function emailValidation (email) {
