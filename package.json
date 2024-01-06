@@ -30,6 +30,7 @@
     "express-session": "^1.17.3",
     "fast-csv": "^4.3.6",
     "geolib": "^3.3.4",
+    "google-translate": "^2.2.0",
     "method-override": "^3.0.0",
     "moment": "^2.29.4",
     "mongoose": "^6.0.0",
