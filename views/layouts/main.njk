@@ -192,6 +192,55 @@
 	  </div>
 	</nav>
 
+	{% if message %}
+    {% for message in message %}
+      <div class="container-fluid blur" style="margin:10px 0px 10px 0px;">
+				<div id="errorMessage"></div>
+				<script type="text/javascript">
+					var errorClass = "alert-{{type}}";
+					if ("{{type}}" == "" ) {
+						errorClass = "alert-info";
+					}
+
+					// and give it some content
+				  var textMsg = "{{message}}";
+
+				  async function submitTranslation() {
+			      try {
+			        const response = await fetch('/translateMsg', {
+			          method: 'POST',
+			          headers: {
+			            'Content-Type': 'application/json',
+			          },
+			          body: JSON.stringify({'inputMessage': textMsg, 'langCode': 'it' }),
+			        });
+
+			        if (!response.ok) {
+			          throw new Error(`Errore nella richiesta: ${response.status}`);
+			        }
+
+			        textMsg = await response.json();
+			        
+			        //Inizio parte HTML dinamica
+			        const errorDiv = document.getElementById("errorMessage");
+
+							errorDiv.classList.add("alert", errorClass);
+
+			        const newContent = document.createTextNode(textMsg.result)
+						  // add the text node to the newly created div
+						  errorDiv.appendChild(newContent);
+			        
+			      } catch (error) {
+			        console.error(error);			        
+			      }
+			    }
+			    submitTranslation();
+
+				</script>
+			</div>
+    {% endfor %}
+  {% endif %}
+
 	<div class="container-fluid blur" style="margin:10px 0px 10px 0px;">
 		<div class="col-12">
 			<div class="row">

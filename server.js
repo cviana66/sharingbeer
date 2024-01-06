@@ -21,7 +21,6 @@ const moment        = require("moment");            // Formattazione delle date.
 
 const fastcsv       = require("fast-csv");          // Gestione dei file CSV. https://c2fo.github.io/fast-csv/docs/introduction/getting-started
 
-
 // config environment variables /
 //env(__dirname + '/.env');
 
@@ -48,11 +47,17 @@ const routesQrcode   = require('./app/routesQrcode.js');
 // paypal v2 ===================================================================
 const routesPaypal    = require('./app/routesPaypal');
 
-// Axereve =====================================================================
+// Axerve ======================================================================
 const routesAxerve    = require('./app/routesAxerve');
 
 // passport ====================================================================
 const pass            = require('./config/passport');
+
+// transMsgPost=================================================================
+const {transMsgPost}  = require('./app/msgHandler');
+
+// transMsgPost=================================================================
+const geoCoordHandler = require('./app/geoCoordHandler');
 
 global.debug = true;
 
@@ -173,6 +178,8 @@ var SharingBeer = function() {
         routesQrcode(self.app, qr);
         routesPaypal(self.app);
         routesAxerve(self.app);
+        transMsgPost(self.app);
+        geoCoordHandler(self.app);
     };
 
     /**
