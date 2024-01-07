@@ -17,7 +17,6 @@
     "npm": "^8.5.0"
   },
   "dependencies": {
-    "@google-cloud/translate": "^8.0.2",
     "@iamtraction/google-translate": "^2.0.1",
     "@paypal/checkout-server-sdk": "^1.0.3",
     "axios": "^1.6.4",
@@ -30,7 +29,6 @@
     "express-session": "^1.17.3",
     "fast-csv": "^4.3.6",
     "geolib": "^3.3.4",
-    "google-translate": "^2.2.0",
     "method-override": "^3.0.0",
     "moment": "^2.29.4",
     "mongoose": "^6.0.0",
@@ -46,7 +44,8 @@
     "passport-local": "^1.0.0",
     "paypal-rest-sdk": "^1.8.1",
     "qr-image": "^3.2.0",
-    "translate": "^2.0.2"
+    "translate": "^2.0.2",
+    "translatte": "^3.0.1"
   },
   "private": true,
   "main": "server.js",
