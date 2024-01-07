@@ -192,12 +192,17 @@
 	  </div>
 	</nav>
 
+
 	
 	<div class="container-fluid blur" style="margin:10px 0px 10px 0px;">
 		<div class="col-12">
 			<div class="row">
 		    <div class="col-sm-3 col-lg-4"></div>
 		    <div class="col-sm-6 col-lg-4"  style="background-color:#2A0009;border-radius:12px 12px 0px 0px;">
+
+			    <div id="waiting" style="display:none">
+	        	<img  src="img/ajax-loader-1.gif" alt="Loading..." />
+	        </div>
 
 				    {% for message in message %}
 				      <div style="margin:10px 0px 0px 0px;">
@@ -207,11 +212,10 @@
 									if ("{{type}}" == "" ) {
 										errorClass = "alert-info";
 									}
-
 									// and give it some content
 								  var textMsg = "{{message}}";
-
 								  async function submitTranslation() {
+								  	document.getElementById("waiting").style.display = 'block';
 							      try {
 							        const response = await fetch('/translateMsg', {
 							          method: 'POST',
@@ -236,14 +240,13 @@
 										  // add the text node to the newly created div
 										  errorDiv.appendChild(newContent);
 										  window.scrollTo(0,0);
+										  document.getElementById("waiting").style.display = 'none';
 
 							      } catch (error) {
 							        console.error(error);			        
 							      }
 							    }
-							    
 							    submitTranslation();
-
 								</script>
 							</div>
 				    {% endfor %}
