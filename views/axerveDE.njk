@@ -55,7 +55,6 @@
           axerve.lightBox.open(pID, pToken, pCallback);
         }
         return;
-<<<<<<< HEAD
       }
 
       function pCallback(response) {
@@ -67,19 +66,7 @@
         post('/axerve_new', {'error': error, 'result': result});
       }
 
-=======
-      }
 
-      function pCallback(response) {
-        console.log(response);
-        
-        let error = JSON.stringify(Object.values(response)[0]);
-        let result = Object.values(response)[2];
-        //alert('Hai controllato i log?');
-        post('/axerve_new', {'error': error, 'result': result});
-      }
-
->>>>>>> newdbstruct
       /**
       * sends a request to the specified url from a form. this will change the window location.
       * @param {string} path the path to send the post request to

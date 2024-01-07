@@ -507,8 +507,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 
                 // controllo che ci siano ancora inviti diposnibili
                 if (req.session.friendsInvited >= req.session.invitationAvailable) {
-                    req.flash('info', "Non hai inviti disponibili!");
-                    req.flash('info', "Acquista un beerBox per avere un nuovo invito");                    
+                    req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per avere nuovi inviti");                
                     controlSates = "disabled";
                     flag = "true";
                 }

@@ -199,56 +199,54 @@
 		    <div class="col-sm-3 col-lg-4"></div>
 		    <div class="col-sm-6 col-lg-4"  style="background-color:#2A0009;border-radius:12px 12px 0px 0px;">
 
-					 	{% if message %}
-					    {% for message in message %}
-					      <div class="row" style="margin:10px 0px 10px 0px;">
-									<div id="errorMessage"></div>
-									<script type="text/javascript">
-										var errorClass = "alert-{{type}}";
-										if ("{{type}}" == "" ) {
-											errorClass = "alert-info";
-										}
+				    {% for message in message %}
+				      <div style="margin:10px 0px 0px 0px;">
+								<div id="errorMessage"></div>
+								<script type="text/javascript">
+									var errorClass = "alert-{{type}}";
+									if ("{{type}}" == "" ) {
+										errorClass = "alert-info";
+									}
 
-										// and give it some content
-									  var textMsg = "{{message}}";
+									// and give it some content
+								  var textMsg = "{{message}}";
 
-									  async function submitTranslation() {
-								      try {
-								        const response = await fetch('/translateMsg', {
-								          method: 'POST',
-								          headers: {
-								            'Content-Type': 'application/json',
-								          },
-								          body: JSON.stringify({'inputMessage': textMsg, 'langCode': 'it' }),
-								        });
+								  async function submitTranslation() {
+							      try {
+							        const response = await fetch('/translateMsg', {
+							          method: 'POST',
+							          headers: {
+							            'Content-Type': 'application/json',
+							          },
+							          body: JSON.stringify({'inputMessage': textMsg, 'langCode': 'it' }),
+							        });
 
-								        if (!response.ok) {
-								          throw new Error(`Errore nella richiesta: ${response.status}`);
-								        }
+							        if (!response.ok) {
+							          throw new Error(`Errore nella richiesta: ${response.status}`);
+							        }
 
-								        textMsg = await response.json();
-								        
-								        //Inizio parte HTML dinamica
-								        const errorDiv = document.getElementById("errorMessage");
+							        textMsg = await response.json();
+							        
+							        //Inizio parte HTML dinamica
+							        const errorDiv = document.getElementById("errorMessage");
 
-												errorDiv.classList.add("alert", errorClass);
+											errorDiv.classList.add("alert", errorClass);
 
-								        const newContent = document.createTextNode(textMsg.result)
-											  // add the text node to the newly created div
-											  errorDiv.appendChild(newContent);
-								        
-								      } catch (error) {
-								        console.error(error);			        
-								      }
-								    }
-								    
-								    submitTranslation();
-								    
+							        const newContent = document.createTextNode(textMsg.result)
+										  // add the text node to the newly created div
+										  errorDiv.appendChild(newContent);
+										  window.scrollTo(0,0);
 
-									</script>
-								</div>
-					    {% endfor %}
-					  {% endif %}
+							      } catch (error) {
+							        console.error(error);			        
+							      }
+							    }
+							    
+							    submitTranslation();
+
+								</script>
+							</div>
+				    {% endfor %}
 
 						{% block body %}
 						{% endblock %}
