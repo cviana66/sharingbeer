@@ -44,8 +44,7 @@
     "passport-local": "^1.0.0",
     "paypal-rest-sdk": "^1.8.1",
     "qr-image": "^3.2.0",
-    "translate": "^2.0.2",
-    "translatte": "^3.0.1"
+    "translate": "^2.0.2"
   },
   "private": true,
   "main": "server.js",
