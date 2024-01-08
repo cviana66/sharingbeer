@@ -216,36 +216,49 @@
 								  var textMsg = "{{message}}";
 								  async function submitTranslation() {
 								  	document.getElementById("waiting").style.display = 'block';
-							      try {
-							        const response = await fetch('/translateMsg', {
-							          method: 'POST',
-							          headers: {
-							            'Content-Type': 'application/json',
-							          },
-							          body: JSON.stringify({'inputMessage': textMsg, 'langCode': 'it' }),
-							        });
+							      
+							      fetch('/translateMsg', {
+						          method: 'POST',
+						          headers: {
+						            'Content-Type': 'application/json',
+						          },
+						          body: JSON.stringify({'inputMessage': textMsg, 'langCode': 'it' }),
+						        }).then (result => {
+						        	//console.log("result: ",result);
+						        	if (!result.ok) {
+												throw new Error('Errore nella richiesta');
+												}
+      								return result.json();
 
-							        if (!response.ok) {
-							          throw new Error(`Errore nella richiesta: ${response.status}`);
-							        }
+						        }).then (async data => {
+						        	textMsgTranslated = await data;
+											//console.log('textMsgTranslated', textMsgTranslated);
 
-							        textMsg = await response.json();
-							        
-							        //Inizio parte HTML dinamica
+											//Inizio parte HTML dinamica
 							        const errorDiv = document.getElementById("errorMessage");
 
 											errorDiv.classList.add("alert", errorClass);
 
-							        const newContent = document.createTextNode(textMsg.result)
+							        const newContent = document.createTextNode(textMsgTranslated.result);
 										  // add the text node to the newly created div
 										  errorDiv.appendChild(newContent);
 										  window.scrollTo(0,0);
 										  document.getElementById("waiting").style.display = 'none';
+						          
+										}).catch (error => {
+											//console.log('error', error);
 
-							      } catch (error) {
-							        console.error(error);			        
-							      }
-							    }
+											const errorDiv = document.getElementById("errorMessage");
+
+											errorDiv.classList.add("alert", errorClass);
+											const newContent = document.createTextNode(textMsg);
+										  // add the text node to the newly created div
+										  errorDiv.appendChild(newContent);
+										  window.scrollTo(0,0);
+										  document.getElementById("waiting").style.display = 'none';
+										});
+									}
+
 							    submitTranslation();
 								</script>
 							</div>
