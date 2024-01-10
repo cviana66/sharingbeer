@@ -4,16 +4,18 @@
       <h3 class="text-white text-center bg-dark"> La prima volta in Sharing Beer </h3>
       <hr style="border-top: 1px solid #5375BD">
       <!-- show any messages that come back with authentication -->
+<!--      
       {% if message %}
         {% for message in message %}
           <div class="alert alert-{{type}}" autofocus>{{message}}</div>
         {% endfor %}
       {% endif %}
-
+-->
       <header class="jumbotron" style="background-color:#2A0009; padding-top: 0px;  padding-bottom: 0px;  margin-bottom: 0px;">
-        <h1 class="display-4 text-white font-weight-light">Ciao,</h1>
+        <p class="lead text-white font-weight-light" style="font-size:2.5em">Ciao,</p>
         <p class="lead text-white text-justify">se non hai ancora un bicchiere di birra davanti a te allora sei nel posto giusto!</p>
-        <p class="lead text-white text-center" style="font-size:1.7em">Prova la <span class="sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span></p>
+        <p class="lead text-white text-center" style="font-size:1.5em">Prova  
+        <p class="text-center sb-font" style="font-size:2.5em;color:#FF9139;">birra Viana</p>
         <!--hr  style="border-top: 1px solid #903246"-->
       </header>
     <a href="#section2">  
@@ -29,7 +31,7 @@
           <div class="flex-row">
             <div ><img class="mx-auto d-block" src="img/invito.png" style="height:100%;width:100%;margin-bottom:30px"></div>
             <div class="align-self-center">
-              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai <span style="font-size:1.2em;"> uno sconto dell'X%  </span> sull'acquisto di un box6beer
+              <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai uno sconto del <span style="font-size:1.2em;">X%</span> sull'acquisto di un <span style="font-size:1.2em;">beerBox </span>
                 <span style="float:right;">
                   <a href="#" onclick="return openDocument('infoValidation.njk')">
                     <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="30px" viewBox="0 0 24 24" width="30px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>

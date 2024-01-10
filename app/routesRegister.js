@@ -224,7 +224,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                                   });
             } else {
               if (user.local.status == 'new') {
-                res.render('validation.njk', {prospect: user.local,});
+                res.render('validation.njk', {
+                  prospect: user.local,
+                  message: req.flash('validateMessage'),
+                  type: "danger"
+                });
               } else if (user.local.status == 'waiting') { 
                 //START TRANSACTION.local
                 const session = await mongoose.startSession();
@@ -256,7 +260,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   } else {
                       // Email Verificata - Utente validato e autenticato'
                       console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {_id:bjectId("' + req.user._id + '"}');
-                      res.render('conferme.njk', { email: req.user.email});
+                      res.render('conferme.njk', { 
+                        user: req.user,
+                        numProducts : req.session.numProducts
+                      });
                   }
                 });
               }
@@ -331,7 +338,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   res.render('emailValidation.njk', { email: req.body.email});
 
                 } catch (e) {
-                  console.log("errore: ",e)
+                  //console.log("errore: ",e)
                   await session.abortTransaction();
                   
                   if (e.code === 11000) {
