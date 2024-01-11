@@ -6,11 +6,9 @@ async function getDistance(addressFrom, addressTo, req, res) {
 
   if (!addressFrom) {
     throw({ errCode: 404, errMsg: 'Indirizzo di partenza non fornito'});
-    //return res.status(400).json({ error: 'Indirizzo di partenza non fornito' });
   }
   if (!addressTo) {
-    throw({ errCode: 404, errMsg: 'Indirizzo di partenza non fornito'});
-    //return res.status(400).json({ error: 'Indirizzo di arrivo non fornito' });
+    throw({ errCode: 404, errMsg: 'Indirizzo di arrivo non fornito'});
   }
 
   try {
