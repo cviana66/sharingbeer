@@ -1,15 +1,10 @@
 {% extends "layouts/main.njk" %} 
 {% block body %}
 
-<h3 class="text-white text-center bg-dark"> Sharing Beer</h3>
-<hr style="border-top: 1px solid #5375BD;">
-
-{% if message %}
-  {% for message in message %}
-    <div class="alert alert-{{type}}">{{message}}</div>
-  {% endfor %}
-{% endif %}
+<hr style="border-top: 1px solid #5375BD; margin-top: 50px;">
 
 <div ><img class="mx-auto d-block" src="img/logoBirraViana.png" style="height:100%;width:100%;margin-bottom:10px"></div>
+
+<hr style="border-top: 1px solid #e99f17; margin-bottom: 50px;">
 
 {% endblock %}

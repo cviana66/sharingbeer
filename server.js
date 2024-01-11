@@ -57,7 +57,7 @@ const pass            = require('./config/passport');
 const {transMsgPost}  = require('./app/msgHandler');
 
 // transMsgPost=================================================================
-const geoCoordHandler = require('./app/geoCoordHandler');
+const {getDistancePost} = require('./app/geoCoordHandler');
 
 global.debug = true;
 
@@ -179,7 +179,7 @@ var SharingBeer = function() {
         routesPaypal(self.app);
         routesAxerve(self.app);
         transMsgPost(self.app);
-        geoCoordHandler(self.app);
+        getDistancePost(self.app);
     };
 
     /**
