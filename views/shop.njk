@@ -4,30 +4,27 @@
       <h3 class="text-white text-center bg-dark">Birre</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
-      {% if message %}
-        {% for message in message %}
-          <div class="alert alert-{{type}}">{{message}}</div>
-        {% endfor %}
-      {% endif %}
-
       {% for prod in products %}
         <form method="POST" action="/shop">
           <input type="hidden" name="item_id" value="{{prod.id}}">
             <div class="card h-100 border-1" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
               <div class=" card-body">
                 <div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
-                <h3 class="card-title text-white text-left">
-                  {{prod.name}}
-                </h3>
-                <p class="text-white font-weight-light text-left">{{prod.quantity}}</p>
+                <table width="100%">
+                  <tr>
+                    <td width="75%"><div><h3 class="card-title text-white text-left">{{prod.name}}</h3></div></td>
+                    <td width="25%"><div><h3 class="card-title text-white text-right">{{prod.prettyPrice}}</h3></div></td>
+                  </h3>
+                </table>
+                <p class="text-white font-weight-light text-right">{{prod.quantity}}</p>
+                <div class="align-self-center">
+                  <p class="text-white font-weight-light text-justify"><i>{{prod.description}}</i></p>
+                </div>
                 <div style="margin: 0px 0px 10px 0px;">
                   <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv()">
-                    <div>{{prod.prettyPrice}}</div>
+                    <!-- <div>{{prod.prettyPrice}}</div> -->
                     <div>Aggiungi al Carrello</div>
                   </button>
-                </div>
-                <div class="align-self-center">
-                  <p class="text-white font-weight-light text-justify">{{prod.description}}</p>
                 </div>
               </div>
               <!--div class="card-footer" style="background-color:#FFBB35;">

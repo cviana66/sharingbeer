@@ -4,26 +4,17 @@
       <h3 class="text-white text-center bg-dark">Area Clienti</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
-      {% if message %}
-        {% for message in message %}
-          <div class="alert alert-warning">{{message}}</div>
-        {% endfor %}
-      {% endif %}
-
       <form role="form" action="/login" method="post">
         <div class="form-group">
-          <label  for="inputUsernameEmail" class="text-white col-form-label-lg">Utente</label>
+          <!-- <label  for="inputUsernameEmail" class="text-white col-form-label-lg">Utente</label> -->
           <div class="input-error" id="wrongMail"></div>
-          <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{ user }}" placeholder="your@email.address" autofocus required >
+          <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{ user }}" placeholder="Indirizzo email" autofocus required >
         </div>
         <div class="form-group">
-          <label for="inputPassword" class="text-white col-form-label-lg">Password</label>
-          <input type="password" class="form-control" id="inputPassword" name="password">
+          <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password">
+          <span class="password-toggle-icon"><i align="top" class="bi bi-eye" id="togglePassword"></i></span>
         </div>
-        <div class="form-check" >
-          <input class="form-check-input" type="checkbox" value="" id="checkPwd" onclick="myFunction()" />
-          <label class="form-check-label text-white font-weight-light text-justify" for="checkPwd">Mostra Password</label>
-        </div>
+
         <div>
           <a class="text-right nav-link" href="/forgot">Password dimenticata?</a>
         </div>
@@ -48,14 +39,20 @@
         </div>
       </div-->
       <script type="text/javascript">
-        function myFunction() {
-          var x = document.getElementById("inputPassword");
-          if (x.type === "password") {
-            x.type = "text";
+        const passwordField = document.getElementById("inputPassword");
+        const togglePassword = document.querySelector(".password-toggle-icon i");
+
+        togglePassword.addEventListener("click", function () {
+          if (passwordField.type === "password") {
+            passwordField.type = "text";
+            togglePassword.classList.remove("bi-eye");
+            togglePassword.classList.add("bi-eye-slash");
           } else {
-            x.type = "password";
+            passwordField.type = "password";
+            togglePassword.classList.remove("bi-eye-slash");
+            togglePassword.classList.add("bi-eye");
           }
-        } 
+        });
       </script>
 
 {% endblock %}

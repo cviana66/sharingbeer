@@ -1,24 +1,18 @@
 {% extends "layouts/main.njk" %} 
 {% block body %}
 
-<h3 class="text-white text-center bg-dark">Recupero Password</h3>
+<h3 class="text-white text-center bg-dark">Ripristino Password</h3>
 <hr style="border-top: 1px solid #5375BD;">
-<!-- show any messages that come back with authentication -->
-{% if message %}
-  {% for message in message %}
-    <div class="alert alert-{{type}}" autofocus>{{message}}</div>
-  {% endfor %}
-{% endif %}
 
 <form role="form" action="/forgot" method="post">
   <div class="form-group">
-    <label for="inputUsernameEmail" class="text-white col-form-label-lg">Indirizzo Email</label>
+    <label for="inputUsernameEmail" class="text-white text-justify">Inserisci l’indirizzo email che usi per accedere al sito. Ti invieremo una email con il link per creare una nuova password</label>
     <div style="color:#ffc107; font-size:0.9em;" id="wrongMail"></div>
-    <input type="text" class="form-control" id="inputUsernameEmail" name="email" placeholder="your@email.address" autofocus>
+    <input type="text" class="form-control" id="inputUsernameEmail" name="email" placeholder="Indirizzo email" autofocus>
   </div>
   <div style="margin-bottom: 40px; margin-top: 40px;">
     <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldLoginControl()">
-      Reimposta Password
+      Invia email di ripristino
     </button>
   </div>
 </form>

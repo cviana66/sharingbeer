@@ -1,47 +1,55 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark"> Invita amici </h3>
+      <!-- <h3 class="text-white text-center bg-dark"> Invita amici </h3> -->
       <hr style="border-top: 1px solid #5375BD;">
-<!--
-      {% if message %}
-        {% for message in message %}
-          <div class="alert alert-{{type}} autofocus">{{message}}</div>
-        {% endfor %}
-      {% endif %}
--->
-      <div>
-        <p class="text-left text-white"> Amici invitati <span style="font-size:1.2em;">{{friendsInvited}}</span></p>
-        <div class="progress" style="margin-bottom:20px;">
-          <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{friendsInvited}}" aria-valuemin="0" aria-valuemax="{{invitationAvailable}}" style="width:{{percentage}}%; background-color:#ffc85d">
-          </div>
-        </div>
-        <p class="text-right text-white"> Inviti disponibili <span style="font-size:1.2em;">{{invitationAvailable}}</span></p>
-      </div>
 
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
-        <div class="card-body">
-          <div class="flex-row">
-            <div ><img class="mx-auto d-block" src="img/cincin.png" style="height:100%;width:100%;margin-bottom:10px"></div>
-            <div class="align-self-center">
-              <p class="text-white font-weight-light text-justify">
-                <span style="font-size:1.2em;">invita i tuoi amici </span> a bere <span class="sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span> e ottieni ad ogni loro acquisto punti <span  style="font-size:1.2em;"> Pinta </span> per <span  style="font-size:1.5em;"> sconti fino al 50%!</span><span style="float:right;"><a href="#" onclick="return openDocument('infoFriend.njk')"><svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#5375BD"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></a></span>
-              </p>
+      
+      <table widht="100%">
+        <tr>
+          <td width="50%">
+            <p class="text-left text-white"><span style="font-size:1.2em;">{{friendsInvited}}</span> Amici invitati</p>
+          </td>
+          <td width="50%" align="right">
+            <p class="text-right text-white">Inviti disponibili <span style="font-size:1.2em;">{{invitationAvailable}}</span></p>
+          </td>
+        </tr>
+        <tr>
+          <td width="100%" colspan="2">
+            <div class="progress" style="margin-bottom:20px;">
+              <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{friendsInvited}}" aria-valuemin="0" aria-valuemax="{{invitationAvailable}}" style="width:{{percentage}}%; background-color:#ffc85d">
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="inputUsernameEmail" class="text-white col-form-label-lg"> Nome del tuo amico </label>
-        <div class="input-error" id="wrongFirstName"></div>
-        <input type="text" class="form-control" id="inputFirstName" value=""
-        name="firstName" placeholder="Nome" required {{controlSates}} >
-      </div>
-      <div style="margin-bottom: 40px; margin-top: 40px;">
-        <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
-          Crea l'invito e condividilo
-        </button>
-      </div>
+          </td>
+        </tr>
+        <tr>
+          <td width="100%" colspan="2">
+            <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
+              <div class="card-body">
+                <div class="flex-row">
+                  <div class="align-self-center">
+                    <p class="text-white font-weight-light text-justify">
+                      <span style="font-size:1.2em;">invita i tuoi amici </span> a bere <span class="sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span> e ottieni ad ogni loro acquisto punti <span  style="font-size:1.2em;"> Pinta </span> per <span  style="font-size:1.5em;"> sconti fino al 50%!</span><span style="float:right;"><a href="#" onclick="return openDocument('infoFriend.njk')"><svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/svg" height="36px" viewBox="0 0 24 24" width="36px" fill="#5375BD"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg></a></span>
+                    </p>
+                  </div>
+                  <div><img class="mx-auto d-block" src="img/cincin.png" style="height:100%;width:100%;margin-bottom:10px"></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputUsernameEmail" class="text-white text-center">Inserisci il Nome del tuo amico</label>
+              <div class="input-error" id="wrongFirstName"></div>
+              <input type="text" class="form-control" id="inputFirstName" value=""
+              name="firstName" placeholder="Nome" required {{controlSates}} >
+            </div>
+            <div style="margin-bottom: 40px; margin-top: 40px;">
+              <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
+                Crea l'invito e condividilo
+              </button>
+            </div>
+          </td>
+        </tr>
+      </table>
 
       <div id="loading" style="display:none">
         <img  src="img/ajax-loader-1.gif" alt="Loading..." />
