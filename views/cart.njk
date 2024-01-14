@@ -1,107 +1,88 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
-    <h3 class="text-white text-center bg-dark">Il tuo Carrello</h3>
-    <hr style="border-top: 1px solid #5375BD;">
+<h3 class="text-white text-center bg-dark">Il tuo Carrello</h3>
+<hr style="border-top: 1px solid #5375BD;">
 
-    {% for prod in cart.items %}
-      <div class="row col-md-12 col-lg-12" >
-
-        <div class="col">
-           <h5 class="card-title text-white text-left">{{prod.name}}</h5>
-           <p class="text-white text-left"> {{prod.quantity}}</p>
-        </div>
+<table class="mx-auto" width="100%">
+{% for prod in cart.items %}
+  <tr> 
+    <td width="45%" rowspan="2">
+      <div>
+        <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%">
       </div>
-
-      <div class="row align-items-center">
-        <div class="col">
-          <table class="mx-auto" style="width:100%;">
-            <tr>
-              <td>
-                <p class="text-white text-center font-weight-bold">{{prod.qty}}</p>
-              </td>
-              <td>
-                <p class="text-white text-center font-weight-normal">x</p>
-              </td>
-              <td>
-                <p class="text-white text-center font-weight-bold">{{prod.prettyPrice}} </p>
-              </td>
-            </tr>
-            <tr>
-              <td rowspan="2">
-                <div>
-                  <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%">
-                </div>
-              </td>
-              <td>
-                <form method="POST" action="cart/plus">
-                  <input type="hidden" name="item_id" value="{{prod.id}}">
-                  <input type="hidden" name="_csrf" value="{{_csrf}}">
-                  <button class="btn btn-link" type="submit">
-                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
-                      <path fill="#fff" d="M17,13H13V17H11V13H7V11H11V7H13V11H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z">
-                      </path>
-                      <title>Plus</title>
-                    </svg>
-                  </button>
-                </form>
-              </td>
-              <td>
-                <form method="POST" action="shop">
-                  <input type="hidden" name="item_id" value="{{prod.id}}">
-                  <input type="hidden" name="_csrf" value="{{_csrf}}">
-                  <button class="btn btn-link" type="submit">
-                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
-                      <path fill="#fff" d="M12,3A3,3 0 0,0 9,6H15A3,3 0 0,0 12,3M19,6A2,2 0 0,1 21,8V20A2,2 0 0,1 19,22H5C3.89,22 3,21.1 3,20V8C3,6.89 3.89,6 5,6H7A5,5 0 0,1 12,1A5,5 0 0,1 17,6H19M9,19L16.5,14L9,10V19Z"></path>
-                      <title>Shop</title>
-                    </svg>
-                  </button>
-                </form>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <form method="POST" action="cart/minus">
-                  <input type="hidden" name="item_id" value="{{prod.id}}">
-                  <input type="hidden" name="_csrf" value="{{_csrf}}">
-                  <button class="btn btn-link" type="submit">
-                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
-                      <path fill="#fff" d="M17,13H7V11H17M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3Z"></path>
-                      <title>Minus</title>
-                    </svg>
-                  </button>
-                </form>
-              </td>
-              <td>
-                <form method="POST" action="cart/delete">
-                  <input type="hidden" name="item_id" value="{{prod.id}}">
-                  <input type="hidden" name="_csrf" value="{_csrf}">
-                  <button class="btn btn-link" type="submit">
-                    <svg style="width:40px;height:40px;vertical-align:top" viewBox="0 0 24 24">
-                      <path fill="#fff" d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"></path>
-                      <title>Delete</title>
-                    </svg>
-                  </button>
-                </form>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="3">
-                <hr style="border-top: 1px solid #5375BD;">
-              </td>
-            </tr>
-          </table>
-        </div>
+    </td>
+    <td width="55%" height="100%">
+      <div class="col">
+         <h5 class="card-title text-white text-left font-weight-bold"><p style="font-size:30px;"><u>{{prod.name}}</u></p></h5>
+         <div class="text-white text-left" style="font-size:11px">{{prod.quantity}}</div>
       </div>
-    {% endfor %}
+    </td>
+  </tr>
+  <tr> 
+    <td width="55%" height="50">
+      <table width="100%" valign="middle">
+        <tr>
+          <td width="20" height="20">
+            <form method="POST" action="cart/minus">
+              <input type="hidden" name="item_id" value="{{prod.id}}">
+              <input type="hidden" name="_csrf" value="{{_csrf}}">
+              <button class="btn btn-link" type="submit">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path fill="#ffffff" 
+                  d="M360-640v-80h240v80H360ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/>
+                  <title>Togli</title>
+                </svg>
+              </button>
+            </form>
+          </td>
+          <td width="40" class="text-white text-center">{{prod.qty}}</td>
+          <td width="20">
+            <form method="POST" action="cart/plus">
+              <input type="hidden" name="item_id" value="{{prod.id}}">
+              <input type="hidden" name="_csrf" value="{{_csrf}}">
+              <button class="btn btn-link" type="submit">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path fill="#ffffff"
+                   d="M440-600v-120H320v-80h120v-120h80v120h120v80H520v120h-80ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/>
+                  <title>Aggiungi</title>
+                </svg>
+              </button>
+            </form>
+          </td>
+          <td width="100%" class="text-white" rowspan="2" valign="middle" align="right">
+            <p style="font-size:25px;">{{prod.prettyPrice}}</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="80" class="text-white" colspan="3" valign="top" align="center" height="12">
+            <form method="POST" action="cart/delete">
+              <input type="hidden" name="item_id" value="{{prod.id}}">
+              <input type="hidden" name="_csrf" value="{_csrf}">
+              <button class="btn btn-link" type="submit"><p style="font-size:12px; font-color:gray;">Rimuovi</button>
+            </form>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <hr style="border-top: 1px solid #5375BD;">
+    </td>
+  </tr>
+  
+  {% endfor %}
+</table>
 
+ <table width="100%">
+    <tr>
+      <td>
 
   {% if numProducts != 0 %}
 
       <div>
-        <h4 class="text-white text-center">Total</h4>
         <div>
-          <h4 class="text-white text-center"><strong>€{{totalPrice}}</strong></h4>
+          <h4 class="text-white text-center">Totale ordine: <strong>€{{totalPrice}}</strong></h4>
         </div>
+      </div>
     
     {% if (userStatus != 'customer') or (nextStep != 'payment') %}
     
@@ -189,7 +170,6 @@
         </script>
         <br>
       {% endif %}
-      </div>
   {% else %}
     <div class="col">
         <h4><p class="text-white text-center">Il carrello è vuoto...</p></h4>
@@ -203,4 +183,7 @@
      </form>
     </div>
   {% endif %}
+    </td>
+  </tr>
+</table>
 {% endblock %}

@@ -224,3 +224,24 @@ color: #4e4e4e;
 .sb-font {
     font-family: myFont;
 }
+
+
+.password-toggle-icon {
+  position: absolute;
+  top: 50%;
+  right: 30px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.password-toggle-icon i {
+  font-size: 22px;
+  line-height: 2;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  margin-bottom: 20px;
+}
+
+.password-toggle-icon i:hover {
+  color: #000;
+}

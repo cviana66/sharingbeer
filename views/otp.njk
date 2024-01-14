@@ -3,13 +3,7 @@
 
       <h3 class="text-white text-center bg-dark"> Verifica indirizzo e-mail </h3>
       <hr style="border-top: 1px solid #5375BD">
-      <!-- show any messages that come back with authentication -->
-      {% if message %}
-        {% for message in message %}
-          <div class="alert alert-{{type}}" autofocus>{{message}}</div>
-        {% endfor %}
-      {% endif %}
-
+     
       <header class="jumbotron" style="background-color:#2A0009; padding-top: 0px;  padding-bottom: 0px;  margin-bottom: 0px;">
         <p class="lead text-white text-justify">Ti abbiamo inviato una email con il codice di verifica </p>
         <p class="lead text-white text-center" style="font-size:1.7em">Prova la <img style="vertical-align: baseline" height="32" src="/img/birra_viana.png"> </p>

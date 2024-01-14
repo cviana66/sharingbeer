@@ -1,103 +1,107 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark">Consegna presso...</h3>
+      <h3 class="text-white text-center bg-dark">Dove vuoi riceverlo</h3>
       <hr style="border-top: 1px solid #5375BD;">
-
-      {% if message %}
-        {% for message in message %}
-          <div class="alert alert-{{type}}">{{message}}</div>
-        {% endfor %}
-      {% endif %}
 
       <div id="loading">
         <img  src="img/ajax-loader-1.gif" alt="Loading..." />
       </div>
       
-      <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
-        <div class="card-body">
-          <span style="font-size:1.1em;">Scegli o inseisci l'indirizzo di consegna</span>
-        </div>
+      <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:5px;">
+        <span style="font-size:0.8em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
       </div>
 
-        
-      <form role="form" action="/axerve_new" method="post" id="selectedAddress">       
-          {%for address in addresses %}
-          
-          <div class="card text-white" style="background-color:#2A0009;border-color:#903246;max-width:18rem;margin-bottom:10px;">
-            <div class="card-body">
-              <p class="card-title">{{address.first}} {{address.last}}</p>
-              <h5 class="card-text">{{address.city}}, {{address.address}} {{address.numciv}}</h5>
-              <p class="card-text">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
-              <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
-                Seleziona e procedi
-              </button>
-            </div>
+      <form role="form" action="/axerve_new" method="post" id="selectedAddress">
+        <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
+          <div class="card-body">
+            <h5 class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio.<br>Ti aspettiamo!</h5>
+            <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
+              Seleziona e vai al riepilogo
+            </button>
           </div>
+        </div>
+        
+        <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:5px;margin-top:20px;">
+          <span style="font-size:0.8em;">oppure scegli tra i tuoi preferiti</span>
+        </div>
+    
+        {%for address in addresses %}
+        <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
+          <div class="card-body">
+            <h5 class="card-text text-center">{{address.city}}, {{address.address}} {{address.numciv}}</h5>
+            <p class="card-text text-center">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
+            <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
+              Seleziona e vai al riepilogo
+            </button>
+          </div>
+        </div>
 
-          {%endfor%}
-      </form>    
+        {%endfor%}
+      </form>
+      
+      <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:5px;margin-top:20px;">
+        <span style="font-size:0.8em;">oppure indicaci tu dove preferisci riceverlo</span>
+      </div>
       
 
       <form role="form" action="/register" method="post" id="addresses">
-        <div class="form-group">
-          <label for="inputUsernameEmail" class="text-white col-form-label-lg">Nome e Cognome</label>
+        <div class="card text-white" style="background-color:#2A0009;border-color:#903246;">
+         <div class="form-group" style="margin-left: 5px; margin-right: 5px;">
+          <!-- <label for="inputUsernameEmail" class="text-white col-form-label-lg">Indirizzo di recapito</label> -->
           <div class="input-error" id="wrongFirstName"></div>
           <input type="text" class="form-control" id="inputFirstName" value="{{firstName}}"
            name="firstName" placeholder="Nome" required>
-        </div>
-        <div class="form-group">
+
           <div class="input-error" id="wrongLastName"></div>
           <input type="text" class="form-control" id="inputLastName" value="{{lastName}}"
            name="lastName" placeholder="Cognome" autofocus required>
         </div>
-        <div class="form-group">
-          <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div>
+        <div class="form-group" style="margin-top: 3px; margin-left: 5px; margin-right: 5px;">
+          <!-- <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div> -->
           <div class="input-error" id="wrongPhone"></div>
           <div class="input-group mb-2">
             <div class="input-group-prepend">
               <span class="input-group-text" id="basic-addon1">+39</span>
             </div>
             <input type="text" class="form-control" id="inputMobile" value="{{mobile}}"
-             name="mobile" placeholder="" required>
+             name="mobile" placeholder="Cellulare" required>
           </div>
         </div>
-        <div class="form-group">
-          <div ><label for="inputCity" class="text-white col-form-label-lg">Città</label></div>
+       
+        <div class="form-group" style="margin-top: 5px; margin-left: 5px; margin-right: 5px;">
+          <!-- <div ><label for="inputCity" class="text-white col-form-label-lg">Città</label></div> -->
           <div class="input-error" id="wrongCity"></div>
           <input type="text" class="form-control" id="inputCity" value="{{city}}"
-           name="city" placeholder="" required autocomplete="off" oninput="selectCity(this.value)"/>
+           name="city" placeholder="Città" required autocomplete="off" oninput="selectCity(this.value)"/>
           <div class="w-100"></div>
           <div id="cities"></div>
+
+          <!-- <div><label for="inputProvincia" class="text-white col-form-label-lg">Provincia</label></div> -->
+          <div class="input-error" id="wrongProvincia"></div>
+          <input type="text" class="form-control" id="inputProvincia" value="" name="Provincia" placeholder="Provincia" required readonly>
+          <div class="w-100"></div>
+          <div id="provincia"></div>
+        
+          <!-- <div ><label for="inputStreet" class="text-white col-form-label-lg">Indirizzo</label></div> -->
+          <div class="input-error" id="wrongStreet"></div>
+          <input type="text" class="form-control" id="inputStreet" value="" name="street" placeholder="Via / Piazza" required readonly autocomplete="off"
+          oninput="selectStreet(this.value)">
+          <div class="w-100"></div>
+        
+          <div id="streets"></div>
+            <!-- <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div> -->
+            <div class="input-error" id="wrongNumciv"></div>
+            <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly>
+          </div>
         </div>
-       
-        <div class="form-group">
-        <div><label for="inputProvincia" class="text-white col-form-label-lg">Provincia</label></div>
-        <div class="input-error" id="wrongProvincia"></div>
-        <input type="text" class="form-control" id="inputProvincia" value="" name="Provincia" required readonly>
-        <div class="w-100"></div>
-        <div id="provincia"></div>
-      </div>
-      <div class="form-group">
-        <div ><label for="inputStreet" class="text-white col-form-label-lg">Indirizzo</label></div>
-        <div class="input-error" id="wrongStreet"></div>
-        <input type="text" class="form-control" id="inputStreet" value="" name="street" required readonly autocomplete="off"
-        oninput="selectStreet(this.value)">
-        <div class="w-100"></div>
-        <div id="streets"></div>
-      </div>
-      <div class="form-group">
-        <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div>
-        <div class="input-error" id="wrongNumciv"></div>
-        <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" required readonly>
-      </div>
         <br>
         <div>
           <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return fieldsRegisterControl()">
-            Salva e procedi
+            Salva e vai al riepilogo
           </button>
         </div>
-      </form>
+        </form>
       <br>
 
 <script type="text/javascript">
