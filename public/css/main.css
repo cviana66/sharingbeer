@@ -234,6 +234,13 @@ color: #4e4e4e;
   cursor: pointer;
 }
 
+.password-toggle-icon-invite {
+  position: absolute;
+  top: 55%;
+  right: 30px;
+  cursor: pointer;
+}
+
 .password-toggle-icon i {
   font-size: 22px;
   line-height: 2;
@@ -242,6 +249,18 @@ color: #4e4e4e;
   margin-bottom: 20px;
 }
 
+.password-toggle-icon-invite i {
+  font-size: 22px;
+  line-height: 2;
+  color: #333;
+  transition: color 0.3s ease-in-out;
+  margin-bottom: 20px;
+}
+
 .password-toggle-icon i:hover {
-  color: #000;
+  color: #333;
+}
+
+.password-toggle-icon-invite i:hover {
+  color: #333;
 }

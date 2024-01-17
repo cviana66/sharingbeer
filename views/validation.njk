@@ -1,16 +1,17 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark"> La prima volta in Sharing Beer </h3>
+      <h3 class="text-white text-center bg-dark">Benvenuto in Sharing Beer</h3>
       <hr style="border-top: 1px solid #5375BD">
     
       <header class="jumbotron" style="background-color:#2A0009; padding-top: 0px;  padding-bottom: 0px;  margin-bottom: 0px;">
         <p class="lead text-white font-weight-light" style="font-size:2.5em">Ciao,</p>
-        <p class="lead text-white text-justify">se non hai ancora un bicchiere di birra davanti a te allora sei nel posto giusto!</p>
+        <p class="lead text-white text-justify" style="font-size:1em">se non hai ancora un bicchiere di birra davanti a te allora sei nel posto giusto!</p>
         <p class="lead text-white text-center" style="font-size:1.5em">Prova  
         <p class="text-center sb-font" style="font-size:2.5em;color:#FF9139;">birra Viana</p>
         <!--hr  style="border-top: 1px solid #903246"-->
       </header>
+
     <a href="#section2">  
       <svg class="arrows">
               <path class="a1" d="M0 0 L30 32 L60 0"></path>
@@ -20,13 +21,13 @@
     </a>  
       <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;" id="section2">
         <div class="card-body">
-          <h3 class="card-title text-white font-weight-light text-center"> Invito </h3>
+          <!-- <h3 class="card-title text-white font-weight-light text-center"> Invito </h3> -->
           <div class="flex-row">
-            <div ><img class="mx-auto d-block" src="img/invito.png" style="height:100%;width:100%;margin-bottom:30px"></div>
+            <div ><img class="mx-auto d-block" src="img/invito.png" style="height:80%;width:80%;margin-bottom:10px"></div>
             <div class="align-self-center">
               <p class="card-text text-white font-weight-light text-justify">accettando questo invito hai uno sconto del <span style="font-size:1.2em;">X%</span> sull'acquisto di un <span style="font-size:1.2em;">beerBox </span>
                 <span style="float:right;">
-                  <a href="#" onclick="return openDocument('infoValidation.njk')">
+                  <a href="#" onclick="openDocument('infoValidation.njk')">
                     <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="30px" viewBox="0 0 24 24" width="30px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>
                   </a>
                 </span>
@@ -40,27 +41,29 @@
         <div class="col-12" >
           <form role="form" action="/validation" method="post">
             <fieldset>
+              <div class="form-group" style="margin-top: 10px;">
+                <!-- <label class="text-white col-form-label-lg" for="inputUserName">Nome</label> -->
+                <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}"
+                 name="firstName" placeholder="Nome" required>
+              </div>
               <div class="form-group">
                 <label class="text-white col-form-label-lg" for="inputUsernameEmail">Indirizzo Email</label>
                 <div class="input-error" id="wrongMail"></div>
                 <!--p class="text-white font-weight-light text-justify" style="font-size:0.7rem;">questo è l'indirizzo email proposto dalla persona che ti ha invitato, se vuoi modificarlo ricorda che deve essere una mail valida e sarà il tuo utente per gli accessi futuri</p-->
-                <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="your@email.address" required>
+                <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="Indirizzo email" required>
               </div>
               <div class="form-group">
-                <label class="text-white col-form-label-lg" for="inputUsernameEmail">Conferma indirizzo Email</label>
+                <!-- <label class="text-white col-form-label-lg" for="inputUsernameEmail">Conferma indirizzo Email</label> -->
                 <div class="input-error" id="wrongControlMail"></div>
-                <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value="" placeholder="your@email.address" required>
-              </div>
-              <div class="form-group">
-                <label class="text-white col-form-label-lg" for="inputUserName">Nome</label>
-                <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}"
-                 name="firstName" placeholder="First name" required>
+                <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value="" 
+                placeholder="Conferma Indirizzo email" required>
               </div>
               <div class="form-group" style="margin:0px 0px 20px 0px">
-                <label for="inputPassword" class="text-white col-form-label-lg">Crea una nuova Password</label>
-                <p class="text-white font-weight-light text-justify" style="font-size:0.7rem;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale</p>
+                <label class="text-white col-form-label-lg">Crea una nuova Password</label>
+                <div class="text-white font-weight-light text-justify" style="font-size:0.7rem;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale</div>
                 <div class="input-error" id="wrongPwd"></div>
-                <input type="password" class="form-control" id="inputPassword" name="password" autocomplete="new-password" value="" required>
+                <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password">
+                <span class="password-toggle-icon-invite"><i class="bi bi-eye" id="togglePassword"></i></span>
               </div>
               <div class="input-error" id="wrongAge"></div>
               <div class="form-check" style="margin:0px 0px 20px 0px;" >
@@ -113,5 +116,20 @@
         </div>
       </div-->
 
+      <script type="text/javascript">
+        const passwordField = document.getElementById("inputPassword");
+        const togglePassword = document.querySelector(".password-toggle-icon-invite i");
 
+        togglePassword.addEventListener("click", function () {
+          if (passwordField.type === "password") {
+            passwordField.type = "text";
+            togglePassword.classList.remove("bi-eye");
+            togglePassword.classList.add("bi-eye-slash");
+          } else {
+            passwordField.type = "password";
+            togglePassword.classList.remove("bi-eye-slash");
+            togglePassword.classList.add("bi-eye");
+          }
+        });
+      </script>
 {% endblock %}
