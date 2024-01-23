@@ -5,6 +5,9 @@ const base = "https://api-m.sandbox.paypal.com";
 
 module.exports = {
   createOrder: async function createOrder(req) {
+
+    totalAmount = (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2);
+
     const accessToken = await generateAccessToken();
     const url = `${base}/v2/checkout/orders`;
     const response = await fetch(url, {
@@ -18,10 +21,10 @@ module.exports = {
         purchase_units: [
           {
             amount: {
-              currency_code: "EUR",
-              value: req.session.totalPrc,
-            },
-          },
+              "currency_code": "EUR",
+              "value": totalAmount              
+            }
+          }
         ],
       }),
     });

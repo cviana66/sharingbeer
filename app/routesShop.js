@@ -10,7 +10,7 @@ module.exports = function(app) {
 // GET SHOP ====================================================================
 // =============================================================================
 //GET
-  app.get('/shop', /*lib.isLoggedIn,*/ function (req,res) {
+  app.get('/shop', lib.isLoggedIn, function (req,res) {
 
   	Product.find(function (err, prods) {
   		if (err) {
@@ -67,6 +67,7 @@ module.exports = function(app) {
 			//Increase quantity or add the product in the shopping cart.
 			if (cart[id]) {
 				cart[id].qty++;
+				cart[id].subtotal=(cart[id].qty*cart[id].price).toFixed(2);
 				req.session.numProducts++;
 			}	else { //il prodotto è scelto per la prima volta
 				cart[id] = {
@@ -76,7 +77,8 @@ module.exports = function(app) {
           quantity: prod.quantity,
 					price: prod.price.toFixed(2),
 					prettyPrice: prod.prettyPrice(),
-					qty: 1
+					qty: 1,
+					subtotal: prod.price.toFixed(2)
 				};
 				req.session.numProducts++;
 			}
@@ -122,6 +124,7 @@ module.exports = function(app) {
   			//decrement the product quantity in the shopping cart.
   			if (cart[id].qty > 1) {
   				cart[id].qty--;
+  				cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
   				req.session.numProducts--;
   			}
       }
@@ -146,6 +149,7 @@ module.exports = function(app) {
 			} else {
   			if (cart[id]) {
   				cart[id].qty++;
+  				cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
   				req.session.numProducts++;
   			}
       }
@@ -177,6 +181,7 @@ module.exports = function(app) {
 			res.redirect('/cart');
 		});
 	});
+
 /*
   // GET ORDER ===========================================================================
   app.get('/order', lib.isLoggedIn, function(req, res) {

@@ -11,41 +11,40 @@
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:5px;">
         <span style="font-size:0.8em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
       </div>
-
-      <form role="form" action="/axerve_new" method="post" id="selectedAddress">
+      <form role="form" action="/orderSummary" method="post" id="selectedAddress">
         <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
           <div class="card-body">
             <h5 class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio.<br>Ti aspettiamo!</h5>
-            <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
+            <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton" >
               Seleziona e vai al riepilogo
             </button>
+            <input type="hidden" name="addressID" value="0" />
           </div>
         </div>
-        
+      </form> 
         <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:5px;margin-top:20px;">
           <span style="font-size:0.8em;">oppure scegli tra i tuoi preferiti</span>
         </div>
-    
-        {%for address in addresses %}
-        <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
-          <div class="card-body">
-            <h5 class="card-text text-center">{{address.city}}, {{address.address}} {{address.numciv}}</h5>
-            <p class="card-text text-center">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
-            <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
-              Seleziona e vai al riepilogo
-            </button>
+      {%for address in addresses %}
+        <form role="form" action="/orderSummary" method="post" id="selectedAddress">
+          <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
+            <div class="card-body">
+              <h5 class="card-text text-center">{{address.city}}, {{address.address}} {{address.numciv}}</h5>
+              <p class="card-text text-center">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
+              <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
+                Seleziona e vai al riepilogo
+              </button>
+              <input type="hidden" name="addressID" value="{{address.id}}" />
+            </div>
           </div>
-        </div>
-
-        {%endfor%}
-      </form>
+        </form>
+      {%endfor%}
       
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:5px;margin-top:20px;">
         <span style="font-size:0.8em;">oppure indicaci tu dove preferisci riceverlo</span>
       </div>
       
-
-      <form role="form" action="/register" method="post" id="addresses">
+      <form role="form" action="/orderSummary" method="post" id="addresses">
         <div class="card text-white" style="background-color:#2A0009;border-color:#903246;">
          <div class="form-group" style="margin-left: 5px; margin-right: 5px;">
           <!-- <label for="inputUsernameEmail" class="text-white col-form-label-lg">Indirizzo di recapito</label> -->
@@ -55,7 +54,7 @@
 
           <div class="input-error" id="wrongLastName"></div>
           <input type="text" class="form-control" id="inputLastName" value="{{lastName}}"
-           name="lastName" placeholder="Cognome" autofocus required>
+           name="lastName" placeholder="Cognome" required>
         </div>
         <div class="form-group" style="margin-top: 3px; margin-left: 5px; margin-right: 5px;">
           <!-- <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div> -->
@@ -79,7 +78,7 @@
 
           <!-- <div><label for="inputProvincia" class="text-white col-form-label-lg">Provincia</label></div> -->
           <div class="input-error" id="wrongProvincia"></div>
-          <input type="text" class="form-control" id="inputProvincia" value="" name="Provincia" placeholder="Provincia" required readonly>
+          <input type="text" class="form-control" id="inputProvincia" value="" name="provincia" placeholder="Provincia" required readonly>
           <div class="w-100"></div>
           <div id="provincia"></div>
         
@@ -100,8 +99,9 @@
           <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return fieldsRegisterControl()">
             Salva e vai al riepilogo
           </button>
+          <input type="hidden" name="addressID" value="1" />
         </div>
-        </form>
+      </form>
       <br>
 
 <script type="text/javascript">

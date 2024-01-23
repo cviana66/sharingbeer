@@ -1,9 +1,9 @@
-module.exports = function(app) {
+module.exports = function(app, mongoose) {
 
   const paypal    = require('../config/paypal/common/paypal-api.js');
   const lib       = require('./libfunction');
 
-  const Order   = require('../app/models/order');
+  //const Order   = require('../app/models/order');
   const Item    = require('../app/models/item');
   const User    = require('../app/models/user');
   const PayInfo = require('../app/models/payinfo');
@@ -22,43 +22,56 @@ app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
   var cart = req.session.cart;
   console.log(cart);
   req.session.order = {};
+  const session = await mongoose.startSession();
 
   try {
     ////////////////////////////////////////////////////////
     // Call PayPal to set up an authorization transaction //
     // and create paypal Order  - Versione V2             //
     ////////////////////////////////////////////////////////
-
+    
+    session.startTransaction();
+    const opts = { session };
     const order = await paypal.createOrder(req);
 
     //Return a successful response to the client with the order ID
     console.log('Paypal Order :', JSON.stringify(order, null, 2));
 
-    var newOrder = new Order();
+    const user = await User.findById(req.user._id);
 
-    newOrder.userId = req.user._id;
-    newOrder.email  = req.user.local.email;
-    newOrder.dateInsert = Date.now();
-    newOrder.status = order.status;
-    //newOrder.discount = 0;
-    newOrder.totalPrice = req.session.totalPrc;
-    newOrder.items = req.session.cartItems.items;
-    newOrder.totalQty = req.session.totalQty;
-    newOrder.paypal.orderId = order.id;
+    user.orders.push({
+        email       : req.user.local.email,
+        dateInsert  : Date.now(),
+        status      : order.status,
+        shipping          : Number(req.session.shipping).toFixed(2),
+        shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),
+        pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
+        totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
+        totalPriceTotal   : (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
+        items : req.session.cartItems.items,
+        totalQty : req.session.totalQty,        
+        'paypal.orderId' : order.id,
+        address : req.session.address,
+        'address.addressID' : req.session.address._id.toString()        
+    });
 
-    let saveOrder = await newOrder.save();
+    let saveOrder = await user.save(opts);
 
     //save in session the Order ID used after for return success payment
     req.session.order.id = saveOrder.id;
     console.log('Sharingbeer ORDER ID :', req.session.order.id );
 
+    await session.commitTransaction();
     res.status(200).json(order);
 
     } catch (err) {
+      await session.abortTransaction();
       //console.log('Order save err', err);
-      console.log("ERR: ",err.message);
+      console.log("ERR: ",JSON.stringify(err.message));
       res.status(500).send(err.message);
       //return res.sendStatus(500);
+    } finally {
+        await session.endSession();
     };
   });
 
@@ -67,37 +80,44 @@ app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
   /////////////////////////
 app.post('/api/orders/:orderID/capture', lib.isLoggedIn, async function(req, res) {
   const { orderID } = req.params;
+  
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const captureData = await paypal.capturePayment(orderID);
     console.log('CAPTURE DATA', JSON.stringify(captureData, null, 2));
     let transaction = captureData.purchase_units[0].payments.captures[0];
-    const filter = { _id: req.session.order.id };
-    const update = {  status: captureData.status,
-                      paypal: {
-                                orderId       : captureData.id,
-                                transactionId : transaction.id,
-                                createTime    : String(transaction.create_time),
-                                updateTime    : String(transaction.update_time),
-                                totalAmount   : transaction.amount.value,
-                                currencyAmount: transaction.amount.currency_code
-                              }
-                    };
 
-    let updateOrder = await Order.findOneAndUpdate(filter,update);
+    const filter = {_id: req.user._id};
 
-    let infoPayment = new PayInfo();
-    infoPayment.userId = req.user.id,
-    infoPayment.orderId = req.session.order.id;
-    infoPayment.transactionId = transaction.id;
-    infoPayment.infoPayment = JSON.stringify(captureData, null, 2);
-    let saveInfoPayment = await infoPayment.save();
+    const update = 
+        {
+          'orders.$[el].status'                : captureData.status,
+          'orders.$[el].paypal.transactionId'  : transaction.id,
+          'orders.$[el].paypal.createTime'     : String(transaction.create_time),
+          'orders.$[el].paypal.updateTime'     : String(transaction.update_time),
+          'orders.$[el].paypal.totalAmount'    : transaction.amount.value,
+          'orders.$[el].paypal.currencyAmount' : transaction.amount.currency_code,
+          'orders.$[el].paypal.infoPayment'    : captureData
+        }
 
+    let updateOrder = await User.findOneAndUpdate(
+                              {_id: req.user._id},
+                              {'$set':update},
+                              {arrayFilters: [{"el.paypal.orderId": captureData.id}]}
+                              ).session(session);
+
+    await session.commitTransaction();
     res.json(captureData);
 
   } catch (err) {
+    await session.abortTransaction();
     console.log('ERR: ',err);
     res.status(500).send(err.message);
-  }
+  } finally {
+        await session.endSession();
+    };
 
 /*
 

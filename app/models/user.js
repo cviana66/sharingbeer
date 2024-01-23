@@ -41,20 +41,34 @@ const userSchema = new Schema({
                 email : {type: String, unique: true},
             }],
   orders: [{
-              userId      : { type: String, required: true },
-              //email       : { type: String, required: true },
+              email       : { type: String, required: true },
               dateInsert  : { type: Date, required: true },
               status      : { type: String, required: true},
               idPayment   : { type: String},
-              discount    : { type: Number},
-              totalPrice  : { type: Number},
-              totalQty    : { type: Number},
+              shippingDiscount    : { type: Number},
+              pointsDiscount      : { type: Number},
+              shipping            : { type: Number},
+              totalPriceBeer      : { type: Number},
+              totalPriceTotal     : { type: Number},
+              totalQty            : { type: Number},
               items : [{ 
                   id : {type: String},
                   name : {type: String},
                   price : {type: Number},
                   qty   : {type: Number},                
               }],
+              address :{  
+                  addressId: {type: String},
+                  name: { first: {type: String},
+                          last : {type: String},
+                        },
+                  mobilePrefix: {type: String},
+                  mobileNumber: {type: String},
+                  city        : {type: String},
+                  province    : {type: String},
+                  address     : {type: String},
+                  houseNumber : {type: String},
+              },
               paypal : {
                   orderId        : { type: String},
                   transactionId  : { type: String},
@@ -62,7 +76,7 @@ const userSchema = new Schema({
                   updateTime     : { type: String},
                   totalAmount    : { type: String},
                   currencyAmount : { type: String},
-                  infoPayment    : { type: String}
+                  infoPayment    : { type: Object}
               }
           }]
 
