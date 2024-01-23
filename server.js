@@ -176,7 +176,7 @@ var SharingBeer = function() {
         routesShop(self.app);
         routesRegister(self.app, moment, mongoose, fastcsv, fs, util);
         routesQrcode(self.app, qr);
-        routesPaypal(self.app);
+        routesPaypal(self.app, mongoose);
         routesAxerve(self.app);
         transMsgPost(self.app);
         getDistancePost(self.app);
@@ -226,7 +226,7 @@ var SharingBeer = function() {
               saveUninitialized: true,
               resave: false,
               cookie: { secure: false,
-                        expires: 600000,
+                        expires: 6000000,
                         sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
               //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
               store: MongoStore.create({

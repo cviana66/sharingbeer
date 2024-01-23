@@ -1,0 +1,144 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+	
+  <h3 class="text-white text-center bg-dark"> Riepilogo ordine </h3>
+  <hr style="border-top: 1px solid #5375BD;">
+
+  <!--div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;"-->
+    <div class="card-body">
+      <div class="flex-row">
+        
+        <table class="mx-auto" width="100%">
+          <tr class="text-white" style="font-size:1.3em;"> 
+            <td width="35%"> <p>Birra </p></td>
+            <td width="15%"> <p>Qt. </p></td>
+            <td width="30%"> <p>Prezzo </p></td>
+            <td width="30%"> <p> </p></td>
+          </tr>
+        {% for item in cartItems.items %}
+          <tr class="text-white"> 
+            <td> {{item.name}} </td>
+            <td> {{item.qty}} </td>
+            <td> €{{item.price}} </td>
+            <td> €{{item.subtotal}}  </td>
+          </tr>
+        {% endfor %}
+          
+          
+          <tr class="text-white" > 
+            <td></td>
+            <td colspan=2 style="font-size:1.0em;"> Spedizione </td>
+            <td style="font-size:1.0em;"> €{{shipping}} </td>
+          </tr>
+          <tr class="text-white" >
+            <td></td> 
+            <td colspan=2 style="font-size:1.0em;"> Sconto spedizione </td>
+            <td style="font-size:1.0em;"> €-{{shippingDiscount}} </td>
+          </tr>
+          <tr class="text-white" >
+            <td></td> 
+            <td colspan=2 style="font-size:1.0em;"> Sconto amici </td>
+            <td style="font-size:1.0em;"> €-{{discount}} </td>
+          </tr>
+          <tr class="text-white" >
+            <td></td> 
+            <td colspan=2  style="font-size:1.3em;"><p> Totale </p></td>
+            <td style="font-size:1.3em;"><p id="total"> </p></td>
+          </tr>
+        </table>
+        
+        <div class="text-white align-center">
+          <p><span style="font-size:1.3em;">Consegna presso:</span></p>
+          
+           <p>{{address.name.first}} {{address.name.last}} </p>
+           <p>{{address.address}} {{address.houseNumber}} - {{address.city}} ({{address.province}})</p>
+        </div>  
+      </div>
+    {% if (numProducts > 0) and (userStatus == 'customer') and (address)%}
+
+        <script src="https://www.paypal.com/sdk/js?client-id=AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv&currency=EUR&disable-funding=sofort,venmo,mybank,card"> </script>
+
+        <!-- Set up a container element for the button -->
+        <div id="paypal-button-container"></div>
+        <script>
+        // Render the PayPal button into #paypal-button-container
+          paypal.Buttons({
+            // Order is created on the server and the order id is returned
+            createOrder: (data, actions) => {
+                return fetch('/api/orders', {
+                    method: 'post'
+                })
+                .then((res) => {
+                    console.log('createOrder.res->',res);
+                    if (!res.ok) {
+                      return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
+                    } else {
+                      return res.json();
+                    }
+                })
+                .then((orderId) => {
+                    console.log('PAYPAL ORDER ID: ',orderId.id)
+                    return orderId.id;
+                })
+                .catch((e) => {
+                  console.error(e);
+                  return window.location.href = ("/infomessage?msg=Pagamento non effettuato&type=info");
+                });
+            },
+            // Call your server to finalize the transaction
+            onApprove: function(data, actions) {
+              return fetch('/api/orders/'+ data.orderID +'/capture', {
+                method: 'post',
+                })
+                .then(function(res) {
+                  console.log('onApprove.res->',res);
+                  if (!res.ok) {
+                    return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
+                  } else {
+                    return res.json();
+                  }
+                })
+                .then(function(orderData) {
+                  console.log(
+                  "Capture result",
+                  orderData,
+                  JSON.stringify(orderData, null, 2)
+                  );
+                  var transaction = orderData.purchase_units[0].payments.captures[0];
+                    window.location.href = ("/infomessage?msg=Transaction " +
+                    transaction.status +
+                    ": " +
+                    transaction.id +
+                    '&type=info');
+                  });
+            },
+            onError: function (err) {
+                  window.location.href = ("/infomessage?msg=Paypal ha risposto in modo anomalo&type=danger");
+            },
+            style: {
+                layout:  'vertical',
+                height:   48,
+                color:   'blue',
+                shape:   'rect',
+                label:   'paypal'
+            },
+          })
+          .render('#paypal-button-container');
+        </script>
+        <br>
+      {% endif %}
+
+  <!--/div-->
+  <script type="text/javascript">
+    function getTotal (subtotale,spedizione, scontoS, scontoA, ) {
+      const tot = Number(subtotale)+Number(spedizione)-Number(scontoS)-Number(scontoA)
+      return tot.toFixed(2)
+    }
+    let e = '€'
+    let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{shippingDiscount}},{{discount}})
+    document.getElementById("total").innerHTML = e.concat(i)
+  </script>
+      
+{% endblock %}
+
+

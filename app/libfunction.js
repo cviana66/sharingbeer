@@ -20,10 +20,19 @@ module.exports = {
 
                       return next();
                   }
-                  // if they aren't redirect them to the home page
+                  // if they aren't redirect them to the Login page
                   res.redirect('/login');
               },
+  isAdmin: function isLoggedIn(req, res, next) {
 
+                  // if user is authenticated in the session, carry on
+                  if (req.isAuthenticated() && req.user.local.status == 'admin')  {                    
+
+                      return next();
+                  }
+                  // if they aren't redirect them to the home page
+                  res.redirect('/');
+              },
   generateToken: function generateToken(n) {
                   var length = n,
                     charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
