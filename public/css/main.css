@@ -3,6 +3,14 @@ html {
   /*font-family: "myFont", "Bitstream Vera Serif", serif;*/
 }
 
+body {
+  font-size:1em;
+  background:repeating-linear-gradient(135deg,#C65800,#C65800 3px,#976400 3px,#976400 6px); 
+  margin:0px 0px 0px 0px; 
+  min-height: 480px;
+}
+
+
 /* Animate DIV */
 .animate-div {
   animation: my-animation 0.7s ease-in-out;
