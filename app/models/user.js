@@ -18,7 +18,8 @@ const userSchema = new Schema({
               initDate              : {type: Date, default: Date.now},
               endDate               : {type: Date},
               resetPasswordToken    : {type: String},
-              resetPasswordExpires  : {type: Date}
+              resetPasswordExpires  : {type: Date},
+              role                  : {type: String}
             },
   addresses : [{  name: { first: {type: String},
                           last : {type: String},
