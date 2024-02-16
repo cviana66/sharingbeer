@@ -94,12 +94,16 @@
               //url: server+"/validation?token="+token
             }
             if (navigator.canShare) {
-              document.getElementById("loading").style.display = 'block';
-              await navigator.share(shareData);
-              document.getElementById("loading").style.display = 'none';
-              post('/infoShare',{firstName:data.friendName,flag:data.flag});
-            } else {                        
-
+              try {  
+                document.getElementById("loading").style.display = 'block';
+                await navigator.share(shareData);
+                document.getElementById("loading").style.display = 'none';
+                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+              } catch {
+                document.getElementById("loading").style.display = 'none';
+                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+              }
+            } else {                                             
               let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
               console.log("MAILTO ", a)
               post('/infoShare',{firstName:data.friendName,flag:data.flag});
