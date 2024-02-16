@@ -434,7 +434,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         });
         await user.save(opts);
         await session.commitTransaction();
-        res.redirect('/orderSummary');
+        res.redirect('/addresses');
       } catch(err) {
           console.log('error', err);
           await session.abortTransaction();
@@ -505,13 +505,15 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       console.log ("SESSION: ", req.session)
       //console.log ("SESSION CARTITEMS: ", req.session.cartItems)
       res.render('orderSummary.njk', {
-        cartItems : req.session.cartItems,
-        address   : address[0].addresses,
+        cartItems   : req.session.cartItems,
+        address     : address[0].addresses,
         numProducts : req.session.numProducts,
-        userStatus : req.user.local.status,
-        shipping : req.session.shipping,
+        userStatus  : req.user.local.status,
+        shipping    : req.session.shipping,
         shippingDiscount : req.session.shippingDiscount,
-        discount : req.session.pointDiscount,
+        discount    : req.session.pointDiscount,
+        user        : req.user,
+        payType     : "paypal"
       })
     }
     catch (e) {

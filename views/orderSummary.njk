@@ -54,7 +54,9 @@
            <p>{{address.address}} {{address.houseNumber}} - {{address.city}} ({{address.province}})</p>
         </div>  
       </div>
-    {% if (numProducts > 0) and (userStatus == 'customer') and (address)%}
+    {% if (numProducts > 0) and (userStatus == 'customer') and (address) %}
+
+      {% if payType =='paypal' %}
 
         <script src="https://www.paypal.com/sdk/js?client-id=AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv&currency=EUR&disable-funding=sofort,venmo,mybank,card"> </script>
 
@@ -127,6 +129,7 @@
         </script>
         <br>
       {% endif %}
+    {% endif %}
 
   <!--/div-->
   <script type="text/javascript">
