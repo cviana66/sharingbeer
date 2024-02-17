@@ -60,13 +60,17 @@
   document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("loading").style.display = 'none';
   });
-
+  
   async function share(token,parentName,server) {
+
     if (document.getElementById("inputFirstName").value == "") {
       let text = "Inserire il Nome";
       document.getElementById("wrongFirstName").innerHTML = text;
       document.getElementById("inputFirstName").focus();
     } else {
+
+      document.getElementById("mybutton").disabled = 'true';
+      
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
       
       fetch('/recomm',
@@ -95,15 +99,19 @@
             }
             if (navigator.canShare) {
               try {  
+                console.log("Prima del navigator")
                 document.getElementById("loading").style.display = 'block';
                 await navigator.share(shareData);
                 document.getElementById("loading").style.display = 'none';
+                console.log("Dopo il navigator")
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
               } catch {
+                console.log("nel catch")
                 document.getElementById("loading").style.display = 'none';
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
               }
-            } else {                                             
+            } else {                  
+              console.log("nell'else del if navigator")                           
               let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
               console.log("MAILTO ", a)
               post('/infoShare',{firstName:data.friendName,flag:data.flag});
