@@ -68,8 +68,11 @@
       document.getElementById("wrongFirstName").innerHTML = text;
       document.getElementById("inputFirstName").focus();
     } else {
-
+      //--------------------------------------------
+      // Disabilito il pulsante e abilito il loading
+      //--------------------------------------------
       document.getElementById("mybutton").disabled = 'true';
+      document.getElementById("loading").style.display = 'block';
       
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
       
@@ -100,20 +103,20 @@
             if (navigator.canShare) {
               try {  
                 console.log("Prima del navigator")
-                document.getElementById("loading").style.display = 'block';
+                //document.getElementById("loading").style.display = 'block';
                 await navigator.share(shareData);
-                document.getElementById("loading").style.display = 'none';
+                //document.getElementById("loading").style.display = 'none';
                 console.log("Dopo il navigator")
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
               } catch (e) {
                 console.log("nel catch: ", e)
-                document.getElementById("loading").style.display = 'none';
+                //document.getElementById("loading").style.display = 'none';
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
               }
             } else {                  
               console.log("nell'else del if navigator")                           
               let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
-              console.log("MAILTO ", a)
+              //console.log("MAILTO ", a)
               post('/infoShare',{firstName:data.friendName,flag:data.flag});
             }
           } else {
@@ -121,7 +124,8 @@
           }
         }
 
-      ).catch (console.error);
+      ).catch(console.error)
+      .finally(()=> {document.getElementById("loading").style.display = 'none';});
     } 
   }
 

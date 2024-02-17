@@ -843,7 +843,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.post('/infoShare', (req,res) => {
        res.render('share.njk', {
               firstName   : req.body.firstName,
-              flag        : req.body.flag
+              flag        : req.body.flag,
+              user        : req.user
           });
     });
 
