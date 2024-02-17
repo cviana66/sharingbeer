@@ -18,7 +18,8 @@ var users;
 
 //POST
   app.post('/axerve_new', function(req, res) {
-
+    console.log("REQ:BODY",req.body)
+    console.log("APIKEY",process.env.APIKEY)
     var amount = req.body.amountEur;
     var transactionID = req.body.transactionID;
     var error = req.body.error;
@@ -72,7 +73,9 @@ var users;
 
       } else {
         dParsed = data;
-        res.render('axerveDE.njk', {'shopLogin':shopLogin, 'paymentID':dParsed.payload.paymentID, 'paymentToken': dParsed.payload.paymentToken});
+        res.render('axerveDE.njk', {'shopLogin':shopLogin, 
+                                    'paymentID':dParsed.payload.paymentID, 
+                                    'paymentToken': dParsed.payload.paymentToken});
 
       }
     })
