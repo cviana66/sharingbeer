@@ -32,7 +32,7 @@ function fieldsValidationControl() {
     document.getElementById("inputUsernameEmail").focus();
     return false;
   };
-  if(email != controlEmail) {
+  if(email.toLowerCase() != controlEmail.toLowerCase()) {
     document.getElementById("wrongControlMail").innerHTML = iwar+"Indirizzo email di conferma differente";
     document.getElementById("inputControlUsernameEmail").focus();
     return false;
