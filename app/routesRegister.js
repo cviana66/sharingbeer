@@ -651,7 +651,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           //throw new Error('ERROR in RECOMM generato da me');
 
           //send email to Parent         
-          await lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
+          lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
 
           await session.commitTransaction();
 
