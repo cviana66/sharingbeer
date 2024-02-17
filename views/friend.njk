@@ -105,8 +105,8 @@
                 document.getElementById("loading").style.display = 'none';
                 console.log("Dopo il navigator")
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
-              } catch {
-                console.log("nel catch")
+              } catch (e) {
+                console.log("nel catch: ", e)
                 document.getElementById("loading").style.display = 'none';
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
               }
