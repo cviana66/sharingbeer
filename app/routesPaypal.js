@@ -20,7 +20,7 @@ module.exports = function(app, mongoose) {
 app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
 
   var cart = req.session.cart;
-  console.log(cart);
+  //console.log(cart);
   req.session.order = {};
   const session = await mongoose.startSession();
 

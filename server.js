@@ -177,7 +177,7 @@ var SharingBeer = function() {
         routesRegister(self.app, moment, mongoose, fastcsv, fs, util);
         routesQrcode(self.app, qr);
         routesPaypal(self.app, mongoose);
-        routesAxerve(self.app);
+        routesAxerve(self.app, mongoose);
         transMsgPost(self.app);
         getDistancePost(self.app);
     };

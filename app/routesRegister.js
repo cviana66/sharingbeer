@@ -502,7 +502,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           ])
       req.session.address = address[0].addresses;         
       //console.log('ADDRESS[0]: ',req.session.address)
-      console.log ("SESSION: ", req.session)
+      //console.log ("SESSION: ", req.session)
       //console.log ("SESSION CARTITEMS: ", req.session.cartItems)
       res.render('orderSummary.njk', {
         cartItems   : req.session.cartItems,
@@ -513,7 +513,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         shippingDiscount : req.session.shippingDiscount,
         discount    : req.session.pointDiscount,
         user        : req.user,
-        payType     : "paypal"
+        payType     : "axerve" //"paypal"  "axerve"
       })
     }
     catch (e) {
@@ -820,10 +820,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.get('/infoMessage', (req, res) => {
       let msg = req.query.msg;
       let msgType = req.query.type;
+      let err = req.body.err;
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
       req.flash('message', msg);
       res.render('info.njk', {
-          message: req.flash('message'),
-          type: msgType,
+          message : req.flash('message'),
+          type    : msgType,
+          user    : req.user
       })
     });
 
@@ -834,17 +837,17 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
       req.flash('message', msg);
       res.render('info.njk', {
-          message: req.flash('message'),
-          type: msgType,
-          err: err
+          message : req.flash('message'),
+          type    : msgType,
+          user    : req.user
       })
     });
 
     app.post('/infoShare', (req,res) => {
        res.render('share.njk', {
-              firstName   : req.body.firstName,
-              flag        : req.body.flag,
-              user        : req.user
+              firstName : req.body.firstName,
+              flag      : req.body.flag,
+              user      : req.user
           });
     });
 

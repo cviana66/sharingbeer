@@ -71,20 +71,21 @@
                     method: 'post'
                 })
                 .then((res) => {
-                    console.log('createOrder.res->',res);
+                    //console.log('createOrder.res->',res);
                     if (!res.ok) {
-                      return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
+                      post('/infomessage',{msg:"Pagamento non effettuato",type:"warning"})
+                      //return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
                     } else {
                       return res.json();
                     }
                 })
                 .then((orderId) => {
-                    console.log('PAYPAL ORDER ID: ',orderId.id)
+                    //console.log('PAYPAL ORDER ID: ',orderId.id)
                     return orderId.id;
                 })
                 .catch((e) => {
-                  console.error(e);
-                  return window.location.href = ("/infomessage?msg=Pagamento non effettuato&type=info");
+                  post('/infomessage',{msg:"Pagamento non effettuato", err:e, type:"danger"})
+                  //return window.location.href = ("/infomessage?msg=Pagamento non effettuato&type=info");
                 });
             },
             // Call your server to finalize the transaction
@@ -93,29 +94,32 @@
                 method: 'post',
                 })
                 .then(function(res) {
-                  console.log('onApprove.res->',res);
+                  //console.log('onApprove.res->',res);
                   if (!res.ok) {
-                    return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
+                    post('/infomessage',{msg:"Pagamento non effettuato",type:"warning"})
+                    //return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
                   } else {
                     return res.json();
                   }
                 })
                 .then(function(orderData) {
-                  console.log(
+                  /*console.log(
                   "Capture result",
                   orderData,
                   JSON.stringify(orderData, null, 2)
-                  );
+                  );*/
                   var transaction = orderData.purchase_units[0].payments.captures[0];
-                    window.location.href = ("/infomessage?msg=Transaction " +
+                    post('/infomessage',{msg:"Transaction "+transaction.status+": "+transaction.id, type:"info"})                    
+                    /*window.location.href = ("/infomessage?msg=Transaction " +
                     transaction.status +
                     ": " +
                     transaction.id +
-                    '&type=info');
+                    '&type=info');*/
                   });
             },
             onError: function (err) {
-                  window.location.href = ("/infomessage?msg=Paypal ha risposto in modo anomalo&type=danger");
+                  post('/infomessage',{msg:"Paypal ha risposto in modo anomalo",err:err, type:"danger"})
+                  //window.location.href = ("/infomessage?msg=Paypal ha risposto in modo anomalo&type=danger");
             },
             style: {
                 layout:  'vertical',
@@ -127,19 +131,99 @@
           })
           .render('#paypal-button-container');
         </script>
-        <br>
+        
+      {% elif payType =='axerve' %}
+
+      <div style="margin-bottom: 40px;">
+          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onClick="startAxerve()">
+            Axerve
+          </button>
+      </div>
+
+      <script script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
+      <script type="text/javascript">
+      
+      function startAxerve() {
+        document.getElementById("mybutton").disabled = 'true';
+        try {
+          fetch('/axerve_create',{
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json"
+            }          
+          })
+          .then(function(result) {
+            console.debug('Axerve.result->',result);
+            if (result.ok) {
+              return result.json();
+            }else{
+              post('/infomessage',{msg:"Pagamento non effettuato", err:result.statusText, type:"warning"})
+            }
+          })
+          .then( async function(data){
+            //console.log('Axerve.data->',data);
+            console.debug("PayID: ",data.payload.paymentID);
+            console.debug("PayToken",data.payload.paymentToken);
+            if (data.error.code == 0) {
+              axerve.lightBox.shop = "GESPAY63388";
+              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback);
+            }
+          })
+        } catch(e) {
+          post('/infomessage',{msg:"Axerve ha risposto in modo anomalo",err:e, type:"danger"})
+          }
+        }
+
+      function pCallback(response) {
+        //console.debug("Pcallback: ",response);
+        let error = JSON.stringify(Object.values(response)[0]);
+        let result = Object.values(response)[2];
+        post('/axerve_response', {'error': error, 'result': result});
+      }
+      
+    </script>
+
       {% endif %}
+    <br>
     {% endif %}
 
   <!--/div-->
   <script type="text/javascript">
-    function getTotal (subtotale,spedizione, scontoS, scontoA, ) {
+    function getTotal (subtotale,spedizione, scontoS, scontoA) {
       const tot = Number(subtotale)+Number(spedizione)-Number(scontoS)-Number(scontoA)
       return tot.toFixed(2)
     }
     let e = '€'
     let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{shippingDiscount}},{{discount}})
     document.getElementById("total").innerHTML = e.concat(i)
+  
+
+    /**
+    * sends a request to the specified url from a form. this will change the window location.
+    * @param {string} path the path to send the post request to
+    * @param {object} params the parameters to add to the url
+    * @param {string} [method=post] the method to use on the form
+    */
+    function post(path, params, method='post') {
+
+      // The rest of this code assumes you are not using a library.
+      // It can be made less verbose if you use one.
+      const form = document.createElement('form');
+      form.method = method;
+      form.action = path;
+
+      for (const key in params) {
+        if (params.hasOwnProperty(key)) {
+          const hiddenField = document.createElement('input');
+          hiddenField.type = 'hidden';
+          hiddenField.name = key;
+          hiddenField.value = params[key];
+          form.appendChild(hiddenField);
+        }
+      }
+      document.body.appendChild(form);
+      form.submit();
+    }
   </script>
       
 {% endblock %}

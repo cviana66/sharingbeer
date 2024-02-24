@@ -54,7 +54,7 @@ module.exports = function(app, passport) {
   app.get('/profile', lib.isLoggedIn, function(req, res) {
 
     console.log('REQ.USER: ', req.user)
-
+    console.log('ORADATA -> ', moment().format('DD/MM/yyyy hh:mm:ss'))
     Friends.find({id : req.user._id }, function(err, friends) {
 
         if (err) {
