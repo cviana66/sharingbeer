@@ -83,9 +83,6 @@
           <h4 class="text-white text-center">Totale ordine: <strong>€{{totalPrice}}</strong></h4>
         </div>
       </div>
-    
-    {% if (userStatus != 'customer') or (nextStep != 'payment') %}
-    
       <form role="form" action="/register" method="GET">
       <div style="margin-bottom: 40px;">
         <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
@@ -93,84 +90,9 @@
         </button>
       </div>
       </form>
-    {% else %}
-        <!--
-          HELP and DOC
-          https://developer.paypal.com/docs/checkout/standard/integrate/
-        -->
-
-        <script src="https://www.paypal.com/sdk/js?client-id=AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv&currency=EUR&disable-funding=sofort,venmo,mybank,card"> </script>
-
-        <!-- Set up a container element for the button -->
-        <div id="paypal-button-container"></div>
-        <script>
-        // Render the PayPal button into #paypal-button-container
-          paypal.Buttons({
-            // Order is created on the server and the order id is returned
-            createOrder: (data, actions) => {
-                return fetch('/api/orders', {
-                    method: 'post'
-                })
-                .then((res) => {
-                    console.log('createOrder.res->',res);
-                    if (!res.ok) {
-                      return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
-                    } else {
-                      return res.json();
-                    }
-                })
-                .then((orderId) => {
-                    console.log('PAYPAL ORDER ID: ',orderId.id)
-                    return orderId.id;
-                })
-                .catch((e) => {
-                  console.error(e);
-                  return window.location.href = ("/infomessage?msg=Pagamento non effettuato&type=info");
-                });
-            },
-            // Call your server to finalize the transaction
-            onApprove: function(data, actions) {
-              return fetch('/api/orders/'+ data.orderID +'/capture', {
-                method: 'post',
-                })
-                .then(function(res) {
-                  console.log('onApprove.res->',res);
-                  if (!res.ok) {
-                    return window.location.href = ("/infomessage?msg=Errore durante la chiamata Paypal - pagamento non effettuato&type=info");
-                  } else {
-                    return res.json();
-                  }
-                })
-                .then(function(orderData) {
-                  console.log(
-                  "Capture result",
-                  orderData,
-                  JSON.stringify(orderData, null, 2)
-                  );
-                  var transaction = orderData.purchase_units[0].payments.captures[0];
-                    window.location.href = ("/infomessage?msg=Transaction " +
-                    transaction.status +
-                    ": " +
-                    transaction.id +
-                    '&type=info');
-                  });
-            },
-            onError: function (err) {
-                  window.location.href = ("/infomessage?msg=Paypal ha risposto in modo anomalo&type=danger");
-            },
-            style: {
-                layout:  'vertical',
-                height:   48,
-                color:   'blue',
-                shape:   'rect',
-                label:   'paypal'
-            },
-          })
-          .render('#paypal-button-container');
-        </script>
-        <br>
-      {% endif %}
+     
   {% else %}
+
     <div class="col">
         <h4><p class="text-white text-center">Il carrello è vuoto...</p></h4>
     </div>

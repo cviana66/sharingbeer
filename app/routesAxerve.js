@@ -35,24 +35,27 @@ var users;
       const user = await User.findById(req.user._id);
       const orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
       req.session.order._id = orderId;                // _id in sessione usato per update ordine in axerve_response
+      req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2)
       console.debug('Sharingbeer ORDER ID :', req.session.order._id.toString());
+
       user.orders.push({
           _id         : orderId,
           email       : req.user.local.email,
           dateInsert  : Date.now(),
-          status      : 'CREATED',
+          status      : "CREATED",
           shipping          : Number(req.session.shipping).toFixed(2),
           shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),
           pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
           totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
-          totalPriceTotal   : (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
+          totalPriceTotal   : req.session.order.totalaAmount,
           items : req.session.cartItems.items,
           totalQty : req.session.totalQty,        
           'paypal.createTime'     : moment().format('DD/MM/yyyy hh:mm:ss'),
           'paypal.orderId'        : req.session.order._id.toString(),
           'paypal.currencyAmount' : currency,
-          address : req.session.address,
-          'address.addressID' : req.session.address._id.toString()        
+          'paypal.totalAmount'    : req.session.order.totalaAmount,
+          address : req.session.shippingAddress,
+          'address.addressID' : req.session.shippingAddress._id.toString()        
       });
       let saveOrder = await user.save(opts);
 
@@ -75,7 +78,7 @@ var users;
           })
         }
       ).then(function(result) {
-        console.debug("RESULT -> : ",result);
+        //console.debug("RESULT -> : ",result);
         return result.json();
       });
       console.debug("DATA -> : ",data);
@@ -96,8 +99,22 @@ var users;
 //POST
 //-------------------------------------------
   app.post('/axerve_response', lib.isLoggedIn, async function(req, res) {
-    console.debug("ERRORE: ",req.body.error)
-    console.debug("RISULTATO: ",req.body.result) 
+
+    const error_code = req.body.error_code; 
+    const error_description = req.body.error_description;
+    var status = req.body.status;
+    const payment_id = req.body.payment_id;
+    const response_URL = req.body.response_URL;
+    const transaction_error_code = req.body.transaction_error_code;
+    const transaction_error_description = req.body.transaction_error_description;
+
+    console.debug('ERROR_CODE -> ', error_code)
+    console.debug('ERROR_DESCRIPTION -> ',error_description)
+    console.debug('STATUS -> ', status)
+    console.debug('PAYMENT_ID -> ',payment_id)
+    console.debug('RESPONSE_URL -> ',response_URL)
+    console.debug('TRANSACTION_ERROR_CODE -> ', transaction_error_code)
+    console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)
 
     //==========================================
     // Inizializzo la Transazione
@@ -105,16 +122,17 @@ var users;
     const session = await mongoose.startSession();
     session.startTransaction();
   
-    try {
-      const status = req.body.result
+    try {      
       //==========================================
       // UPDATE Esito del pagamento 
       //==========================================
+      if (status == "") status = "KO";
       const filter = {_id: req.user._id};
       const update = 
           {
-            'orders.$[el].status'                  : status,          
-            'orders.$[el].paypal.updateTime'       : moment().format('DD/MM/yyyy hh:mm:ss')            
+            'orders.$[el].status'               : status,
+            'orders.$[el].paypal.transactionId' : payment_id,    
+            'orders.$[el].paypal.updateTime'    : moment().format('DD/MM/yyyy hh:mm:ss')     
           }
 
       let updateOrder = await User.findOneAndUpdate(
@@ -125,14 +143,16 @@ var users;
 
       await session.commitTransaction();
 
-      if (status == 'OK') {
-        req.flash('info','OK :) AXERVE orderId = ' + req.session.order._id.toString());
+      if (status == 'OK' && error_code == 0) {
+        //TODO: sostituire con pagina ad HOC
+        req.flash('info','AXERVE Pagamento effettuato orderId = ' + req.session.order._id.toString());
         res.render('info.njk',{
                                 message: req.flash('info'),
                                 type: "info"
                               });
       }else{
-        req.flash('warning','!!!KO!!! AXERVE orderId  = ' + req.session.order._id.toString());
+        //TODO: sostituire con pagina ad HOC
+        req.flash('warning','AXERVE Pagmento non avvenuto orderId  = ' + req.session.order._id.toString());
         res.render('info.njk',{
                                 message: req.flash('warning'),
                                 type: "warning"
