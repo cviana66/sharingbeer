@@ -92,15 +92,17 @@ module.exports = function(app) {
 //GET
 	app.get('/cart', lib.isLoggedIn, function (req, res) {
 
+    req.session.nextStep = 'address'; 
+    
 		//Retrieve the shopping cart from session
 		lib.retriveCart(req);
 
 		var model = { user       : req.user.local,
   						    numProducts: req.session.numProducts,
   						    cart       : req.session.cartItems,
-                  totalPrice : req.session.totalPrc,
-                  userStatus : req.user.local.status,
-                  nextStep   : req.session.nextStep
+                  totalPrice : req.session.totalPrc
+                  //userStatus : req.user.local.status,
+                  //nextStep   : req.session.nextStep
   					    };
 
   	res.render('cart.njk', model);

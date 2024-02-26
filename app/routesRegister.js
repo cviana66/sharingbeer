@@ -288,8 +288,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 });
 
             } else {
+                const email = req.body.email.toLowerCase();
                 //start email validation
-                if (!lib.emailValidation(req.body.email)) {
+                if (!lib.emailValidation(email)) {
                     let msg = 'Indirizzo mail non valido'; //'Please provide a valid email';
                     req.flash('validateMessage', msg)
                     console.info(moment().format() + ' [WARNING][RECOVERY:NO] "POST /validation" OKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:'+ user._id + '"} FLASH: ' + msg);
@@ -310,7 +311,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
                 const filter =  {'friends.token':req.body.token };
                 const update =  {'friends.$.status':'accepted',
-                                 'friends.$.email':req.body.email,
+                                 'friends.$.email':email,
                                  'friends.$.name.first':lib.capitalizeFirstLetter(req.body.firstName),
                                  'friends.$.id': user._id.toString()
                                 }
@@ -321,7 +322,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 try {
                   await User.findOneAndUpdate(filter,{'$set':update}).session(session);
                   
-                  user.local.email = req.body.email;
+                  user.local.email = email;
                   user.local.password = user.generateHash(req.body.password);
                   user.local.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
                   user.local.resetPasswordToken = newToken
@@ -329,13 +330,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   user.local.status = "waiting"
                   await user.save(opts);
 
-                  await lib.sendmailToPerson(req.body.firstName,req.body.email, '', newToken, req.body.firstName, '', req.body.email, 'conferme',server);
+                  await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme',server);
                   let msg = 'Inviata email di verifica'; //'Validated and Logged';
                   console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
 
                   await session.commitTransaction();
 
-                  res.render('emailValidation.njk', { email: req.body.email});
+                  res.render('emailValidation.njk', { email: email});
 
                 } catch (e) {
                   //console.log("errore: ",e)
@@ -344,12 +345,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   if (e.code === 11000) {
                     let msg = 'Indirizzo e-mail già registrato';
                     req.flash('validateMessage', msg);
-                    console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
+                    console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
                     res.redirect("/validation?token=" + req.body.token);
                   } else {
                     let msg = 'Spiacente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';      
                     req.flash('error', msg);
-                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + req.body.email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
                     return res.render('info.njk', {
                         message: req.flash('error'),
                         type: "danger"
@@ -363,10 +364,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           });
       });
 
-    // =====================================
-    // Registrazione come cliente
-    // =====================================
-    //GET
+// ==========================================
+// Registrazione come cliente
+// ==========================================
+
+//-------------------------------------------
+//GET
+//-------------------------------------------
     app.get('/register', lib.isLoggedIn, function(req, res) {
 
         if (req.user.local.status == 'validated') {
@@ -378,15 +382,17 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             res.render('registration.njk', model);
 
         } else if (req.user.local.status == 'customer' && req.session.numProducts > 0) {
-            res.redirect('/addresses');
+          res.redirect('/addresses');
 
         } else {
             console.log('User: ', req.user); //TODO: gestire il caso anomalo con un messaggio di warning e loggare
             res.redirect('/cart');
         }
     });
-    //POST
 
+//-------------------------------------------
+//POST
+//-------------------------------------------
     app.post('/register', lib.isLoggedIn, async function(req, res) {
       const session = await mongoose.startSession();
       try {
@@ -420,25 +426,58 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           user.local.name.last               = req.body.lastName;
           user.local.status                  = 'customer'; // to change in 'customer' after session  of testing  
         }
+        const addressId = new mongoose.Types.ObjectId() 
         user.addresses.push({
-                            'name.first'      : req.body.firstName,     
-                            'name.last'       : req.body.lastName,
-                            mobilePrefix    : '+39',
-                            mobileNumber    : req.body.mobile,
-                            city            : req.body.city, 
-                            province        : req.body.provincia,
-                            address         : req.body.street,
-                            houseNumber     : req.body.numberciv,
-                            main            : main,
-                            preferred       : 'yes'
+                _id             : addressId,
+                'name.first'    : req.body.firstName,     
+                'name.last'     : req.body.lastName,
+                mobilePrefix    : '+39',
+                mobileNumber    : req.body.mobile,
+                city            : req.body.city, 
+                province        : req.body.provincia,
+                address         : req.body.street,
+                houseNumber     : req.body.numberciv,
+                main            : main,
+                preferred       : 'yes'
         });
         await user.save(opts);
         await session.commitTransaction();
-        res.redirect('/addresses');
+        if (req.session.nextStep = 'payment') {
+
+        //TODO : rendere parametrico l'importo shipping e i discount
+        req.session.shipping = '20.00';
+        req.session.pointDiscount = '10.00';
+        req.session.shippingDiscount = '0.00'
+        var typeShipping = "consegna"
+
+        address = await User.aggregate([
+          {$match:{"_id":req.user._id}}, 
+          {$unwind: "$addresses"}, 
+          {$match :{ "addresses._id":addressId}},
+          {$project:{_id:0,friends:0,orders:0,local:0}}
+          ])
+        req.session.shippingAddress = address[0].addresses;         
+        console.debug('ADDRESS[0]: ',address[0].addresses)
+
+        res.render('orderSummary.njk', {
+                cartItems   : req.session.cartItems,
+                address     : address[0].addresses,
+                numProducts : req.session.numProducts,
+                userStatus  : req.user.local.status,
+                shipping    : req.session.shipping,
+                shippingDiscount  : req.session.shippingDiscount,
+                typeShipping      : typeShipping,
+                discount    : req.session.pointDiscount,
+                user        : req.user,
+                payType     : "axerve" //"paypal"  "axerve"
+              })
+        } else {
+          res.redirect('/addresses');
+        }
       } catch(err) {
           console.log('error', err);
           await session.abortTransaction();
-          req.flash('error', 'The application has encountered an unknown error.It doesn\'t appear to have affected your data, but our technical staff have been automatically notified and will be looking into this with the utmost urgency.');
+          req.flash('error', 'L\'applicazione ha riscontrato un errore inatteso') 
           res.render('info.njk', {
               message: req.flash('error'),
               type: "danger"
@@ -448,8 +487,15 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       }
     });
 
+//-------------------------------------------
+//GET
+//-------------------------------------------
     app.get('/addresses',lib.isLoggedIn, async function(req, res) {
-      //console.log("ADDRESSES: ",req.user.addresses)
+      
+      console.debug("ADDRESSES: ",req.user.addresses)
+
+      req.session.nextStep = 'payment'; 
+    
       try {
           res.render('addresses.njk', {
               addresses   : req.user.addresses,
@@ -461,7 +507,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
       } catch (err) {
           console.log('error', err);
-          req.flash('error', 'The application has encountered an unknown error.It doesn\'t appear to have affected your data, but our technical staff have been automatically notified and will be looking into this with the utmost urgency.') 
+          req.flash('error', 'L\'applicazione ha riscontrato un errore inatteso') 
           res.render('info.njk', {
               message: req.flash('error'),
               type: "danger"
@@ -476,41 +522,51 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //POST
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
     
-    //console.log ("ADDRESS ID: ", req.body.addressID)
+    console.debug("ADDRESS ID: ", req.body.addressID)
+    var typeShipping ;
+    var address;
     try{
       if (req.body.addressID == '0' ) {
         //TODO : rendere parametrico l'importo shipping e i discount
         req.session.shipping = '0.00';
         req.session.pointDiscount = '10.00';
         req.session.shippingDiscount = '5.00'
-      } else if (req.body.addressID == '1') {
-        //TODO : rendere parametrico l'importo shipping e i discount
-        req.session.shipping = '20.00';
-        req.session.pointDiscount = '10.00';
-        req.session.shippingDiscount = '0.00'
+        address = await User.aggregate([
+            {$match:{"local.email": "birrificioviana@gmail.com"}}, 
+            {$unwind: "$addresses"}, 
+            //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
+            {$project:{_id:0,friends:0,orders:0,local:0}}
+            ])
+        req.session.shippingAddress = address[0].addresses;  
+        console.debug('ADDRESS[0]: ',address[0].addresses)       
+        typeShipping = "ritiro"
       } else {
         //TODO : rendere parametrico l'importo shipping e i discount
         req.session.shipping = '10.00';
         req.session.pointDiscount = '10.00';
         req.session.shippingDiscount = '0.00'
+        typeShipping = "consegna"
+        address = await User.aggregate([
+            {$match:{"_id":req.user._id}}, 
+            {$unwind: "$addresses"}, 
+            {$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
+            {$project:{_id:0,friends:0,orders:0,local:0}}
+            ])
+        req.session.shippingAddress = address[0].addresses;         
+        console.debug('ADDRESS[0]: ',address[0].addresses)
       }
-      let address = await User.aggregate([
-          {$match:{"_id":req.user._id}}, 
-          {$unwind: "$addresses"}, 
-          {$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
-          {$project:{_id:0,friends:0,orders:0,local:0}}
-          ])
-      req.session.address = address[0].addresses;         
-      //console.log('ADDRESS[0]: ',req.session.address)
-      //console.log ("SESSION: ", req.session)
-      //console.log ("SESSION CARTITEMS: ", req.session.cartItems)
+
+      //console.debug("SESSION: ", req.session)
+      //console.debug ("SESSION CARTITEMS: ", req.session.cartItems)
+
       res.render('orderSummary.njk', {
         cartItems   : req.session.cartItems,
         address     : address[0].addresses,
         numProducts : req.session.numProducts,
         userStatus  : req.user.local.status,
         shipping    : req.session.shipping,
-        shippingDiscount : req.session.shippingDiscount,
+        shippingDiscount  : req.session.shippingDiscount,
+        typeShipping      : typeShipping,
         discount    : req.session.pointDiscount,
         user        : req.user,
         payType     : "axerve" //"paypal"  "axerve"
@@ -518,7 +574,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     }
     catch (e) {
       console.log ('ERROR ',e)
-      req.flash('error', 'The application has encountered an unknown error.It doesn\'t appear to have affected your data, but our technical staff have been automatically notified and will be looking into this with the utmost urgency.') 
+      req.flash('error', 'The application has encountered an unknown error') 
       res.render('info.njk', {
           message: req.flash('error'),
           type: "danger"
@@ -621,13 +677,16 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
         try {
           const opts = { session };
+          //-------------------------------------------------
           // creo nuovo user con i dati segnalati dal PARENT
+          //-------------------------------------------------
           const newUser   = await new User();
           const password  = lib.generatePassword(6);
           const firstName = lib.capitalizeFirstLetter(req.body.firstName);
           const token     = lib.generateToken(20);
-          //console.log('TOKEN: ',token);
           
+          console.debug('TOKEN: ',token);
+
           // Set the newUser's local credentials
           newUser.local.password        = newUser.generateHash(password);
           newUser.local.name.first      = firstName;
@@ -636,21 +695,23 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           newUser.local.email           = token+"@sb.sb";
           newUser.local.token           = token;
           newUser.local.resetPasswordToken   = token; 
-          newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
-          
+          newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno          
 		      await newUser.save(opts);
-
-          // Push a new Friend in Parent
+          
+          //-------------------------------------------------
+          // Push a new Friend in PARENT
+          //-------------------------------------------------
           const user = await User.findById(req.user.id);
           user.friends.push({ 'name.first'  : firstName,
                               'token'       : token,
                               'status'      : 'new'                              
           });
-
           await user.save(opts);
           //throw new Error('ERROR in RECOMM generato da me');
 
-          //send email to Parent         
+          //-------------------------------------------------
+          //send email to Parent 
+          //-------------------------------------------------
           lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
 
           await session.commitTransaction();
@@ -821,7 +882,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       let msg = req.query.msg;
       let msgType = req.query.type;
       let err = req.body.err;
-      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
       req.flash('message', msg);
       res.render('info.njk', {
           message : req.flash('message'),
@@ -840,6 +901,17 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           message : req.flash('message'),
           type    : msgType,
           user    : req.user
+      })
+    });
+
+    app.get('/infoAxerve', (req, res) => {
+      let msg = "Pagamento non effettuato";
+      let msgType = "warning";
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoAxerve"  FLASH: '+msg);
+      req.flash('message', msg);
+      res.render('info.njk', {
+          message : req.flash('message'),
+          type    : msgType,
       })
     });
 
