@@ -145,14 +145,14 @@ var users;
 
       if (status == 'OK' && error_code == 0) {
         //TODO: sostituire con pagina ad HOC
-        req.flash('info','AXERVE Pagamento effettuato orderId = ' + req.session.order._id.toString());
+        req.flash('info','AXERVE Pagamento effettuato orderId = ' + req.session.order._id.toString() +' '+ error_code + error_description);
         res.render('info.njk',{
                                 message: req.flash('info'),
                                 type: "info"
                               });
       }else{
         //TODO: sostituire con pagina ad HOC
-        req.flash('warning','AXERVE Pagmento non avvenuto orderId  = ' + req.session.order._id.toString());
+        req.flash('warning','AXERVE Pagmento non avvenuto orderId  = ' + req.session.order._id.toString() +' '+ error_code + error_description);
         res.render('info.njk',{
                                 message: req.flash('warning'),
                                 type: "warning"
