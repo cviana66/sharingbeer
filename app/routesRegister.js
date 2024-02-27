@@ -21,145 +21,104 @@ var mailconferme = require('../config/mailConferme');
 
 const https = require('https');
 
-//const assert = require('assert');
 
 module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
-    // TESTING
-    app.get('/test', function(req, res) {
-          req.session.elements = [];
-          res.render('testRegistrationV2.njk', {
-          });
-    });
-
-    app.get('/share', function(req, res) {
-          console.log("FISRT NAME: ",req.body.firstName);
-          res.render('share.njk', {
-                firstName : req.body.firstName // encodeURIComponent("Ciao \n come stai")
-          });
-    });
-
-    app.get('/qrq', function(req, res) {
-          res.render('square.njk', {
-          });
-    });
-
-    app.get('/redirect', function(req, res) {
-        req.flash('info', 'SHOP');
-        res.redirect('/shop');
-    });
-    app.get('/redirectType', function(req, res) {
-        req.flash('info', 'SHOP');
-        res.redirect('/shop/warning');
-    });
-
-    app.get('/testflash', function(req,res) {
-      let msg = 'Email Verificata. Utente validato e autenticato';
-      req.flash('info', msg);
-      console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
-      res.redirect('/shop');
-    });
-
-    app.get('/emailvalidation', function(req,res) {
-      res.render('emailValidation.njk', { email: 'indirizzo@email.mio'});  
-    });
-    
-
-// =====================================
-// API =================================
-// =====================================
+// =================================================================================================
+// API OVERPASS OPENSTREETMAPS
+// =================================================================================================
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx
 
-    app.post('/overpass/:istat', function(req, res) {
+  app.post('/overpass/:istat', function(req, res) {
 
-      option = '[out:json];'+
-               'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.params.istat+'"];' +
-               'way(area)[highway][name];'+
-               'for (t["name"])(make x name=_.val;out;);'
+    option = '[out:json];'+
+             'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.params.istat+'"];' +
+             'way(area)[highway][name];'+
+             'for (t["name"])(make x name=_.val;out;);'
 
-      const url = 'https://overpass-api.de/api/interpreter?data='+option;
+    const url = 'https://overpass-api.de/api/interpreter?data='+option;
 
-      //console.log('OVERPASS: ',option);
+    //console.log('OVERPASS: ',option);
 
-      const request = https.request(url, (response) => {
-          let data = ''; // !!!!! inserire/tolgiere  > per creare/eliminare errore
-          response.on('data', (chunk) => {
-              data = data + chunk.toString();
-          });
-          
-              response.on('end', () => {
-                try {
-                  const parseJSON = JSON.parse(data);
-                  const elements = parseJSON.elements;
-                  req.session.elements = elements;
-                  //console.log(req.session.elements);
-                  res.send('{"status":"200", "statusText":"OK"}');
-                } catch (e) {
-                  console.log('Error', e);
-                  res.send('{"status":"500","statusText":'+e+'"}'); 
-                }
-              });
-          
-      });
-      request.on('error', (error) => {
-          console.log('Error', error);
-            res.send('{"status":"500","statusText":'+error+'"}');
-      });
-      request.end()
-    });
-
-    app.post('/streets', function(req, res) {
-        var rates = req.session.elements;
-        var index, value, result;
-        var newArr = [];
-        for (index = 0; index < rates.length; ++index) {
-            name = rates[index].tags.name.toLowerCase();
-            if (name.indexOf(req.body.street.toLowerCase()) != -1) {
-                newArr.push(rates[index].tags.name);
-            }
-        }
-        res.send(newArr);
-    });
-
-    app.post('/cities',  function(req, res) {
-        req.session.elements = [];
-        //throw('Genera ERRORE');
-        //console.log("city : ", req.body.city);
-        CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},
-                     null,
-                     {sort: {Comune: 1}},
-                     function(err, city) {
-                       //console.log("Got city : ", city);
-                       res.send(city)
-                     })
-    });
-
-    app.post('/caps', function(req, res) {
-        //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
-        //res.render('validation.dust', { message: req.flash('validation') });
-        //console.log("city : ", req.body.city);
-        MultipleCap.find({
-            'Comune': req.body.city
-        }).sort('CAP').exec(function(err, caps) {
-            if (caps.length == 0) {
-                CityCap.find({'Comune': req.body.city},
-                              null,
-                              {sort: {Comune: 1}},
-                              function(err, cap) {
-                                  //console.log('CAP: ', cap);
-                                  res.send(cap)
-                              });
-            } else {
-                console.log('CAPS: ', caps);
-                res.send(caps)
-            }
+    const request = https.request(url, (response) => {
+        let data = ''; // !!!!! inserire/tolgiere  > per creare/eliminare errore
+        response.on('data', (chunk) => {
+            data = data + chunk.toString();
         });
+        
+            response.on('end', () => {
+              try {
+                const parseJSON = JSON.parse(data);
+                const elements = parseJSON.elements;
+                req.session.elements = elements;
+                //console.log(req.session.elements);
+                res.send('{"status":"200", "statusText":"OK"}');
+              } catch (e) {
+                console.log('Error', e);
+                res.send('{"status":"500","statusText":'+e+'"}'); 
+              }
+            });
+        
     });
+    request.on('error', (error) => {
+        console.log('Error', error);
+          res.send('{"status":"500","statusText":'+error+'"}');
+    });
+    request.end()
+  });
 
-//------------------------------------------------------------------------------
+  app.post('/streets', function(req, res) {
+      var rates = req.session.elements;
+      var index, value, result;
+      var newArr = [];
+      for (index = 0; index < rates.length; ++index) {
+          name = rates[index].tags.name.toLowerCase();
+          if (name.indexOf(req.body.street.toLowerCase()) != -1) {
+              newArr.push(rates[index].tags.name);
+          }
+      }
+      res.send(newArr);
+  });
+
+  app.post('/cities',  function(req, res) {
+      req.session.elements = [];
+      //throw('Genera ERRORE');
+      //console.log("city : ", req.body.city);
+      CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},
+                   null,
+                   {sort: {Comune: 1}},
+                   function(err, city) {
+                     //console.log("Got city : ", city);
+                     res.send(city)
+                   })
+  });
+
+  app.post('/caps', function(req, res) {
+      //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+      //res.render('validation.dust', { message: req.flash('validation') });
+      //console.log("city : ", req.body.city);
+      MultipleCap.find({
+          'Comune': req.body.city
+      }).sort('CAP').exec(function(err, caps) {
+          if (caps.length == 0) {
+              CityCap.find({'Comune': req.body.city},
+                            null,
+                            {sort: {Comune: 1}},
+                            function(err, cap) {
+                                //console.log('CAP: ', cap);
+                                res.send(cap)
+                            });
+          } else {
+              console.log('CAPS: ', caps);
+              res.send(caps)
+          }
+      });
+  });
+
+//==================================================================================================
 // UTILITY per importare i Comuni Italiani
-//------------------------------------------------------------------------------
+//==================================================================================================
     app.get('/importCityIstat/:csvname', (req,res) => {
       console.log('PARAM: ',req.params.csvname);
       let stream = fs.createReadStream('./data/'+ req.params.csvname +'.csv');
@@ -194,10 +153,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
        res.send('Collection CityIstat');
      });
 
-    // =====================================
-    // TOKEN VALIDATION ========= 05-01-2022
-    // =====================================
-    //GET
+//==================================================================================================
+// TOKEN VALIDATION ========= 05-01-2022
+//==================================================================================================
+//GET
     app.get('/validation', function(req, res) {
 
         User.findOne({
@@ -364,10 +323,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           });
       });
 
-// ==========================================
-// Registrazione come cliente
-// ==========================================
-
+//==================================================================================================
+// REGISTRAZIONE CLIENTE
+//==================================================================================================
 //-------------------------------------------
 //GET
 //-------------------------------------------
@@ -442,6 +400,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         });
         await user.save(opts);
         await session.commitTransaction();
+
+      //------------------------------------------------------------------------
+      // Caso di spedizione presso indirizzo inserito appena prima del pagamento
+      //------------------------------------------------------------------------
         if (req.session.nextStep = 'payment') {
 
         //TODO : rendere parametrico l'importo shipping e i discount
@@ -516,16 +478,22 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
     });
 
-// =============================================================================
-// ORDER SUMMARY ===============================================================
-// =============================================================================
+// =================================================================================================
+// ORDER SUMMARY 
+// =================================================================================================
+//-------------------------------------------
 //POST
+//-------------------------------------------
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
     
     console.debug("ADDRESS ID: ", req.body.addressID)
     var typeShipping ;
     var address;
     try{
+
+      //--------------------------------------
+      // Caso di ritiro presso Sede Birrificio
+      //--------------------------------------
       if (req.body.addressID == '0' ) {
         //TODO : rendere parametrico l'importo shipping e i discount
         req.session.shipping = '0.00';
@@ -541,6 +509,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         console.debug('ADDRESS[0]: ',address[0].addresses)       
         typeShipping = "ritiro"
       } else {
+      //-------------------------------------------------------
+      // Caso di spedizione presso indirizzo esistente in base dati
+      //-------------------------------------------------------
         //TODO : rendere parametrico l'importo shipping e i discount
         req.session.shipping = '10.00';
         req.session.pointDiscount = '10.00';
@@ -583,161 +554,164 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
   });
 
-    // =====================================
-    // FRIEND - gestione degli inviti
-    // 24-12-2021
-    // 05-02-2022
-    // 12-02-2022 introddotto il logger
-    // 24-11-2022 uso della Trasaction
-    // =====================================
-    //GET
-    app.get('/recomm', lib.isLoggedIn, function(req, res) {
+  // ===============================================================================================
+  // FRIEND - gestione degli inviti
+  // 24-12-2021
+  // 05-02-2022
+  // 12-02-2022 introddotto il logger
+  // 24-11-2022 uso della Trasaction
+  // ===============================================================================================
+  //GET
+  app.get('/recomm', lib.isLoggedIn, function(req, res) {
 
-        // conto quanti amici ha già lo User
-        User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)}, async function(err, user) {
-            if (err) {
-                console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
-                req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                return res.render('info.njk', {
-                    message: req.flash('error'),
-                    type: "danger"
-                });
-            } else {
-              /* Conta quanti amici sono "new" ---> al momento non usato ma funzionante
-                const u = await User.aggregate([
-                  {$match:{"_id":mongoose.Types.ObjectId("656af6eca93c31dc18501d06")}}, 
-                  {$unwind: "$friends"}, 
-                  {$match :{ "friends.status":"new"}},
-                  {$project:{_id:0,addresses:0,orders:0,local:0}},
-                  {$group:{_id:null,count:{$count:{ }}}}
-                  ])
-                console.log('AGGREGATE: ',u)
-              */
-                req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); //numero di inviti disponibili = amici ammissibili
-                req.session.friendsInvited = parseInt(user.friends.length, 10);             //numero di amici già invitati
+      // conto quanti amici ha già lo User
+      User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)}, async function(err, user) {
+          if (err) {
+              console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
+              req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
+              return res.render('info.njk', {
+                  message: req.flash('error'),
+                  type: "danger"
+              });
+          } else {
+            /* Conta quanti amici ssono "new" ---> al momento non usato ma funzionante
+              const u = await User.aggregate([
+                {$match:{"_id":mongoose.Types.ObjectId("656af6eca93c31dc18501d06")}}, 
+                {$unwind: "$friends"}, 
+                {$match :{ "friends.status":"new"}},
+                {$project:{_id:0,addresses:0,orders:0,local:0}},
+                {$group:{_id:null,count:{$count:{ }}}}
+                ])
+              console.log('AGGREGATE: ',u)
+            */
+              req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); //numero di inviti disponibili = amici ammissibili
+              req.session.friendsInvited = parseInt(user.friends.length, 10);             //numero di amici già invitati
 
-                let error = "";
-                let controlSates = "";
-                let flag = "false";
-                
-                // controllo che ci siano ancora inviti diposnibili
-                if (req.session.friendsInvited >= req.session.invitationAvailable) {
-                    req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per avere nuovi inviti");                
-                    controlSates = "disabled";
-                    flag = "true";
-                }
+              let error = "";
+              let controlSates = "";
+              let flag = "false";
+              
+              // controllo che ci siano ancora inviti diposnibili
+              if (req.session.friendsInvited >= req.session.invitationAvailable) {
+                  req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per avere nuovi inviti");                
+                  controlSates = "disabled";
+                  flag = "true";
+              }
 
-                let server;
-                if (process.env.NODE_ENV== "development") {
-                  server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-                } else {
-                  server = req.protocol+'://'+req.hostname;
-                }
-                res.render('friend.njk', {
-                    controlSates: controlSates,
-                    flag: flag,
-                    message: req.flash('info'),
-                    type: "info",
-                    numProducts: req.session.numProducts, //numero di proodotti nel carrello
-                    user: req.user.local,
-                    invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                    friendsInvited: req.session.friendsInvited,
-                    percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
-                    //token: lib.generateToken(20),
-                    parentName: req.user.local.name.first,
-                    parentEmail: req.user.local.email,
-                    server: server
-                });
-            };
-        });
-    });
-    //POST
-    app.post('/recomm', lib.isLoggedIn, async (req, res) => {
+              let server;
+              if (process.env.NODE_ENV== "development") {
+                server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+              } else {
+                server = req.protocol+'://'+req.hostname;
+              }
+              res.render('friend.njk', {
+                  controlSates: controlSates,
+                  flag: flag,
+                  message: req.flash('info'),
+                  type: "info",
+                  numProducts: req.session.numProducts, //numero di proodotti nel carrello
+                  user: req.user.local,
+                  invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
+                  friendsInvited: req.session.friendsInvited,
+                  percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
+                  //token: lib.generateToken(20),
+                  parentName: req.user.local.name.first,
+                  parentEmail: req.user.local.email,
+                  server: server
+              });
+          };
+      });
+  });
 
-        // controllo che ci siano ancora inviti diposnibili
-        if (req.session.friendsInvited >= req.session.invitationAvailable) {
-            req.flash('info', "Non hai inviti disponibili! Acquista un BoxNbeer per avere un nuovo invito");
-            return res.render('friend.njk', {
-                message: req.flash('info'),
-                type: "info",
-                invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                friendsInvited: req.session.friendsInvited,
-                percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-            });
-        }
-        let server;
-        if (process.env.NODE_ENV== "development") {
-          server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-        } else {
-          server = req.protocol+'://'+req.hostname;
-        }
-        //START TRANSACTION
-        const session = await mongoose.startSession();
-        session.startTransaction();
+//-------------------------------------------
+//POST
+//-------------------------------------------
+  app.post('/recomm', lib.isLoggedIn, async (req, res) => {
 
-        try {
-          const opts = { session };
-          //-------------------------------------------------
-          // creo nuovo user con i dati segnalati dal PARENT
-          //-------------------------------------------------
-          const newUser   = await new User();
-          const password  = lib.generatePassword(6);
-          const firstName = lib.capitalizeFirstLetter(req.body.firstName);
-          const token     = lib.generateToken(20);
-          
-          console.debug('TOKEN: ',token);
-
-          // Set the newUser's local credentials
-          newUser.local.password        = newUser.generateHash(password);
-          newUser.local.name.first      = firstName;
-          newUser.local.idParent        = req.user.id; //id parent
-          newUser.local.status          = 'new';  // status
-          newUser.local.email           = token+"@sb.sb";
-          newUser.local.token           = token;
-          newUser.local.resetPasswordToken   = token; 
-          newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno          
-		      await newUser.save(opts);
-          
-          //-------------------------------------------------
-          // Push a new Friend in PARENT
-          //-------------------------------------------------
-          const user = await User.findById(req.user.id);
-          user.friends.push({ 'name.first'  : firstName,
-                              'token'       : token,
-                              'status'      : 'new'                              
+      // controllo che ci siano ancora inviti diposnibili
+      if (req.session.friendsInvited >= req.session.invitationAvailable) {
+          req.flash('info', "Non hai inviti disponibili! Acquista un BoxNbeer per avere un nuovo invito");
+          return res.render('friend.njk', {
+              message: req.flash('info'),
+              type: "info",
+              invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
+              friendsInvited: req.session.friendsInvited,
+              percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
           });
-          await user.save(opts);
-          //throw new Error('ERROR in RECOMM generato da me');
+      }
+      let server;
+      if (process.env.NODE_ENV== "development") {
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        server = req.protocol+'://'+req.hostname;
+      }
+      //START TRANSACTION
+      const session = await mongoose.startSession();
+      session.startTransaction();
 
-          //-------------------------------------------------
-          //send email to Parent 
-          //-------------------------------------------------
-          lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
+      try {
+        const opts = { session };
+        //-------------------------------------------------
+        // creo nuovo user con i dati segnalati dal PARENT
+        //-------------------------------------------------
+        const newUser   = await new User();
+        const password  = lib.generatePassword(6);
+        const firstName = lib.capitalizeFirstLetter(req.body.firstName);
+        const token     = lib.generateToken(20);
+        
+        console.debug('TOKEN: ',token);
 
-          await session.commitTransaction();
+        // Set the newUser's local credentials
+        newUser.local.password        = newUser.generateHash(password);
+        newUser.local.name.first      = firstName;
+        newUser.local.idParent        = req.user.id; //id parent
+        newUser.local.status          = 'new';  // status
+        newUser.local.email           = token+"@sb.sb";
+        newUser.local.token           = token;
+        newUser.local.resetPasswordToken   = token; 
+        newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno          
+	      await newUser.save(opts);
+        
+        //-------------------------------------------------
+        // Push a new Friend in PARENT
+        //-------------------------------------------------
+        const user = await User.findById(req.user.id);
+        user.friends.push({ 'name.first'  : firstName,
+                            'token'       : token,
+                            'status'      : 'new'                              
+        });
+        await user.save(opts);
+        //throw new Error('ERROR in RECOMM generato da me');
 
-          req.session.friendsInvited += 1;
-          let flag = false;
-          if (req.session.friendsInvited < req.session.invitationAvailable) {
-			     flag = true;
-		      }
+        //-------------------------------------------------
+        //send email to Parent 
+        //-------------------------------------------------
+        lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
 
-          res.send({
-              friendName: firstName,
-              parentName: req.user.local.name.first,
-              flag      : flag,
-              token     : token,
-              server    : server,
-              ok        : true       
-          })
-        } catch (e) {
-            await session.abortTransaction();
-            console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
-            return res.status(500).send({err:e, ok:false})
-        } finally {
-            await session.endSession();
-        }
-    });
+        await session.commitTransaction();
+
+        req.session.friendsInvited += 1;
+        let flag = false;
+        if (req.session.friendsInvited < req.session.invitationAvailable) {
+		     flag = true;
+	      }
+
+        res.send({
+            friendName: firstName,
+            parentName: req.user.local.name.first,
+            flag      : flag,
+            token     : token,
+            server    : server,
+            ok        : true       
+        })
+      } catch (e) {
+          await session.abortTransaction();
+          console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
+          return res.status(500).send({err:e, ok:false})
+      } finally {
+          await session.endSession();
+      }
+  });
 
     /************************************
     /* versione con invio mail che 
@@ -832,10 +806,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         }
     }); */
 
-    // =====================================
-    // Utility =============================
-    // =====================================
-    // visualizza in formato HTML la mail conferma
+// =================================================================================================
+// UTILITY
+// =================================================================================================
+// visualizza in formato HTML la mail conferma
     app.get('/mailconferme', function(req, res) {
       let server;
       if (process.env.NODE_ENV == "development") {
@@ -926,4 +900,46 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.get('/videoPromo', (req, res) => {
           res.render('video.njk')
     });
+
+// =================================================================================================
+// TESTING 
+// =================================================================================================
+    app.get('/test', function(req, res) {
+          req.session.elements = [];
+          res.render('testRegistrationV2.njk', {
+          });
+    });
+
+    app.get('/share', function(req, res) {
+          console.log("FISRT NAME: ",req.body.firstName);
+          res.render('share.njk', {
+                firstName : req.body.firstName // encodeURIComponent("Ciao \n come stai")
+          });
+    });
+
+    app.get('/qrq', function(req, res) {
+          res.render('square.njk', {
+          });
+    });
+
+    app.get('/redirect', function(req, res) {
+        req.flash('info', 'SHOP');
+        res.redirect('/shop');
+    });
+    app.get('/redirectType', function(req, res) {
+        req.flash('info', 'SHOP');
+        res.redirect('/shop/warning');
+    });
+
+    app.get('/testflash', function(req,res) {
+      let msg = 'Email Verificata. Utente validato e autenticato';
+      req.flash('info', msg);
+      console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
+      res.redirect('/shop');
+    });
+
+    app.get('/emailvalidation', function(req,res) {
+      res.render('emailValidation.njk', { email: 'indirizzo@email.mio'});  
+    });
+
 }
