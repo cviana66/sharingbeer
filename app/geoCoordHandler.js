@@ -1,6 +1,38 @@
 const axios = require('axios');
 const geolib = require('geolib'); // calcolare la distanza tra le coordinate iniziali e finali
 
+async function getCoordinates(address) {
+  if (!address) {
+    throw({ errCode: 404, errMsg: 'Indirizzo di riferimento non fornito'});
+  }
+
+  try {
+    // Effettua una richiesta al servizio di geocodifica di Nominatim per ottenere le coordinate di partenza
+    const geocodeResponse = await axios.get('https://nominatim.openstreetmap.org/search', {
+      params: {
+        q: address,
+        format: 'json',
+      },
+    });
+
+    var coordinates = null;
+    if (geocodeResponse.data.length > 0) {
+      coordinates = {'puntoMappa': {'indirizzo': address, 
+                                    'latitude': geocodeResponse.data[0].lat,
+                                    'longitude': geocodeResponse.data[0].lon}};
+      //console.log('Indirizzo', address, ' - coordinate', coordinates);
+
+      return coordinates;
+    } else {
+      throw({ errCode: 404, errMsg: 'Indirizzo di riferimento non trovato' });
+    }
+
+  } catch (error) {
+    console.error('ERRORE', error);
+    throw({ errCode: 500, errMsg: 'Errore durante la geocodifica' });
+  }
+}
+
 <!-------------------------------------------------------------->
 async function getDistance(addressFrom, addressTo, req, res) {
 
@@ -12,40 +44,15 @@ async function getDistance(addressFrom, addressTo, req, res) {
   }
 
   try {
-    // Effettua una richiesta al servizio di geocodifica di Nominatim per ottenere le coordinate di partenza
-    const geocodeResponseFrom = await axios.get('https://nominatim.openstreetmap.org/search', {
-      params: {
-        q: addressFrom,
-        format: 'json',
-      },
-    });
+    var coordinatesFrom = await getCoordinates(addressFrom);
 
-    var coordinatesFrom = null;
-    if (geocodeResponseFrom.data.length > 0) {
-      coordinatesFrom = {'latitude': geocodeResponseFrom.data[0].lat, 'longitude': geocodeResponseFrom.data[0].lon};
-      //res.json({ addressFrom, coordinatesFrom });
-      // Effettua una richiesta al servizio di geocodifica di Nominatim per ottenere le coordinate di arrivo
-      const geocodeResponseTo = await axios.get('https://nominatim.openstreetmap.org/search', {
-        params: {
-          q: addressTo,
-          format: 'json',
-        },
-      });
+    var coordinatesTo = await getCoordinates(addressTo);
 
-      var coordinatesTo = null;
-      if (geocodeResponseTo.data.length > 0) {
-        coordinatesTo = {'latitude': geocodeResponseTo.data[0].lat, 'longitude': geocodeResponseTo.data[0].lon};
+    // Calcola la distanza lineare tra le coordinate utilizzando geolib
+    const distanceInMeters = await geolib.getDistance(coordinatesFrom.puntoMappa, coordinatesTo.puntoMappa);
+    
+    return JSON.stringify({ addressFrom, coordinatesFrom, addressTo, coordinatesTo, distanceInMeters});
 
-        // Calcola la distanza lineare tra le coordinate utilizzando geolib
-        const distanceInMeters = geolib.getDistance(coordinatesFrom, coordinatesTo);
-
-        return JSON.stringify({ addressFrom, coordinatesFrom, addressTo, coordinatesTo, distanceInMeters, distanceInMeters});
-      } else {
-        throw({ errCode: 404, errMsg: 'Indirizzo di arrivo non trovato' });
-      }
-    } else {
-      throw({ errCode: 404, errMsg: 'Indirizzo di partenza non trovato' });
-    }
   } catch (error) {
     console.error('ERRORE', error);
     throw({ errCode: 500, errMsg: 'Errore durante la geocodifica' });
@@ -74,4 +81,4 @@ function getDistancePost(app) {
 //{"address":"via abruzzi 7 biella","coordinates":["8.0520154","45.5513972"]}
 
 // Esporta la funzione getDistance, nel caso in cui vuoi utilizzarla altrove
-module.exports = { getDistance, getDistancePost };
+module.exports = { getCoordinates, getDistance, getDistancePost };

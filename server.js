@@ -59,6 +59,9 @@ const {transMsgPost}  = require('./app/msgHandler');
 // transMsgPost=================================================================
 const {getDistancePost} = require('./app/geoCoordHandler');
 
+// geoMap ======================================================================
+const {geoMap}        = require('./app/routesGeoMap');
+
 global.debug = true;
 
 //global.cost = 3;
@@ -187,6 +190,7 @@ var SharingBeer = function() {
         routesAxerve(self.app, mongoose);
         transMsgPost(self.app);
         getDistancePost(self.app);
+        geoMap(self.app, moment);
     };
 
     /**
