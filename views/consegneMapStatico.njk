@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>Quick Start - Leaflet</title>
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		.leaflet-container {
+			height: 400px;
+			width: 600px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+<form method="GET" action="/geoMapSample">
+	<div>Indirizzo: <br><input type="text" name="indirizzo"><input type="submit"></div>
+</form>
+
+<div id="map" style="width: 90%; height: 75%;"></div>
+
+<script>
+	var actualLatitude = null;
+	var actualLongitude = null;
+
+	var marker = null;
+
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition((position) => {
+			actualLatitude = position.coords.latitude;
+			actualLongitude = position.coords.longitude;
+
+			console.log('actualLatitude', actualLatitude);
+			console.log('actualLongitude', actualLongitude);
+
+			marker = L.marker([actualLatitude, actualLongitude]).addTo(map)
+				//.bindPopup('Sei qui').openPopup();
+			marker._icon.style.filter = "hue-rotate(160deg)"
+			
+		});
+	}
+
+
+	let map = null;
+	let tipoPunto = null;
+
+	let addressLatitude = null;
+	let addressLongitude = null;
+
+	{% for consegna in consegneAddress %}
+		tipoPunto = '{{ consegna.puntoMappa.tipoPunto }}';
+
+		addressLatitude = {{ consegna.puntoMappa.coordinateGPS.latitude }};
+		addressLongitude = {{ consegna.puntoMappa.coordinateGPS.longitude }};
+
+		if (tipoPunto === 'Birrificio') {
+			map = L.map('map').setView([addressLatitude, addressLongitude], 13);
+
+			const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				maxZoom: 19,
+				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+			}).addTo(map);
+		}
+
+		marker = L.marker([addressLatitude, addressLongitude]).addTo(map);
+		if (tipoPunto === 'Birrificio') {
+			marker.bindPopup(tipoPunto + '<br>{{ consegna.puntoMappa.indirizzo }}').openPopup()
+			marker._icon.style.filter = "hue-rotate(240deg)";
+		} else if (tipoPunto === 'Deposito') {
+			marker._icon.style.filter = "hue-rotate(195deg)";
+		}
+	
+
+		/*const circle = L.circle([51.508, -0.11], {
+			color: 'red',
+			fillColor: '#f03',
+			fillOpacity: 0.5,
+			radius: 500
+		}).addTo(map).bindPopup('I am a circle.');
+
+		const polygon = L.polygon([
+			[51.509, -0.08],
+			[51.503, -0.06],
+			[51.51, -0.047]
+		]).addTo(map).bindPopup('I am a polygon.');
+
+		function onMapClick(e) {
+			popup
+				.setLatLng(e.latlng)
+				.setContent(`You clicked the map at ${e.latlng.toString()}`)
+				.openOn(map);
+		}
+
+		map.on('click', onMapClick);
+		
+		const popup = L.popup()
+			.setLatLng([addressLatitude, addressLongitude])
+			.setContent('{{coordinate.puntoMappa.indirizzo}}')
+			.openOn(map);*/
+
+	{% endfor %}
+</script>
+
+
+
+</body>
+</html>
