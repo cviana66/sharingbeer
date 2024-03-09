@@ -485,7 +485,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //POST
 //-------------------------------------------
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
-    
+
     console.debug("ADDRESS ID: ", req.body.addressID)
     var typeShipping ;
     var address;
@@ -529,7 +529,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
       //console.debug("SESSION: ", req.session)
       //console.debug ("SESSION CARTITEMS: ", req.session.cartItems)
-
+      
       res.render('orderSummary.njk', {
         cartItems   : req.session.cartItems,
         address     : address[0].addresses,
@@ -545,7 +545,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     }
     catch (e) {
       console.log ('ERROR ',e)
-      req.flash('error', 'The application has encountered an unknown error') 
+      req.flash('error', 'Mi dspiace, si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com') 
       res.render('info.njk', {
           message: req.flash('error'),
           type: "danger"
@@ -713,6 +713,63 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       }
   });
 
+// =================================================================================================
+// MESSAGGISTICA
+// =================================================================================================
+app.get('/infoMessage', (req, res) => {
+      let msg = req.query.msg;
+      let msgType = req.query.type;
+      let err = req.body.err;
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+      req.flash('message', msg);
+      res.render('info.njk', {
+          message : req.flash('message'),
+          type    : msgType,
+          user    : req.user,
+          numProducts : req.session.numProducts
+      })
+    });
+
+    app.post('/infoMessage', (req, res) => {
+      let msg = req.body.msg;
+      let msgType = req.body.type;
+      let err = req.body.err;
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+      req.flash('message', msg);
+      res.render('info.njk', {
+          message : req.flash('message'),
+          type    : msgType,
+          user    : req.user,
+          numProducts : req.session.numProducts
+      })
+    });
+
+    app.get('/infoAxerve', (req, res) => {
+      let msg = "Pagamento non effettuato";
+      let msgType = "warning";
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoAxerve"  FLASH: '+msg);
+      req.flash('message', msg);
+      res.render('info.njk', {
+          message : req.flash('message'),
+          type    : msgType,
+          numProducts : req.session.numProducts
+      })
+    });
+
+    app.post('/infoShare', (req,res) => {
+       res.render('share.njk', {
+              firstName : req.body.firstName,
+              flag      : req.body.flag,
+              user      : req.user,
+              numProducts : req.session.numProducts
+          });
+    });
+
+    app.get('/videoPromo', (req, res) => {
+          res.render('video.njk')
+    });
+
+
     /************************************
     /* versione con invio mail che 
     /* per privacy non si può utilizzare
@@ -852,55 +909,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       res.send(mailinvite('Name', 'Email', 'Token', 'userName', server))
     })   
 
-    app.get('/infoMessage', (req, res) => {
-      let msg = req.query.msg;
-      let msgType = req.query.type;
-      let err = req.body.err;
-      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
-      req.flash('message', msg);
-      res.render('info.njk', {
-          message : req.flash('message'),
-          type    : msgType,
-          user    : req.user
-      })
-    });
-
-    app.post('/infoMessage', (req, res) => {
-      let msg = req.body.msg;
-      let msgType = req.body.type;
-      let err = req.body.err;
-      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
-      req.flash('message', msg);
-      res.render('info.njk', {
-          message : req.flash('message'),
-          type    : msgType,
-          user    : req.user
-      })
-    });
-
-    app.get('/infoAxerve', (req, res) => {
-      let msg = "Pagamento non effettuato";
-      let msgType = "warning";
-      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoAxerve"  FLASH: '+msg);
-      req.flash('message', msg);
-      res.render('info.njk', {
-          message : req.flash('message'),
-          type    : msgType,
-      })
-    });
-
-    app.post('/infoShare', (req,res) => {
-       res.render('share.njk', {
-              firstName : req.body.firstName,
-              flag      : req.body.flag,
-              user      : req.user
-          });
-    });
-
-    app.get('/videoPromo', (req, res) => {
-          res.render('video.njk')
-    });
-
+    
 // =================================================================================================
 // TESTING 
 // =================================================================================================

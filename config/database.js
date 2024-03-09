@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
-const moment   = require("moment"); 
+const moment   = require("moment-timezone"); 
+
+moment().tz("Europe/Rome").format();
 
 mongoose.set('strictQuery', false);
 

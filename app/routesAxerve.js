@@ -2,22 +2,22 @@ const lib           = require('./libfunction');
 //const https         = require("https");  
 const fetch         = require("node-fetch");
 const User          = require('../app/models/user');
-const moment        = require('moment');
 
 const {transMsg}    = require("./msgHandler");
 
-module.exports = function(app,mongoose) {
+module.exports = function(app,mongoose, moment) {
 
 var counter;
 var users;
 
-
-
+//-------------------------------------------
 //POST
+//-------------------------------------------
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
     var cart = req.session.cart;
     const currency='EUR';
     const shopLogin="GESPAY63388"; //TODO: dichiararlo come variabile di sistema
+    const paymentType =  [""]
 
     req.session.order = {};
  
@@ -72,9 +72,11 @@ var users;
           },
           body: JSON.stringify({  
             "shopLogin": shopLogin,
+            "paymentType":paymentType,
             "amount": (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
             "currency": currency,
-            'shopTransactionID' : req.session.order._id.toString()
+            "shopTransactionID" : req.session.order._id.toString(),
+            "paymentType": paymentType
           })
         }
       ).then(function(result) {
@@ -83,8 +85,17 @@ var users;
       });
       console.debug("DATA -> : ",data);
 
-      await session.commitTransaction();
-      res.status(200).json(data);
+      if (data.error.code != 0) {
+        data.ok = false;
+        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(data));
+        await session.abortTransaction();
+        res.status(500).json(data);  
+      } else {
+        await session.commitTransaction();
+        res.status(200).json(data);  
+      }
+
+      
 
     } catch (e) {
         console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
@@ -144,6 +155,12 @@ var users;
       await session.commitTransaction();
 
       if (status == 'OK' && error_code == 0) {
+        
+        //=====================================
+        // Svuoto il carrello
+        //=====================================
+        req.session.cart = {}
+
         //TODO: sostituire con pagina ad HOC
         req.flash('info','AXERVE Pagamento effettuato orderId = ' + req.session.order._id.toString() +' '+ error_code + error_description);
         res.render('info.njk',{

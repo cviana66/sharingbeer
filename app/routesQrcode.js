@@ -2,7 +2,7 @@
 // ATTENZIONE!!!! Modulo utilizzato solo per la parte QrCode //
 ///////////////////////////////////////////////////////////////
 
-module.exports = function(app, qr) {
+module.exports = function(app, qr, moment) {
 
   var lib     = require('./libfunction');
 /*

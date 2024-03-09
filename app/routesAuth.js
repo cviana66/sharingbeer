@@ -5,11 +5,10 @@ const transporter   = require('../config/mailer');
 const Friends       = require('./models/friend');
 const Users         = require('./models/user');
 const lib           = require('./libfunction');
-const moment        = require('moment');
 
 var mailvalidatemail = require('../config/mailValidateMail');
 
-module.exports = function(app, passport) {
+module.exports = function(app, passport, moment) {
 
 // =====================================
 // HOME PAGE (with login links) ========

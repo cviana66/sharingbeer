@@ -32,6 +32,7 @@
     "geolib": "^3.3.4",
     "method-override": "^3.0.0",
     "moment": "^2.29.4",
+    "moment-timezone": "^0.5.45",
     "mongoose": "^6.0.0",
     "morgan": "^1.10.0",
     "node-env-file": "^0.1.8",
