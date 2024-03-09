@@ -16,7 +16,10 @@ const paypal        = require('paypal-rest-sdk');   // PayPal
 const qr            = require('qr-image');          // Generazione QR Code. https://www.npmjs.com/package/qr-image
 const nunjucks      = require('nunjucks');          // Template per Javascript. https://mozilla.github.io/nunjucks/
 //const cons          = require('consolidate');       // Consolida il framework da utilizzare per package. NON USATO?. https://github.com/tj/consolidate.js
-const moment        = require("moment");            // Formattazione delle date. https://www.npmjs.com/package/moment
+const moment        = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
+
+moment().tz("Europe/Rome").format();
+
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
 
 const fastcsv       = require("fast-csv");          // Gestione dei file CSV. https://c2fo.github.io/fast-csv/docs/introduction/getting-started
@@ -139,7 +142,7 @@ var SharingBeer = function() {
     /**
      *  Set up server IP address and port # using env variables/defaults.
      */
-    self.setupVariables = function() {const moment = require("moment");
+    self.setupVariables = function() {
         //  Set the environment variables we need.
         self.port = process.env.PORT || 3000;
         console.info(moment().format()+' [INFO] SERVER PORT: '+self.port);
@@ -182,12 +185,12 @@ var SharingBeer = function() {
      *  Create the routing table entries + handlers for the application.
      */
     self.createRoutes = function() {
-        routesAuth(self.app, passport);
+        routesAuth(self.app, passport, moment);
         routesShop(self.app);
         routesRegister(self.app, moment, mongoose, fastcsv, fs, util);
-        routesQrcode(self.app, qr);
-        routesPaypal(self.app, mongoose);
-        routesAxerve(self.app, mongoose);
+        routesQrcode(self.app, qr, moment);
+        routesPaypal(self.app, mongoose, moment);
+        routesAxerve(self.app, mongoose, moment);
         transMsgPost(self.app);
         getDistancePost(self.app);
         geoMap(self.app, moment);

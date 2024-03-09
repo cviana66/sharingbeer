@@ -1,4 +1,4 @@
-module.exports = function(app, mongoose) {
+module.exports = function(app, mongoose, moment) {
 
   const paypal    = require('../config/paypal/common/paypal-api.js');
   const lib       = require('./libfunction');

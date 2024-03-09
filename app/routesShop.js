@@ -4,7 +4,7 @@
 var Product = require('./models/product.js');
 var lib = require('./libfunction');
 
-module.exports = function(app) {
+module.exports = function(app, moment) {
 
 // =============================================================================
 // GET SHOP ====================================================================
