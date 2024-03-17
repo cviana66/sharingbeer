@@ -65,6 +65,9 @@ const {getDistancePost} = require('./app/geoCoordHandler');
 // geoMap ======================================================================
 const {geoMap}        = require('./app/routesGeoMap');
 
+// percorso consegne ===========================================================
+const routesDelivery  = require('./app/routesDelivery');
+
 global.debug = true;
 
 //global.cost = 3;
@@ -194,6 +197,7 @@ var SharingBeer = function() {
         transMsgPost(self.app);
         getDistancePost(self.app);
         geoMap(self.app, moment);
+        routesDelivery(self.app, moment);
     };
 
     /**

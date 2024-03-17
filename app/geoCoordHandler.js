@@ -1,7 +1,40 @@
 const axios = require('axios');
 const geolib = require('geolib'); // calcolare la distanza tra le coordinate iniziali e finali
 
-async function getCoordinates(address) {
+async function getAddressFromCoordinates(latitude, longitude) {
+  if (!latitude || !longitude) {
+    throw({ errCode: 404, errMsg: 'Coordinate non corrette'});
+  }
+
+  try {
+    // Effettua una richiesta al servizio di geocodifica di Nominatim per ottenere l'indirizzo di partenza
+    const geocodeResponse = await axios.get('https://nominatim.openstreetmap.org/reverse', {
+      params: {
+        lat: latitude,
+        lon: longitude,
+        format: 'jsonv2',
+      },
+    });
+
+    var coordinates = null;
+    if (geocodeResponse.data) {
+      coordinates = {'puntoMappa': {'indirizzo': geocodeResponse.data.display_name, 
+                                    'latitude': latitude,
+                                    'longitude': longitude}};
+      
+      return coordinates;
+    } else {
+      throw({ errCode: 500, errMsg: "Indirizzo di riferimento non trovato per le coordinate. Latitudine: " + latitude + ", Longitudine: " + longitude});
+    }
+
+  } catch (error) {
+    console.error('ERRORE', error);
+    throw({ errCode: 500, errMsg: "Errore durante la geocodifica delle coordinate. Latitudine: " + latitude + ", Longitudine: " + longitude});
+  }
+}
+
+<!-------------------------------------------------------------->
+async function getCoordinatesFromAddress(address) {
   if (!address) {
     throw({ errCode: 404, errMsg: 'Indirizzo di riferimento non fornito'});
   }
@@ -12,24 +45,32 @@ async function getCoordinates(address) {
       params: {
         q: address,
         format: 'json',
+        polygon_kml: 1
       },
     });
+    //console.log('geocodeResponse', geocodeResponse.data);
+
+    var isPreciseAddress = 'N';
+    if (geocodeResponse.data[0] && geocodeResponse.data[0].geokml.indexOf('<Point>') >= 0)  {
+      isPreciseAddress = 'Y';
+    }
 
     var coordinates = null;
     if (geocodeResponse.data.length > 0) {
       coordinates = {'puntoMappa': {'indirizzo': address, 
+                                    'isPreciseAddress': isPreciseAddress,
                                     'latitude': geocodeResponse.data[0].lat,
                                     'longitude': geocodeResponse.data[0].lon}};
-      //console.log('Indirizzo', address, ' - coordinate', coordinates);
+      //console.log('Indirizzo', address, 'isPreciseAddress', isPreciseAddress, ' - coordinate', coordinates);
 
       return coordinates;
     } else {
-      throw({ errCode: 404, errMsg: 'Indirizzo di riferimento non trovato' });
+      throw({ errCode: 500, errMsg: 'Indirizzo di riferimento non trovato per "' + address + '"'});
     }
 
   } catch (error) {
     console.error('ERRORE', error);
-    throw({ errCode: 500, errMsg: 'Errore durante la geocodifica' });
+    throw({ errCode: 500, errMsg: "Errore durante la geocodifica dell'indirizzo: " + address });
   }
 }
 
@@ -44,9 +85,9 @@ async function getDistance(addressFrom, addressTo, req, res) {
   }
 
   try {
-    var coordinatesFrom = await getCoordinates(addressFrom);
+    var coordinatesFrom = await getCoordinatesFromAddress(addressFrom);
 
-    var coordinatesTo = await getCoordinates(addressTo);
+    var coordinatesTo = await getCoordinatesFromAddress(addressTo);
 
     // Calcola la distanza lineare tra le coordinate utilizzando geolib
     const distanceInMeters = await geolib.getDistance(coordinatesFrom.puntoMappa, coordinatesTo.puntoMappa);
@@ -81,4 +122,4 @@ function getDistancePost(app) {
 //{"address":"via abruzzi 7 biella","coordinates":["8.0520154","45.5513972"]}
 
 // Esporta la funzione getDistance, nel caso in cui vuoi utilizzarla altrove
-module.exports = { getCoordinates, getDistance, getDistancePost };
+module.exports = { getCoordinatesFromAddress, getAddressFromCoordinates, getDistance, getDistancePost };

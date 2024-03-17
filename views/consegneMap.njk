@@ -9,6 +9,15 @@
 	
 	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
 
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
+	  
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+	<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="css/webcam.css">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
@@ -32,33 +41,261 @@
 
 <div id="map" style="width: 95%; height: 75%;"></div>
 
-<table id="manevTable" width="100%" align="center"></table>
+<form id="updateForm" action="/delivery" method="POST" enctype="application/json">
+	<table width="100%" align="center">
+		<tr>
+			<td width="100%" align="right" style="padding-top: 5px;">
+				<input type="hidden" id="updateData" name="updateData">
+				<input type="hidden" id="startFromGPS" name="startFromGPS" value="N">
+				<input type="hidden" id="gpsLatitude" name="gpsLatitude">
+				<input type="hidden" id="gpsLongitude" name="gpsLongitude">
+				<input type="button" id="updatePathFromGPS" value="Guidami" onclick="setStartFromGPS()">
+				<input type="button" id="updatePath" value="Aggiorna percorso" onclick="updatePercorso()">
+			</td>
+		</tr>
+		<tr>
+			<td width="100%" style="font-family: Arial;"><p style="font-size: 20px;"><b>Riepilogo percorso</b></p>
+				<div id="riepilogoPercorso"></div>
+			</td>
+		</tr>
+		<tr>
+			<td width="100%" style="font-family: Arial;"><hr><p style="font-size: 20px;"><b>Ordine di consegna</b></p>
+				<ul id="puntiMappa"></ul>
+			</td>
+		</tr>
+		<tr>
+			<td width="100%" style="font-family: Arial;">
+				<hr><p style="font-size: 20px; color: red;"><b>Indirizzi non validi</b></p>
+				<ul id="puntiMappaErr"></ul>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<div class="container-fluid blur" id="popup" style="margin: 10px;"></div>
 <script>
-	let map = L.map('map').setView({{avgCoord}}, 12);
+	const addBtnLabel = 'Aggiungi punto al percorso';
+	const remBtnLabel = 'Rimuovi punto dal percorso';
+
+	var actualLatitude = null;
+	var actualLongitude = null;
+
+	let refMarker = null;
+
+	let map = L.map('map').setView({{avgCoord}}, 11);
 	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-				maxZoom: 19,
+				maxZoom: 20,
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 			}).addTo(map);
+
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition((position) => {
+			actualLatitude = position.coords.latitude;
+			actualLongitude = position.coords.longitude;
+
+			//console.log('actualLatitude', actualLatitude);
+			//console.log('actualLongitude', actualLongitude);
+
+			marker = L.marker([actualLatitude, actualLongitude]).addTo(map)
+				//.bindPopup('Sei qui').openPopup();
+			marker._icon.style.filter = "hue-rotate(160deg)"
+			marker.bindPopup('<b><p style="font-size:20px">    La tua posizione</p></b>');
+			
+		});
+	}
 	
+	var consegneAddress = {{ consegneAddressString | safe }};
+	//var consegneAddressOk = {{ consegneAddressOKString | safe }};
+	//var consegneAddressErr = {{ consegneAddressErrorString | safe }};
+	var travelSummary = {{ geoJSONsummaryString | safe }};
+	var locations = {{ locationsString | safe }};
 	var decodedPoint = {{ geoJSONPointString | safe }};
 	var decodedShape = {{ geoJSONShapeString | safe }};
 	var decodedManev = {{ geoJSONManevString | safe }};
-	console.log('decodedManev', decodedManev);
+	console.log('consegneAddress', consegneAddress);
+	//console.log('travelSummary', travelSummary);
+	console.log('locations', locations);
+
+	document.getElementById("riepilogoPercorso").innerHTML = '<b>Durata complessiva</b>: ' + travelSummary.durataTotale + '<br>' + 
+																'<b>&nbsp;&nbsp;&nbsp;&nbsp;di cui in viaggio</b>: ' + travelSummary.durata + '<br>' + 
+																'<b>Lunghezza complessiva</b>: ' + travelSummary.lunghezza + ' km';
 
 	var sbLayer = L.geoJSON().addTo(map);
 	sbLayer.addData(decodedPoint);
 	sbLayer.addData(decodedShape);
 
-	for (var i=0; i<decodedManev.length; i++) {
-		var x=document.getElementById('manevTable').insertRow(i);
+	var selectedPoints = null;
+	var deselectedPoints = null;
 
-		var decodedManevElem = decodedManev[i];
-		var targetPoint = decodedManevElem[decodedManevElem.length -1].instruction;
+	for (var i=0; i<consegneAddress.length; i++) {
 
-		var c1=x.insertCell(0);
-    	c1.innerHTML=targetPoint;
+		var consegneElem = consegneAddress[i].puntoMappa;
 
+		var tipoPunto = consegneElem.tipoPunto;
+
+		var original_index = consegneElem.orderSeq;
+		if (original_index == null) {
+			original_index = 0;
+		}
+
+		var orderDetails = i + ') ' + consegneElem.indirizzo;
+
+		var infoIcon = '<span style="float:right;">'+
+                  '<a href="#" onclick="popupInfo(' + original_index + ')">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="20px" viewBox="0 0 24 24" width="20px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>' +
+                  '</a>' +
+                '</span>     ';
+
+    var urgentIcon = L.icon({
+		    iconUrl: 'img/urgentDelivery.png',
+		    //shadowUrl: 'leaf-shadow.png',
+
+		    iconSize:     [34, 45], // size of the icon
+		    shadowSize:   [46, 30], // size of the shadow
+		    iconAnchor:   [17, 45], // point of the icon which will correspond to marker's location
+		    shadowAnchor: [4, 62],  // the same for the shadow
+		    popupAnchor:  [-1, -35] // point from which the popup should open relative to the iconAnchor
+		});
+
+		var marker = null;
+
+		if (consegneElem.stato != 'ERRORE') {
+			var addressLatitude  = consegneElem.coordinateGPS.latitude;
+			var addressLongitude = consegneElem.coordinateGPS.longitude;
+
+			if (consegneElem.isHighPriority == "Y") {
+				marker = L.marker([addressLatitude, addressLongitude], {icon: urgentIcon}).addTo(map);
+			} else {
+				marker = L.marker([addressLatitude, addressLongitude]).addTo(map);
+			}
+
+			var action = '';
+			var actionLabel = '';
+			var opacity = '1';
+			if (consegneElem.planningSelection != 'M') {
+				if (consegneElem.planningSelection == 'Y') {
+					actionLabel = remBtnLabel;
+					opacity = '1';
+				} else {
+					actionLabel = addBtnLabel;
+					opacity = '0.5';
+				}
+				action = '<span style="float:center; padding-left:20px;"><input type="button" id="actBtn' + original_index + '" onclick="togglePoint(' + original_index + ')" value="' + actionLabel + '"></span>';
+			};
+			marker.setOpacity(opacity);
+
+			var pointDetails = '<div style="visibility: hidden;" id="popupInfo' + original_index + '"></div>';
+
+			marker.bindPopup(infoIcon + '<b><p style="font-size:20px">    ' + consegneElem.tipoPunto + '</p></b>' + pointDetails + action); //.openPopup();
+
+			if (tipoPunto === 'Birrificio') {
+				marker._icon.style.filter = "hue-rotate(240deg)";
+			} else if (tipoPunto === 'Deposito') {
+				marker._icon.style.filter = "hue-rotate(195deg)";
+			}
+		}
 	}
+
+	var pointNr = 0;
+	for (i=0; i<consegneAddress.length; i++) {
+		if (consegneAddress[i].puntoMappa.stato != 'ERRORE' && consegneAddress[i].puntoMappa.planningSelection == 'Y') {
+			pointNr ++;
+
+			var elencoPuntiMappa = document.getElementById("puntiMappa");
+			var listItem = document.createElement("li");
+			var notePunto = "";
+			if (consegneAddress[i].puntoMappa.isPreciseAddress == 'N') {
+				listItem.style.color = 'red';
+				notePunto = '[zona] '
+			}
+			listItem.textContent = pointNr + ') ' + notePunto + consegneAddress[i].puntoMappa.tipoPunto + ' - ' + consegneAddress[i].puntoMappa.indirizzo;
+
+			elencoPuntiMappa.appendChild(listItem);
+		}
+	}
+
+	var errCount = 0;
+	for (i=0; i<consegneAddress.length; i++) {
+		if (consegneAddress[i].puntoMappa.stato == 'ERRORE') {
+			var elencoPuntiMappa = document.getElementById("puntiMappaErr");
+			var listItem = document.createElement("li");
+			listItem.textContent = consegneAddress[i].puntoMappa.indirizzo;
+
+			elencoPuntiMappa.appendChild(listItem);
+
+			errCount++;
+		}
+	}
+
+	if (errCount == 0) {
+		document.getElementById("puntiMappaErr").innerHTML = 'Niente da segnalare';
+	}
+
+	function togglePoint(pointNr) {
+		var prevValue = consegneAddress[pointNr].puntoMappa.planningSelection;
+		var newValue = '';
+		var actionLabel = '';
+
+		if (prevValue == 'Y') {
+			newValue = 'N'
+			actionLabel = addBtnLabel;
+		} else {
+			newValue = 'Y'
+			actionLabel = remBtnLabel;
+		}
+
+		consegneAddress[pointNr].puntoMappa.planningSelection = newValue;
+		document.getElementById("actBtn" + pointNr).value = actionLabel;
+
+		return false;
+	}
+
+	function popupInfo(pointNr) {
+		var actualVisibility = document.getElementById("popupInfo" + pointNr).style.visibility;
+		var newVisibility = null;
+
+		var consegneElem = consegneAddress[pointNr].puntoMappa;
+
+		if (actualVisibility == 'visible') {
+			newVisibility = 'hidden';
+			document.getElementById("popupInfo" + pointNr).innerHTML = '';
+		} else {
+		newVisibility = 'visible';
+			var details = '<hr>';
+			if (consegneElem.cliente) {details += '<br><b>Cliente: </b>' + consegneElem.cliente;}
+			if (consegneElem.mobile) {details += '<br><b>Mobile: </b>' + consegneElem.mobile;}
+			if (consegneElem.indirizzo) {details += '<br><b>Indirizzo: </b>' + consegneElem.indirizzo;}
+			details += '<br><b>Selezione consegna</b>: ' + consegneElem.planningSelection + '<br>';
+
+			document.getElementById("popupInfo" + pointNr).innerHTML = details;
+		}
+
+		document.getElementById("popupInfo" + pointNr).style.visibility = newVisibility;
+ 	}
+
+ 	if (consegneAddress[0].puntoMappa.tipoPunto == 'Posizione attuale') {
+		document.getElementById("updatePathFromGPS").value = "Partenza dal Birrificio";
+	}
+
+ 	function setStartFromGPS() {
+ 		var setVal = "Y";
+ 		if (consegneAddress[0].puntoMappa.tipoPunto == 'Posizione attuale') {
+ 			setVal = "N";
+ 		}
+ 		document.getElementById("startFromGPS").value = setVal;
+ 		document.getElementById("gpsLatitude").value = actualLatitude;
+ 		document.getElementById("gpsLongitude").value = actualLongitude;
+
+ 		document.getElementById("updateData").value = JSON.stringify(consegneAddress);
+
+ 		document.getElementById("updateForm").submit();
+ 	}
+
+ 	function updatePercorso() {
+ 		document.getElementById("updateData").value = JSON.stringify(consegneAddress);
+
+ 		document.getElementById("updateForm").submit();
+ 	}
 
 </script>
 
