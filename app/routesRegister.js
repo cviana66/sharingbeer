@@ -18,6 +18,7 @@ var mailfriend = require('../config/mailFriend');
 var mailparent = require('../config/mailParent');
 var mailinvite = require('../config/mailInvite');
 var mailconferme = require('../config/mailConferme');
+var {getDistance} = require('../app/geoCoordHandler');
 
 const https = require('https');
 
@@ -406,10 +407,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       //------------------------------------------------------------------------
         if (req.session.nextStep = 'payment') {
 
-        //TODO : rendere parametrico l'importo shipping e i discount
-        req.session.shipping = '20.00';
-        req.session.pointDiscount = '10.00';
-        req.session.shippingDiscount = '0.00'
+        //TODO : rendere parametrico l'importo discount
+
         var typeShipping = "consegna"
 
         address = await User.aggregate([
@@ -421,12 +420,31 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         req.session.shippingAddress = address[0].addresses;         
         console.debug('ADDRESS[0]: ',address[0].addresses)
 
+        let customerAddress = address[0].addresses.address + ' ' + 
+                          address[0].addresses.houseNumber + ' ' +
+                          address[0].addresses.city +  ' ' +
+                          address[0].addresses.province;
+        let birrificioAddress ='via molignati 10 candelo biella';
+        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
+
+        console.log('DISTANZA = ', dist.distanceInMeters)
+
+        if ( Number(dist.distanceInMeters) > 15000) {
+          req.session.shippingCost = '10.00';
+          req.session.pointDiscount = '2.00';
+          req.session.shippingDiscount = '0.00'  
+        } else {
+          req.session.shippingCost = '5.00';
+          req.session.pointDiscount = '2.00';
+          req.session.shippingDiscount = '0.00'  
+        }
+
         res.render('orderSummary.njk', {
                 cartItems   : req.session.cartItems,
                 address     : address[0].addresses,
                 numProducts : req.session.numProducts,
                 userStatus  : req.user.local.status,
-                shipping    : req.session.shipping,
+                shipping    : req.session.shippingCost,
                 shippingDiscount  : req.session.shippingDiscount,
                 typeShipping      : typeShipping,
                 discount    : req.session.pointDiscount,
@@ -489,6 +507,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     console.debug("ADDRESS ID: ", req.body.addressID)
     var typeShipping ;
     var address;
+
     try{
 
       //--------------------------------------
@@ -496,9 +515,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       //--------------------------------------
       if (req.body.addressID == '0' ) {
         //TODO : rendere parametrico l'importo shipping e i discount
-        req.session.shipping = '0.00';
+        
+        req.session.shippingCost = '0.00';
         req.session.pointDiscount = '10.00';
         req.session.shippingDiscount = '5.00'
+        
         address = await User.aggregate([
             {$match:{"local.email": "birrificioviana@gmail.com"}}, 
             {$unwind: "$addresses"}, 
@@ -513,10 +534,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       // Caso di spedizione presso indirizzo esistente in base dati
       //-------------------------------------------------------
         //TODO : rendere parametrico l'importo shipping e i discount
-        req.session.shipping = '10.00';
-        req.session.pointDiscount = '10.00';
-        req.session.shippingDiscount = '0.00'
+        
+        
         typeShipping = "consegna"
+        
         address = await User.aggregate([
             {$match:{"_id":req.user._id}}, 
             {$unwind: "$addresses"}, 
@@ -525,6 +546,26 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             ])
         req.session.shippingAddress = address[0].addresses;         
         console.debug('ADDRESS[0]: ',address[0].addresses)
+
+        let customerAddress = address[0].addresses.address + ' ' + 
+                          address[0].addresses.houseNumber + ' ' +
+                          address[0].addresses.city +  ' ' +
+                          address[0].addresses.province;
+        let birrificioAddress ='via molignati 10 candelo biella';
+        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
+
+        console.log('DISTANZA = ', dist.distanceInMeters)
+
+        if ( Number(dist.distanceInMeters) > 15000) {
+          req.session.shippingCost = '10.00';
+          req.session.pointDiscount = '2.00';
+          req.session.shippingDiscount = '0.00'  
+        } else {
+          req.session.shippingCost = '5.00';
+          req.session.pointDiscount = '2.00';
+          req.session.shippingDiscount = '0.00'  
+        }
+
       }
 
       //console.debug("SESSION: ", req.session)
@@ -535,7 +576,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         address     : address[0].addresses,
         numProducts : req.session.numProducts,
         userStatus  : req.user.local.status,
-        shipping    : req.session.shipping,
+        shipping    : req.session.shippingCost,
         shippingDiscount  : req.session.shippingDiscount,
         typeShipping      : typeShipping,
         discount    : req.session.pointDiscount,
