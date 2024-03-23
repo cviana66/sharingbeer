@@ -25,7 +25,7 @@ var users;
         },
         body: JSON.stringify({  
           "shopLogin": shopLogin,
-          "amount": (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
+          "amount": (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
           "currency": currency,
           'shopTransactionID' : '1111111'
         })

@@ -781,7 +781,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 005053,Ferrere,Nord-ovest,Piemonte,Asti,AT,D554
 005054,Fontanile,Nord-ovest,Piemonte,Asti,AT,D678
 005055,Frinco,Nord-ovest,Piemonte,Asti,AT,D802
-005056,Grana,Nord-ovest,Piemonte,Asti,AT,E134
+005056,Grana Monferrato,Nord-ovest,Piemonte,Asti,AT,E134
 005057,Grazzano Badoglio,Nord-ovest,Piemonte,Asti,AT,E159
 005058,Incisa Scapaccino,Nord-ovest,Piemonte,Asti,AT,E295
 005059,Isola d'Asti,Nord-ovest,Piemonte,Asti,AT,E338
@@ -802,8 +802,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 005074,Montaldo Scarampi,Nord-ovest,Piemonte,Asti,AT,F409
 005075,Montechiaro d'Asti,Nord-ovest,Piemonte,Asti,AT,F468
 005076,Montegrosso d'Asti,Nord-ovest,Piemonte,Asti,AT,F527
-005077,Montemagno,Nord-ovest,Piemonte,Asti,AT,F556
-005079,Moransengo,Nord-ovest,Piemonte,Asti,AT,F709
+005077,Montemagno Monferrato,Nord-ovest,Piemonte,Asti,AT,F556
 005080,Nizza Monferrato,Nord-ovest,Piemonte,Asti,AT,F902
 005081,Olmo Gentile,Nord-ovest,Piemonte,Asti,AT,G048
 005082,Passerano Marmorito,Nord-ovest,Piemonte,Asti,AT,G358
@@ -833,7 +832,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 005107,Soglio,Nord-ovest,Piemonte,Asti,AT,I781
 005108,Tigliole,Nord-ovest,Piemonte,Asti,AT,L168
 005109,Tonco,Nord-ovest,Piemonte,Asti,AT,L203
-005110,Tonengo,Nord-ovest,Piemonte,Asti,AT,L204
 005111,Vaglio Serra,Nord-ovest,Piemonte,Asti,AT,L531
 005112,Valfenera,Nord-ovest,Piemonte,Asti,AT,L574
 005113,Vesime,Nord-ovest,Piemonte,Asti,AT,L807
@@ -845,6 +843,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 005119,Villa San Secondo,Nord-ovest,Piemonte,Asti,AT,M019
 005120,Vinchio,Nord-ovest,Piemonte,Asti,AT,M058
 005121,Montiglio Monferrato,Nord-ovest,Piemonte,Asti,AT,M302
+005122,Moransengo-Tonengo,Nord-ovest,Piemonte,Asti,AT,M434
 006001,Acqui Terme,Nord-ovest,Piemonte,Alessandria,AL,A052
 006002,Albera Ligure,Nord-ovest,Piemonte,Alessandria,AL,A146
 006003,Alessandria,Nord-ovest,Piemonte,Alessandria,AL,A182
@@ -1262,7 +1261,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 012006,Azzate,Nord-ovest,Lombardia,Varese,VA,A531
 012007,Azzio,Nord-ovest,Lombardia,Varese,VA,A532
 012008,Barasso,Nord-ovest,Lombardia,Varese,VA,A619
-012009,Bardello,Nord-ovest,Lombardia,Varese,VA,A645
 012010,Bedero Valcuvia,Nord-ovest,Lombardia,Varese,VA,A728
 012011,Besano,Nord-ovest,Lombardia,Varese,VA,A819
 012012,Besnate,Nord-ovest,Lombardia,Varese,VA,A825
@@ -1271,7 +1269,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 012015,Bisuschio,Nord-ovest,Lombardia,Varese,VA,A891
 012016,Bodio Lomnago,Nord-ovest,Lombardia,Varese,VA,A918
 012017,Brebbia,Nord-ovest,Lombardia,Varese,VA,B126
-012018,Bregano,Nord-ovest,Lombardia,Varese,VA,B131
 012019,Brenta,Nord-ovest,Lombardia,Varese,VA,B150
 012020,Brezzo di Bedero,Nord-ovest,Lombardia,Varese,VA,B166
 012021,Brinzio,Nord-ovest,Lombardia,Varese,VA,B182
@@ -1346,7 +1343,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 012091,Lozza,Nord-ovest,Lombardia,Varese,VA,E707
 012092,Luino,Nord-ovest,Lombardia,Varese,VA,E734
 012093,Luvinate,Nord-ovest,Lombardia,Varese,VA,E769
-012095,Malgesso,Nord-ovest,Lombardia,Varese,VA,E856
 012096,Malnate,Nord-ovest,Lombardia,Varese,VA,E863
 012097,Marchirolo,Nord-ovest,Lombardia,Varese,VA,E929
 012098,Marnate,Nord-ovest,Lombardia,Varese,VA,E965
@@ -1392,6 +1388,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 012141,Sangiano,Nord-ovest,Lombardia,Varese,VA,H872
 012142,Maccagno con Pino e Veddasca,Nord-ovest,Lombardia,Varese,VA,M339
 012143,Cadrezzate con Osmate,Nord-ovest,Lombardia,Varese,VA,M425
+012144,Bardello con Malgesso e Bregano,Nord-ovest,Lombardia,Varese,VA,M433
 013003,Albavilla,Nord-ovest,Lombardia,Como,CO,A143
 013004,Albese con Cassano,Nord-ovest,Lombardia,Como,CO,A153
 013005,Albiolo,Nord-ovest,Lombardia,Como,CO,A164
@@ -1505,7 +1502,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 013193,Pusiano,Nord-ovest,Lombardia,Como,CO,H094
 013195,Rezzago,Nord-ovest,Lombardia,Como,CO,H255
 013197,Rodero,Nord-ovest,Lombardia,Como,CO,H478
-013199,Ronago,Nord-ovest,Lombardia,Como,CO,H521
 013201,Rovellasca,Nord-ovest,Lombardia,Como,CO,H601
 013202,Rovello Porro,Nord-ovest,Lombardia,Como,CO,H602
 013203,Sala Comacina,Nord-ovest,Lombardia,Como,CO,H679
@@ -1521,7 +1517,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 013223,Torno,Nord-ovest,Lombardia,Como,CO,L228
 013226,Trezzone,Nord-ovest,Lombardia,Como,CO,L413
 013227,Turate,Nord-ovest,Lombardia,Como,CO,L470
-013228,Uggiate-Trevano,Nord-ovest,Lombardia,Como,CO,L487
 013229,Valbrona,Nord-ovest,Lombardia,Como,CO,L547
 013232,Valmorea,Nord-ovest,Lombardia,Como,CO,L640
 013233,Val Rezzo,Nord-ovest,Lombardia,Como,CO,H259
@@ -1540,6 +1535,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 013253,Alta Valle Intelvi,Nord-ovest,Lombardia,Como,CO,M383
 013254,Centro Valle Intelvi,Nord-ovest,Lombardia,Como,CO,M394
 013255,Solbiate con Cagno,Nord-ovest,Lombardia,Como,CO,M412
+013256,Uggiate con Ronago ,Nord-ovest,Lombardia,Como,CO,M435
 014001,Albaredo per San Marco,Nord-ovest,Lombardia,Sondrio,SO,A135
 014002,Albosaggia,Nord-ovest,Lombardia,Sondrio,SO,A172
 014003,Andalo Valtellino,Nord-ovest,Lombardia,Sondrio,SO,A273
@@ -2199,7 +2195,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 017205,Zone,Nord-ovest,Lombardia,Brescia,BS,M188
 017206,Piancogno,Nord-ovest,Lombardia,Brescia,BS,G549
 018001,Alagna,Nord-ovest,Lombardia,Pavia,PV,A118
-018002,Albaredo Arnaboldi,Nord-ovest,Lombardia,Pavia,PV,A134
 018003,Albonese,Nord-ovest,Lombardia,Pavia,PV,A171
 018004,Albuzzano,Nord-ovest,Lombardia,Pavia,PV,A175
 018005,Arena Po,Nord-ovest,Lombardia,Pavia,PV,A387
@@ -2222,7 +2217,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 018023,Bressana Bottarone,Nord-ovest,Lombardia,Pavia,PV,B159
 018024,Broni,Nord-ovest,Lombardia,Pavia,PV,B201
 018025,Calvignano,Nord-ovest,Lombardia,Pavia,PV,B447
-018026,Campospinoso,Nord-ovest,Lombardia,Pavia,PV,B567
+018026,Campospinoso Albaredo,Nord-ovest,Lombardia,Pavia,PV,B567
 018027,Candia Lomellina,Nord-ovest,Lombardia,Pavia,PV,B587
 018029,Canneto Pavese,Nord-ovest,Lombardia,Pavia,PV,B613
 018030,Carbonara al Ticino,Nord-ovest,Lombardia,Pavia,PV,B741
@@ -2812,7 +2807,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 021050,Meltina,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F118
 021051,Merano,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F132
 021052,Monguelfo-Tesido,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F371
-021053,Montagna,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F392
+021053,Montagna sulla Strada del Vino,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F392
 021054,Moso in Passiria,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F766
 021055,Nalles,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F836
 021056,Naturno,Nord-est,Trentino-Alto Adige/Südtirol,Bolzano/Bozen,BZ,F849
@@ -3179,7 +3174,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 024041,Foza,Nord-est,Veneto,Vicenza,VI,D750
 024042,Gallio,Nord-est,Veneto,Vicenza,VI,D882
 024043,Gambellara,Nord-est,Veneto,Vicenza,VI,D897
-024044,Gambugliano,Nord-est,Veneto,Vicenza,VI,D902
 024046,Grisignano di Zocco,Nord-est,Veneto,Vicenza,VI,E184
 024047,Grumolo delle Abbadesse,Nord-est,Veneto,Vicenza,VI,E226
 024048,Isola Vicentina,Nord-est,Veneto,Vicenza,VI,E354
@@ -3231,7 +3225,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 024100,Schio,Nord-est,Veneto,Vicenza,VI,I531
 024101,Solagna,Nord-est,Veneto,Vicenza,VI,I783
 024102,Sossano,Nord-est,Veneto,Vicenza,VI,I867
-024103,Sovizzo,Nord-est,Veneto,Vicenza,VI,I879
 024104,Tezze sul Brenta,Nord-est,Veneto,Vicenza,VI,L156
 024105,Thiene,Nord-est,Veneto,Vicenza,VI,L157
 024106,Tonezza del Cimone,Nord-est,Veneto,Vicenza,VI,D717
@@ -3254,8 +3247,8 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 024125,Valbrenta,Nord-est,Veneto,Vicenza,VI,M423
 024126,Colceresa,Nord-est,Veneto,Vicenza,VI,M426
 024127,Lusiana Conco,Nord-est,Veneto,Vicenza,VI,M427
+024128,Sovizzo,Nord-est,Veneto,Vicenza,VI,M436
 025001,Agordo,Nord-est,Veneto,Belluno,BL,A083
-025002,Alano di Piave,Nord-est,Veneto,Belluno,BL,A121
 025003,Alleghe,Nord-est,Veneto,Belluno,BL,A206
 025004,Arsiè,Nord-est,Veneto,Belluno,BL,A443
 025005,Auronzo di Cadore,Nord-est,Veneto,Belluno,BL,A501
@@ -3310,11 +3303,11 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 025066,Vodo Cadore,Nord-est,Veneto,Belluno,BL,M108
 025067,Voltago Agordino,Nord-est,Veneto,Belluno,BL,M124
 025069,Zoppè di Cadore,Nord-est,Veneto,Belluno,BL,M189
-025070,Quero Vas,Nord-est,Veneto,Belluno,BL,M332
 025071,Longarone,Nord-est,Veneto,Belluno,BL,M342
 025072,Alpago,Nord-est,Veneto,Belluno,BL,M375
 025073,Val di Zoldo,Nord-est,Veneto,Belluno,BL,M374
 025074,Borgo Valbelluna,Nord-est,Veneto,Belluno,BL,M421
+025075,Setteville,Nord-est,Veneto,Belluno,BL,M437
 026001,Altivole,Nord-est,Veneto,Treviso,TV,A237
 026002,Arcade,Nord-est,Veneto,Treviso,TV,A360
 026003,Asolo,Nord-est,Veneto,Treviso,TV,A471
@@ -3474,7 +3467,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 028019,Camposampiero,Nord-est,Veneto,Padova,PD,B563
 028020,Campo San Martino,Nord-est,Veneto,Padova,PD,B564
 028021,Candiana,Nord-est,Veneto,Padova,PD,B589
-028022,Carceri,Nord-est,Veneto,Padova,PD,B749
 028023,Carmignano di Brenta,Nord-est,Veneto,Padova,PD,B795
 028026,Cartura,Nord-est,Veneto,Padova,PD,B848
 028027,Casale di Scodosia,Nord-est,Veneto,Padova,PD,B877
@@ -3545,7 +3537,6 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 028095,Urbana,Nord-est,Veneto,Padova,PD,L497
 028096,Veggiano,Nord-est,Veneto,Padova,PD,L710
 028097,Vescovana,Nord-est,Veneto,Padova,PD,L805
-028098,Vighizzolo d'Este,Nord-est,Veneto,Padova,PD,L878
 028099,Vigodarzere,Nord-est,Veneto,Padova,PD,L892
 028100,Vigonza,Nord-est,Veneto,Padova,PD,L900
 028101,Villa del Conte,Nord-est,Veneto,Padova,PD,L934
@@ -3555,6 +3546,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 028105,Vo',Nord-est,Veneto,Padova,PD,M103
 028106,Due Carrare,Nord-est,Veneto,Padova,PD,M300
 028107,Borgo Veneto,Nord-est,Veneto,Padova,PD,M402
+028108,Santa Caterina d'Este ,Nord-est,Veneto,Padova,PD,M438
 029001,Adria,Nord-est,Veneto,Rovigo,RO,A059
 029002,Ariano nel Polesine,Nord-est,Veneto,Rovigo,RO,A400
 029003,Arquà Polesine,Nord-est,Veneto,Rovigo,RO,A435
@@ -5539,7 +5531,7 @@ Istat,Comune,ZonaGeo,Regione,Provincia,SiglaAuto,CodCatasto
 068030,Pianella,Sud,Abruzzo,Pescara,PE,G555
 068031,Picciano,Sud,Abruzzo,Pescara,PE,G589
 068032,Pietranico,Sud,Abruzzo,Pescara,PE,G621
-068033,Popoli,Sud,Abruzzo,Pescara,PE,G878
+068033,Popoli Terme,Sud,Abruzzo,Pescara,PE,G878
 068034,Roccamorice,Sud,Abruzzo,Pescara,PE,H425
 068035,Rosciano,Sud,Abruzzo,Pescara,PE,H562
 068036,Salle,Sud,Abruzzo,Pescara,PE,H715

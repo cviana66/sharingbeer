@@ -35,7 +35,7 @@ var users;
       const user = await User.findById(req.user._id);
       const orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
       req.session.order._id = orderId;                // _id in sessione usato per update ordine in axerve_response
-      req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2)
+      req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2)
       console.debug('Sharingbeer ORDER ID :', req.session.order._id.toString());
 
       user.orders.push({
@@ -43,7 +43,7 @@ var users;
           email       : req.user.local.email,
           dateInsert  : Date.now(),
           status      : "CREATED",
-          shipping          : Number(req.session.shipping).toFixed(2),
+          shipping          : Number(req.session.shippingCost).toFixed(2),
           shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),
           pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
           totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
@@ -73,7 +73,7 @@ var users;
           body: JSON.stringify({  
             "shopLogin": shopLogin,
             "paymentType":paymentType,
-            "amount": (Number(req.session.totalPrc)+Number(req.session.shipping)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
+            "amount": (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
             "currency": currency,
             "shopTransactionID" : req.session.order._id.toString(),
             "paymentType": paymentType

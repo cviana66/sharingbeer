@@ -116,8 +116,10 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       //console.debug("VALHALLA result: ",result);
       return result.json();
 
-    }).then(async function(data) {
-      //console.debug("VALHALLA data: ", data);
+
+      // Costruisci l'URL del server Valhalla all'interno del container Docker
+      const valhallaUrl = 'https://valh.sharingbeer.it/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+
 
       if (data.error) {
         throw(data.error);
