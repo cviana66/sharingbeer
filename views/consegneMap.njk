@@ -74,6 +74,14 @@
 
 <div class="container-fluid blur" id="popup" style="margin: 10px;"></div>
 <script>
+	const completeIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 -960 960 960" width="40"><path fill="green" d="m379.333-216.667-252.999-253 76.332-76.332 176.667 177.666L757-746l76.333 75.333-454 454Z"/></svg>';
+
+	const rejectIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 -960 960 960" width="40"><path fill="brown" d="M480.386-261.334q21.656 0 35.468-13.812 13.812-13.812 13.812-35.854 0-21-13.996-35.333-13.997-14.333-35.354-14.333-21.358 0-35.67 14.333Q430.334-332 430.334-311q0 21.667 14.198 35.666 14.198 14 35.854 14ZM439.667-407H521v-294.333h-81.333V-407ZM318.334-90.667 90.667-318.137v-324.196L318.137-870h324.196L870-642.529v324.195L642.529-90.667H318.334Zm42.578-105.999h237.421l165.001-164.246v-237.421L599.088-763.334H361.667L196.666-599.088v237.421l164.246 165.001ZM480-480Z"/></svg>';
+
+	const addToQueue = '<svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 -960 960 960" width="40"><path fill="grey" d="M439.667-365H521v-120.334h120.333v-81.332H521V-687h-81.333v120.334H319.333v81.332h120.334V-365ZM310.334-90.667V-171H156.666q-43.824 0-74.912-31.088Q50.667-233.175 50.667-277v-486.334q0-44.099 31.087-75.382Q112.842-870 156.666-870h646.668q44.099 0 75.382 31.284Q910-807.433 910-763.334V-277q0 43.825-31.284 74.912Q847.433-171 803.334-171H650.333v80.333H310.334ZM156.666-277h646.668v-486.334H156.666V-277Zm0 0v-486.334V-277Z"/></svg>';
+
+	const removeFromQueue = '<svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 -960 960 960" width="40"><path fill="grey" d="M300.334-475h359.332v-106.666H300.334V-475Zm10 384.333V-171H156.666q-43.824 0-74.912-31.088Q50.667-233.175 50.667-277v-486.334q0-44.099 31.087-75.382Q112.842-870 156.666-870h646.668q44.099 0 75.382 31.284Q910-807.433 910-763.334V-277q0 43.825-31.284 74.912Q847.433-171 803.334-171H650.333v80.333H310.334ZM156.666-277h646.668v-486.334H156.666V-277Zm0 0v-486.334V-277Z"/></svg>';
+
 	const addBtnLabel = 'Aggiungi punto al percorso';
 	const remBtnLabel = 'Rimuovi punto dal percorso';
 
@@ -88,33 +96,15 @@
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 			}).addTo(map);
 
-	if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition((position) => {
-			actualLatitude = position.coords.latitude;
-			actualLongitude = position.coords.longitude;
-
-			//console.log('actualLatitude', actualLatitude);
-			//console.log('actualLongitude', actualLongitude);
-
-			marker = L.marker([actualLatitude, actualLongitude]).addTo(map)
-				//.bindPopup('Sei qui').openPopup();
-			marker._icon.style.filter = "hue-rotate(160deg)"
-			marker.bindPopup('<b><p style="font-size:20px">    La tua posizione</p></b>');
-			
-		});
-	}
-	
 	var consegneAddress = {{ consegneAddressString | safe }};
-	//var consegneAddressOk = {{ consegneAddressOKString | safe }};
-	//var consegneAddressErr = {{ consegneAddressErrorString | safe }};
 	var travelSummary = {{ geoJSONsummaryString | safe }};
 	var locations = {{ locationsString | safe }};
 	var decodedPoint = {{ geoJSONPointString | safe }};
 	var decodedShape = {{ geoJSONShapeString | safe }};
 	var decodedManev = {{ geoJSONManevString | safe }};
-	console.log('consegneAddress', consegneAddress);
+	//console.log('consegneAddress', consegneAddress);
 	//console.log('travelSummary', travelSummary);
-	console.log('locations', locations);
+	//console.log('locations', locations);
 
 	document.getElementById("riepilogoPercorso").innerHTML = '<b>Durata complessiva</b>: ' + travelSummary.durataTotale + '<br>' + 
 																'<b>&nbsp;&nbsp;&nbsp;&nbsp;di cui in viaggio</b>: ' + travelSummary.durata + '<br>' + 
@@ -142,7 +132,7 @@
 
 		var infoIcon = '<span style="float:right;">'+
                   '<a href="#" onclick="popupInfo(' + original_index + ')">' +
-                    '<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="20px" viewBox="0 0 24 24" width="20px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="26" viewBox="0 0 24 24" width="26" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>' +
                   '</a>' +
                 '</span>     ';
 
@@ -170,23 +160,39 @@
 			}
 
 			var action = '';
-			var actionLabel = '';
+			var addActVisib = '';
+			var remActVisib = '';
 			var opacity = '1';
 			if (consegneElem.planningSelection != 'M') {
 				if (consegneElem.planningSelection == 'Y') {
-					actionLabel = remBtnLabel;
+					actionIcon = removeFromQueue;
+					addActVisib = 'none';
+					remActVisib = 'inline-block';
 					opacity = '1';
 				} else {
-					actionLabel = addBtnLabel;
+					actionIcon = addToQueue;
+					addActVisib = 'inline-block';
+					remActVisib = 'none';
 					opacity = '0.5';
 				}
-				action = '<span style="float:center; padding-left:20px;"><input type="button" id="actBtn' + original_index + '" onclick="togglePoint(' + original_index + ')" value="' + actionLabel + '"></span>';
+
+				var iconsDetails = '';
+				if (consegneElem.planningSelection == 'Y') {
+					iconsDetails = '<span>' + completeIcon + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + rejectIcon + '</span>';
+				}
+
+				action = iconsDetails + 
+								'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+								'<span id="actBtn' + original_index + '" onclick="togglePoint(' + original_index + ')" >' + 
+								'<div id="addBtnDiv' + original_index + '" style="display: ' + addActVisib + ';">' + addToQueue + '</div>' +
+								'<div id="remBtnDiv' + original_index + '" style="display: ' + remActVisib + ';">' + removeFromQueue + '</div>' + 
+								'</span>';
 			};
 			marker.setOpacity(opacity);
 
 			var pointDetails = '<div style="visibility: hidden;" id="popupInfo' + original_index + '"></div>';
 
-			marker.bindPopup(infoIcon + '<b><p style="font-size:20px">    ' + consegneElem.tipoPunto + '</p></b>' + pointDetails + action); //.openPopup();
+			marker.bindPopup(infoIcon + '<b><p style="font-size:20px">    ' + consegneElem.tipoPunto + '</p></b>' + action + pointDetails); //.openPopup();
 
 			if (tipoPunto === 'Birrificio') {
 				marker._icon.style.filter = "hue-rotate(240deg)";
@@ -197,21 +203,19 @@
 	}
 
 	var pointNr = 0;
-	for (i=0; i<consegneAddress.length; i++) {
-		if (consegneAddress[i].puntoMappa.stato != 'ERRORE' && consegneAddress[i].puntoMappa.planningSelection == 'Y') {
-			pointNr ++;
+	for (i=1; i<locations.length -1; i++) {
+		pointNr++;
 
-			var elencoPuntiMappa = document.getElementById("puntiMappa");
-			var listItem = document.createElement("li");
-			var notePunto = "";
-			if (consegneAddress[i].puntoMappa.isPreciseAddress == 'N') {
-				listItem.style.color = 'red';
-				notePunto = '[zona] '
-			}
-			listItem.textContent = pointNr + ') ' + notePunto + consegneAddress[i].puntoMappa.tipoPunto + ' - ' + consegneAddress[i].puntoMappa.indirizzo;
-
-			elencoPuntiMappa.appendChild(listItem);
+		var elencoPuntiMappa = document.getElementById("puntiMappa");
+		var listItem = document.createElement("li");
+		var notePunto = "";
+		if (locations[i].isPreciseAddress == 'N') {
+			listItem.style.color = 'red';
+			notePunto = '[zona] '
 		}
+		listItem.textContent = pointNr + ') ' + notePunto + locations[i].name;
+
+		elencoPuntiMappa.appendChild(listItem);
 	}
 
 	var errCount = 0;
@@ -231,21 +235,52 @@
 		document.getElementById("puntiMappaErr").innerHTML = 'Niente da segnalare';
 	}
 
+	//Posizione GPS
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition((position) => {
+
+			var sbIcon = L.icon({
+			    iconUrl: 'img/favicon128.png',
+			    //shadowUrl: 'leaf-shadow.png',
+
+			    iconSize:     [17, 27], // size of the icon
+			    shadowSize:   [23, 15], // size of the shadow
+			    iconAnchor:   [8, 22], // point of the icon which will correspond to marker's location
+			    shadowAnchor: [2, 31],  // the same for the shadow
+			    popupAnchor:  [-1, -17] // point from which the popup should open relative to the iconAnchor
+			});
+
+			actualLatitude = position.coords.latitude;
+			actualLongitude = position.coords.longitude;
+
+			//console.log('actualLatitude', actualLatitude);
+			//console.log('actualLongitude', actualLongitude);
+
+			marker = L.marker([actualLatitude, actualLongitude], {icon: sbIcon}).addTo(map)
+			//marker.bindPopup('<b><p style="font-size:20px">    La tua posizione</p></b>');
+			
+		});
+	}
+
 	function togglePoint(pointNr) {
 		var prevValue = consegneAddress[pointNr].puntoMappa.planningSelection;
 		var newValue = '';
-		var actionLabel = '';
+		var addBtnDiv = '';
+		var remBtnDiv = '';
 
 		if (prevValue == 'Y') {
-			newValue = 'N'
-			actionLabel = addBtnLabel;
+			newValue = 'N';
+			addBtnDiv = 'inline-block';
+			remBtnDiv = 'none';
 		} else {
 			newValue = 'Y'
-			actionLabel = remBtnLabel;
+			addBtnDiv = 'none';
+			remBtnDiv = 'inline-block';
 		}
 
 		consegneAddress[pointNr].puntoMappa.planningSelection = newValue;
-		document.getElementById("actBtn" + pointNr).value = actionLabel;
+		document.getElementById("addBtnDiv" + pointNr).style.display = addBtnDiv;
+		document.getElementById("remBtnDiv" + pointNr).style.display = remBtnDiv;
 
 		return false;
 	}
@@ -265,7 +300,13 @@
 			if (consegneElem.cliente) {details += '<br><b>Cliente: </b>' + consegneElem.cliente;}
 			if (consegneElem.mobile) {details += '<br><b>Mobile: </b>' + consegneElem.mobile;}
 			if (consegneElem.indirizzo) {details += '<br><b>Indirizzo: </b>' + consegneElem.indirizzo;}
-			details += '<br><b>Selezione consegna</b>: ' + consegneElem.planningSelection + '<br>';
+			details += '<br><br><b>Articoli</b>:<br>'
+
+			var items = consegneElem.orderItems;
+			for (d=0; d<items.length; d++) {
+				details += '- ' + items[d].qty + ' di ' + items[d].name + '<br>';
+			}
+			details += '<br>';
 
 			document.getElementById("popupInfo" + pointNr).innerHTML = details;
 		}
@@ -298,8 +339,6 @@
  	}
 
 </script>
-
-
 
 </body>
 </html>
