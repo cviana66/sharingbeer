@@ -16,7 +16,8 @@ module.exports = function(app, moment) {
 
 		const aggregationResult = await User.aggregate([
 		    { $unwind: { path: '$orders' } },
-		    { $match: { 'orders.status': 'OK' } }
+		    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
+		    { $match: { 'orders.status': 'OK'} }
 		  ]
 		);
 
@@ -31,6 +32,8 @@ module.exports = function(app, moment) {
 								  orders.address.city +  ' ' +
 								  orders.address.province;
 
+			var orderItems = orders.items;
+			
 			var insertDate = orders.dateInsert;
 			var todayDate  = new Date();
 
@@ -40,7 +43,7 @@ module.exports = function(app, moment) {
 			if (dayDiff >= 3) {isHighPriority = 'Y';}
 			
 			//Imposto indirizzo di consegna 
-			var puntoMappa = {'puntoMappa': {'tipoPunto': 'Consegna', 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority}};
+			var puntoMappa = {'puntoMappa': {'tipoPunto': 'Consegna', 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority, orderItems}};
 			if (consegneAddress == null) {
 				consegneAddress = [puntoMappa];
 			} else {
@@ -53,8 +56,8 @@ module.exports = function(app, moment) {
 
 		try {
 			const mapResult = await geoMapCore(consegneAddress, null /*departure date_time*/);
-        
-    		return res.render('consegneMap.njk', mapResult);
+
+			return res.render('consegneMap.njk', mapResult);
     	} catch (error) {
 			console.debug(error);
 
@@ -99,8 +102,16 @@ module.exports = function(app, moment) {
 		
 		//console.debug('POST updConsegneAddress', updConsegneAddress);
 
-		const mapResult = await geoMapCore(updConsegneAddress, departure);
+		try {
+			const mapResult = await geoMapCore(updConsegneAddress, departure);
 
-		return res.render('consegneMap.njk', mapResult);
+			return res.render('consegneMap.njk', mapResult);
+		} catch (error) {
+			console.debug(error);
+
+			req.flash('error', "Errore nella gestione interna dell'ottimizzazione di percorso");
+        
+        	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+		}
 	});
 }

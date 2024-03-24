@@ -95,6 +95,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
     // Costruisci l'URL del server Valhalla all'interno del container Docker
     var valhallaUrl = 'http://localhost:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+    //var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
 
     // Esegui la richiesta HTTP POST al server Valhalla per calcolare il percorso
     await fetch(valhallaUrl, {
@@ -119,6 +120,10 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
     }).then(async function(data) {
       //console.debug("VALHALLA data: ", data);
+
+      if (data.error) {
+        throw(data.error);
+      }
 
       var locations = data.trip.locations;
       for (l=0; l<locations.length; l++) {
@@ -164,6 +169,8 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       avgLat = avgLat / (consegneAddressOk.length);
       avgLon = avgLon / (consegneAddressOk.length);
 
+      //console.log('avgLat', avgLat, 'avgLon', avgLon);
+
       var time = new Date(data.trip.summary.time * 1000).toISOString().slice(11, 19);
       var cost = new Date(data.trip.summary.cost * 1000).toISOString().slice(11, 19);
       var length = data.trip.summary.length.toLocaleString();
@@ -208,8 +215,6 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       //console.debug('geoJSONshape manev', geoJSONmanev);
 
       coreResult = { consegneAddressString: JSON.stringify(consegneAddressPar),
-                      //consegneAddressOKString: JSON.stringify(consegneAddressOk),
-                      //consegneAddressErrorString: JSON.stringify(consegneAddressErr),
                       geoJSONsummaryString : JSON.stringify(geoJSONsummary),
                       locationsString: JSON.stringify(locations),
                       geoJSONPointString: JSON.stringify(geoJSONpoint), 
@@ -223,7 +228,8 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       throw('Errore nel core Mappa', error);
     });
   } catch (error) {
-    console.log('error', error);
+    console.debug('error', error);
+
     throw(error);
   }
 
