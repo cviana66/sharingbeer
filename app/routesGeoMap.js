@@ -119,6 +119,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
       // Costruisci l'URL del server Valhalla all'interno del container Docker
       const valhallaUrl = 'https://valh.sharingbeer.it/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+      //const valhallaUrl = 'https://192.168.0.111/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
 
 
       if (data.error) {
