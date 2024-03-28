@@ -113,7 +113,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       })
     }).then(function(result) {
     
-      //console.debug("VALHALLA result: ",result);
+      console.debug("VALHALLA result: ",result);
       return result.json();
 
 
@@ -140,7 +140,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
         }
         
       }
-      //console.debug('locations', locations);
+      console.debug('locations', locations);
 
       var shapes = data.trip.legs;
       
