@@ -45,6 +45,8 @@
 	<table width="100%" align="center">
 		<tr>
 			<td width="100%" align="right" style="padding-top: 5px;">
+				<input type="hidden" id="orderID" name="orderID">
+				<input type="hidden" id="actionCode" name="actionCode">
 				<input type="hidden" id="updateData" name="updateData">
 				<input type="hidden" id="startFromGPS" name="startFromGPS" value="N">
 				<input type="hidden" id="gpsLatitude" name="gpsLatitude">
@@ -178,7 +180,9 @@
 
 				var iconsDetails = '';
 				if (consegneElem.planningSelection == 'Y') {
-					iconsDetails = '<span>' + completeIcon + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + rejectIcon + '</span>';
+					var actionCode = "'DEL01'";
+					var orderID = "'" + consegneElem.orderID  + "'"
+					iconsDetails = '<span onclick="updateOrder(' + actionCode +', ' + orderID + ', ' + original_index + ')">' + completeIcon + '</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>' + rejectIcon + '</span>';
 				}
 
 				action = iconsDetails + 
@@ -300,7 +304,7 @@
 			if (consegneElem.cliente) {details += '<br><b>Cliente: </b>' + consegneElem.cliente;}
 			if (consegneElem.mobile) {details += '<br><b>Mobile: </b>' + consegneElem.mobile;}
 			if (consegneElem.indirizzo) {details += '<br><b>Indirizzo: </b>' + consegneElem.indirizzo;}
-			details += '<br><br><b>Articoli</b>:<br>'
+			details += '<br><br><b>Ordine </b>:<br>' + consegneElem.orderID + '<br><b>Articoli</b>:<br>'
 
 			var items = consegneElem.orderItems;
 			for (d=0; d<items.length; d++) {
@@ -318,6 +322,7 @@
 		document.getElementById("updatePathFromGPS").value = "Partenza dal Birrificio";
 	}
 
+
  	function setStartFromGPS() {
  		var setVal = "Y";
  		if (consegneAddress[0].puntoMappa.tipoPunto == 'Posizione attuale') {
@@ -331,6 +336,19 @@
 
  		document.getElementById("updateForm").submit();
  	}
+
+
+ 	function updateOrder(actionCode, orderID, pointNr) {
+ 		//console.log('actionCode', actionCode, 'orderID', orderID);
+ 		togglePoint(pointNr);
+
+ 		document.getElementById("actionCode").value = actionCode;
+
+ 		document.getElementById("orderID").value = orderID;
+
+ 		updatePercorso();
+ 	}
+
 
  	function updatePercorso() {
  		document.getElementById("updateData").value = JSON.stringify(consegneAddress);
