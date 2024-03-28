@@ -93,8 +93,8 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
 
     // Costruisci l'URL del server Valhalla all'interno del container Docker
-    //var valhallaUrl = 'http://localhost:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
-    var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
+    var valhallaUrl = 'http://192.168.0.111:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+    //var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
 
     // Esegui la richiesta HTTP POST al server Valhalla per calcolare il percorso
     await fetch(valhallaUrl, {
@@ -115,12 +115,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
     
       console.debug("VALHALLA result: ",result);
       return result.json();
-
-
-      // Costruisci l'URL del server Valhalla all'interno del container Docker
-      const valhallaUrl = 'https://valh.sharingbeer.it/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
-      //const valhallaUrl = 'https://192.168.0.111/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
-
+    }).then(function(data) {
 
       if (data.error) {
         throw(data.error);
@@ -223,19 +218,12 @@ async function geoMapCore(consegneAddressPar, departurePar) {
                       geoJSONManevString: JSON.stringify(geoJSONmanev), 
                       avgCoord: JSON.stringify([avgLat, avgLon]) };
 
-    }).catch(function(error) {
-      //console.debug(error);
-
+    }) 
+  } catch(error) {
+      console.debug(error);
       throw('Errore nel core Mappa', error);
-    });
-  } catch (error) {
-    console.debug('error', error);
-
-    throw(error);
   }
-
   return coreResult;
-
 }
 
 function geoMap(app, moment) {
