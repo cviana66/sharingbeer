@@ -310,7 +310,7 @@ function geoMap(app, moment) {
       const endPoint = { lat: 45.1883784, lon: 7.0160303 };
 
       // Costruisci l'URL del server Valhalla all'interno del container Docker
-      const valhallaUrl = 'http://localhost:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+      const valhallaUrl = 'https://valh.sharingbeer.it/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
 
       // Esegui la richiesta HTTP POST al server Valhalla per calcolare il percorso
       await fetch(valhallaUrl, {
