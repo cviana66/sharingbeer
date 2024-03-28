@@ -197,7 +197,7 @@ var SharingBeer = function() {
         transMsgPost(self.app);
         getDistancePost(self.app);
         geoMap(self.app, moment);
-        routesDelivery(self.app, moment);
+        routesDelivery(self.app, mongoose, moment);
     };
 
     /**

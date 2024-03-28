@@ -9,18 +9,17 @@ async function geoMapCore(consegneAddressPar, departurePar) {
   var consegneAddressErr = [];
   var coreResult = null;
 
-  let departureTime = new Date();
+  var departureTime = new Date();
   departureTime.setDate(departureTime.getDate() + 1);
   departureTime.setHours(10, 0, 0);
 
-  let departure = moment(departureTime).format('YYYY-MM-DDThh:mm');
+  var departure = moment(departureTime).format('YYYY-MM-DDThh:mm');
 
   if (departurePar != null) {
     departure = departurePar;
   }
 
-  let destinationsList = [];
-  let locationsList = [];
+  var locationsList = [];
 
   try {
     var destinationIdx = 0;
@@ -83,7 +82,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
         consegneAddressErr.push(consegneAddressPar[i]);
         consegneAddressPar[i].puntoMappa['stato'] = 'ERRORE'
-        //delete consegneAddressPar[i];
+        //devare consegneAddressPar[i];
         
       }
     }
@@ -94,8 +93,8 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
 
     // Costruisci l'URL del server Valhalla all'interno del container Docker
-    var valhallaUrl = 'http://localhost:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
-    //var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
+    //var valhallaUrl = 'http://localhost:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+    var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
 
     // Esegui la richiesta HTTP POST al server Valhalla per calcolare il percorso
     await fetch(valhallaUrl, {
@@ -105,7 +104,6 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       },
       body: JSON.stringify({
         locations: locationsList,
-        destination: destinationsList,
         costing: 'auto', // Modalità di trasporto, es. 'auto', 'bicycle', 'pedestrian', ecc.
         directions_options: {
           units: 'kilometers', // Unità di misura, es. 'miles', 'kilometers', ecc.
@@ -241,7 +239,7 @@ function geoMap(app, moment) {
 
   <!-------------------------------------------------------------------->
   app.get('/consegneMap', async function(req, res) {
-    let departureTime = new Date();
+    var departureTime = new Date();
     departureTime.setDate(departureTime.getDate() + 1);
     departureTime.setHours(10, 0, 0);
 
