@@ -93,8 +93,8 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
 
     // Costruisci l'URL del server Valhalla all'interno del container Docker
-    var valhallaUrl = 'http://192.168.0.111:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
-    //var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
+    //var valhallaUrl = 'http://192.168.0.111:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+    var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
 
     // Esegui la richiesta HTTP POST al server Valhalla per calcolare il percorso
     await fetch(valhallaUrl, {
@@ -228,7 +228,6 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
 function geoMap(app, moment) {
 
-  <!-------------------------------------------------------------------->
   app.get('/consegneMap', async function(req, res) {
     var departureTime = new Date();
     departureTime.setDate(departureTime.getDate() + 1);
@@ -265,7 +264,6 @@ function geoMap(app, moment) {
     
   });
 
-  <!-------------------------------------------------------------------->
   //GET
   app.get('/geoMapSample', async function(req, res) {
     const addressFrom = req.query.indirizzo;
@@ -289,7 +287,6 @@ function geoMap(app, moment) {
     }
   });
 
-  <!-------------------------------------------------------------------->
   //GET
   app.get('/calcola-percorso', async (req, res) => {
     try {

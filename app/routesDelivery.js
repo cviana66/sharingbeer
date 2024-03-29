@@ -111,7 +111,6 @@ async function updateDeliveryData(mongoose, orderIDPar) {
 
 module.exports = function(app, mongoose, moment) {
 
-	<!-------------------------------------------------------------------->
 	// GET
 	app.get('/delivery', async function(req, res) {
 
@@ -129,7 +128,6 @@ module.exports = function(app, mongoose, moment) {
 	});
 
 
-	<!-------------------------------------------------------------------->
 	// POST
 	app.post('/delivery', async function(req, res) {
 		let departureTime = new Date();
