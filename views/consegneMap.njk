@@ -105,6 +105,7 @@
 	<table width="100%" align="center">
 		<tr>
 			<td width="100%" align="right" style="padding-top: 5px;">
+				<input type="hidden" id="tglID" name="tglID" value="0">
 				<input type="hidden" id="orderID" name="orderID">
 				<input type="hidden" id="actionCode" name="actionCode">
 				<input type="hidden" id="updateData" name="updateData">
@@ -248,15 +249,16 @@
 					var NOK03 = 'NOK03';
 
 					iconsDetails += 
-						'<span onclick="updateOrder(DEL01, ' + orderID + ', ' + original_index + ')">' + completeIcon + '</span>' +
-						'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
-						'<span onclick="toggleRejectDetails(' + original_index + ')">' + rejectIcon + 
+					'<table width="100%"><tr>' +
+					'<td width="30%" style="border-radius: 10px;" align="center" valign="top" id="confirm' + original_index + '"><span onclick="updateOrder(DEL01, ' + orderID + ', ' + original_index + ')">' + completeIcon + '</span></td>' +
+					'<td width="30%" style="border-radius: 10px;" align="center" valign="top"><span onclick="toggleRejectDetails(' + original_index + ')">' + rejectIcon + 
 						'<div id="rejectDetails' + original_index + '" style="display: none;"><b>Seleziona la motivazione</b>:' +
 						'<div><input type="button" value="Cliente non trovato" onclick="updateOrder(NOK01, ' + orderID + ', ' + original_index + ')"></div>' +
 						'<div><input type="button" value="Ordine respinto/rifiutato" onclick="updateOrder(NOK02, ' + orderID + ', ' + original_index + ')"></div>' +
 						'<div><input type="button" value="Ordine non conforme" onclick="updateOrder(NOK03, ' + orderID + ', ' + original_index + ')"></div>' +
-						'</div>' +
-						'</span>';
+						'</div></td>' +
+					'<td width="40%" align="center"</td>' +
+					'</tr></table>';
 				}
 
 				action = '<table width="250"><tr><td width="75%" align="left" valign="top">' + iconsDetails + '</td>' +
@@ -366,6 +368,8 @@
 	function toggleRejectDetails(pointNr) {
 		var displayValue = document.getElementById("rejectDetails" + pointNr).style.display;
 
+		document.getElementById("confirm" + pointNr).style.background = 'transparent';
+
 		if (displayValue == 'none') { 
 			displayValue = 'inline-block';
 		} else if (displayValue == 'inline-block') { 
@@ -427,15 +431,36 @@
  	function updateOrder(actionCode, orderID, pointNr) {
  		//console.log('actionCode', actionCode, 'orderID', orderID);
 
- 		togglePoint(pointNr);
+ 		consegneAddress[pointNr].puntoMappa.planningSelection = 'N';
+ 		document.getElementById("addBtnDiv" + pointNr).style.display = 'none';
+		document.getElementById("remBtnDiv" + pointNr).style.display = 'none';
 
- 		consegneAddress[pointNr].puntoMappa.stato = "Ordine aggiornato";
+		actConfColor = document.getElementById("confirm" + pointNr).style.background;
 
- 		document.getElementById("actionCode").value = actionCode;
+		var actTgl = parseInt(document.getElementById("tglID").value);
+		if (actionCode == 'DEL01') {
+			if (actConfColor == 'lightgreen') {
+				actTgl += 1;
+			} else {
+				document.getElementById("confirm" + pointNr).style.background = 'lightgreen';
+			}
+		} else {
+				actTgl = 0;
+				document.getElementById("confirm" + pointNr).style.background = 'transparent';
+		}
 
- 		document.getElementById("orderID").value = orderID;
+		document.getElementById("tglID").value = actTgl;
+		//console.log('document.getElementById("tglID").value', document.getElementById("tglID").value);
 
- 		updatePercorso();
+		if (actTgl > 0 || actionCode != 'DEL01') {
+	 		consegneAddress[pointNr].puntoMappa.stato = "Ordine aggiornato";
+	
+	 		document.getElementById("actionCode").value = actionCode;
+	
+	 		document.getElementById("orderID").value = orderID;
+	
+	 		updatePercorso()
+		};
  	}
 
 
