@@ -78,9 +78,14 @@ const userSchema = new Schema({
                   totalAmount    : { type: String},
                   currencyAmount : { type: String},
                   infoPayment    : { type: Object}
-              }
+              },
+              delivery : [{ 
+                  id : {type: String},
+                  status : {type: String},
+                  note : {type: String},
+                  date_ref : {type: Date, default: Date.now}
+              }]
           }]
-
 });
 
 // methods =====================================================================

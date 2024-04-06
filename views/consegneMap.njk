@@ -39,6 +39,66 @@
 </head>
 <body>
 
+{% for message in message %}
+  <div style="margin:10px 0px 0px 0px;">
+		<div id="errorMessage"></div>
+		<script type="text/javascript">
+			var errorClass = "alert-{{type}}";
+			if ("{{type}}" == "" ) {
+				errorClass = "alert-info";
+			}
+			// and give it some content
+		  var textMsg = "{{message}}";
+		  async function submitTranslation() {
+		  	document.getElementById("waiting").style.display = 'block';
+	      
+	      fetch('/translateMsg', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({'inputMessage': textMsg, 'langCode': 'it' }),
+        }).then (result => {
+        	//console.log("result: ",result);
+        	if (!result.ok) {
+						throw new Error('Errore nella richiesta');
+					}
+					return result.json();
+
+        }).then (async data => {
+        	textMsgTranslated = await data;
+					//console.log('textMsgTranslated', textMsgTranslated);
+
+					//Inizio parte HTML dinamica
+	        const errorDiv = document.getElementById("errorMessage");
+
+					errorDiv.classList.add("alert", errorClass);
+
+	        const newContent = document.createTextNode(textMsgTranslated.result);
+				  // add the text node to the newly created div
+				  errorDiv.appendChild(newContent);
+				  window.scrollTo(0,0);
+				  document.getElementById("waiting").style.display = 'none';
+          
+				}).catch (error => {
+					//console.log('error', error);
+
+					const errorDiv = document.getElementById("errorMessage");
+
+					errorDiv.classList.add("alert", errorClass);
+					const newContent = document.createTextNode(textMsg);
+				  // add the text node to the newly created div
+				  errorDiv.appendChild(newContent);
+				  window.scrollTo(0,0);
+				  document.getElementById("waiting").style.display = 'none';
+				});
+			}
+
+	    submitTranslation();
+		</script>
+	</div>
+{% endfor %}
+
 <div id="map" style="width: 95%; height: 75%;"></div>
 
 <form id="updateForm" action="/delivery" method="POST" enctype="application/json">
@@ -113,7 +173,7 @@
 																'<b>Lunghezza complessiva</b>: ' + travelSummary.lunghezza + ' km';
 
 	var sbLayer = L.geoJSON().addTo(map);
-	sbLayer.addData(decodedPoint);
+	//sbLayer.addData(decodedPoint);
 	sbLayer.addData(decodedShape);
 
 	var selectedPoints = null;
@@ -151,7 +211,8 @@
 
 		var marker = null;
 
-		if (consegneElem.stato != 'ERRORE') {
+		if (consegneElem.stato != 'ERRORE' && consegneElem.stato != 'Ordine aggiornato') {
+
 			var addressLatitude  = consegneElem.coordinateGPS.latitude;
 			var addressLongitude = consegneElem.coordinateGPS.longitude;
 
@@ -180,23 +241,36 @@
 
 				var iconsDetails = '';
 				if (consegneElem.planningSelection == 'Y') {
-					var actionCode = "'DEL01'";
 					var orderID = "'" + consegneElem.orderID  + "'"
-					iconsDetails = '<span onclick="updateOrder(' + actionCode +', ' + orderID + ', ' + original_index + ')">' + completeIcon + '</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>' + rejectIcon + '</span>';
+					var DEL01 = 'DEL01';
+					var NOK01 = 'NOK01';
+					var NOK02 = 'NOK02';
+					var NOK03 = 'NOK03';
+
+					iconsDetails += 
+						'<span onclick="updateOrder(DEL01, ' + orderID + ', ' + original_index + ')">' + completeIcon + '</span>' +
+						'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+						'<span onclick="toggleRejectDetails(' + original_index + ')">' + rejectIcon + 
+						'<div id="rejectDetails' + original_index + '" style="display: none;"><b>Seleziona la motivazione</b>:' +
+						'<div><input type="button" value="Cliente non trovato" onclick="updateOrder(NOK01, ' + orderID + ', ' + original_index + ')"></div>' +
+						'<div><input type="button" value="Ordine respinto/rifiutato" onclick="updateOrder(NOK02, ' + orderID + ', ' + original_index + ')"></div>' +
+						'<div><input type="button" value="Ordine non conforme" onclick="updateOrder(NOK03, ' + orderID + ', ' + original_index + ')"></div>' +
+						'</div>' +
+						'</span>';
 				}
 
-				action = iconsDetails + 
-								'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' +
+				action = '<table width="250"><tr><td width="75%" align="left" valign="top">' + iconsDetails + '</td>' +
+								'<td width="25%" align="center" valign="top">' +
 								'<span id="actBtn' + original_index + '" onclick="togglePoint(' + original_index + ')" >' + 
 								'<div id="addBtnDiv' + original_index + '" style="display: ' + addActVisib + ';">' + addToQueue + '</div>' +
 								'<div id="remBtnDiv' + original_index + '" style="display: ' + remActVisib + ';">' + removeFromQueue + '</div>' + 
-								'</span>';
+								'</span></td></tr></table>';
 			};
 			marker.setOpacity(opacity);
 
 			var pointDetails = '<div style="visibility: hidden;" id="popupInfo' + original_index + '"></div>';
 
-			marker.bindPopup(infoIcon + '<b><p style="font-size:20px">    ' + consegneElem.tipoPunto + '</p></b>' + action + pointDetails); //.openPopup();
+			marker.bindPopup(infoIcon + '<b><p style="font-size:20px">    ' + consegneElem.tipoPunto + '</p></b><div>' + action + pointDetails + '</div>'); //.openPopup();
 
 			if (tipoPunto === 'Birrificio') {
 				marker._icon.style.filter = "hue-rotate(240deg)";
@@ -289,6 +363,18 @@
 		return false;
 	}
 
+	function toggleRejectDetails(pointNr) {
+		var displayValue = document.getElementById("rejectDetails" + pointNr).style.display;
+
+		if (displayValue == 'none') { 
+			displayValue = 'inline-block';
+		} else if (displayValue == 'inline-block') { 
+			displayValue = 'none';
+		}
+
+		document.getElementById("rejectDetails" + pointNr).style.display = displayValue;
+	}
+
 	function popupInfo(pointNr) {
 		var actualVisibility = document.getElementById("popupInfo" + pointNr).style.visibility;
 		var newVisibility = null;
@@ -340,7 +426,10 @@
 
  	function updateOrder(actionCode, orderID, pointNr) {
  		//console.log('actionCode', actionCode, 'orderID', orderID);
+
  		togglePoint(pointNr);
+
+ 		consegneAddress[pointNr].puntoMappa.stato = "Ordine aggiornato";
 
  		document.getElementById("actionCode").value = actionCode;
 

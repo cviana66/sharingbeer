@@ -55,13 +55,22 @@ async function loadDeliveryData() {
 	return mapResult;
 }
 
-async function updateDeliveryData(mongoose, orderIDPar) {
+async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
+	var actionStatus = {};
+	actionStatus['DEL01'] = {status: 'OK - CONSEGNATO', statusDesc: 'Consegna effettuata'};
+	actionStatus['NOK01'] = {status: 'NON CONSEGNATO', statusDesc: 'Cliente non trovato'};
+	actionStatus['NOK02'] = {status: 'NON CONSEGNATO', statusDesc: 'Ordine respinto/rifiutato'};
+	actionStatus['NOK03'] = {status: 'NON CONSEGNATO', statusDesc: 'Ordine non conforme'};
+
+	//console.log('actionCode', actionCode);
+
 	var orderID = mongoose.Types.ObjectId(orderIDPar);
 
 	var result = null;
 
 	const session = await mongoose.startSession();
 	session.startTransaction();
+    const opts = { session };
 
 	try {
 		const aggregationResult = await User.aggregate([
@@ -72,14 +81,33 @@ async function updateDeliveryData(mongoose, orderIDPar) {
 		//console.debug('aggregationResult', aggregationResult);
 
 		for (i=0; i < aggregationResult.length; i++) {
-			const order = aggregationResult[i].orders;
-			console.log('order', order);
+			var order = aggregationResult[i].orders;
+			//console.log('order', order);
+
+			var deliveryStatus = actionStatus[actionCode].status;
+			var deliveryStatusDesc = actionStatus[actionCode].statusDesc;
+			
+			if (!deliveryStatusDesc) { throw("Descrizione stato consegna non riconosciuta"); }
+
+			if (actionCode.toString() == 'DEL01') {
+				await User.updateOne(
+					{ "orders._id": order._id }, 
+					{ $set: { "orders.$.status": actionStatus[actionCode].status } }
+				);
+			}
+
+			var deliveryDocUpd = {_id: new mongoose.Types.ObjectId(),
+												status: deliveryStatus,
+												note: deliveryStatusDesc
+											};
+
+			//order['delivery'] = deliveryDocUpd;
+
 			await User.updateOne(
-				{ "orders._id": order._id }, 
-				{ $set: { "orders.$.status": "OK - CONSEGNATO" } }
-	        );
-		}
-		
+					{ "orders._id": order._id }, 
+					{ $push: { "orders.$.delivery": deliveryDocUpd } }
+				);
+		}		
 
 		const aggregationResultDone = await User.aggregate([
 											{ $unwind: { path: '$orders' } },
@@ -165,10 +193,19 @@ module.exports = function(app, mongoose, moment) {
 
 		try {
 			// Come prima cosa aggiorno il database se occorre. Se va in errore salta il resto
-			if (actionCode && actionCode ==	'DEL01') {
-				await updateDeliveryData(mongoose, orderID);
+			if (actionCode) {
+				await updateDeliveryData(mongoose, orderID, actionCode);
 			}
+		} catch (error) {
+			console.debug(error);
 
+			req.flash('error', "Errore durante l'aggiornamento della consegna.");
+        
+        	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+		}
+
+
+		try {
 			const mapResult = await geoMapCore(updConsegneAddress, departure);
 
 			return res.render('consegneMap.njk', mapResult);

@@ -69,10 +69,13 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
             locationIdx++;
 
-            consegneAddressPar[i].puntoMappa['stato'] = 'OK'
+            consegneAddressPar[i].puntoMappa['stato'] = 'OK';
 
-        } else if (consegneAddressPar[i].puntoMappa.planningSelection == 'N') {
-          consegneAddressPar[i].puntoMappa['stato'] = 'ESCLUSO'
+        } else if (consegneAddressPar[i].puntoMappa.planningSelection == 'N' && consegneAddressPar[i].puntoMappa.stato != 'Ordine aggiornato') {
+          consegneAddressPar[i].puntoMappa['stato'] = 'ESCLUSO';
+
+        } else if (consegneAddressPar[i].puntoMappa.stato != 'Ordine aggiornato') {
+          consegneAddressPar[i].puntoMappa['stato'] = 'Ordine aggiornato';
 
         }
         
@@ -113,7 +116,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       })
     }).then(function(result) {
     
-      console.debug("VALHALLA result: ",result);
+      //console.debug("VALHALLA result: ",result);
       return result.json();
     }).then(function(data) {
 
@@ -135,7 +138,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
         }
         
       }
-      console.debug('locations', locations);
+      //console.debug('locations', locations);
 
       var shapes = data.trip.legs;
       
