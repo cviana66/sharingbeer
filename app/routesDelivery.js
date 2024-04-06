@@ -13,14 +13,17 @@ async function loadDeliveryData() {
 	const aggregationResult = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { 'orders.status': 'OK'} }
+	    { $match: { 'orders.status': 'OK',  'orders.deliveryType': 'CONSEGNA'} }
 	  ]
 	);
 
 	for (i=0; i<aggregationResult.length; i++) {
 		var orders = aggregationResult[i].orders;
 
+		var deliveryType = orders.deliveryType;
+		
 		var orderID = orders._id.toString();
+
 		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
 		var customerMobile = orders.address.mobileNumber;
 		var customerAddress = orders.address.address + ' ' + 
@@ -39,18 +42,23 @@ async function loadDeliveryData() {
 		if (dayDiff >= 3) {isHighPriority = 'Y';}
 		
 		//Imposto indirizzo di consegna 
-		var puntoMappa = {'puntoMappa': {'tipoPunto': 'Consegna', 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority, orderItems}};
-		if (consegneAddress == null) {
-			consegneAddress = [puntoMappa];
-		} else {
-			consegneAddress.push(puntoMappa);
+		if (deliveryType == 'CONSEGNA') {
+			var puntoMappa = {'puntoMappa': {'tipoPunto': 'Consegna', 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority, orderItems}};
+			if (consegneAddress == null) {
+				consegneAddress = [puntoMappa];
+			} else {
+				consegneAddress.push(puntoMappa);
+			}
 		}
 	}
 	consegneAddress.push(birrificioAddress);
 
-	//console.log('consegneAddress', consegneAddress);
+	var mapResult;
+	if (consegneAddress.length > 2) {
+		//console.log('consegneAddress', consegneAddress);
 
-	const mapResult = await geoMapCore(consegneAddress, null /*departure date_time*/);
+		mapResult = await geoMapCore(consegneAddress, null /*departure date_time*/);
+	}
 
 	return mapResult;
 }
@@ -87,8 +95,6 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 			var deliveryStatus = actionStatus[actionCode].status;
 			var deliveryStatusDesc = actionStatus[actionCode].statusDesc;
 			
-			if (!deliveryStatusDesc) { throw("Descrizione stato consegna non riconosciuta"); }
-
 			if (actionCode.toString() == 'DEL01') {
 				await User.updateOne(
 					{ "orders._id": order._id }, 
@@ -145,7 +151,13 @@ module.exports = function(app, mongoose, moment) {
 		try {
 			const mapResult = await loadDeliveryData();
 
-			return res.render('consegneMap.njk', mapResult);
+			if (!mapResult) {
+				req.flash('info', 'Non ci sono consegne programmate al momento');
+	        
+	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
+			} else {
+				return res.render('consegneMap.njk', mapResult);
+			}
     	} catch (error) {
 			console.debug(error);
 
