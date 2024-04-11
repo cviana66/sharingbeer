@@ -235,17 +235,16 @@ color: #4e4e4e;
 
 
 .password-toggle-icon {
-  position: absolute;
-  top: 50%;
-  right: 30px;
-  transform: translateY(-50%);
+  position: relative;
+  right: -90%;
+  bottom: 40px;
   cursor: pointer;
 }
 
 .password-toggle-icon-invite {
-  position: absolute;
-  top: 54%;
-  right: 30px;
+  position: relative;
+  right: -90%;
+  bottom: 40px;
   cursor: pointer;
 }
 
@@ -254,7 +253,6 @@ color: #4e4e4e;
   line-height: 2;
   color: #333;
   transition: color 0.3s ease-in-out;
-  margin-bottom: 20px;
 }
 
 .password-toggle-icon-invite i {
