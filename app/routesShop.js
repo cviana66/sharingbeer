@@ -16,7 +16,7 @@ module.exports = function(app, moment) {
 		var ordiniInConsegna = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'CONSEGNA'}]}},
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Consegna'}]}},
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}]);
 	
 		
@@ -29,13 +29,13 @@ module.exports = function(app, moment) {
 		var ordiniInRitiro = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'RITIRO'}]}},
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Ritiro'}]}},
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}])
 
 		var ordiniConsegnati = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{'orders.status':'OK-CONSEGNATO'}},
+								{$match:{'orders.status':'OK - CONSEGNATO'}},
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}]);
 
 		//console.debug('ORDINI IN CONSEGNA: ',JSON.stringify(ordiniInConsegna, null, 2))

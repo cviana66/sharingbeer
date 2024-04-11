@@ -439,7 +439,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
         //TODO : rendere parametrico l'importo discount
 
-        req.session.deliveryType =  "CONSEGNA"
+        req.session.deliveryType =  "Consegna"
 
         address = await User.aggregate([
           {$match:{"_id":req.user._id}}, 
@@ -557,14 +557,14 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             ])
         req.session.shippingAddress = address[0].addresses;  
         console.debug('ADDRESS[0]: ',address[0].addresses)       
-        req.session.deliveryType =  "RITIRO"
+        req.session.deliveryType =  "Ritiro"
       } else {
       //-------------------------------------------------------
       // Caso di spedizione presso indirizzo esistente in base dati
       //-------------------------------------------------------
         //TODO : rendere parametrico l'importo shipping e i discount
         
-        req.session.deliveryType =  "CONSEGNA"
+        req.session.deliveryType =  "Consegna"
         
         address = await User.aggregate([
             {$match:{"_id":req.user._id}}, 
