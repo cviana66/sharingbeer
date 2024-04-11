@@ -1,8 +1,8 @@
 const User          = require('./models/user');
 const {geoMapCore}	= require('./routesGeoMap');
-const {getAddressFromCoordinates} = require('./geoCoordHandler');
+const {getAddressFromCoordinates} = require('./geoCoordHandler'); 
 
-async function loadDeliveryData() {
+async function loadDeliveryData(moment) {
 	var consegneAddress = [];
 
 	var birrificioAddress = {'puntoMappa': {'tipoPunto': 'Birrificio', 'orderSeq':0, 'indirizzo':'via molignati 10 candelo biella', 'planningSelection':'M'}};
@@ -13,7 +13,7 @@ async function loadDeliveryData() {
 	const aggregationResult = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { 'orders.status': 'OK',  'orders.deliveryType': 'CONSEGNA'} }
+	    { $match: { 'orders.status': 'OK',  'orders.deliveryType': 'Consegna'} }
 	  ]
 	);
 
@@ -33,17 +33,17 @@ async function loadDeliveryData() {
 
 		var orderItems = orders.items;
 		
-		var insertDate = orders.dateInsert;
-		var todayDate  = moment().format(); //new Date();
+		var insertDate = moment(orders.dateInsert);
+		var todayDate  = moment(new Date()); //new Date();
 
-		var dayDiff = Math.round((todayDate.getTime() - insertDate.getTime()) / (1000 * 3600 * 24));
-
+		var dayDiff = todayDate.startOf('day').diff(insertDate.startOf('day'), 'days');
+		
 		var isHighPriority = 'N';
 		if (dayDiff >= 3) {isHighPriority = 'Y';}
 		
 		//Imposto indirizzo di consegna 
-		if (deliveryType == 'CONSEGNA') {
-			var puntoMappa = {'puntoMappa': {'tipoPunto': 'Consegna', 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority, orderItems}};
+		if (deliveryType == 'Consegna') {
+			var puntoMappa = {'puntoMappa': {'tipoPunto': deliveryType, 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority, orderItems}};
 			if (consegneAddress == null) {
 				consegneAddress = [puntoMappa];
 			} else {
@@ -101,6 +101,13 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 					{ $set: { "orders.$.status": actionStatus[actionCode].status } }
 				);
 			}
+			
+			if (actionCode.toString() == 'NOK01') {
+				await User.updateOne(
+					{ "orders._id": order._id }, 
+					{ $set: { "orders.$.deliveryType": 'Ritiro' } }
+				);
+			}
 
 			var deliveryDocUpd = {_id: new mongoose.Types.ObjectId(),
 												status: deliveryStatus,
@@ -149,7 +156,7 @@ module.exports = function(app, mongoose, moment) {
 	app.get('/delivery', async function(req, res) {
 
 		try {
-			const mapResult = await loadDeliveryData();
+			const mapResult = await loadDeliveryData(moment);
 
 			if (!mapResult) {
 				req.flash('info', 'Non ci sono consegne programmate al momento');
