@@ -16,7 +16,7 @@ var users;
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
     var cart = req.session.cart;
     const currency='EUR';
-    const shopLogin="GESPAY63388"; //TODO: dichiararlo come variabile di sistema
+    const shopLogin=process.env.SHOPLOGIN; //TODO: dichiararlo come variabile di sistema
     const paymentType =  [""]
 
     req.session.order = {};
@@ -41,13 +41,14 @@ var users;
       user.orders.push({
           _id         : orderId,
           email       : req.user.local.email,
-          dateInsert  : Date.now(),
+          dateInsert  : moment().format(), //Date.now(),
           status      : "CREATED",
+          deliveryType : req.session.deliveryType,
           shipping          : Number(req.session.shippingCost).toFixed(2),
           shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),
           pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
           totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
-          totalPriceTotal   : req.session.order.totalaAmount,
+          totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
           items : req.session.cartItems.items,
           totalQty : req.session.totalQty,        
           'paypal.createTime'     : moment().format('DD/MM/yyyy hh:mm:ss'),
@@ -72,30 +73,29 @@ var users;
           },
           body: JSON.stringify({  
             "shopLogin": shopLogin,
-            "paymentType":paymentType,
             "amount": (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
             "currency": currency,
-            "shopTransactionID" : req.session.order._id.toString(),
-            "paymentType": paymentType
+            "shopTransactionID" : req.session.order._id.toString()
           })
         }
       ).then(function(result) {
-        //console.debug("RESULT -> : ",result);
+        console.debug("RESULT -> : ",JSON.stringify(result));
         return result.json();
       });
-      console.debug("DATA -> : ",data);
 
-      if (data.error.code != 0) {
-        data.ok = false;
-        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(data));
+      const resData = await data
+      //const resData =  data
+      console.debug("DATA -> : ", JSON.stringify(resData));
+
+      if (resData.error.code != 0) {
+        resData.ok = false;
+        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(resData));
         await session.abortTransaction();
-        res.status(500).json(data);  
+        res.status(500).json(resData);  
       } else {
         await session.commitTransaction();
-        res.status(200).json(data);  
+        res.status(200).json(resData);  
       }
-
-      
 
     } catch (e) {
         console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);

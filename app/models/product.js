@@ -9,7 +9,7 @@ var ProductSchema = new Schema({
   price: { type: Number, required: true },
   linkImage: {type: String, required: true},
   description: {type: String},
-  quantity: { type: String}
+  quantity: { type: Number}
 
 /*
   make: { type: String},

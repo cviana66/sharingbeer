@@ -34,7 +34,7 @@ async function loadDeliveryData() {
 		var orderItems = orders.items;
 		
 		var insertDate = orders.dateInsert;
-		var todayDate  = new Date();
+		var todayDate  = moment().format(); //new Date();
 
 		var dayDiff = Math.round((todayDate.getTime() - insertDate.getTime()) / (1000 * 3600 * 24));
 

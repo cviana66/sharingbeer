@@ -41,7 +41,7 @@ app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
 
     user.orders.push({
         email       : req.user.local.email,
-        dateInsert  : Date.now(),
+        dateInsert  : moment().format(), //Date.now(),
         status      : order.status,
         shipping          : Number(req.session.shippingCost).toFixed(2),
         shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),

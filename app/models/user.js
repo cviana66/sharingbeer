@@ -31,7 +31,8 @@ const userSchema = new Schema({
                   address     : {type: String},
                   houseNumber : {type: String},
                   main        : {type: String}, // inserito all'atto della registrazine
-                  preferred   : {type: String}  // preferito nelle spedizioni
+                  preferred   : {type: String}, // preferito nelle spedizioni
+                  postcode    : {type: String}
               }],
   friends : [{  id    : {type: String, unique: true },
                 name  : { first: {type: String, required: true, unique: false},
@@ -49,14 +50,16 @@ const userSchema = new Schema({
               shippingDiscount    : { type: Number},
               pointsDiscount      : { type: Number},
               shipping            : { type: Number},
-              totalPriceBeer      : { type: Number},
-              totalPriceTotal     : { type: Number},
+              deliveryType        : { type: String},
+              totalPriceBeer      : { type: String},
+              totalPriceTotal     : { type: String},
               totalQty            : { type: Number},
               items : [{ 
-                  id : {type: String},
-                  name : {type: String},
-                  price : {type: Number},
-                  qty   : {type: Number},                
+                  id        : {type: String},
+                  name      : {type: String},
+                  price     : {type: String},
+                  qty       : {type: Number},
+                  linkImage : {type: String},
               }],
               address :{  
                   addressId: {type: String},
@@ -69,6 +72,7 @@ const userSchema = new Schema({
                   province    : {type: String},
                   address     : {type: String},
                   houseNumber : {type: String},
+                  postcode    : {type: String},
               },
               paypal : {
                   orderId        : { type: String},

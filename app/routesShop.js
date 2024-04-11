@@ -2,9 +2,49 @@
 // ECOMMERCE SHOPPING CHAR https://github.com/EastpointSoftware/traider.io =====
 // =============================================================================
 var Product = require('./models/product.js');
+var User = require('../app/models/user');
 var lib = require('./libfunction');
 
 module.exports = function(app, moment) {
+
+// =============================================================================
+// SHOPPING ====================================================================
+// =============================================================================
+//GET
+	app.get('/shopping', lib.isLoggedIn, async function (req,res) {
+
+		var ordiniInConsegna = await User.aggregate([
+								{$match:{"_id":req.user._id}},
+								{$unwind:"$orders"},
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'CONSEGNA'}]}},
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}]);
+	
+		
+		for ( var i in  ordiniInConsegna) {			
+			date = ordiniInConsegna[i].orders.dateInsert;
+			formattedDate =  ("0" + (date.getDate())).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear() + '  '+ date.getHours() + ':' + ("0" + date.getMinutes()).slice(-2);
+			ordiniInConsegna[i].orders.dateInsert = formattedDate;
+		}
+
+		var ordiniInRitiro = await User.aggregate([
+								{$match:{"_id":req.user._id}},
+								{$unwind:"$orders"},
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'RITIRO'}]}},
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}])
+
+		var ordiniConsegnati = await User.aggregate([
+								{$match:{"_id":req.user._id}},
+								{$unwind:"$orders"},
+								{$match:{'orders.status':'OK-CONSEGNATO'}},
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}]);
+
+		//console.debug('ORDINI IN CONSEGNA: ',JSON.stringify(ordiniInConsegna, null, 2))
+		res.render('shopping.njk', {
+                  ordiniInConsegna : ordiniInConsegna,
+                  ordiniInRitiro : ordiniInRitiro,
+                  ordiniConsegnati : ordiniConsegnati
+               })
+	})
 
 // =============================================================================
 // GET SHOP ====================================================================

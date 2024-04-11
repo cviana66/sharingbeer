@@ -162,11 +162,16 @@ function fieldsRegisterControl() {
   var province = document.getElementById("inputProvincia").value;
   var address = document.getElementById("inputStreet").value;
   var numciv = document.getElementById("inputNumciv").value;
+  var numcivHidden = document.getElementById("hiddenCivicNumber").value;
   var cognome = document.getElementById("inputLastName").value;
   var nome = document.getElementById("inputFirstName").value;
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
   var submit = true;
+
+console.log('******************HIdden ',numcivHidden)
+console.log('****************** ',numciv)
+
   // init messaggi di warning
   if (document.getElementById("wrongFirstName") != null) document.getElementById("wrongFirstName").innerHTML = "";
   if (document.getElementById("wrongLastName") != null) document.getElementById("wrongLastName").innerHTML = "";
@@ -229,18 +234,21 @@ function fieldsRegisterControl() {
     document.getElementById("wrongProvincia").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
-  if (address == "" || document.getElementById("myselectstreet") !=null) {
-    text = iwar+"Inserire o selezionare l'indirizzo ";
+  if (address == "" || document.getElementById("myselectstreet") !=null || document.getElementById("hiddenStreet").value != 'OK') {
+    text = iwar+"Inserire o selezionare un indirizzo esistente";
     document.getElementById("wrongStreet").innerHTML = text;
     document.getElementById("inputStreet").focus();
     document.getElementById("wrongStreet").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
-  if (numciv == "") {
-    text = iwar+"Inserire il Numero Civico";
+  if (numciv == "" || numcivHidden != numciv) {
+    if (numciv == "") {
+      text = iwar+"Inserire il Numero Civico";  
+    } else {
+      text = iwar+"Inserire un Numero Civico valido";
+    }
     document.getElementById("wrongNumciv").innerHTML = text;
     document.getElementById("inputNumciv").focus();
-    document.getElementById("").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
   
