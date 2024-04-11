@@ -20,6 +20,7 @@ var mailinvite = require('../config/mailInvite');
 var mailconferme = require('../config/mailConferme');
 var {getDistance} = require('../app/geoCoordHandler');
 
+const fetch = require("node-fetch");
 const https = require('https');
 
 
@@ -31,19 +32,19 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx
 
-  app.post('/overpass/:istat', function(req, res) {
+  app.post('/overpass/istat', function(req, res) {
 
-    option = '[out:json];'+
-             'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.params.istat+'"];' +
+    var option = '[out:json];'+
+             'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.body.istat+'"];' +
              'way(area)[highway][name];'+
              'for (t["name"])(make x name=_.val;out;);'
 
     const url = 'https://overpass-api.de/api/interpreter?data='+option;
 
-    //console.log('OVERPASS: ',option);
+    console.log('OVERPASS: ',option);
 
     const request = https.request(url, (response) => {
-        let data = ''; // !!!!! inserire/tolgiere  > per creare/eliminare errore
+        let data = '';
         response.on('data', (chunk) => {
             data = data + chunk.toString();
         });
@@ -53,7 +54,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 const parseJSON = JSON.parse(data);
                 const elements = parseJSON.elements;
                 req.session.elements = elements;
-                //console.log(req.session.elements);
+                console.log('parseJSON: ',parseJSON);
                 res.send('{"status":"200", "statusText":"OK"}');
               } catch (e) {
                 console.log('Error', e);
@@ -68,6 +69,34 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     });
     request.end()
   });
+
+
+  app.post('/overpass/houseNumber', async function(req,res){
+
+    var option =  '[out:json];'+
+                  'area[name="'+req.body.comune+'"]["ref:ISTAT"="'+req.body.istat+'"]->.code;'+
+                  '( node(area.code)["addr:street"="'+req.body.via+'"]'+
+                  '["addr:housenumber"="'+req.body.numero+'"];);'+
+                  '(._;>;);out;'
+    console.debug('OPTION: ',option)
+    const url = 'https://overpass-api.de/api/interpreter?';
+
+    const data = await fetch(url, 
+                          {
+                            method: 'POST',
+                            headers: {'Accept': 'application/json',
+                                      "Content-Type": "application/json"},
+                            body: option
+                          })
+                          .then(function(result) {
+                                  console.debug("RESULT -> : ",result);
+                                  return result.json();
+                          });
+      const objData = await data
+      console.debug("DATA -> : ", JSON.stringify(objData));
+      res.send(objData)
+  });
+
 
   app.post('/streets', function(req, res) {
       var rates = req.session.elements;
@@ -383,7 +412,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           //console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
           user.local.name.first              = req.body.firstName;
           user.local.name.last               = req.body.lastName;
-          user.local.status                  = 'customer'; // to change in 'customer' after session  of testing  
+          user.local.status                  = 'customer';
         }
         const addressId = new mongoose.Types.ObjectId() 
         user.addresses.push({
@@ -396,6 +425,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 province        : req.body.provincia,
                 address         : req.body.street,
                 houseNumber     : req.body.numberciv,
+                postcode        : req.body.hiddenCAP,
                 main            : main,
                 preferred       : 'yes'
         });
@@ -409,7 +439,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
         //TODO : rendere parametrico l'importo discount
 
-        var typeShipping = "consegna"
+        req.session.deliveryType =  "CONSEGNA"
 
         address = await User.aggregate([
           {$match:{"_id":req.user._id}}, 
@@ -424,7 +454,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                           address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
                           address[0].addresses.province;
-        let birrificioAddress ='via molignati 10 candelo biella';
+        let birrificioAddress ='Via Molignati 10 Candelo Biella';
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
 
         console.log('DISTANZA = ', dist.distanceInMeters)
@@ -446,7 +476,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 userStatus  : req.user.local.status,
                 shipping    : req.session.shippingCost,
                 shippingDiscount  : req.session.shippingDiscount,
-                typeShipping      : typeShipping,
+                deliveryType      : req.session.deliveryType,
                 discount    : req.session.pointDiscount,
                 user        : req.user,
                 payType     : "axerve" //"paypal"  "axerve"
@@ -505,7 +535,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
 
     console.debug("ADDRESS ID: ", req.body.addressID)
-    var typeShipping ;
     var address;
 
     try{
@@ -528,15 +557,14 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             ])
         req.session.shippingAddress = address[0].addresses;  
         console.debug('ADDRESS[0]: ',address[0].addresses)       
-        typeShipping = "ritiro"
+        req.session.deliveryType =  "RITIRO"
       } else {
       //-------------------------------------------------------
       // Caso di spedizione presso indirizzo esistente in base dati
       //-------------------------------------------------------
         //TODO : rendere parametrico l'importo shipping e i discount
         
-        
-        typeShipping = "consegna"
+        req.session.deliveryType =  "CONSEGNA"
         
         address = await User.aggregate([
             {$match:{"_id":req.user._id}}, 
@@ -578,7 +606,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         userStatus  : req.user.local.status,
         shipping    : req.session.shippingCost,
         shippingDiscount  : req.session.shippingDiscount,
-        typeShipping      : typeShipping,
+        deliveryType      : req.session.deliveryType,
         discount    : req.session.pointDiscount,
         user        : req.user,
         payType     : "axerve" //"paypal"  "axerve"

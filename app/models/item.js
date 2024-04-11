@@ -7,7 +7,7 @@ var ItemSchema = new Schema({
     idOrder    	: { type: String, required: true },
     idPrdoduct 	: { type: String, required: true },
     nameProduct	: { type: String},
-    quantity	: { type: String},
+    quantity	: { type: Number},
     price	    : { type: Number}
 });
 

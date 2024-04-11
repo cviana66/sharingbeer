@@ -80,21 +80,72 @@
 
   document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("loading").style.display = 'none';
-  });
+    });
 /*==================================================================*/
 /* GESTIONE della CITTA' con query MONGODB                          */
 /* Gestione delle VIE con query su OpenStreetMaps                   */
 /*==================================================================*/
 
+//----------------------CIVICNUMBER e CAP---------------------------
+async function listOfCivicNumber(n) {
+  console.log('CITTA: ',document.getElementById("inputCity").value);
+  console.log('VIA: ',document.getElementById("inputStreet").value);
+  document.getElementById("wrongNumciv").innerHTML = ''
+  
+  //document.getElementById("loading").style.display = 'block';
+  
+  let data = {};
+  let response;
+  data.comune = document.getElementById("inputCity").value;
+  data.via = document.getElementById("inputStreet").value;
+  data.numero = n;
+  await $.ajax({
+    type: 'POST',
+    dataType: 'json',
+    url: '/overpass/houseNumber',
+    data: data,
+    success: function(res) {
+      response = res;
+      console.log('RESPONSE: ',response)
+    },
+    error: function (e) {
+      console.log("ErrorListOfNumber", e.responseText);
+      response = e;
+    }
+  });
+  
+  if (response.elements.length > 0) {
+    console.log('RESPONSE NUMCIVIC: ',response.elements[0].tags['addr:housenumber'])
+    console.log('RESPONSE CAP: ',response.elements[0].tags['addr:postcode'])
+    document.getElementById("hiddenCivicNumber").value = response.elements[0].tags['addr:housenumber']
+    document.getElementById("hiddenCAP").value = response.elements[0].tags['addr:postcode'] 
+  } else {
+    console.log('NUMERO SBAGLIATO')
+    document.getElementById("hiddenCivicNumber").value = ""
+    document.getElementById("hiddenCAP").value =""
+  }
+  //document.getElementById("loading").style.display = 'none';
+};
+
+
+async function selectCivicNumber() {
+}
+
 //----------------------------TREET---------------------------------
-function setValueStreet(via) {
+async function setValueStreet(via) {
   if (document.getElementById('myselectstreet') != null) {
     document.getElementById('myselectstreet').remove();
   };
   console.log('SETVALUESTREET');
+  document.getElementById("hiddenStreet").value = 'OK';
   document.getElementById("inputStreet").value = via;
   document.getElementById('inputNumciv').removeAttribute('readonly');
   document.getElementById("inputNumciv").focus();
+  document.getElementById("wrongStreet").innerHTML = "";
+  
+  //const comune = document.getElementById("inputCity").value
+  //var res = await listOfCivicNumber(comune,via);
+ 
 }
 //********************************************************************
 // DATA LA CITTA E IL CODICE ISTAT RECUPERA LE VIE DA OPENSTREETMAP
@@ -114,10 +165,11 @@ async function listOfStreets(citta,istat) {
   await $.ajax({
     type: 'POST',
     dataType: 'json',
-    url: '/overpass/'+istat,
+    url: '/overpass/istat',
     data: data,
     success: function(res) {
       response = res;
+      console.log('STREET: ', JSON.stringify(res) )
     },
     error: function (e) {
       console.log("ErrorListOfStreets", e.responseText);
@@ -127,12 +179,15 @@ async function listOfStreets(citta,istat) {
   return response;
 };
 
-function selectStreet (v) {
+//-------------------- MAIN STREET ------------------
+async function selectStreet(v) {
+  document.getElementById("wrongStreet").innerHTML = "";
+  document.getElementById("wrongNumciv").innerHTML = ''
   let vl = v.toLowerCase();
   if (vl.length > 3) {
     let data = {};
     data.street = vl;
-    $.ajax({
+    await $.ajax({
       type: 'POST',
       dataType: 'json',
       url: '/streets',
@@ -143,10 +198,12 @@ function selectStreet (v) {
           /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
           document.getElementById("inputNumciv").setAttribute('readonly', true);
           document.getElementById('inputNumciv').value = null;
-          let select = document.createElement('ul');
-          let size = res.length;
-          let via = document.getElementById("inputStreet").value.toLowerCase();
-          let street = res[0].toLowerCase();
+          var select = document.createElement('ul');
+          var size = res.length;
+          var via = document.getElementById("inputStreet").value.toLowerCase();
+          var street = res[0].toLowerCase();
+
+
 
           console.log('via=',via);
           console.log('street=', street);
@@ -155,30 +212,36 @@ function selectStreet (v) {
           //------------------------------------------------------------------------------
           if (size == 1 && via == street) {
             document.getElementById("inputStreet").value = res[0];
+            document.getElementById("hiddenStreet").value = 'OK';
+            
             if (document.getElementById('myselectstreet') != null) {
               document.getElementById('myselectstreet').remove();
             }
             setValueStreet(res[0]);
-            return;
+            //return;
+          } else {
+            document.getElementById("hiddenStreet").value = 'KO';
+            select.setAttribute('id','myselectstreet');
+            select.setAttribute('class','form-control');
+            select.setAttribute('style','list-style-type: none;');
+
+            for (var i = 0; i <res.length; i += 1) {
+                let option = document.createElement('li');
+                a = document.createElement('a');
+                a.textContent = res[i];
+                a.setAttribute('href',"javascript:void(0)");
+                a.setAttribute('onclick','setValueStreet("'+res[i]+'")');
+                option.appendChild(a);
+                select.appendChild(option);
+            };
+            $("#streets").html(select);
           }
-          //------------------------------------------------------------------------------
-
-          select.setAttribute('id','myselectstreet');
-          select.setAttribute('class','form-control');
-          select.setAttribute('style','list-style-type: none;');
-
-          for (var i = 0; i <res.length; i += 1) {
-              let option = document.createElement('li');
-              a = document.createElement('a');
-              a.textContent = res[i];
-              a.setAttribute('href',"javascript:void(0)");
-              a.setAttribute('onclick','setValueStreet("'+res[i]+'")');
-              option.appendChild(a);
-              select.appendChild(option);
-          };
-          $("#streets").html(select);
 
         } else {
+          console.log ("FINE SELECTSTREET")
+          document.getElementById("inputNumciv").setAttribute('readonly', true);
+          document.getElementById('inputNumciv').value = null;
+          document.getElementById("hiddenStreet").value = 'KO';
           if (document.getElementById('myselectstreet') != null) {
             document.getElementById('myselectstreet').remove();
           }
@@ -197,8 +260,6 @@ function selectStreet (v) {
 
 };
 
-//----------------------------CITY-------------------------------------
-
 //*******************************************************
 // DATA LA CITTA' SELEZIONA LE VIE
 //*******************************************************
@@ -208,6 +269,8 @@ async function setValueCity(comune, provincia, istat) {
   if (document.getElementById('myselectcity') != null) {
     document.getElementById('myselectcity').remove();
   };
+  console.log('SETVALUE_CITY');
+  document.getElementById("hiddenStreet").value = 'OK';
   document.getElementById("inputCity").value = comune;
   document.getElementById("inputProvincia").value = provincia;
   document.getElementById("wrongProvincia").innerHTML = "";
@@ -230,6 +293,7 @@ async function setValueCity(comune, provincia, istat) {
   document.getElementById('inputCity').removeAttribute('readonly');
 };
 
+//----------------------------CITY-------------------------------------
 async function listOfCities(v) {
   let vl = v.toLowerCase();
   var data = {};
@@ -240,10 +304,11 @@ async function listOfCities(v) {
     url: '/cities',
     data: data,
     success: function(res) {
+      console.log('CITY: ', JSON.stringify(res) )
       response = res;
     },
     error: function (e) {
-      console.log("ErrorListOfCities", e);
+      console.log("ErrorListOfCities", JSON.stringify(e));
       response = e;
     }
   });
@@ -258,13 +323,15 @@ async function selectCity(v) {
   document.getElementById('inputStreet').value = null;
   document.getElementById("inputNumciv").setAttribute('readonly', true);
   document.getElementById('inputNumciv').value = null;
+  document.getElementById("wrongCity").innerHTML = "";
   
   if (v.length > 2 || v =='lu' || v =='ne' || v =='re' || v =='ro') {
     //*******************************************************
     // RICERCA LE CITTA' A PARTIRE DALLA STRINGA INSERITA
     //*******************************************************
     try {
-      res = await listOfCities(v);  
+      res = await listOfCities(v);
+     // if (res) {   
       document.getElementById("wrongProvincia").innerHTML = "";
       document.getElementById("wrongStreet").innerHTML = "";
       document.getElementById("wrongNumciv").innerHTML = "";
@@ -278,8 +345,9 @@ async function selectCity(v) {
         input.setAttribute("value", "OK");
         console.log('INPUT: ',input);
         //append to form element that you want .
-        document.getElementById("registration").appendChild(input);
+        document.getElementById("addresses").appendChild(input);
       }
+     // }
     } catch (e){
       document.getElementById("inputProvincia").removeAttribute('readonly');
       document.getElementById("inputStreet").removeAttribute('readonly');
@@ -297,7 +365,7 @@ async function selectCity(v) {
         input.setAttribute("value", "KO");
         console.log('INPUT: ',input);
         //append to form element that you want .
-        document.getElementById("registration").appendChild(input);
+        document.getElementById("addresses").appendChild(input);
       }
       return;
     }
@@ -310,6 +378,7 @@ async function selectCity(v) {
       let city = res[0].Comune.toLowerCase()
 
       if (res.length == 1 && citta == city) {
+        //document.getElementById("hiddenCity").value = 'OK';
         document.getElementById("inputCity").value = res[0].Comune;
         document.getElementById("inputProvincia").value = res[0].Provincia;
         if (document.getElementById('myselectcity') != null) {
@@ -319,6 +388,7 @@ async function selectCity(v) {
         setValueCity(res[0].Comune, res[0].Provincia, res[0].Istat);
         //*********************************************************
       } else {
+        //document.getElementById("hiddenCity").value = 'OK';
         select.setAttribute('id','myselectcity');
         select.setAttribute('class','form-control');
         select.setAttribute('style','list-style-type: none;');
@@ -357,6 +427,40 @@ async function selectCity(v) {
     };
   }
 };
+
+var inputCN = document.createElement("input");
+      inputCN.setAttribute("type", "hidden");
+      inputCN.setAttribute("id","hiddenCivicNumber");
+      inputCN.setAttribute("name", "hiddenCivicNumber");
+      inputCN.setAttribute("value", "");
+      console.log('INPUT: ',inputCN);
+      document.getElementById("addresses").appendChild(inputCN);
+
+  var inputCAP = document.createElement("input");
+      inputCAP.setAttribute("type", "hidden");
+      inputCAP.setAttribute("id","hiddenCAP");
+      inputCAP.setAttribute("name", "hiddenCAP");
+      inputCAP.setAttribute("value", "");
+      console.log('INPUT: ',inputCAP);
+      document.getElementById("addresses").appendChild(inputCAP);
+
+  var inputStreet = document.createElement("input");
+      inputStreet.setAttribute("type", "hidden");
+      inputStreet.setAttribute("id","hiddenStreet");
+      inputStreet.setAttribute("name", "hiddenStreet");
+      inputStreet.setAttribute("value", "KO");
+      console.log('INPUT: ',inputStreet);
+      document.getElementById("addresses").appendChild(inputStreet);
+/*
+  var inputCity = document.createElement("input");
+      inputCity.setAttribute("type", "hidden");
+      inputCity.setAttribute("id","hiddenCity");
+      inputCity.setAttribute("name", "hiddenCity");
+      inputCity.setAttribute("value", "KO");
+      console.log('INPUT: ',inputCity);
+      document.getElementById("addresses").appendChild(inputCity);
+*/
+
 </script>
 
 {% endblock %}

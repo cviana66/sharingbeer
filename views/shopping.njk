@@ -1,0 +1,34 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<h3 class="text-white text-center bg-dark">Ordini</h3>
+<hr style="border-top: 1px solid #5375BD;">
+
+<div class="text-white">
+      {% for purchase in ordiniInConsegna %}
+        <div>ORDINE # {{purchase.orders._id}}</div>
+        <div>Effettuato il {{purchase.orders.dateInsert}}</div>
+        <div>Totale €{{purchase.orders.totalPriceTotal}}</div>
+        <div>Indirizzo di consegna: {{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}}</div>
+        <div>{{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}}, {{purchase.orders.address.city}} - {{purchase.orders.address.postcode}} ({{purchase.orders.address.province}})</div>
+        
+        {% for prod in purchase.orders.items %}
+        <table>
+          <tr >
+            <td width="25%" rowspan="4"> <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%"> </td>
+          </tr>
+          <tr>
+            <td>{{prod.name}}</td>
+          </tr>
+          <tr>
+            <td>Prezzo per BeerBox €{{prod.price}}</td>
+          </tr>
+          <tr>
+            <td class="text-white text-left">N° BeerBox {{prod.qty}}</td>
+          </tr>
+        </table>
+        {% endfor %}
+    <hr style="border-top: 1px solid #5375BD;">
+      {% endfor %}
+</div>
+{% endblock %}

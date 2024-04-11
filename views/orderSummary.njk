@@ -49,14 +49,14 @@
         
         <div class="text-white align-center">
         
-        {% if typeShipping == 'consegna' %}
+        {% if deliveryType == 'CONSEGNA' %}
           <p><span style="font-size:1.3em;">Consegna presso:</span></p>
         {% else %}
           <p><span style="font-size:1.3em;">Ritiro presso:</span></p>
         {% endif %}
           
            <p>{{address.name.first}} {{address.name.last}} </p>
-           <p>{{address.address}} {{address.houseNumber}} - {{address.city}} ({{address.province}})</p>
+           <p>{{address.address}} {{address.houseNumber}} - {{address.city}} - {{address.postcode}} ({{address.province}})</p>
         
         </div>  
       </div>
@@ -184,12 +184,12 @@
               return result.json();
             }
           })
-          .then( async function(data){
-            console.log('Axerve.data->',data);            
+          .then(function(data){
+            console.log('Axerve.data->',JSON.stringify(data));            
             if (data.error.code == 0) {
               console.debug("PayID: ",data.payload.paymentID);
               console.debug("PayToken",data.payload.paymentToken);
-              axerve.lightBox.shop = "GESPAY63388";
+              axerve.lightBox.shop = "GESPAY96332";
               axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback);
               return
             }
