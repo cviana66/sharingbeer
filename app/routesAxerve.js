@@ -183,4 +183,11 @@ var users;
           await session.endSession();
     };
   });
+
+app.get('/response', function(req, res) {
+
+  console.debug('PARAMETRI: ',req.query);
+  res.redirect('/shop');
+});
+
 };
