@@ -16,7 +16,7 @@ var users;
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
     var cart = req.session.cart;
     const currency='EUR';
-    const shopLogin=process.env.SHOPLOGIN; //TODO: dichiararlo come variabile di sistema
+    const shopLogin=process.env.SHOPLOGIN;
     const paymentType =  [""]
 
     req.session.order = {};
@@ -29,36 +29,13 @@ var users;
     const opts = { session };
     
     try {
-      //==========================================
-      // Inserimento dati in MongoDB
-      //==========================================
+      
       const user = await User.findById(req.user._id);
       const orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
       req.session.order._id = orderId;                // _id in sessione usato per update ordine in axerve_response
       req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2)
+      
       console.debug('Sharingbeer ORDER ID :', req.session.order._id.toString());
-
-      user.orders.push({
-          _id         : orderId,
-          email       : req.user.local.email,
-          dateInsert  : moment().format(), //Date.now(),
-          status      : "CREATED",
-          deliveryType : req.session.deliveryType,
-          shipping          : Number(req.session.shippingCost).toFixed(2),
-          shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),
-          pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
-          totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
-          totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
-          items : req.session.cartItems.items,
-          totalQty : req.session.totalQty,        
-          'paypal.createTime'     : moment().format('DD/MM/yyyy hh:mm:ss'),
-          'paypal.orderId'        : req.session.order._id.toString(),
-          'paypal.currencyAmount' : currency,
-          'paypal.totalAmount'    : req.session.order.totalaAmount,
-          address : req.session.shippingAddress,
-          'address.addressID' : req.session.shippingAddress._id.toString()        
-      });
-      let saveOrder = await user.save(opts);
 
       //==========================================
       // Chiamo Axerve per ottenere ID e Token
@@ -84,7 +61,6 @@ var users;
       });
 
       const resData = await data
-      //const resData =  data
       console.debug("DATA -> : ", JSON.stringify(resData));
 
       if (resData.error.code != 0) {
@@ -93,6 +69,35 @@ var users;
         await session.abortTransaction();
         res.status(500).json(resData);  
       } else {
+
+        //==========================================
+        // Inserimento dati in MongoDB
+        //==========================================
+        user.orders.push({
+          _id         : orderId,
+          email       : req.user.local.email,
+          dateInsert  : moment().format(), //Date.now(),
+          status      : "CREATED",
+          deliveryType : req.session.deliveryType,
+          shipping          : Number(req.session.shippingCost).toFixed(2),
+          shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),
+          pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
+          totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
+          totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
+          items : req.session.cartItems.items,
+          totalQty : req.session.totalQty,        
+          address : req.session.shippingAddress,
+          'paypal.shopLogin'        : shopLogin,
+          'paypal.createTime'       : moment().format('DD/MM/yyyy hh:mm:ss'),
+          'paypal.orderId'          : req.session.order._id.toString(),
+          'paypal.currencyAmount'   : currency,
+          'paypal.totalAmount'      : req.session.order.totalaAmount,
+          'paypal.transactionId'    : resData.payload.paymentID,
+          'paypal.token'            : resData.payload.paymentToken,
+          'paypal.errorCode'        : resData.error.code,
+          'paypal.errorDescription' : resData.error.description     
+        });
+        let saveOrder = await user.save(opts);
         await session.commitTransaction();
         res.status(200).json(resData);  
       }
@@ -118,7 +123,7 @@ var users;
     const response_URL = req.body.response_URL;
     const transaction_error_code = req.body.transaction_error_code;
     const transaction_error_description = req.body.transaction_error_description;
-
+  
     console.debug('ERROR_CODE -> ', error_code)
     console.debug('ERROR_DESCRIPTION -> ',error_description)
     console.debug('STATUS -> ', status)
@@ -126,7 +131,7 @@ var users;
     console.debug('RESPONSE_URL -> ',response_URL)
     console.debug('TRANSACTION_ERROR_CODE -> ', transaction_error_code)
     console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)
-
+  
     //==========================================
     // Inizializzo la Transazione
     //==========================================
@@ -142,8 +147,10 @@ var users;
       const update = 
           {
             'orders.$[el].status'               : status,
-            'orders.$[el].paypal.transactionId' : payment_id,    
-            'orders.$[el].paypal.updateTime'    : moment().format('DD/MM/yyyy hh:mm:ss')     
+            //'orders.$[el].paypal.transactionId' : payment_id,    
+            'orders.$[el].paypal.updateTime'    : moment().format('DD/MM/yyyy hh:mm:ss'),
+            'orders.$[el].paypal.errorCode'        : error_code,
+            'orders.$[el].paypal.errorDescription' : error_description     
           }
 
       let updateOrder = await User.findOneAndUpdate(
@@ -184,10 +191,31 @@ var users;
     };
   });
 
-app.get('/response', function(req, res) {
+app.get('/response', async function(req, res) {
+  //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0,'orders.items':0}}])
+  //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$set :{'orders.paypal.shopLogin':'CIAO'}}])
 
+  var updateStatus = await User.findOneAndUpdate(
+                                {'orders.paypal.transactionId':req.query.paymentID, 'orders.paypal.shopLogin':req.query.a, 'orders.paypal.token':req.query.paymentToken},
+                                {$set :{'orders.$[elem].paypal.s2sStatus':req.query.Status}},
+                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:req.query.paymentID}}]});                        
+                              /*  
+                                {'orders.paypal.transactionId':'1519209477078', 'orders.paypal.shopLogin':'GESPAY96332', 'orders.paypal.token':'09955144-f17c-4e42-8468-d7818ae00480'},
+                                {$set :{'orders.$[elem].paypal.s2sStatus':'OK'}},
+                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:'1519209477078'}}]}
+                                )
+                              */
+    
   console.debug('PARAMETRI: ',req.query);
-  res.redirect('/shop');
+/*
+  PARAMETRI:  {
+  a: 'GESPAY96332',
+  Status: 'KO',
+  paymentID: '1614179477016',
+  paymentToken: '09955144-f17c-4e42-8468-d7818ae00480'
+}
+*/
+  res.redirect('/');
 });
 
 };

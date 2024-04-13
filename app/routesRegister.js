@@ -448,7 +448,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           {$project:{_id:0,friends:0,orders:0,local:0}}
           ])
         req.session.shippingAddress = address[0].addresses;         
-        console.debug('ADDRESS[0]: ',address[0].addresses)
+        //console.debug('ADDRESS[0]: ',address[0].addresses)
 
         let customerAddress = address[0].addresses.address + ' ' + 
                           address[0].addresses.houseNumber + ' ' +
@@ -502,7 +502,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //-------------------------------------------
     app.get('/addresses',lib.isLoggedIn, async function(req, res) {
       
-      console.debug("ADDRESSES: ",req.user.addresses)
+      //console.debug("ADDRESSES: ",req.user.addresses)
 
       req.session.nextStep = 'payment'; 
     
@@ -534,7 +534,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //-------------------------------------------
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
 
-    console.debug("ADDRESS ID: ", req.body.addressID)
+    //console.debug("ADDRESS ID: ", req.body.addressID)
     var address;
 
     try{
@@ -556,7 +556,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
         req.session.shippingAddress = address[0].addresses;  
-        console.debug('ADDRESS[0]: ',address[0].addresses)       
+        //console.debug('ADDRESS[0]: ',address[0].addresses)       
         req.session.deliveryType =  "Ritiro"
       } else {
       //-------------------------------------------------------
@@ -573,7 +573,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
         req.session.shippingAddress = address[0].addresses;         
-        console.debug('ADDRESS[0]: ',address[0].addresses)
+        //console.debug('ADDRESS[0]: ',address[0].addresses)
 
         let customerAddress = address[0].addresses.address + ' ' + 
                           address[0].addresses.houseNumber + ' ' +
