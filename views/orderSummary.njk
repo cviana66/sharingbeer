@@ -200,7 +200,7 @@
         }
 
       function pCallback(response) {
-       
+      /* 
         console.debug("Pcallback: ",response);
         console.debug('ERROR_CODE -> ', response.error.code)
         console.debug('ERROR_DESCRIPTION -> ',response.error.description)
@@ -209,7 +209,7 @@
         console.debug('RESPONSE_URL -> ',response.responseURL)
         console.debug('TRANSACTION_ERROR_CODE -> ', response.transactionErrorCode)
         console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',response.transactionErrorDescription)
-
+      */
         post('/axerve_response', {'error_code': response.error.code,
                                   'error_description': response.error.description,
                                   'status': response.status,

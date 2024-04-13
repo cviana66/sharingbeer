@@ -46,7 +46,6 @@ const userSchema = new Schema({
               email       : { type: String, required: true },
               dateInsert  : { type: Date, required: true },
               status      : { type: String, required: true},
-              idPayment   : { type: String},
               shippingDiscount    : { type: Number},
               pointsDiscount      : { type: Number},
               shipping            : { type: Number},
@@ -75,13 +74,18 @@ const userSchema = new Schema({
                   postcode    : {type: String},
               },
               paypal : {
-                  orderId        : { type: String},
-                  transactionId  : { type: String},
-                  createTime     : { type: String},
-                  updateTime     : { type: String},
-                  totalAmount    : { type: String},
-                  currencyAmount : { type: String},
-                  infoPayment    : { type: Object}
+                  shopLogin         : { type: String},
+                  orderId           : { type: String},
+                  transactionId     : { type: String},
+                  token             : { type: String},
+                  errorCode         : { type: String},
+                  errorDescription  : { type: String},
+                  createTime        : { type: String},
+                  updateTime        : { type: String},
+                  totalAmount       : { type: String},
+                  currencyAmount    : { type: String},
+                  infoPayment       : { type: Object},
+                  s2sStatus         : { type: String},
               },
               delivery : [{ 
                   id : {type: String},
@@ -105,3 +109,6 @@ userSchema.methods.validPassword = function(password) {
 
 // create the model for users and expose it to our app
 module.exports = mongoose.model('User', userSchema);
+
+
+
