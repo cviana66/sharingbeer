@@ -234,39 +234,46 @@ color: #4e4e4e;
 }
 
 
+.contenitore {
+    display: grid;
+    grid-template-columns: 100% auto;
+    gap: 0px; /* spazio tra le colonne */
+    align-items: center; /* allinea verticalmente al centro */
+}
+
+.contenitore input[type="text"] {
+    width: 100%; /* larghezza del campo input */
+}
+
+
 .password-toggle-icon {
   position: relative;
-  right: -90%;
-  bottom: 40px;
+  right: 35px;
   cursor: pointer;
 }
 
-.password-toggle-icon-invite {
+.passwordConfirm-toggle-icon {
   position: relative;
-  right: -90%;
-  bottom: 40px;
+  right: 35px;
   cursor: pointer;
 }
 
 .password-toggle-icon i {
   font-size: 22px;
-  line-height: 2;
   color: #333;
   transition: color 0.3s ease-in-out;
 }
 
-.password-toggle-icon-invite i {
+.passwordConfirm-toggle-icon i {
   font-size: 22px;
-  line-height: 2;
   color: #333;
   transition: color 0.3s ease-in-out;
-  margin-bottom: 20px;
 }
 
 .password-toggle-icon i:hover {
   color: #333;
 }
 
-.password-toggle-icon-invite i:hover {
+.passwordConfirm-toggle-icon i:hover {
   color: #333;
 }

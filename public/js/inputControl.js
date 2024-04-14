@@ -22,6 +22,7 @@ function fieldsValidationControl() {
   document.getElementById("wrongPrivacy").innerHTML = "";
   document.getElementById("wrongAge").innerHTML = "";
   document.getElementById("wrongControlMail").innerHTML = "";
+  document.getElementById("wrongConfirmPwd").innerHTML = "";
 
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var email = document.getElementById("inputUsernameEmail").value;
@@ -46,8 +47,6 @@ function fieldsValidationControl() {
   }
   if (document.getElementById("confirmPassword") != null) {
     pwd2 = document.getElementById("confirmPassword").value;
-  } else { // per gestire il caso in cui non ci sia la PWD di conferma
-    pwd2 = pwd1
   }
 
   if(pwd1 != "") {
@@ -90,6 +89,21 @@ function fieldsValidationControl() {
     document.getElementById("inputPassword").focus();
     return false;
   }
+
+  if(pwd2 != "") {
+    if(pwd2.length < 6) {
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password di conferma deve essere di almeno 6 caratteri";
+      document.getElementById("confirmPassword").focus();
+      return false;
+    }
+  }
+
+  if(pwd1 != pwd2) {
+      document.getElementById("wrongConfirmPwd").innerHTML = iwar+"La password di conferma è differente";
+      document.getElementById("confirmPassword").focus();
+      return false;
+  }
+
   if(!document.getElementById('checkAge').checked) {
     document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella di controllo solo se hai più di 18 anni";
     return false;
