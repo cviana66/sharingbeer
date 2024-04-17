@@ -4,23 +4,69 @@ const {getAddressFromCoordinates} = require('./geoCoordHandler');
 
 async function loadDeliveryData(moment) {
 	var consegneAddress = [];
+	var ritiroOrders = [];
 
 	var birrificioAddress = {'puntoMappa': {'tipoPunto': 'Birrificio', 'orderSeq':0, 'indirizzo':'via molignati 10 candelo biella', 'planningSelection':'M'}};
 
 	//Imposto indirizzo di partenza delle consegne: Birrificio
 	consegneAddress.push(birrificioAddress);
 
-	const aggregationResult = await User.aggregate([
+	const aggregationResultRitiro = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { 'orders.status': 'OK',  'orders.deliveryType': 'Consegna'} }
+	    { $match: { $and: [{'orders.status': 'OK'}, {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } }
 	  ]
 	);
 
-	for (i=0; i<aggregationResult.length; i++) {
-		var orders = aggregationResult[i].orders;
+	const aggregationResultConsegna = await User.aggregate([
+	    { $unwind: { path: '$orders' } },
+	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
+	    { $match: { $and: [{'orders.status': 'OK'}, {'orders.deliveryType': 'Consegna'}] } }
+	  ]
+	);
 
+	for (i=0; i<aggregationResultRitiro.length; i++) {
+		var orders = aggregationResultRitiro[i].orders;
+		
 		var deliveryType = orders.deliveryType;
+
+		if (!deliveryType) {
+			deliveryType = 'Ritiro';
+		}
+		
+		var orderID = orders._id.toString();
+
+		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
+		var customerMobile = orders.address.mobileNumber;
+		var customerAddress = orders.address.address + ' ' + 
+							  orders.address.houseNumber + ' ' +
+							  orders.address.city +  ' ' +
+							  orders.address.province;
+
+		var orderItems = orders.items;
+		
+		var insertDate = moment(orders.dateInsert);
+		var todayDate  = moment(new Date()); //new Date();
+
+		var dayDiff = todayDate.startOf('day').diff(insertDate.startOf('day'), 'days');
+		
+		var isHighPriority = 'N';
+		if (dayDiff >= 3) {isHighPriority = 'Y';}
+		
+		//Imposto indirizzo di consegna 
+		if (deliveryType == 'Ritiro') {
+			ritiroOrders.push(orders);
+		}
+	}
+
+	for (i=0; i<aggregationResultConsegna.length; i++) {
+		var orders = aggregationResultConsegna[i].orders;
+		
+		var deliveryType = orders.deliveryType;
+
+		if (!deliveryType) {
+			deliveryType = 'Ritiro';
+		}
 		
 		var orderID = orders._id.toString();
 
@@ -60,7 +106,9 @@ async function loadDeliveryData(moment) {
 		mapResult = await geoMapCore(consegneAddress, null /*departure date_time*/);
 	}
 
-	return mapResult;
+	var result = [ritiroOrders, mapResult];
+
+	return result;
 }
 
 async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
@@ -152,14 +200,40 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 
 module.exports = function(app, mongoose, moment) {
 
+
+	// GET
+	app.get('/deliveryInHouse', async function(req, res) {
+
+		try {
+			const result = await loadDeliveryData(moment);
+			const ordersInHouse = result[0];
+
+			if (!ordersInHouse) {
+				req.flash('info', 'Non ci sono consegne previste al momento');
+	        
+	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
+			} else {
+				return res.json(ordersInHouse); //render('consegneMap.njk', mapResult);
+			}
+    	} catch (error) {
+			console.debug(error);
+
+	        req.flash('error', error);
+	        
+	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+		}
+	});
+
+
 	// GET
 	app.get('/delivery', async function(req, res) {
 
 		try {
-			const mapResult = await loadDeliveryData(moment);
+			const result = await loadDeliveryData(moment);
+			const mapResult = result[1];
 
 			if (!mapResult) {
-				req.flash('info', 'Non ci sono consegne programmate al momento');
+				req.flash('info', 'Non ci sono consegne da effettuare al momento');
 	        
 	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
 			} else {
@@ -192,6 +266,8 @@ module.exports = function(app, mongoose, moment) {
 		var gpsAddress	 = null;
 
 		var updConsegneAddress = JSON.parse(req.body.updateData);
+
+		//console.debug('ANTE updConsegneAddress', updConsegneAddress);
 
 		if (startFromGPS == 'Y') {
 			gpsAddress = await getAddressFromCoordinates(gpsLatitude, gpsLongitude);
