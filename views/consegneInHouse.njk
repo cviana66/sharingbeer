@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<base target="_top">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico" />
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
+	  
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+	<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	
+	<link rel="stylesheet" type="text/css" media="screen" href="css/webcam.css">
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		.leaflet-container {
+			height: 400px;
+			width: 600px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+	</style>
+
+	
+</head>
+<body>
+
+<script src="https://momentjs.com/downloads/moment.js"></script>
+
+{% for message in message %}
+  <div style="margin:10px 0px 0px 0px;">
+		<div id="errorMessage"></div>
+		<script type="text/javascript">
+			var errorClass = "alert-{{type}}";
+			if ("{{type}}" == "" ) {
+				errorClass = "alert-info";
+			}
+			// and give it some content
+		  var textMsg = "{{message}}";
+		  async function submitTranslation() {
+		  	document.getElementById("waiting").style.display = 'block';
+	      
+	      fetch('/translateMsg', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({'inputMessage': textMsg, 'langCode': 'it' }),
+        }).then (result => {
+        	//console.log("result: ",result);
+        	if (!result.ok) {
+						throw new Error('Errore nella richiesta');
+					}
+					return result.json();
+
+        }).then (async data => {
+        	textMsgTranslated = await data;
+					//console.log('textMsgTranslated', textMsgTranslated);
+
+					//Inizio parte HTML dinamica
+	        const errorDiv = document.getElementById("errorMessage");
+
+					errorDiv.classList.add("alert", errorClass);
+
+	        const newContent = document.createTextNode(textMsgTranslated.result);
+				  // add the text node to the newly created div
+				  errorDiv.appendChild(newContent);
+				  window.scrollTo(0,0);
+				  document.getElementById("waiting").style.display = 'none';
+          
+				}).catch (error => {
+					//console.log('error', error);
+
+					const errorDiv = document.getElementById("errorMessage");
+
+					errorDiv.classList.add("alert", errorClass);
+					const newContent = document.createTextNode(textMsg);
+				  // add the text node to the newly created div
+				  errorDiv.appendChild(newContent);
+				  window.scrollTo(0,0);
+				  document.getElementById("waiting").style.display = 'none';
+				});
+			}
+
+	    submitTranslation();
+		</script>
+	</div>
+{% endfor %}
+
+<form id="updateForm" action="/deliveryInHouse" method="POST" enctype="application/json">
+	<table width="100%" align="center">
+		<tr>
+			<td width="100%" align="right" style="padding-top: 5px;">
+				<input type="hidden" id="noRepeat" name="noRepeat" value="N">
+				<input type="hidden" id="orderID" name="orderID">
+				<input type="hidden" id="actionCode" name="actionCode">
+			</td>
+		</tr>
+		<tr>
+			<td width="100%" style="font-family: Arial; height: 40px; vertical-align: middle; color:#FFBB35; font-size:1.1em; background:repeating-linear-gradient(135deg,#C65800,#C65800 3px,#976400 3px,#976400 6px);"><b>Riepilogo ordini da consegnare</b>
+			</td>
+		</tr>
+		<tr>
+			<td width="100%" style="font-family: Arial;">
+				<div id="riepilogoOrdini"></div>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<div class="container-fluid blur" id="popup" style="margin: 10px;"></div>
+<script>
+	const completeIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 -960 960 960" width="40"><path fill="green" d="m379.333-216.667-252.999-253 76.332-76.332 176.667 177.666L757-746l76.333 75.333-454 454Z"/></svg>';
+
+	var ordersInHouse = {{ ordersInHouseString | safe }};
+	//console.log('ordersInHouse', ordersInHouse);
+
+	var contentTable = '<table width="100%" style="font-family: Arial;">';
+
+	if (!ordersInHouse) {
+		contentTable += '<tr><td><p style="font-size: 16px;"><b>Non ci sono ordini da consegnare in house</b></td></tr>';
+	}
+	
+	for (i = 0; i < ordersInHouse.length; i++) {
+		var orderInHouse = ordersInHouse[i];
+		
+		var orderID = orderInHouse._id;
+		var customerFullName = orderInHouse.address.name.last + ' ' + orderInHouse.address.name.first;
+		var orderInsertDate = moment(new Date(orderInHouse.dateInsert)).format("DD/MM/YYYY");
+		var items = orderInHouse.items;
+		
+		contentTable += `<tr id="row${i}" style="border: 0;"><td width="5%" style="background: lightgreen; visibility: hidden;" id="selection${i}"></td>`;
+		contentTable += `<td width="85%" style="padding: 5px; padding-top: 10px;" onClick="toggleSelection(${i})"><div style="font-size: 16px;"><b><u>${customerFullName}</u></b></div>`;
+		contentTable += `<div style="font-size: 10px; padding-left: 10px;"><i>Data ordine: ${orderInsertDate}</i><br></div>`;
+		
+		for (j = 0; j < items.length; j++) {
+			var qty = items[j].qty;
+			var name = items[j].name;
+
+			contentTable += `<div style="font-size: 14px; padding-left: 10px;">- <b>${qty}</b> birra <b>${name}</b></div>`;
+		}
+
+		contentTable += `</td>`;
+		contentTable += `<td width="10%" style="visibility: hidden;" id="confirm${i}" onClick="updateOrder('${orderInHouse._id}', ${i})">${completeIcon}</td></tr>`;
+					
+	}
+
+	contentTable += '</table>';
+
+	document.getElementById("riepilogoOrdini").innerHTML = contentTable;
+
+	function toggleSelection(rowNr) {
+		var actualVisibility = document.getElementById("selection" + rowNr).style.visibility;
+
+		if (actualVisibility == 'hidden') {
+			document.getElementById("selection" + rowNr).style.visibility = 'visible';
+			document.getElementById("confirm" + rowNr).style.visibility = 'visible';
+			document.getElementById("row" + rowNr).style.border = '2px solid lightgreen';
+		} else {
+			document.getElementById("selection" + rowNr).style.visibility = 'hidden';
+			document.getElementById("confirm" + rowNr).style.visibility = 'hidden';
+			document.getElementById("row" + rowNr).style.border = '0';
+		}
+	}
+	
+ 	function updateOrder(orderID, rowNr) {
+ 		//console.log('orderID', orderID);
+
+ 		var noRepeat = document.getElementById("noRepeat").value;
+	
+		if (noRepeat == 'N') {
+			document.getElementById("noRepeat").value = 'Y';
+
+			
+
+			document.getElementById("confirm" + rowNr).innerHTML = '<img src="img/Spinner-5.gif" width="35px" height="35px" alt="Loading..." />';
+
+			document.getElementById("orderID").value = orderID;
+	
+	 		document.getElementById("actionCode").value = 'DEL00';
+		
+			document.getElementById("updateForm").submit();
+		}
+	}
+
+</script>
+
+</body>
+</html>	

@@ -14,7 +14,8 @@ async function loadDeliveryData(moment) {
 	const aggregationResultRitiro = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { $and: [{'orders.status': 'OK'}, {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } }
+	    { $match: { $and: [{'orders.status': 'OK'}, {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
+	    { $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
 	  ]
 	);
 
@@ -113,6 +114,7 @@ async function loadDeliveryData(moment) {
 
 async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 	var actionStatus = {};
+	actionStatus['DEL00'] = {status: 'OK - CONSEGNATO', statusDesc: 'Ritiro in house effettuato'};
 	actionStatus['DEL01'] = {status: 'OK - CONSEGNATO', statusDesc: 'Consegna effettuata'};
 	actionStatus['NOK01'] = {status: 'NON CONSEGNATO', statusDesc: 'Cliente non trovato'};
 	actionStatus['NOK02'] = {status: 'NON CONSEGNATO', statusDesc: 'Ordine respinto/rifiutato'};
@@ -142,8 +144,8 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 
 			var deliveryStatus = actionStatus[actionCode].status;
 			var deliveryStatusDesc = actionStatus[actionCode].statusDesc;
-			
-			if (actionCode.toString() == 'DEL01') {
+
+			if (actionCode.toString().substring(0, 3) == 'DEL') {
 				await User.updateOne(
 					{ "orders._id": order._id }, 
 					{ $set: { "orders.$.status": actionStatus[actionCode].status } }
@@ -199,31 +201,6 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 
 
 module.exports = function(app, mongoose, moment) {
-
-
-	// GET
-	app.get('/deliveryInHouse', async function(req, res) {
-
-		try {
-			const result = await loadDeliveryData(moment);
-			const ordersInHouse = result[0];
-
-			if (!ordersInHouse) {
-				req.flash('info', 'Non ci sono consegne previste al momento');
-	        
-	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
-			} else {
-				return res.json(ordersInHouse); //render('consegneMap.njk', mapResult);
-			}
-    	} catch (error) {
-			console.debug(error);
-
-	        req.flash('error', error);
-	        
-	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
-		}
-	});
-
 
 	// GET
 	app.get('/delivery', async function(req, res) {
@@ -310,6 +287,52 @@ module.exports = function(app, mongoose, moment) {
 			req.flash('error', "Errore nella gestione interna dell'ottimizzazione di percorso");
         
         	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+		}
+	});
+
+
+	// ALL
+	app.all('/deliveryInHouse', async function(req, res) {
+
+		var actionCode = req.body.actionCode;
+		var orderID = req.body.orderID;
+
+		try {
+			// Come prima cosa aggiorno il database se occorre. Se va in errore salta il resto
+			if (actionCode) {
+				await updateDeliveryData(mongoose, orderID, actionCode);
+			}
+
+		} catch (error) {
+			console.debug(error);
+
+			req.flash('error', "Errore durante l'aggiornamento della consegna.");
+        
+        	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+		}
+
+
+		try {
+			// Carico la lista degli ordini da ritirare
+
+			const result = await loadDeliveryData(moment);
+			const ordersInHouse = result[0];
+
+			//console.debug('ordersInHouse', ordersInHouse);
+
+			if (!ordersInHouse) {
+				req.flash('info', 'Non ci sono consegne previste al momento');
+	        
+	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
+			} else {
+				return res.render('consegneInHouse.njk', {ordersInHouseString: JSON.stringify(ordersInHouse)});
+			}
+    	} catch (error) {
+			console.debug(error);
+
+	        req.flash('error', error);
+	        
+	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 	});
 }
