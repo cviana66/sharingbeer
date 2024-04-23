@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 	<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
 	
+	<link rel="stylesheet" type="text/css" media="screen" href="css/toggle.css">
 	<link rel="stylesheet" type="text/css" media="screen" href="css/webcam.css">
 	<style>
 		html, body {
@@ -95,7 +96,7 @@
 {% endfor %}
 
 <form id="updateForm" action="/deliveryInHouse" method="POST" enctype="application/json">
-	<table width="100%" align="center">
+	<table width="95%" align="center">
 		<tr>
 			<td width="100%" align="right" style="padding-top: 5px;">
 				<input type="hidden" id="noRepeat" name="noRepeat" value="N">
@@ -104,7 +105,17 @@
 			</td>
 		</tr>
 		<tr>
-			<td width="100%" style="font-family: Arial; height: 40px; vertical-align: middle; color:#FFBB35; font-size:1.1em; background:repeating-linear-gradient(135deg,#C65800,#C65800 3px,#976400 3px,#976400 6px);"><b>Riepilogo ordini da consegnare</b>
+			<td width="100%" style="font-family: Arial; height: 40px; vertical-align: middle; color:#FFBB35; font-size:1.3em; background:repeating-linear-gradient(135deg,#C65800,#C65800 3px,#976400 3px,#976400 6px); padding-left: 5px;"><b>Riepilogo ordini per ritiro</b>
+			</td>
+		</tr>
+		<tr>
+			<td width="100%" style="font-family: Arial; padding-top: 10px;">
+				<div class="form-group">
+					<div class="contenitore">
+            <input type="text" class="form-control" id="searchCriteria" name="searchCriteria" onkeyup="handledList()" placeholder="Cognome Cliente ... (almeno 3 caratteri)">
+            <a class="reset-field-icon"><i class="bi-x-circle"></i></a>
+          </div>
+				</div>
 			</td>
 		</tr>
 		<tr>
@@ -122,39 +133,8 @@
 	var ordersInHouse = {{ ordersInHouseString | safe }};
 	//console.log('ordersInHouse', ordersInHouse);
 
-	var contentTable = '<table width="100%" style="font-family: Arial;">';
+	handledList();
 
-	if (!ordersInHouse) {
-		contentTable += '<tr><td><p style="font-size: 16px;"><b>Non ci sono ordini da consegnare in house</b></td></tr>';
-	}
-	
-	for (i = 0; i < ordersInHouse.length; i++) {
-		var orderInHouse = ordersInHouse[i];
-		
-		var orderID = orderInHouse._id;
-		var customerFullName = orderInHouse.address.name.last + ' ' + orderInHouse.address.name.first;
-		var orderInsertDate = moment(new Date(orderInHouse.dateInsert)).format("DD/MM/YYYY");
-		var items = orderInHouse.items;
-		
-		contentTable += `<tr id="row${i}" style="border: 0;"><td width="5%" style="background: lightgreen; visibility: hidden;" id="selection${i}"></td>`;
-		contentTable += `<td width="85%" style="padding: 5px; padding-top: 10px;" onClick="toggleSelection(${i})"><div style="font-size: 16px;"><b><u>${customerFullName}</u></b></div>`;
-		contentTable += `<div style="font-size: 10px; padding-left: 10px;"><i>Data ordine: ${orderInsertDate}</i><br></div>`;
-		
-		for (j = 0; j < items.length; j++) {
-			var qty = items[j].qty;
-			var name = items[j].name;
-
-			contentTable += `<div style="font-size: 14px; padding-left: 10px;">- <b>${qty}</b> birra <b>${name}</b></div>`;
-		}
-
-		contentTable += `</td>`;
-		contentTable += `<td width="10%" style="visibility: hidden;" id="confirm${i}" onClick="updateOrder('${orderInHouse._id}', ${i})">${completeIcon}</td></tr>`;
-					
-	}
-
-	contentTable += '</table>';
-
-	document.getElementById("riepilogoOrdini").innerHTML = contentTable;
 
 	function toggleSelection(rowNr) {
 		var actualVisibility = document.getElementById("selection" + rowNr).style.visibility;
@@ -163,11 +143,69 @@
 			document.getElementById("selection" + rowNr).style.visibility = 'visible';
 			document.getElementById("confirm" + rowNr).style.visibility = 'visible';
 			document.getElementById("row" + rowNr).style.border = '2px solid lightgreen';
+
+			for (i = 0; i < ordersInHouse.length; i++) {
+				if (i != rowNr) {
+					document.getElementById("selection" + i).style.visibility = 'hidden';
+					document.getElementById("confirm" + i).style.visibility = 'hidden';
+					document.getElementById("row" + i).style.border = '0';
+				}
+			}
 		} else {
 			document.getElementById("selection" + rowNr).style.visibility = 'hidden';
 			document.getElementById("confirm" + rowNr).style.visibility = 'hidden';
 			document.getElementById("row" + rowNr).style.border = '0';
 		}
+	}
+
+
+	function handledList() {
+
+		var criteria = document.getElementById("searchCriteria").value;
+		if (criteria) { 
+			criteria = criteria.toLowerCase(); 
+
+			//console.log('criteria', criteria, 'criteria.length', criteria.length, '
+		}
+		
+		var contentTable = '<table width="100%" style="font-family: Arial;">';
+
+		if (!ordersInHouse) {
+			contentTable += '<tr><td><p style="font-size: 16px;"><b>Non ci sono ordini da consegnare in house</b></td></tr>';
+		}
+		
+		for (i = 0; i < ordersInHouse.length; i++) {
+			var orderInHouse = ordersInHouse[i];
+			
+			var orderID = orderInHouse._id;
+			var customerFullName = orderInHouse.address.name.last + ' ' + orderInHouse.address.name.first;
+			var orderInsertDate = moment(new Date(orderInHouse.dateInsert)).format("DD/MM/YYYY");
+			var items = orderInHouse.items;
+
+			//console.log('customer', customerFullName, 'indexOf(criteria)', customerFullName.toLowerCase().indexOf(criteria));
+
+			if (!criteria || criteria.length < 3 || (criteria.length >= 3 && customerFullName.toLowerCase().indexOf(criteria) >= 0)) {
+			
+				contentTable += `<tr id="row${i}" style="border: 0;"><td width="5%" style="background: lightgreen; visibility: hidden;" id="selection${i}"></td>`;
+				contentTable += `<td width="85%" style="padding: 5px; padding-top: 10px;" onClick="toggleSelection(${i})"><div style="font-size: 16px;"><img src="img/favicon32.png" width="18" height="18px" alt="#${i}" /> <b><u>${customerFullName}</u></b></div>`;
+				contentTable += `<div style="font-size: 10px; padding-left: 10px;"><i>Data ordine: ${orderInsertDate}</i><br></div>`;
+				
+				for (j = 0; j < items.length; j++) {
+					var qty = items[j].qty;
+					var name = items[j].name;
+
+					contentTable += `<div style="font-size: 14px; padding-left: 10px;">- <b>${qty}</b> birra <b>${name}</b></div>`;
+				}
+
+				contentTable += `</td>`;
+				contentTable += `<td width="10%" style="visibility: hidden; cursor: alias;" id="confirm${i}" onClick="updateOrder('${orderInHouse._id}', ${i})">${completeIcon}</td></tr>`;
+			}
+						
+		}
+
+		contentTable += '</table>';
+
+		document.getElementById("riepilogoOrdini").innerHTML = contentTable;
 	}
 	
  	function updateOrder(orderID, rowNr) {
@@ -178,8 +216,6 @@
 		if (noRepeat == 'N') {
 			document.getElementById("noRepeat").value = 'Y';
 
-			
-
 			document.getElementById("confirm" + rowNr).innerHTML = '<img src="img/Spinner-5.gif" width="35px" height="35px" alt="Loading..." />';
 
 			document.getElementById("orderID").value = orderID;
@@ -189,6 +225,14 @@
 			document.getElementById("updateForm").submit();
 		}
 	}
+
+	const resetCriteria = document.querySelector(".reset-field-icon i");
+
+	resetCriteria.addEventListener("click", function () {
+		document.getElementById("searchCriteria").value = '';
+
+		handledList();
+	});
 
 </script>
 
