@@ -19,6 +19,11 @@ const nunjucks      = require('nunjucks');          // Template per Javascript. 
 const moment        = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
 
 moment().tz("Europe/Rome").format();
+moment.locale('it');
+
+console.debug('DATA: ',moment().format('dddd DD MMMM YYYY - HH:mm'))
+//console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('dddd DD MMMM YYYY - HH:mm'))
+//console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('DD.MM.YYYY - HH:mm'))
 
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
 
@@ -190,7 +195,7 @@ var SharingBeer = function() {
      */
     self.createRoutes = function() {
         routesAuth(self.app, passport, moment);
-        routesShop(self.app);
+        routesShop(self.app, moment);
         routesRegister(self.app, moment, mongoose, fastcsv, fs, util);
         routesQrcode(self.app, qr, moment);
         routesPaypal(self.app, mongoose, moment);

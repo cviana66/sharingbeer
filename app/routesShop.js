@@ -17,13 +17,12 @@ module.exports = function(app, moment) {
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
 								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Consegna'}]}},
-								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}]);
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}},
+								{$sort:{'orders.dateInsert': -1} }]);
 	
 		
 		for ( var i in  ordiniInConsegna) {			
-			date = ordiniInConsegna[i].orders.dateInsert;
-			formattedDate =  ("0" + (date.getDate())).slice(-2) + '-' + ("0" + (date.getMonth() + 1)).slice(-2) + '-' + date.getFullYear() + '  '+ date.getHours() + ':' + ("0" + date.getMinutes()).slice(-2);
-			ordiniInConsegna[i].orders.dateInsert = formattedDate;
+			ordiniInConsegna[i].orders.dateInsert = moment(ordiniInConsegna[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
 		}
 
 		var ordiniInRitiro = await User.aggregate([
@@ -45,6 +44,27 @@ module.exports = function(app, moment) {
                   ordiniConsegnati : ordiniConsegnati
                })
 	})
+
+// =============================================================================
+// ORDER OUTCOME ===============================================================
+// =============================================================================
+//GET
+	app.get('/orderOutcome', lib.isLoggedIn, function(req, res) {
+//TODO da finire l'implemetazione ... solo abbozzata 
+
+req.session.order._id= '65db550ac66e651d5e72a85d',
+status = 'OK',
+
+		//console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} ERROR: '+error_code+' '+error_description);
+    //TODO: sostituire con pagina ad HOC
+    res.render('orderOutcome.njk', {
+      status  : status,
+      orderId : req.session.order._id,
+      user    : req.user,
+      deliveryDate: moment().add(3,'d').format('dddd DD MMMM')
+    })
+
+  });
 
 // =============================================================================
 // GET SHOP ====================================================================
