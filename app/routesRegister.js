@@ -18,6 +18,8 @@ var mailfriend = require('../config/mailFriend');
 var mailparent = require('../config/mailParent');
 var mailinvite = require('../config/mailInvite');
 var mailconferme = require('../config/mailConferme');
+var mailorder = require('../config/mailOrder');
+
 var {getDistance} = require('../app/geoCoordHandler');
 
 const fetch = require("node-fetch");
@@ -785,7 +787,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 // =================================================================================================
 // MESSAGGISTICA
 // =================================================================================================
-app.get('/infoMessage', (req, res) => {
+    app.get('/infoMessage', (req, res) => {
       let msg = req.query.msg;
       let msgType = req.query.type;
       let err = req.body.err;
@@ -809,18 +811,6 @@ app.get('/infoMessage', (req, res) => {
           message : req.flash('message'),
           type    : msgType,
           user    : req.user,
-          numProducts : req.session.numProducts
-      })
-    });
-
-    app.get('/infoAxerve', (req, res) => {
-      let msg = "Pagamento non effettuato";
-      let msgType = "warning";
-      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoAxerve"  FLASH: '+msg);
-      req.flash('message', msg);
-      res.render('info.njk', {
-          message : req.flash('message'),
-          type    : msgType,
           numProducts : req.session.numProducts
       })
     });
@@ -977,6 +967,16 @@ app.get('/infoMessage', (req, res) => {
       }
       res.send(mailinvite('Name', 'Email', 'Token', 'userName', server))
     })   
+
+    app.get('/mailorder', function(req, res) {
+      let server;
+      if (process.env.NODE_ENV== "development") {
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        server = req.protocol+'://'+req.hostname;
+      }
+      res.send(mailorder('Name', 'orderId', 'deliveryDate', server))
+    }) 
 
     
 // =================================================================================================

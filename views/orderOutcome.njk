@@ -1,0 +1,50 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+	
+  <h3 class="text-white text-center bg-dark"> Ordine</h3>
+  
+  <p class="text-white font-weight-light text-center" style="font-size:1.1em"> #{{orderId}} </p>
+{% if status == 'OK' %}
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
+    <div class="card-body">
+	    <div class="flex-row">
+        <div class="align-self-center">
+		      <p class="text-white font-weight-light text-center"> Grazie {{user.local.name.first}} per aver acquistato <br><span class="sb-font" style="font-size:1.5em;color:#FF9139;">birra Viana</span></p>
+          <p class="text-white font-weight-light text-center" style="font-size:1.2em"> Il tuo ordine è stato completato ed il tuo acquisto è in preparazione.</p>      
+          <p class="text-white font-weight-light text-center" style="font-size:1.1em"> Dovresti ricevere il tuo ordine entro <b>{{deliveryDate}}</b> </p>
+          <p class="text-white font-weight-light text-left"> Ti abbiamo inviato una e-mail di conferma al tuo indirizzo: <b>{{user.local.email}}</b> </p>
+          <br>
+          <p class="text-white font-weight-light text-lect"> Mi raccomando, bevi in modo responsabile :)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% else %}
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
+    <div class="card-body">
+      <div class="flex-row">
+        <div class="align-self-center">
+          <p class="text-white font-weight-light text-justify">
+            Il tuo rodine è </p>
+          <p class="text-white font-weight-light text-left"> Grazie {{user.local.name.first}} per bere acquistato <span class="sb-font" style="font-size:1.5em;color:#FF9139;">birra Viana</span></p>
+          <p class="text-white font-weight-light text-center" style="font-size:2.0"em> Il tuo ordine è stato completato ed è il tuo acquisto è in preparazione.</p>      
+          <p class="text-white font-weight-light text-left"> Ti abbiamo inviato una e-mail di conferma al tuo indirizzo: {{user.local.email}} </p>
+          <br>
+          <p class="text-white font-weight-light text-lect"> Mi raccomando, bevi in modo responsabile :)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+  
+        
+   <form role="form" action="/shopping" method="GET">
+	   <div style="margin-bottom: 40px;">
+		   <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+			   Riepilogo ordini
+           </button>
+      </div>
+   </form>
+        
+
+{% endblock %}

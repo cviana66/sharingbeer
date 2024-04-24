@@ -189,7 +189,7 @@
             if (result.ok) {
               return result.json();
             }else{
-              post('/infomessage',{msg:"Pagamento non effettuato", err:result.statusText, type:"warning"})
+              post('/infomessage',{msg:"Pagamento non effettuato: ", err:result.statusText, type:"warning"})
               return result.json();
             }
           })
@@ -204,7 +204,7 @@
             }
           })
         } catch(e) {
-          post('/infomessage',{msg:"Pagamento non effettuato",err:e, type:"danger"})
+          post('/infomessage',{msg:"Pagamento non effettuato: ",err:e, type:"danger"})
           }
         }
 

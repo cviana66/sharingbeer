@@ -159,6 +159,18 @@ var users;
                                 {arrayFilters: [{"el._id": req.session.order._id}]}
                                 ).session(session);
 
+      //========================================
+      // INVIO EMAIL al CLIENTE
+      //========================================
+      let server;
+      if (process.env.NODE_ENV== "development") {
+        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+      } else {
+        server = req.protocol+'://'+req.hostname;
+      }
+      const html = mailOrder(userName,orderId,deliveryDate)
+      lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'order',server, html)
+
       await session.commitTransaction();
 
       if (status == 'OK' && error_code == 0) {
@@ -168,23 +180,26 @@ var users;
         //=====================================
         req.session.cart = {}
 
+        console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} ERROR: '+error_code+' '+error_description);
         //TODO: sostituire con pagina ad HOC
-        req.flash('info','AXERVE Pagamento effettuato orderId = ' + req.session.order._id.toString() +' '+ error_code + error_description);
-        res.render('info.njk',{
-                                message: req.flash('info'),
-                                type: "info"
-                              });
-      }else{
-        //TODO: sostituire con pagina ad HOC
-        req.flash('warning','AXERVE Pagmento non avvenuto orderId  = ' + req.session.order._id.toString() +' '+ error_code + error_description);
-        res.render('info.njk',{
-                                message: req.flash('warning'),
-                                type: "warning"
-                              });
+        res.render('orderOutcome.njk', {
+          status  : status,
+          orderId : req.session.order._id,
+          user    : req.user,
+          deliveryDate: moment().add(3,'d').format('dddd DD')
+        })
+
+      } else {
+        console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} ERROR: '+error_code+' '+error_description);
+        res.render('orderOutcome.njk', {
+          status  : status,
+          orderId : req.session.order._id,
+          user    : req.user
+        })
       }
     } catch (e) {
       await session.abortTransaction();
-      console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
+      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} FUNCTION: User.findOneAndUpdate: '+e+' ERROR: '+error_code+' '+error_description);
       res.status(500).send();
     } finally {
           await session.endSession();

@@ -57,7 +57,7 @@ module.exports = {
                             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
                           }
                          },
-  sendmailToPerson: async function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server) {
+  sendmailToPerson: async function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server, html) {
 
                       console.log('MAIL TYPE: ', typeOfMail);
                       console.log("SERVER:", server);
@@ -96,7 +96,14 @@ module.exports = {
                             to: Email, //'cviana66@gmail.com', // list of receivers
                             subject: 'Imposta nuova password - Birrificio Viana', // Subject line
                             html: mailvalidatemail(Token, server)
-                        }  
+                        } 
+                      } else if  (typeOfMail == 'order') {
+                        var mailOptions = {
+                            from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
+                            to: Email, //'cviana66@gmail.com', // list of receivers
+                            subject: 'Conferma ordine - Birrificio Viana', // Subject line
+                            html: html
+                        }   
                       }
                       // effettua l'invio della mail
                       try {
