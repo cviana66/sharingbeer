@@ -3,67 +3,84 @@
 	
   <h3 class="text-white text-center bg-dark"> Riepilogo ordine </h3>
   <hr style="border-top: 1px solid #5375BD;">
+      
+    <table class="mx-auto" width="100%">
+      {% for item in cartItems.items %}
+        <tr class="text-white" valign="top"> 
+          <td width="16%" style="padding-right: 10px; padding-bottom: 10px">
+            <img src="{{item.linkImage}}" width="100%" height="auto">
+          </td>
+          <td width="auto">
+            <table width="100%">
+              <tr style="color:#FFBB35; border-top: 1px solid; padding-top: 10px;">
+                <td width="80%" style="font-size:1.3em;"><b>{{item.name}}</b></td>
+                <td width="20%" style="font-size:1.3em;" align="right">&euro;{{item.subtotal}}</td>
+              </tr>
+              <tr>
+                <td colspan="2">{{item.qty}} Beerbox a {{item.price}} &euro;/cad.</td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
 
-  <!--div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;"-->
-    <div class="card-body">
-      <div class="flex-row">
-        
-        <table class="mx-auto" width="100%">
-          <tr class="text-white" style="font-size:1.3em;"> 
-            <td width="35%"> <p>Birra </p></td>
-            <td width="15%"> <p>Qt. </p></td>
-            <td width="30%"> <p>Prezzo </p></td>
-            <td width="30%"> <p> </p></td>
-          </tr>
-        {% for item in cartItems.items %}
-          <tr class="text-white"> 
-            <td> {{item.name}} </td>
-            <td> {{item.qty}} </td>
-            <td> €{{item.price}} </td>
-            <td> €{{item.subtotal}}  </td>
-          </tr>
-        {% endfor %}
-          
-          
-          <tr class="text-white" > 
-            <td></td>
-            <td colspan=2 style="font-size:1.0em;"> Spedizione </td>
-            <td style="font-size:1.0em;"> €{{shipping}} </td>
-          </tr>
-          <tr class="text-white" >
-            <td></td> 
-            <td colspan=2 style="font-size:1.0em;"> Sconto spedizione </td>
-            <td style="font-size:1.0em;"> €-{{shippingDiscount}} </td>
-          </tr>
-          <tr class="text-white" >
-            <td></td> 
-            <td colspan=2 style="font-size:1.0em;"> Sconto amici </td>
-            <td style="font-size:1.0em;"> €-{{discount}} </td>
-          </tr>
-          <tr class="text-white" >
-            <td></td> 
-            <td colspan=2  style="font-size:1.3em;"><p> Totale </p></td>
-            <td style="font-size:1.3em;"><p id="total"> </p></td>
-          </tr>
-        </table>
-        
-        <div class="text-white align-center">
-        
-        {% if deliveryType == 'Consegna' %}
-          <p><span style="font-size:1.3em;">Consegna presso:</span></p>
+    <table class="mx-auto" width="100%" style="margin: 10px;">
+      <!-- Savings -->
+      <tr class="text-white">
+        <td width="16%" rowspan="2" align="center"><img src="img/savings_36dp.svg"></td>
+        <td width="64%" padding-left="15px" style="font-size:0.9em;">Vantaggio dai tuoi amici</td>
+        <td width="20%" style="color: #FFBB35; font-size:1.3em;" align="right">&euro;-{{discount}}</td>
+      </tr>
+      <tr class="text-white">
+        <td width="64%" padding-left="15px" style="font-size:0.9em;">Sconto su spedizione</td>
+        <td width="20%" style="color: #FFBB35; font-size:1.3em;" align="right">&euro;-{{shippingDiscount}}</td>
+      </tr>
+    </table>
+
+    <table class="mx-auto" width="100%" style="margin: 10px;">
+      <!-- Shipping -->
+      <tr class="text-white">
+        <td width="16%" align="center"><img src="img/local_shipping_36dp.svg"></td>
+        {% if shipping != 0 %}
+          <td width="80%" padding-left="15px">Spese di spedizione</td>
+          <td width="20%" style="color: #FFBB35; font-size:1.3em;" align="right">&euro;{{shipping}}</td>
         {% else %}
-          <p><span style="font-size:1.3em;">Ritiro presso:</span></p>
+          <td colspan="2" width="100%" padding-left="15px">La consegna è <font style="color: #FFBB35; font-size:1.3em;"><b>gratis</b></font></td>
         {% endif %}
-          
-           <p>{{address.name.first}} {{address.name.last}} </p>
-           <p>{{address.address}} {{address.houseNumber}} - {{address.city}} - {{address.postcode}} ({{address.province}})</p>
-        
-        </div>  
-      </div>
+      </tr>
+    </table>
+
+    <table class="mx-auto" width="100%" style="margin: 10px; border: 3px solid; color: #FFBB35; font-size:1.5em;">
+      <!-- Shipping -->
+      <tr class="text-white">
+        <td width="70%" height="60px" style="color: #FFBB35; padding-left: 15px;" valign="middle"><b>Totale ordine</b></td>
+        <td width="30%" height="60px" style="color: #FFBB35;" valign="middle" align="right" id="total"></td>
+      </tr>
+    </table>
+
+    <table class="mx-auto" width="100%" style="margin: 20px;">
+      <!-- Delivery -->
+      <tr class="text-white">
+        <td colspan="2" width="100%" padding-left="15px">
+          {% if deliveryType == 'Consegna' %}
+            <i><b>Indirizzo dove verrà consegnato:</b></i>
+          {% else %}
+            <i><b>Puoi effettuare qui il ritiro:</b></i>
+          {% endif %}
+        </td>
+      </tr>
+      <tr class="text-white">
+        <td width="16%" rowspan="3" align="center"><img src="img/location_on_36dp.svg"></td>
+        <td width="84%" style="color: #FFBB35; font-size:1.3em;">{{address.name.first}} {{address.name.last}}</td>
+      </tr>
+      <tr class="text-white">
+        <td width="84%">{{address.address}} {{address.houseNumber}} - {{address.city}} - {{address.postcode}} ({{address.province}})</td>
+      </tr>
+    </table>
+
     {% if (numProducts > 0) and (userStatus == 'customer') and (address) %}
-
       {% if payType =='paypal' %}
-
         <script src="https://www.paypal.com/sdk/js?client-id=AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv&currency=EUR&disable-funding=sofort,venmo,mybank,card"> </script>
 
         <!-- Set up a container element for the button -->
@@ -132,7 +149,7 @@
                 height:   48,
                 color:   'blue',
                 shape:   'rect',
-                label:   'paypal'
+                label:   'Vai su PayPal'
             },
           })
           .render('#paypal-button-container');
@@ -142,16 +159,8 @@
 
       <div style="margin-bottom: 40px;">
           <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onClick="startAxerve()">
-            Axerve
+            Conferma e paga
           </button>
-      </div>
-      <div class="text-white">
-        <li>numero carta |data  
-        <li>4012000000003010 |05/27  Frictionless flow </li>
-        <li>4012000000003101 |05/27  Challenge flow </li>
-        <li>4012000000003077 |05/27  NPA </li>
-        <li>4012000000003036 |05/27  Attempted </li>
-        <li>4012000000003028 |05/27  Failed authentication </li>
       </div>
 
       <script script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
@@ -224,7 +233,7 @@
     </script>
 
       {% endif %}
-    <br>
+
     {% endif %}
 
   <!--/div-->
@@ -233,9 +242,9 @@
       const tot = Number(subtotale)+Number(spedizione)-Number(scontoS)-Number(scontoA)
       return tot.toFixed(2)
     }
-    let e = '€'
+
     let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{shippingDiscount}},{{discount}})
-    document.getElementById("total").innerHTML = e.concat(i)
+    document.getElementById("total").innerHTML = `<b>&euro;${i}</b>`;
   
 
     /**
