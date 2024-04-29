@@ -975,7 +975,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       } else {
         server = req.protocol+'://'+req.hostname;
       }
-      res.send(mailorder('Name', 'orderId', 'deliveryDate', server))
+      
+      const html = mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server)
+      lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
+      res.send(mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server))
+      return
+
     }) 
 
     

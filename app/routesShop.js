@@ -16,11 +16,10 @@ module.exports = function(app, moment) {
 		var ordiniInConsegna = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Consegna'}]}},
-								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}},
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Consegna'},{'orders.paypal.s2sStatus':'OK'}]}},
+								{$project:{_id:0,addresses:0,friends:0,local:0}},
 								{$sort:{'orders.dateInsert': -1} }]);
 	
-		
 		for ( var i in  ordiniInConsegna) {			
 			ordiniInConsegna[i].orders.dateInsert = moment(ordiniInConsegna[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
 		}
@@ -28,14 +27,20 @@ module.exports = function(app, moment) {
 		var ordiniInRitiro = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Ritiro'}]}},
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Ritiro'},{'orders.paypal.s2sStatus':'OK'}]}},
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}])
+		for ( var i in  ordiniInRitiro) {			
+			ordiniInRitiro[i].orders.dateInsert = moment(ordiniInRitiro[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
+		}
 
 		var ordiniConsegnati = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
 								{$match:{'orders.status':'OK - CONSEGNATO'}},
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}]);
+		for ( var i in  ordiniConsegnati) {			
+			ordiniConsegnati[i].orders.dateInsert = moment(ordiniConsegnati[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
+		}
 
 		//console.debug('ORDINI IN CONSEGNA: ',JSON.stringify(ordiniInConsegna, null, 2))
 		res.render('shopping.njk', {
@@ -61,7 +66,7 @@ status = 'OK',
       status  : status,
       orderId : req.session.order._id,
       user    : req.user,
-      deliveryDate: moment().add(3,'d').format('dddd DD MMMM')
+      deliveryDate: lib.deliveryDate()
     })
 
   });
