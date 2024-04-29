@@ -7,6 +7,7 @@ const mailparent  = require('../config/mailParent');
 const mailinvite  = require('../config/mailInvite');
 const mailconferme  = require('../config/mailConferme');
 const mailvalidatemail  = require('../config/mailValidateMail');
+const moment        = require("moment-timezone"); 
 
 const User  = require('../app/models/user');
 
@@ -145,5 +146,21 @@ module.exports = {
                       } else {
                         return true;
                       }
+                    },
+  deliveryDate: function deliveryDate() {
+                    moment().tz("Europe/Rome").format();
+                    moment.locale('it');
+                    var giornoLavorativo
+                    console.debug('OGGI: ', moment().add(3,'d').format('dddd'))
+                    if (moment().add(3,'d').format('ddddd') == "sabato") {
+                      giornoLavorativo = moment().add(5,'d').format('dddd DD MMMM')
+                    } else if (moment().add(3,'d').format('dddd') == "domenica") {
+                      giornoLavorativo = moment().add(4,'d').format('dddd DD MMMM')
+                    } else {
+                      giornoLavorativo = moment().add(3,'d').format('dddd DD MMMM')
                     }
+                    return giornoLavorativo  
+                }
 }
+
+

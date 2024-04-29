@@ -1,8 +1,7 @@
 const lib           = require('./libfunction');
-//const https         = require("https");  
 const fetch         = require("node-fetch");
 const User          = require('../app/models/user');
-
+const mailorder     = require('../config/mailOrder');
 const {transMsg}    = require("./msgHandler");
 
 module.exports = function(app,mongoose, moment) {
@@ -168,8 +167,10 @@ var users;
       } else {
         server = req.protocol+'://'+req.hostname;
       }
-      const html = mailOrder(userName,orderId,deliveryDate)
-      lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'order',server, html)
+
+      const html = mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server)
+      lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
+
 
       await session.commitTransaction();
 
@@ -199,8 +200,12 @@ var users;
       }
     } catch (e) {
       await session.abortTransaction();
-      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} FUNCTION: User.findOneAndUpdate: '+e+' ERROR: '+error_code+' '+error_description);
-      res.status(500).send();
+      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
+      res.render('orderOutcome.njk', {
+          status  : status,
+          orderId : req.session.order._id,
+          user    : req.user
+        })
     } finally {
           await session.endSession();
     };

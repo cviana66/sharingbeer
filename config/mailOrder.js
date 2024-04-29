@@ -26,7 +26,8 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao '+name+'.</p> \
   								<p> Grazie per aver acquistato Birra Viana su Sharingbeer. </p> \
-  								<p> Il tuo ordine è in preparazione e quando pronto sarai avvisato per la consegna via e-mail e whatsapp </p> \
+  								<p> Il tuo ordine è in preparazione e quando pronto per la consegna sarai avvisato via e-mail e/o whatsapp </p> \
+                  <p> Dovresti ricevere il tuo ordine entro '+deliveryDate+' \
                   <p> Accedi ai tuoi ordini cliccando su </p> \
                   <div align="center"> \
     								<a href="'+server+'/shopping?orderId='+orderId+'"> \

@@ -4,31 +4,96 @@
 <h3 class="text-white text-center bg-dark">Ordini</h3>
 <hr style="border-top: 1px solid #5375BD;">
 
-<div class="text-white">
-      {% for purchase in ordiniInConsegna %}
-        <div>ORDINE # {{purchase.orders._id}}</div>
-        <div>Effettuato il {{purchase.orders.dateInsert}}</div>
-        <div>Totale €{{purchase.orders.totalPriceTotal}}</div>
-        <div>Indirizzo di consegna: {{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}}</div>
-        <div>{{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}}, {{purchase.orders.address.city}} - {{purchase.orders.address.postcode}} ({{purchase.orders.address.province}})</div>
-        
-        {% for prod in purchase.orders.items %}
-        <table>
-          <tr >
-            <td width="25%" rowspan="4"> <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%"> </td>
-          </tr>
-          <tr>
-            <td>{{prod.name}}</td>
-          </tr>
-          <tr>
-            <td>Prezzo per BeerBox €{{prod.price}}</td>
-          </tr>
-          <tr>
-            <td class="text-white text-left">N° BeerBox {{prod.qty}}</td>
-          </tr>
-        </table>
-        {% endfor %}
-    <hr style="border-top: 1px solid #5375BD;">
+
+<!-- Nav tabs -->
+
+<nav class="nav nav-pills nav-justified">
+  <a class="nav-item nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true"><b>in consegna</b></a>
+  <a class="nav-item nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false"><b>da ritirare</b></a>
+  <a class="nav-item nav-link" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="false"><b>conegnati o ritirati</b></a>
+</nav>
+
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active text-white " id="home" role="tabpanel" aria-labelledby="home-tab" style="margin: 0px 0px 20px 0px;">
+    {% for purchase in ordiniInConsegna %}
+    <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 0px 0px;">
+      <div style="margin: 5px 5px 5px 5px;">
+        <div><span style="font-size:1.1em;font-weight: bold;">ORDINE #</span>{{purchase.orders._id}}</div>
+        <div><span style="font-size:1.1em;font-weight: normal;"> Effettuato </span>il {{purchase.orders.dateInsert}}</div>      
+      </div>
+      {% for prod in purchase.orders.items %}
+      <table style="margin: 5px 5px 5px 5px;">
+        <tr >
+          <td width="16%" rowspan="4" style="padding: 5px;"> <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%"> </td>
+        </tr>
+        <tr>
+          <td>{{prod.name}}</td>
+        </tr>
+        <tr>
+          <td class="text-white text-left">N° BeerBox {{prod.qty}}</td>
+        </tr>
+        <tr>
+          <td>Prezzo per BeerBox €{{prod.price}}</td>
+        </tr>      
+      </table>      
       {% endfor %}
+      <div style="margin: 5px 5px 5px 5px;">
+        <div>
+          <span style="font-size:1.1em;font-weight: bold;">Totale</span> 
+          <span style="font-size:0.8em;">(con sconti e trasporto)</span> 
+          <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
+        </div>
+        <div style="font-size:1.1em;font-weight: bold;">Indirizzo di consegna: </div>
+        <div>{{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}}, {{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}}, {{purchase.orders.address.city}} - {{purchase.orders.address.postcode}} ({{purchase.orders.address.province}})</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="tab-pane text-white " id="profile" role="tabpanel" aria-labelledby="profile-tab" style="margin: 0px 0px 20px 0px;">
+    {% for purchase in ordiniInRitiro %}
+    <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 0px 0px;">
+      <div><span style="font-size:1.1em;font-weight: bold;">ORDINE #</span>{{purchase.orders._id}}</div>
+      <div><span style="font-size:1.1em;font-weight: normal;"> Effettuato</span> il {{purchase.orders.dateInsert}}</div>      
+      
+      {% for prod in purchase.orders.items %}
+      <table style="margin: 5px 5px 5px 5px;">
+        <tr >
+          <td width="16%" rowspan="4" style="padding: 5px;">  <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%"> </td>
+        </tr>
+        <tr>
+          <td>{{prod.name}}</td>
+        </tr>
+        <tr>
+          <td class="text-white text-left">N° BeerBox {{prod.qty}}</td>
+        </tr>
+        <tr>
+          <td>Prezzo per BeerBox €{{prod.price}}</td>
+        </tr>      
+      </table>      
+      {% endfor %}
+      <div>
+        <span style="font-size:1.1em;font-weight: bold;">Totale</span> 
+        <span style="font-size:0.8em;">(con sconti e trasporto)</span> 
+        <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
+      </div>
+      <div style="font-size:1.1em;font-weight: bold;">Indirizzo di consegna: </div>
+      <div>{{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}}, {{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}}, {{purchase.orders.address.city}} - {{purchase.orders.address.postcode}} ({{purchase.orders.address.province}})</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="tab-pane text-white " id="messages" role="tabpanel" aria-labelledby="messages-tab">c</div>
+  
 </div>
+
+
+<script type="text/javascript">
+  $('#myTab a').on('click', function (e) {
+  e.preventDefault()
+  $(this).tab('show')
+  })
+</script>
+
 {% endblock %}
