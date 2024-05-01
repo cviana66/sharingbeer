@@ -3,7 +3,7 @@
 	
   <h3 class="text-white text-center bg-dark"> Ordine</h3>
   
-  <p class="text-white font-weight-light text-center" style="font-size:1.1em"> #{{orderId}} </p>
+  <!--p class="text-white font-weight-light text-center" style="font-size:1.1em"> {{orderId}} </p-->
 {% if status == 'OK' %}
   <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
     <div class="card-body">
@@ -11,7 +11,7 @@
         <div class="align-self-center">
 		      <p class="text-white font-weight-light text-center"> Grazie {{user.local.name.first}} per aver acquistato <br><span class="sb-font" style="font-size:1.5em;color:#FF9139;">birra Viana</span></p>
           <p class="text-white font-weight-light text-center" style="font-size:1.2em"> Il tuo ordine è stato completato ed il tuo acquisto è in preparazione.</p>      
-          <p class="text-white font-weight-light text-center" style="font-size:1.1em"> Dovresti ricevere il tuo ordine entro <b>{{deliveryDate}}</b> </p>
+          <p class="text-white font-weight-light text-center" style="font-size:1.1em"> Dovresti ricevere il tuo ordine entro <br><b>{{deliveryDate}}</b> </p>
           <p class="text-white font-weight-light text-left"> Ti abbiamo inviato una e-mail di conferma al tuo indirizzo: <b>{{user.local.email}}</b> </p>
           <br>
           <p class="text-white font-weight-light text-lect"> Mi raccomando, bevi in modo responsabile :)</p>
@@ -19,32 +19,40 @@
       </div>
     </div>
   </div>
+  <div>
+    <form role="form" action="/shopping" method="GET">
+       <div style="margin-bottom: 40px;">
+         <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+           Riepilogo ordini
+             </button>
+        </div>
+     </form>
+  </div>
 {% else %}
   <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
     <div class="card-body">
-      <div class="flex-row">
+      <div class="flex-r2w">
         <div class="align-self-center">
-          <p class="text-white font-weight-light text-justify">
-            Il tuo rodine è </p>
-          <p class="text-white font-weight-light text-left"> Grazie {{user.local.name.first}} per bere acquistato <span class="sb-font" style="font-size:1.5em;color:#FF9139;">birra Viana</span></p>
-          <p class="text-white font-weight-light text-center" style="font-size:2.0"em> Il tuo ordine è stato completato ed è il tuo acquisto è in preparazione.</p>      
-          <p class="text-white font-weight-light text-left"> Ti abbiamo inviato una e-mail di conferma al tuo indirizzo: {{user.local.email}} </p>
-          <br>
-          <p class="text-white font-weight-light text-lect"> Mi raccomando, bevi in modo responsabile :)</p>
+          <p class="text-white text-center" style="font-size:1.2em"> Pagamento non effettuato </p>
+          <p class="text-white font-weight-light text-left"> Ci spiace ma il tuo ordine di aquisto <b>non</b> è andato a buon fine. </p>
+          <p class="text-white font-weight-light text-left"> Riprova e se il problema persiste puoi contattarci all'indirizzo: <div class="text-white text-center"> birrificioviana@gmail.com </div> </p>
         </div>
       </div>
     </div>
   </div>
+  <div>
+    <form role="form" action="/cart" method="GET">
+     <div style="margin-bottom: 40px;">
+       <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+          Vai al carrello
+        </button>
+      </div>
+   </form>
+  </div>
 {% endif %}
   
         
-   <form role="form" action="/shopping" method="GET">
-	   <div style="margin-bottom: 40px;">
-		   <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-			   Riepilogo ordini
-           </button>
-      </div>
-   </form>
+   
         
 
 {% endblock %}

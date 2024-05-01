@@ -15,8 +15,9 @@ var users;
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
     var cart = req.session.cart;
     const currency='EUR';
+
+    //const shopLogin='GESPAY63388' 
     const shopLogin=process.env.SHOPLOGIN;
-    const paymentType =  [""]
 
     req.session.order = {};
  
@@ -122,6 +123,7 @@ var users;
     const response_URL = req.body.response_URL;
     const transaction_error_code = req.body.transaction_error_code;
     const transaction_error_description = req.body.transaction_error_description;
+    const orderId = req.session.order._id
   
     console.debug('ERROR_CODE -> ', error_code)
     console.debug('ERROR_DESCRIPTION -> ',error_description)
@@ -142,6 +144,7 @@ var users;
       // UPDATE Esito del pagamento 
       //==========================================
       if (status == "") status = "KO";
+
       const filter = {_id: req.user._id};
       const update = 
           {
@@ -158,56 +161,59 @@ var users;
                                 {arrayFilters: [{"el._id": req.session.order._id}]}
                                 ).session(session);
 
-      //========================================
-      // INVIO EMAIL al CLIENTE
-      //========================================
-      let server;
-      if (process.env.NODE_ENV== "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      }
-
-      const html = mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server)
-      lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
-
-
-      await session.commitTransaction();
-
-      if (status == 'OK' && error_code == 0) {
+      if (status == 'OK') {
+        //========================================
+        // INVIO EMAIL al CLIENTE
+        //========================================
+        let server;
+        if (process.env.NODE_ENV== "development") {
+          server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+        } else {
+          server = req.protocol+'://'+req.hostname;
+        }
+        if (orderId != undefined ) {
+          const html = mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server)
+          lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
+        }
         
         //=====================================
         // Svuoto il carrello
         //=====================================
         req.session.cart = {}
+        req.session.order = {}
+        req.session.numProducts = 0
 
-        console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} ERROR: '+error_code+' '+error_description);
-        //TODO: sostituire con pagina ad HOC
+        console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
         res.render('orderOutcome.njk', {
           status  : status,
-          orderId : req.session.order._id,
+          orderId : orderId,
           user    : req.user,
-          deliveryDate: moment().add(3,'d').format('dddd DD')
+          deliveryDate: lib.deliveryDate(),
+          numProducts : req.session.numProducts
         })
 
       } else {
-        console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} ERROR: '+error_code+' '+error_description);
+        console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
         res.render('orderOutcome.njk', {
           status  : status,
-          orderId : req.session.order._id,
-          user    : req.user
+          orderId : orderId,
+          user    : req.user,
+          numProducts : req.session.numProducts
         })
       }
+      
+      await session.commitTransaction();
+
     } catch (e) {
-      await session.abortTransaction();
       console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
+      await session.abortTransaction();
       res.render('orderOutcome.njk', {
-          status  : status,
-          orderId : req.session.order._id,
-          user    : req.user
+          status  : 'KO',
+          user    : req.user,
+          numProducts : req.session.numProducts
         })
     } finally {
-          await session.endSession();
+        await session.endSession();
     };
   });
 

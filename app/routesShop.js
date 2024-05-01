@@ -46,7 +46,8 @@ module.exports = function(app, moment) {
 		res.render('shopping.njk', {
                   ordiniInConsegna : ordiniInConsegna,
                   ordiniInRitiro : ordiniInRitiro,
-                  ordiniConsegnati : ordiniConsegnati
+                  ordiniConsegnati : ordiniConsegnati,
+                  numProducts : req.session.numProducts
                })
 	})
 
@@ -55,21 +56,34 @@ module.exports = function(app, moment) {
 // =============================================================================
 //GET
 	app.get('/orderOutcome', lib.isLoggedIn, function(req, res) {
-//TODO da finire l'implemetazione ... solo abbozzata 
+	
+	//TODO da finire l'implemetazione ... solo abbozzata 
 
-req.session.order._id= '65db550ac66e651d5e72a85d',
-status = 'OK',
-
-		//console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} ERROR: '+error_code+' '+error_description);
-    //TODO: sostituire con pagina ad HOC
     res.render('orderOutcome.njk', {
-      status  : status,
-      orderId : req.session.order._id,
+      status  : 'KO',
       user    : req.user,
-      deliveryDate: lib.deliveryDate()
+      deliveryDate: lib.deliveryDate(),
+      numProducts : req.session.numProducts
     })
 
   });
+
+  //POST
+	app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
+	
+   	const status = req.body.status;
+    const err = req.body.err;
+    console.debug('ERR: ', err)
+      
+    res.render('orderOutcome.njk', {
+      status  : status,
+      user    : req.user,
+      deliveryDate: lib.deliveryDate(),
+      numProducts : req.session.numProducts
+    })
+
+  });
+
 
 // =============================================================================
 // GET SHOP ====================================================================
