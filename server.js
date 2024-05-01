@@ -21,8 +21,10 @@ const moment        = require("moment-timezone");            // Formattazione de
 moment().tz("Europe/Rome").format();
 moment.locale('it');
 
-console.debug('DATA: ',moment().format('dddd DD MMMM YYYY - HH:mm'))
-console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('dddd DD MMMM YYYY - HH:mm'))
+console.debug('OGGI moment() : ',moment().format())
+
+console.debug('OGGI: ',moment().format('dddd DD MMMM YYYY - HH:mm'))
+//console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('dddd DD MMMM YYYY - HH:mm'))
 //console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('DD.MM.YYYY - HH:mm'))
 
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file

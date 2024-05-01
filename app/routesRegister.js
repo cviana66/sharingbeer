@@ -37,13 +37,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   app.post('/overpass/istat', function(req, res) {
 
     var option = '[out:json];'+
-             'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.body.istat+'"];' +
-             'way(area)[highway][name];'+
-             'for (t["name"])(make x name=_.val;out;);'
+             'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.body.istat+'"]->.a;' +
+             'node(area.a)["addr:city"="'+req.body.city+'"]["addr:street"];' +
+             'for (t["addr:street"])(make via name=_.val;out;);'
 
     const url = 'https://overpass-api.de/api/interpreter?data='+option;
 
-    console.log('OVERPASS: ',option);
+    console.debug('OVERPASS: ',option);
 
     const request = https.request(url, (response) => {
         let data = '';
@@ -56,10 +56,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 const parseJSON = JSON.parse(data);
                 const elements = parseJSON.elements;
                 req.session.elements = elements;
-                console.log('parseJSON: ',parseJSON);
+                //console.debug('STREET: ',JSON.stringify(parseJSON,null,2));
                 res.send('{"status":"200", "statusText":"OK"}');
               } catch (e) {
-                console.log('Error', e);
+                console.debug('Error', e);
                 res.send('{"status":"500","statusText":'+e+'"}'); 
               }
             });
@@ -80,7 +80,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   '( node(area.code)["addr:street"="'+req.body.via+'"]'+
                   '["addr:housenumber"="'+req.body.numero+'"];);'+
                   '(._;>;);out;'
-    console.debug('OPTION: ',option)
+    console.debug('OPTION: ',JSON.stringify(option, null, 2))
     const url = 'https://overpass-api.de/api/interpreter?';
 
     const data = await fetch(url, 
@@ -113,7 +113,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       res.send(newArr);
   });
 
-  app.post('/cities',  function(req, res) {
+  app.post('/cities', function(req, res) {
       req.session.elements = [];
       //throw('Genera ERRORE');
       //console.log("city : ", req.body.city);
@@ -126,6 +126,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                    })
   });
 
+/*
   app.post('/caps', function(req, res) {
       //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
       //res.render('validation.dust', { message: req.flash('validation') });
@@ -147,6 +148,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           }
       });
   });
+*/
 
 //==================================================================================================
 // UTILITY per importare i Comuni Italiani
@@ -479,6 +481,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 shipping    : req.session.shippingCost,
                 shippingDiscount  : req.session.shippingDiscount,
                 deliveryType      : req.session.deliveryType,
+                deliveryDate      : lib.deliveryDate(),
                 discount    : req.session.pointDiscount,
                 user        : req.user,
                 payType     : "axerve" //"paypal"  "axerve"
@@ -609,6 +612,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         shipping    : req.session.shippingCost,
         shippingDiscount  : req.session.shippingDiscount,
         deliveryType      : req.session.deliveryType,
+        deliveryDate      : lib.deliveryDate(),
         discount    : req.session.pointDiscount,
         user        : req.user,
         payType     : "axerve" //"paypal"  "axerve"

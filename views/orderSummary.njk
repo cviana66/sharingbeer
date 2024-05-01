@@ -7,14 +7,14 @@
     <table class="mx-auto" width="100%">
       {% for item in cartItems.items %}
         <tr class="text-white" valign="top"> 
-          <td width="16%" style="padding-right: 10px; padding-bottom: 10px">
+          <td width="16%" style="padding-right: 10px; padding:0px 5px 10px 0px;">
             <img src="{{item.linkImage}}" width="100%" height="auto">
           </td>
           <td width="auto">
             <table width="100%">
-              <tr style="color:#FFBB35; border-top: 1px solid; padding-top: 10px;">
-                <td width="80%" style="font-size:1.3em;"><b>{{item.name}}</b></td>
-                <td width="20%" style="font-size:1.3em;" align="right">&euro;{{item.subtotal}}</td>
+              <tr style="padding:10px 0px 0px 0px;">
+                <td width="80%" style="font-size:1.3em;color:#FFBB35;"><b><u>{{item.name}}</u></b></td>
+                <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;{{item.subtotal}}</td>
               </tr>
               <tr>
                 <td colspan="2">{{item.qty}} Beerbox a {{item.price}} &euro;/cad.</td>
@@ -30,32 +30,36 @@
       <tr class="text-white">
         <td width="16%" rowspan="2" align="center"><img src="img/savings_36dp.svg"></td>
         <td width="64%" padding-left="15px" style="font-size:0.9em;">Vantaggio dai tuoi amici</td>
-        <td width="20%" style="color: #FFBB35; font-size:1.3em;" align="right">&euro;-{{discount}}</td>
+        <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;-{{discount}}</td>
       </tr>
-      <tr class="text-white">
+      <!---tr class="text-white">
         <td width="64%" padding-left="15px" style="font-size:0.9em;">Sconto su spedizione</td>
-        <td width="20%" style="color: #FFBB35; font-size:1.3em;" align="right">&euro;-{{shippingDiscount}}</td>
-      </tr>
+        <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;-{{shippingDiscount}}</td>
+      </tr-->
     </table>
 
     <table class="mx-auto" width="100%" style="margin: 10px;">
       <!-- Shipping -->
       <tr class="text-white">
-        <td width="16%" align="center"><img src="img/local_shipping_36dp.svg"></td>
+        
         {% if shipping != 0 %}
-          <td width="80%" padding-left="15px">Spese di spedizione</td>
-          <td width="20%" style="color: #FFBB35; font-size:1.3em;" align="right">&euro;{{shipping}}</td>
+          <td width="16%" align="center"><img src="img/local_shipping_36dp.svg"></td>
+          <td width="64%" padding-left="15px">Spese di spedizione</td>
+          <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;{{shipping}}</td>
+        {% elif deliveryType == 'Ritiro' %}
+          <!--td colspan="2" width="100%" padding-left="15px"> <font style="color: #FFBB35; font-size:1.3em;"><b>gratis</b></font></td-->
         {% else %}
-          <td colspan="2" width="100%" padding-left="15px">La consegna è <font style="color: #FFBB35; font-size:1.3em;"><b>gratis</b></font></td>
+          <td width="16%" align="center"><img src="img/local_shipping_36dp.svg"></td>
+          <td colspan="2" width="100%" padding-left="15px">La consegna è <font style="font-size:1.3em;"><b>gratis</b></font></td>
         {% endif %}
       </tr>
     </table>
 
-    <table class="mx-auto" width="100%" style="margin: 10px; border: 3px solid; color: #FFBB35; font-size:1.5em;">
+    <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.5em;">
       <!-- Shipping -->
       <tr class="text-white">
         <td width="70%" height="60px" style="color: #FFBB35; padding-left: 15px;" valign="middle"><b>Totale ordine</b></td>
-        <td width="30%" height="60px" style="color: #FFBB35;" valign="middle" align="right" id="total"></td>
+        <td width="30%" height="60px" style=";padding:0px 5px 0px 0px;" valign="middle" align="right" id="total"></td>
       </tr>
     </table>
 
@@ -76,6 +80,16 @@
       </tr>
       <tr class="text-white">
         <td width="84%">{{address.address}} {{address.houseNumber}} - {{address.city}} - {{address.postcode}} ({{address.province}})</td>
+      </tr>
+    </table>
+    <table class="mx-auto" width="100%" style="margin: 20px;">
+      <tr class="text-white">
+        <td colspan="2" width="100%" padding-left="15px">
+          <i><b>Consegna entro il:</b></i>
+        </td>
+      <tr class="text-white">
+        <td width="16%" rowspan="3" align="center"><img src="img/event_available_black_36dp.svg"></td>
+        <td width="84%" style="font-size:1.2em;">{{deliveryDate}}</td>
       </tr>
     </table>
 
@@ -190,7 +204,7 @@
             if (result.ok) {
               return result.json();
             }else{
-              post('/infomessage',{msg:"Pagamento non effettuato: ", err:result.statusText, type:"warning"})
+              post('/orderOutcome',{status:"KO"})
               return result.json();
             }
           })
@@ -205,7 +219,7 @@
             }
           })
         } catch(e) {
-          post('/infomessage',{msg:"Pagamento non effettuato: ",err:e, type:"danger"})
+          post('/orderOutcome',{status:"KO"})
           }
         }
 

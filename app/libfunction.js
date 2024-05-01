@@ -151,7 +151,6 @@ module.exports = {
                     moment().tz("Europe/Rome").format();
                     moment.locale('it');
                     var giornoLavorativo
-                    console.debug('OGGI: ', moment().add(3,'d').format('dddd'))
                     if (moment().add(3,'d').format('ddddd') == "sabato") {
                       giornoLavorativo = moment().add(5,'d').format('dddd DD MMMM')
                     } else if (moment().add(3,'d').format('dddd') == "domenica") {
