@@ -34,18 +34,18 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx
 
-  app.post('/overpass/istat', function(req, res) {
-
+  app.post('/overpass/istat', async function(req, res) {
+    var newArr = [];
     var option = '[out:json];'+
              'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.body.istat+'"]->.a;' +
-             'node(area.a)["addr:city"="'+req.body.city+'"]["addr:street"];' +
-             'for (t["addr:street"])(make via name=_.val;out;);'
+             '(node(area.a)["addr:street"];for (t["addr:street"])(make via name=_.val;out;););' +
+             '(way(area.a)[highway]["name"];for (t["name"])(make via name=_.val;out;););'
 
     const url = 'https://overpass-api.de/api/interpreter?data='+option;
 
     console.debug('OVERPASS: ',option);
 
-    const request = https.request(url, (response) => {
+    const request = await https.request(url, (response) => {
         let data = '';
         response.on('data', (chunk) => {
             data = data + chunk.toString();
@@ -55,8 +55,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
               try {
                 const parseJSON = JSON.parse(data);
                 const elements = parseJSON.elements;
-                req.session.elements = elements;
-                //console.debug('STREET: ',JSON.stringify(parseJSON,null,2));
+                //console.debug('STREET: ', elements);
+                for (var index = 0; index < elements.length; ++index) {
+                  newArr.push(elements[index].tags.name);
+                }
+                //console.debug('STREET: ', newArr);
+                req.session.elements = newArr.filter((elem,indexx,self) => {return indexx === self.indexOf(elem);});
+                
                 res.send('{"status":"200", "statusText":"OK"}');
               } catch (e) {
                 console.debug('Error', e);
@@ -73,14 +78,23 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   });
 
 
-  app.post('/overpass/houseNumber', async function(req,res){
-
+  app.post('/overpass/cap', async function(req,res){
+    var newArr = [];
+    //Query Overpass che restitutisce CAP se esiste in mappa OSM e valida il numero civico
     var option =  '[out:json];'+
                   'area[name="'+req.body.comune+'"]["ref:ISTAT"="'+req.body.istat+'"]->.code;'+
-                  '( node(area.code)["addr:street"="'+req.body.via+'"]'+
-                  '["addr:housenumber"="'+req.body.numero+'"];);'+
-                  '(._;>;);out;'
-    console.debug('OPTION: ',JSON.stringify(option, null, 2))
+                  '(node(area.code)'+
+                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
+                  '["addr:street"="'+req.body.via+'"]'+
+                  '["addr:housenumber"="'+req.body.numero+'"];'+
+                  'for (t["addr:postcode"])(make c "addr:postcode"=_.val;out;););'+
+                  '(node(area.code)'+
+                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
+                  '["addr:street"="'+req.body.via+'"]'+
+                  '["addr:housenumber"="'+req.body.numero+'"];'+
+                  'for (t["addr:housenumber"])(make n "addr:housenumber"=_.val;out;););'
+    
+    console.debug('OPTION1: ',option)
     const url = 'https://overpass-api.de/api/interpreter?';
 
     const data = await fetch(url, 
@@ -91,23 +105,64 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                             body: option
                           })
                           .then(function(result) {
-                                  console.debug("RESULT -> : ",result);
+                                  //console.debug("RESULT -> : ",result);
                                   return result.json();
                           });
-      const objData = await data
-      console.debug("DATA -> : ", JSON.stringify(objData));
-      res.send(objData)
-  });
+      var objData = await data
+      
+      console.debug("OVERPASS DATA -> : ", objData.elements);
 
+      for (var index = 0; index < objData.elements.length; ++index) {          
+          if ( objData.elements[index].tags["addr:postcode"] != "" ) {
+              newArr.push(objData.elements[index]);
+          }
+      }
+      console.debug('ARR: ',newArr)
+      
+      if (newArr.length == 0) {        
+        //Query Overpass che restitutisce CAP anche se il numero civico non esiste o non è presente in mappa OSM
+        var option =  '[out:json];'+
+                  'area[name="'+req.body.comune+'"]["ref:ISTAT"="'+req.body.istat+'"]->.code;'+
+                  'node(area.code)'+
+                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
+                  '["addr:street"="'+req.body.via+'"]'+
+                  '["addr:postcode"];'+
+                  'for (t["addr:postcode"])(make c "addr:postcode"=_.val;out;);'
+        
+        console.debug('OPTION2: ',option)
+        const url = 'https://overpass-api.de/api/interpreter?';
+
+        const data = await fetch(url, 
+                              {
+                                method: 'POST',
+                                headers: {'Accept': 'application/json',
+                                          "Content-Type": "application/json"},
+                                body: option
+                              })
+                              .then(function(result) {
+                                      //console.debug("RESULT -> : ",result);
+                                      return result.json();
+                              });
+          objData = await data
+          console.debug("OVERPASS DATA 2-> : ", objData.elements);
+          for (var index = 0; index < objData.elements.length; ++index) {          
+          if ( objData.elements[index].tags["addr:postcode"] != "") {
+              newArr.push(objData.elements[index]);
+          }
+        }
+      console.debug('ARR: ',newArr)
+      }
+      
+      res.send(newArr)
+  });
 
   app.post('/streets', function(req, res) {
       var rates = req.session.elements;
-      var index, value, result;
       var newArr = [];
-      for (index = 0; index < rates.length; ++index) {
-          name = rates[index].tags.name.toLowerCase();
+      for (var index = 0; index < rates.length; ++index) {
+          name = rates[index].toLowerCase();
           if (name.indexOf(req.body.street.toLowerCase()) != -1) {
-              newArr.push(rates[index].tags.name);
+              newArr.push(rates[index]);
           }
       }
       res.send(newArr);
@@ -431,7 +486,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 houseNumber     : req.body.numberciv,
                 postcode        : req.body.hiddenCAP,
                 main            : main,
-                preferred       : 'yes'
+                preferred       : 'yes',
+                affidability    : req.body.hiddenAddressIsValid,
         });
         await user.save(opts);
         await session.commitTransaction();

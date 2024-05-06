@@ -97,10 +97,10 @@ global.mktBoozeXParent = 1;
 global.mktBoozeXFriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato
 global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent / global.mktBoozeXFriends;
 
-var isDebugMode = true;
+
 console.debug = function()
 {
-  if (isDebugMode){
+  if (global.debug){
      var args = Array.prototype.slice.call(arguments);
      console.log.apply(console,args);
   }

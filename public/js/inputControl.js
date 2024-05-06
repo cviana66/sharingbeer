@@ -176,15 +176,12 @@ function fieldsRegisterControl() {
   var province = document.getElementById("inputProvincia").value;
   var address = document.getElementById("inputStreet").value;
   var numciv = document.getElementById("inputNumciv").value;
-  var numcivHidden = document.getElementById("hiddenCivicNumber").value;
   var cognome = document.getElementById("inputLastName").value;
   var nome = document.getElementById("inputFirstName").value;
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
   var submit = true;
 
-console.log('******************HIdden ',numcivHidden)
-console.log('****************** ',numciv)
 
   // init messaggi di warning
   if (document.getElementById("wrongFirstName") != null) document.getElementById("wrongFirstName").innerHTML = "";
@@ -255,7 +252,8 @@ console.log('****************** ',numciv)
     document.getElementById("wrongStreet").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
-  if (numciv == "" || numcivHidden != numciv) {
+  
+  if (numciv == "") { 
     if (numciv == "") {
       text = iwar+"Inserire il Numero Civico";  
     } else {
@@ -263,7 +261,7 @@ console.log('****************** ',numciv)
     }
     document.getElementById("wrongNumciv").innerHTML = text;
     document.getElementById("inputNumciv").focus();
-    return false;
+    return false
   }
   
   return true;
