@@ -83,53 +83,63 @@
     });
 /*==================================================================*/
 /* GESTIONE della CITTA' con query MONGODB                          */
-/* Gestione delle VIE con query su OpenStreetMaps                   */
+/* Gestione delle VIE con query su OpenStreetMaps (Overpass)        */
 /*==================================================================*/
 
 //----------------------CIVICNUMBER e CAP---------------------------
-async function listOfCivicNumber(n) {
-  console.log('CITTA: ',document.getElementById("inputCity").value);
-  console.log('VIA: ',document.getElementById("inputStreet").value);
+async function listOfCivicNumber() {
+  fieldsRegisterControl()
+  document.getElementById("loading").style.display = 'block';
+  console.debug('CITTA: ',document.getElementById("inputCity").value);
+  console.debug('VIA: ',document.getElementById("inputStreet").value);
   document.getElementById("wrongNumciv").innerHTML = ''
-  
-  //document.getElementById("loading").style.display = 'block';
   
   let data = {};
   let response;
   data.comune = document.getElementById("inputCity").value;
   data.via = document.getElementById("inputStreet").value;
-  data.numero = n;
-  await $.ajax({
-    type: 'POST',
-    dataType: 'json',
-    url: '/overpass/houseNumber',
-    data: data,
-    success: function(res) {
-      response = res;
-      console.log('RESPONSE: ',response)
-    },
-    error: function (e) {
-      console.log("ErrorListOfNumber", e.responseText);
-      response = e;
-    }
-  });
-  
-  if (response.elements.length > 0) {
-    console.log('RESPONSE NUMCIVIC: ',response.elements[0].tags['addr:housenumber'])
-    console.log('RESPONSE CAP: ',response.elements[0].tags['addr:postcode'])
-    document.getElementById("hiddenCivicNumber").value = response.elements[0].tags['addr:housenumber']
-    document.getElementById("hiddenCAP").value = response.elements[0].tags['addr:postcode'] 
-  } else {
-    console.log('NUMERO SBAGLIATO')
-    document.getElementById("hiddenCivicNumber").value = ""
-    document.getElementById("hiddenCAP").value =""
-  }
-  //document.getElementById("loading").style.display = 'none';
+  data.istat = document.getElementById("hiddenIstat").value;
+  data.numero = document.getElementById("inputNumciv").value;
+    await $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      url: '/overpass/cap',
+      data: data,
+      success: function(res) {
+
+        if (res.length == 2 || res.length == 1) {
+          var nc="";
+          var cap="";    
+          cap = res[0].tags['addr:postcode'];
+          if (res.length == 2) nc = res[1].tags['addr:housenumber'];
+          console.debug('CAP: ',cap)
+          console.debug('N°: ',nc)
+          document.getElementById("hiddenCAP").value = cap
+          if (cap!="" && nc!="") {
+            document.getElementById("hiddenAddressIsValid").value = 'completo'
+            console.debug('HIDDEN ADDRESS 1: ', document.getElementById("hiddenAddressIsValid").value)
+          } else if ((cap!="" && nc=="")||(cap=="" && nc!="")) {
+            document.getElementById("hiddenAddressIsValid").value = 'parziale'
+            console.debug('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
+          } else {
+            document.getElementById("hiddenAddressIsValid").value = ""
+            console.debug('HIDDEN ADDRESS 3: ', document.getElementById("hiddenAddressIsValid").value)
+          }
+        } else {
+          console.debug('CAP NON PRESENTE')
+          document.getElementById("hiddenCAP").value =""
+          document.getElementById("hiddenAddressIsValid").value = ""
+        }
+
+      },
+      error: function (e) {
+        console.log("ErrorListOfNumber", e.responseText);
+        res = e;
+      }
+    });
+    
+  document.getElementById("loading").style.display = 'none';
 };
-
-
-async function selectCivicNumber() {
-}
 
 //----------------------------TREET---------------------------------
 async function setValueStreet(via) {
@@ -141,12 +151,9 @@ async function setValueStreet(via) {
   document.getElementById("inputStreet").value = via;
   document.getElementById('inputNumciv').removeAttribute('readonly');
   document.getElementById("inputNumciv").focus();
-  document.getElementById("wrongStreet").innerHTML = "";
-  
-  //const comune = document.getElementById("inputCity").value
-  //var res = await listOfCivicNumber(comune,via);
- 
+  document.getElementById("wrongStreet").innerHTML = ""; 
 }
+
 //********************************************************************
 // DATA LA CITTA E IL CODICE ISTAT RECUPERA LE VIE DA OPENSTREETMAP
 //********************************************************************
@@ -169,7 +176,7 @@ async function listOfStreets(citta,istat) {
     data: data,
     success: function(res) {
       response = res;
-      console.log('STREET: ', JSON.stringify(res) )
+      console.log('STREET: ', JSON.stringify(res,null,2) )
     },
     error: function (e) {
       console.log("ErrorListOfStreets", e.responseText);
@@ -271,6 +278,7 @@ async function setValueCity(comune, provincia, istat) {
   };
   console.log('SETVALUE_CITY');
   document.getElementById("hiddenStreet").value = 'OK';
+  document.getElementById("hiddenIstat").value = istat;
   document.getElementById("inputCity").value = comune;
   document.getElementById("inputProvincia").value = provincia;
   document.getElementById("wrongProvincia").innerHTML = "";
@@ -430,9 +438,9 @@ async function selectCity(v) {
 
 var inputCN = document.createElement("input");
       inputCN.setAttribute("type", "hidden");
-      inputCN.setAttribute("id","hiddenCivicNumber");
-      inputCN.setAttribute("name", "hiddenCivicNumber");
-      inputCN.setAttribute("value", "");
+      inputCN.setAttribute("id","hiddenAddressIsValid");
+      inputCN.setAttribute("name", "hiddenAddressIsValid");
+      inputCN.setAttribute("value", "false");
       console.log('INPUT: ',inputCN);
       document.getElementById("addresses").appendChild(inputCN);
 
@@ -451,15 +459,14 @@ var inputCN = document.createElement("input");
       inputStreet.setAttribute("value", "KO");
       console.log('INPUT: ',inputStreet);
       document.getElementById("addresses").appendChild(inputStreet);
-/*
-  var inputCity = document.createElement("input");
-      inputCity.setAttribute("type", "hidden");
-      inputCity.setAttribute("id","hiddenCity");
-      inputCity.setAttribute("name", "hiddenCity");
-      inputCity.setAttribute("value", "KO");
-      console.log('INPUT: ',inputCity);
-      document.getElementById("addresses").appendChild(inputCity);
-*/
+
+  var inputIstat = document.createElement("input");
+      inputIstat.setAttribute("type", "hidden");
+      inputIstat.setAttribute("id","hiddenIstat");
+      inputIstat.setAttribute("name", "hiddenIstat");
+      inputIstat.setAttribute("value", "");
+      console.log('INPUT: ',inputIstat);
+      document.getElementById("addresses").appendChild(inputIstat);
 
 </script>
 
