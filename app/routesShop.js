@@ -51,6 +51,98 @@ module.exports = function(app, moment) {
                })
 	})
 
+// =================================================================================================
+// ORDER SUMMARY 
+// =================================================================================================
+//-------------------------------------------
+//POST
+//-------------------------------------------
+  app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
+
+    try{
+
+      //--------------------------------------
+      // Caso di ritiro presso Sede Birrificio
+      //--------------------------------------
+      if (req.body.addressID == '0' ) {
+        //TODO : rendere parametrico l'importo shipping e i discount
+        
+        req.session.shippingCost = '0.00';
+        req.session.pointDiscount = '10.00';
+        
+        var address = await User.aggregate([
+            {$match:{"local.email": "birrificioviana@gmail.com"}}, 
+            {$unwind: "$addresses"}, 
+            //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
+            {$project:{_id:0,friends:0,orders:0,local:0}}
+            ])
+        req.session.shippingAddress = address[0].addresses;  
+        //console.debug('ADDRESS[0]: ',address[0].addresses)       
+        req.session.deliveryType =  "Ritiro"
+      } else {
+      //-------------------------------------------------------
+      // Caso di spedizione presso indirizzo esistente in base dati
+      //-------------------------------------------------------
+        //TODO : rendere parametrico l'importo shipping e i discount
+        
+        req.session.deliveryType =  "Consegna"
+        
+        address = await User.aggregate([
+            {$match:{"_id":req.user._id}}, 
+            {$unwind: "$addresses"}, 
+            {$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
+            {$project:{_id:0,friends:0,orders:0,local:0}}
+            ])
+        req.session.shippingAddress = address[0].addresses;         
+        //console.debug('ADDRESS[0]: ',address[0].addresses)
+
+        let customerAddress = address[0].addresses.address + ' ' + 
+                          address[0].addresses.houseNumber + ' ' +
+                          address[0].addresses.city +  ' ' +
+                          address[0].addresses.province;
+        let birrificioAddress ='via molignati 10 candelo biella';
+        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
+
+        console.log('DISTANZA = ', dist.distanceInMeters)
+
+        if ( Number(dist.distanceInMeters) > 15000) {
+          req.session.shippingCost = priceCurier[req.session.numProducts-1];
+          req.session.pointDiscount = '2.00';
+        } else {
+          if (req.session.numProducts > 5) {
+            req.session.shippingCost = '0.00';
+          } else {
+            console.debug('PRICE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
+            req.session.shippingCost = priceLocal[req.session.numProducts-1]
+          }
+          req.session.pointDiscount = '2.00';          
+        }
+      }
+      
+      res.render('orderSummary.njk', {
+        cartItems   : req.session.cartItems,
+        address     : address[0].addresses,
+        numProducts : req.session.numProducts,
+        userStatus  : req.user.local.status,
+        shipping    : req.session.shippingCost,
+        deliveryType      : req.session.deliveryType,
+        deliveryDate      : lib.deliveryDate(),
+        discount    : req.session.pointDiscount,
+        user        : req.user,
+        payType     : "axerve" //"paypal"  "axerve"
+      })
+    }
+    catch (e) {
+      console.log ('ERROR ',e)
+      req.flash('error', 'Mi dspiace, si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com') 
+      res.render('info.njk', {
+          message: req.flash('error'),
+          type: "danger"
+      });
+    }
+
+  });
+
 // =============================================================================
 // ORDER OUTCOME ===============================================================
 // =============================================================================
@@ -86,7 +178,7 @@ module.exports = function(app, moment) {
 
 
 // =============================================================================
-// GET SHOP ====================================================================
+// SHOP ========================================================================
 // =============================================================================
 //GET
   app.get('/shop', lib.isLoggedIn, function (req,res) {
@@ -94,28 +186,31 @@ module.exports = function(app, moment) {
   	Product.find(function (err, prods) {
   		if (err) {
   			let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
+  			console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
         req.flash('message', msg);
         return res.render('info.njk', {
             message: req.flash('message'),
             type: "warning"
         })
+  		} else {
+  			req.flash('info', req.query.msg);
+	  		prods.forEach(function(prod) {
+	  			prod.prettyPrice = prod.prettyPrice();
+	  		});
+
+	  		//mette in memoria i prodotti dal carrello
+	      lib.retriveCart(req);
+
+			  var model =  { products   : prods,                   //prodotti dello shop
+	  						       user       : req.user,                //utente loggato
+	  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello
+	  						       //cart       : req.session.cartItems,   //prodotti nel carrello
+	                     message    : req.flash('info'),
+	                     type       : "info"
+	  					       };
+	      
+	  		res.render('shop.njk', model);
   		}
-  		prods.forEach(function(prod) {
-  			prod.prettyPrice = prod.prettyPrice();
-  		});
-
-  		//mette in memoria i prodotti dal carrello
-      lib.retriveCart(req);
-
-		  var model =  { products   : prods,                   //prodotti dello shop
-  						       user       : req.user,                //utente loggato
-  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello
-  						       //cart       : req.session.cartItems,   //prodotti nel carrello
-                     message    : req.flash('info'),
-                     type       : "info"
-  					       };
-      //console.log("numero di prodotti in carrello: ",req.session.numProducts)
-  		res.render('shop.njk', model);
   	});
   });
 //POST
@@ -127,8 +222,6 @@ module.exports = function(app, moment) {
 		var cart = req.session.cart = req.session.cart || {};
 		//Read the incoming product data from shop.njk
 		var id = req.body.item_id;
-
-    //console.log("productID: ",id);
 
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
@@ -142,26 +235,41 @@ module.exports = function(app, moment) {
             message: req.flash('message'),
             type: "warning"
         })
+			} else {
+				/*------------------------------------------------------------------------------
+				/ Verifico se il prodotto selezioanto è disponibile.
+				/ La verifica è parziale a causa della possibilità di concorrenza nell'acquisto
+				/ da più users. 
+				/ La verifica finale è fatta in orderSummary.
+				/------------------------------------------------------------------------------*/
+				var q =  (!cart[id]) ? 0 : cart[id].qty; //se il carrello è vuoto
+				
+				if ((Number(prod.quantity) - Number(q)) > 0) {
+					console.debug('DISPONIBILITA: ', Number(prod.quantity), Number(q))
+					//Increase quantity or add the product in the shopping cart.
+					if (cart[id]) {
+						cart[id].qty++;
+						cart[id].subtotal=(cart[id].qty*cart[id].price).toFixed(2);
+						req.session.numProducts++;
+					}	else { //il prodotto è scelto per la prima volta
+						cart[id] = {
+							id : prod._id,
+							name: prod.name,
+		          linkImage: prod.linkImage,
+		          quantity: prod.quantity,
+							price: prod.price.toFixed(2),
+							prettyPrice: prod.prettyPrice(),
+							qty: 1,
+							subtotal: prod.price.toFixed(2)
+						};
+						req.session.numProducts++;
+					}
+					res.redirect('/shop');
+				} else {
+					const msg = 'La birra '+prod.name+' è esaurita e sarà a breve in riassortimento'
+					res.redirect('/shop?msg='+ msg);
+				}
 			}
-			//Increase quantity or add the product in the shopping cart.
-			if (cart[id]) {
-				cart[id].qty++;
-				cart[id].subtotal=(cart[id].qty*cart[id].price).toFixed(2);
-				req.session.numProducts++;
-			}	else { //il prodotto è scelto per la prima volta
-				cart[id] = {
-					id : prod._id,
-					name: prod.name,
-          linkImage: prod.linkImage,
-          quantity: prod.quantity,
-					price: prod.price.toFixed(2),
-					prettyPrice: prod.prettyPrice(),
-					qty: 1,
-					subtotal: prod.price.toFixed(2)
-				};
-				req.session.numProducts++;
-			}
-			res.redirect('/shop');
 
 		});
 	});

@@ -14,31 +14,33 @@
                   <tr>
                     <td width="75%"><div><h3 class="card-title text-white text-left">{{prod.name}}</h3></div></td>
                     <td width="25%"><div><h3 class="card-title text-white text-right">{{prod.prettyPrice}}</h3></div></td>
-                  </h3>
+                  </tr>
                 </table>
-                <p class="text-white font-weight-light text-right">BeerBox disponibili: {{prod.quantity}}</p>
+                {% if prod.quantity > 20 %}
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili</h5>
+                {% elif prod.quantity < 20 and prod.quantity > 6 %}
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento </h5>
+                {% else %}
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox finiti e in assortimento </h5>
+                {% endif %}
                 <div class="align-self-center">
-                  <p class="text-white font-weight-light text-justify"><i>{{prod.description}}</i></p>
+                  <p class="text-white font-italic text-justify">{{prod.description}}</p>
                 </div>
-                <div style="margin: 0px 0px 10px 0px;">
-                  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv()">
-                    <!-- <div>{{prod.prettyPrice}}</div> -->
-                    <div>Aggiungi al Carrello</div>
-                  </button>
-                </div>
-              </div>
-              <!--div class="card-footer" style="background-color:#FFBB35;">
-                <small class="text-muted">&#9733; &#9733; &#9733; &#9733; &#9734;</small>
-              </div-->
+                {% if prod.quantity > 10 %}
+                  <div style="margin: 0px 0px 10px 0px;">
+                    <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv()">
+                      <!-- <div>{{prod.prettyPrice}}</div> -->
+                      <div>Aggiungi al Carrello</div>
+                    </button>
+                  </div>
+                {% endif %}
+                </div>            
             </div>
-            <!--hr style="border-top: 1px solid #5375BD;"-->
         </form>
 
-     {% else %}
-
-      <p>Non ci sono prodotti :(<br> <a href="/products">Aggiungi</a></p>
-
-    {% endfor %}
+      {% else %}
+        <p>Non ci sono prodotti :(<br> <a href="/products">Aggiungi</a></p>
+      {% endfor %}
 
 <script type="text/javascript">
   let content = document.getElementById("carrello");

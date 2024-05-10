@@ -3,6 +3,7 @@ const fetch         = require("node-fetch");
 const User          = require('../app/models/user');
 const mailorder     = require('../config/mailOrder');
 const {transMsg}    = require("./msgHandler");
+const Product = require('./models/product.js');
 
 module.exports = function(app,mongoose, moment) {
 
@@ -29,11 +30,26 @@ var users;
     const opts = { session };
     
     try {
-      
+
+      //=============================================
+      // Decurto i prodotti dalla disponibilità 
+      // per ciacun prodotto in acquisto
+      //=============================================
+      for (var index = 0; index < req.session.numProductsPerId.length; index++) {
+        console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
+        const filter = {_id:req.session.numProductsPerId[index].id};
+        console.debug("FILTER: ",filter)
+        let doc = await Product.findOne(filter)
+        const update = { quantity: (Number(doc.quantity) - Number(req.session.numProductsPerId[index].qty))};
+        let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
+        console.debug('QUANTITY UPDATE MINUS: ',doc1.quantity)
+      }
+      //=============================================
+
       const user = await User.findById(req.user._id);
       const orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
       req.session.order._id = orderId;                // _id in sessione usato per update ordine in axerve_response
-      req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2)
+      req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2)
       
       console.debug('Sharingbeer ORDER ID :', req.session.order._id.toString());
 
@@ -50,7 +66,7 @@ var users;
           },
           body: JSON.stringify({  
             "shopLogin": shopLogin,
-            "amount": (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.shippingDiscount)).toFixed(2),
+            "amount": (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2),
             "currency": currency,
             "shopTransactionID" : req.session.order._id.toString()
           })
@@ -80,7 +96,6 @@ var users;
           status      : "CREATED",
           deliveryType : req.session.deliveryType,
           shipping          : Number(req.session.shippingCost).toFixed(2),
-          shippingDiscount  : Number(req.session.shippingDiscount).toFixed(2),
           pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
           totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
           totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
@@ -193,7 +208,21 @@ var users;
         })
 
       } else {
-        console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
+        console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} ERROR: '+e+' '+error_code+' '+error_description);
+        //==============================================
+        // Ri-aggiungo i prodotti dalla disponibilità 
+        // per prodotto per acquisto non effettuato
+        //=============================================
+        for (var index = 0; index < req.session.numProductsPerId.length; index++) {
+          console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
+          const filter = {_id:req.session.numProductsPerId[index].id};
+          console.debug("FILTER: ",filter)
+          let doc = await Product.findOne(filter)
+          const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
+          let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
+          console.debug('QUANTITY UPDATE: ',doc1.quantity)
+        }
+        //=============================================
         res.render('orderOutcome.njk', {
           status  : status,
           orderId : orderId,
@@ -205,8 +234,25 @@ var users;
       await session.commitTransaction();
 
     } catch (e) {
-      console.error(moment().format() + ' [ERROR][RECOVERY:YES] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
-      await session.abortTransaction();
+      console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
+      //await session.abortTransaction();
+
+      //==============================================
+      // Ri-aggiungo i prodotti nella disponibilità 
+      // per prodotto per acquisto non effettuato
+      //=============================================
+      for (var index = 0; index < req.session.numProductsPerId.length; index++) {
+        console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
+        const filter = {_id:req.session.numProductsPerId[index].id};
+        console.debug("FILTER: ",filter)
+        let doc = await Product.findOne(filter)
+        const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
+        let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
+        console.debug('QUANTITY UPDATE ADD: ',doc1.quantity)
+      }
+      //=============================================
+     
+      await session.commitTransaction();
       res.render('orderOutcome.njk', {
           status  : 'KO',
           user    : req.user,

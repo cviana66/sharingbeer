@@ -495,6 +495,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       //------------------------------------------------------------------------
       // Caso di spedizione presso indirizzo inserito appena prima del pagamento
       //------------------------------------------------------------------------
+
+
         if (req.session.nextStep = 'payment') {
 
         //TODO : rendere parametrico l'importo discount
@@ -514,19 +516,22 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                           address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
                           address[0].addresses.province;
-        let birrificioAddress ='Via Molignati 10 Candelo Biella';
+        let birrificioAddress ='Via Molignati 12 Candelo Biella';
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
 
         console.log('DISTANZA = ', dist.distanceInMeters)
 
         if ( Number(dist.distanceInMeters) > 15000) {
-          req.session.shippingCost = '10.00';
+          req.session.shippingCost = priceCurier[req.session.numProducts-1];
           req.session.pointDiscount = '2.00';
-          req.session.shippingDiscount = '0.00'  
         } else {
-          req.session.shippingCost = '5.00';
+          if (req.session.numProducts > 5) {
+            req.session.shippingCost = '0.00';
+          } else {
+            console.debug('PRICE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
+            req.session.shippingCost = priceLocal[req.session.numProducts-1]
+          }
           req.session.pointDiscount = '2.00';
-          req.session.shippingDiscount = '0.00'  
         }
 
         res.render('orderSummary.njk', {
@@ -535,7 +540,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 numProducts : req.session.numProducts,
                 userStatus  : req.user.local.status,
                 shipping    : req.session.shippingCost,
-                shippingDiscount  : req.session.shippingDiscount,
                 deliveryType      : req.session.deliveryType,
                 deliveryDate      : lib.deliveryDate(),
                 discount    : req.session.pointDiscount,
@@ -586,104 +590,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       }
 
     });
-
-// =================================================================================================
-// ORDER SUMMARY 
-// =================================================================================================
-//-------------------------------------------
-//POST
-//-------------------------------------------
-  app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
-
-    //console.debug("ADDRESS ID: ", req.body.addressID)
-    var address;
-
-    try{
-
-      //--------------------------------------
-      // Caso di ritiro presso Sede Birrificio
-      //--------------------------------------
-      if (req.body.addressID == '0' ) {
-        //TODO : rendere parametrico l'importo shipping e i discount
-        
-        req.session.shippingCost = '0.00';
-        req.session.pointDiscount = '10.00';
-        req.session.shippingDiscount = '5.00'
-        
-        address = await User.aggregate([
-            {$match:{"local.email": "birrificioviana@gmail.com"}}, 
-            {$unwind: "$addresses"}, 
-            //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
-            {$project:{_id:0,friends:0,orders:0,local:0}}
-            ])
-        req.session.shippingAddress = address[0].addresses;  
-        //console.debug('ADDRESS[0]: ',address[0].addresses)       
-        req.session.deliveryType =  "Ritiro"
-      } else {
-      //-------------------------------------------------------
-      // Caso di spedizione presso indirizzo esistente in base dati
-      //-------------------------------------------------------
-        //TODO : rendere parametrico l'importo shipping e i discount
-        
-        req.session.deliveryType =  "Consegna"
-        
-        address = await User.aggregate([
-            {$match:{"_id":req.user._id}}, 
-            {$unwind: "$addresses"}, 
-            {$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
-            {$project:{_id:0,friends:0,orders:0,local:0}}
-            ])
-        req.session.shippingAddress = address[0].addresses;         
-        //console.debug('ADDRESS[0]: ',address[0].addresses)
-
-        let customerAddress = address[0].addresses.address + ' ' + 
-                          address[0].addresses.houseNumber + ' ' +
-                          address[0].addresses.city +  ' ' +
-                          address[0].addresses.province;
-        let birrificioAddress ='via molignati 10 candelo biella';
-        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
-
-        console.log('DISTANZA = ', dist.distanceInMeters)
-
-        if ( Number(dist.distanceInMeters) > 15000) {
-          req.session.shippingCost = '10.00';
-          req.session.pointDiscount = '2.00';
-          req.session.shippingDiscount = '0.00'  
-        } else {
-          req.session.shippingCost = '5.00';
-          req.session.pointDiscount = '2.00';
-          req.session.shippingDiscount = '0.00'  
-        }
-
-      }
-
-      //console.debug("SESSION: ", req.session)
-      //console.debug ("SESSION CARTITEMS: ", req.session.cartItems)
-      
-      res.render('orderSummary.njk', {
-        cartItems   : req.session.cartItems,
-        address     : address[0].addresses,
-        numProducts : req.session.numProducts,
-        userStatus  : req.user.local.status,
-        shipping    : req.session.shippingCost,
-        shippingDiscount  : req.session.shippingDiscount,
-        deliveryType      : req.session.deliveryType,
-        deliveryDate      : lib.deliveryDate(),
-        discount    : req.session.pointDiscount,
-        user        : req.user,
-        payType     : "axerve" //"paypal"  "axerve"
-      })
-    }
-    catch (e) {
-      console.log ('ERROR ',e)
-      req.flash('error', 'Mi dspiace, si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com') 
-      res.render('info.njk', {
-          message: req.flash('error'),
-          type: "danger"
-      });
-    }
-
-  });
 
   // ===============================================================================================
   // FRIEND - gestione degli inviti

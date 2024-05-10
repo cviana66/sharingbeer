@@ -253,12 +253,12 @@
 
   <!--/div-->
   <script type="text/javascript">
-    function getTotal (subtotale,spedizione, scontoS, scontoA) {
-      const tot = Number(subtotale)+Number(spedizione)-Number(scontoS)-Number(scontoA)
+    function getTotal (subtotale,spedizione, scontoA) {
+      const tot = Number(subtotale)+Number(spedizione)-Number(scontoA)
       return tot.toFixed(2)
     }
 
-    let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{shippingDiscount}},{{discount}})
+    let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{discount}})
     document.getElementById("total").innerHTML = `<b>&euro;${i}</b>`;
   
 
