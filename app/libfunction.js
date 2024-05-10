@@ -122,18 +122,26 @@ module.exports = {
                       totalPrice = 0,
                       totalQty = 0
                   req.session.numProducts = 0;
+                  req.session.numProductsPerId = [];
 
-                  if (!cart) {
-                    req.session.numProducts = 0;
-                  } else {
+                  console.debug('CART: ', cart)
+
+                 // if (!cart) {
+                 //   req.session.numProducts = 0;
+                 // } else {
+                  if (cart) {
                     for (var item in cart) {
                       if (cart[item].qty > 0) {
                         cartItems.items.push(cart[item]);
                         totalPrice += (cart[item].qty * cart[item].price);
                         totalQty += cart[item].qty;
                         req.session.numProducts += cart[item].qty;
+                        let npXid = { "id":cart[item].id.toString(), "qty":cart[item].qty}
+                        req.session.numProductsPerId.push(npXid);  
+                        console.debug('PRODOTTI NEL CARRELLO: ITEM=',item, ' PRODOTTO: ', cart[item])
                       }
                     }
+                    console.debug('NUMERO PRODOTTI PER ID: ',req.session.numProductsPerId.length, req.session.numProductsPerId)
                     req.session.cartItems = cartItems;
                     req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
                     req.session.totalQty = cartItems.totalQty = totalQty;

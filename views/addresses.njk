@@ -12,7 +12,7 @@
         <span style="font-size:0.9em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
       </div>
       <form role="form" action="/orderSummary" method="post" id="selectedAddress">
-        <div class="card text-white" style="background-color:#903246;border-color:#903246;margin-bottom:10px;">
+        <div class="card text-white" style="background-color:#6B1628;border-color:#903246;margin-bottom:10px;">
           <div class="card-body">
             <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!<br>
             <p style="font-size:1.0em;" class="card-text text-center">Ti aspettiamo in
@@ -119,18 +119,20 @@
 
 //----------------------CIVICNUMBER e CAP---------------------------
 async function listOfCivicNumber() {
-  fieldsRegisterControl()
-  document.getElementById("loading").style.display = 'block';
-  console.debug('CITTA: ',document.getElementById("inputCity").value);
-  console.debug('VIA: ',document.getElementById("inputStreet").value);
-  document.getElementById("wrongNumciv").innerHTML = ''
-  
-  let data = {};
-  let response;
-  data.comune = document.getElementById("inputCity").value;
-  data.via = document.getElementById("inputStreet").value;
-  data.istat = document.getElementById("hiddenIstat").value;
-  data.numero = document.getElementById("inputNumciv").value;
+  const ret = fieldsRegisterControl()
+  if (ret) {
+    document.getElementById("loading").style.display = 'block';
+    console.debug('CITTA: ',document.getElementById("inputCity").value);
+    console.debug('VIA: ',document.getElementById("inputStreet").value);
+    document.getElementById("wrongNumciv").innerHTML = ''
+    
+    let data = {};
+    let response;
+    data.comune = document.getElementById("inputCity").value;
+    data.via = document.getElementById("inputStreet").value;
+    data.istat = document.getElementById("hiddenIstat").value;
+    data.numero = document.getElementById("inputNumciv").value;
+    
     await $.ajax({
       type: 'POST',
       dataType: 'json',
@@ -168,7 +170,7 @@ async function listOfCivicNumber() {
         res = e;
       }
     });
-    
+  }
   document.getElementById("loading").style.display = 'none';
 };
 

@@ -77,7 +77,12 @@ const routesDelivery  = require('./app/routesDelivery');
 
 global.debug = true;
 
-//global.cost = 3;
+/*  =======================================================================
+    Delivery price
+    ======================================================================= */
+
+global.priceLocal = ['5.50','4.20','2.80','1.50','0.40'] 
+global.priceCurier =  ['7.70','7.90','6.60','6.60','5.20','11.10','9.80','8.40','7.70','11.40','10.00','8.70','8.60','7.30','9.90','4.60','3.20'] 
 
 /*  =======================================================================
     Settings Booze
@@ -97,7 +102,9 @@ global.mktBoozeXParent = 1;
 global.mktBoozeXFriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato
 global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent / global.mktBoozeXFriends;
 
-
+/*  =======================================================================
+    Debug utility
+    ======================================================================= */
 console.debug = function()
 {
   if (global.debug){
@@ -106,37 +113,7 @@ console.debug = function()
   }
 }
 
-/*  =======================================================================
-/*  Settings Host
-/*  ======================================================================= */
-/*
-if (process.env.NODE_ENV== "development") {
-  global.server = "http://localhost:8080";
-} else if (process.env.NODE_ENV == "production") {
-  global.server = "https://sharingbeer.it";
-}
-*/
 
-/*  =======================================================================
-/*  Logger in file   DISATTIVATO perchè l'hosting HEROKU non lo permette
-/*  Attivato il servizio LogDNA
-/*  =======================================================================
-var log_file_action = fs.createWriteStream(__dirname + '/actionTODO.log', {flags : 'w'});
-var log_file_info = fs.createWriteStream(__dirname + '/applicationInfo.log', {flags : 'w'});
-console.log ('################### '+__dirname+' ###################');
-
-var log_stdout = process.stdout;
-
-console.err = function(d) {
-  log_file_action.write(util.format(d) + '\n');
-  log_stdout.write(util.format(d) + '\n');
-};
-
-console.info = function(d) {
-  log_file_info.write(util.format(d) + '\n');
-  log_stdout.write(util.format(d) + '\n');
-
-}; */
 
 /**
  *  Define the application.

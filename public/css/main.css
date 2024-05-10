@@ -10,6 +10,11 @@ body {
   min-height: 480px;
 }
 
+/* estende le classi di Bootstrap */
+
+.text-emphasis {
+  color: #FFBB35;
+}
 
 /* Animate DIV */
 .animate-div {

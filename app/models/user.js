@@ -47,7 +47,6 @@ const userSchema = new Schema({
               email       : { type: String, required: true },
               dateInsert  : { type: Date, required: true },
               status      : { type: String, required: true},
-              shippingDiscount    : { type: Number},
               pointsDiscount      : { type: Number},
               shipping            : { type: Number},
               deliveryType        : { type: String},

@@ -5,23 +5,14 @@
 module.exports = function(app, qr, moment) {
 
   var lib     = require('./libfunction');
-/*
-  var port = process.env.port;
-  if (port === 8080) {
-      address = "htpp://127.0.0.1:8080";
-  } else {
-      address = "https://sharingbeer.herokuapp.com";
-  }
 
-  app.locals.baseurl = address;
-*/
 // ======================================================================================
 // QRCODE ===============================================================================
 // ======================================================================================
 //GET
   //Create QRCode
   app.get('/qr', function(req, res) {
-    var code = qr.image('sb-sharingbeer', { type: 'svg' });
+    var code = qr.image('sharingbeer.eu', { type: 'svg' });
     res.type('svg');
     code.pipe(res);
   });
