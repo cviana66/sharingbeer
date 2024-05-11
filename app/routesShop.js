@@ -52,7 +52,8 @@ module.exports = function(app, moment) {
 	})
 
 // =================================================================================================
-// ORDER SUMMARY 
+// ORDER SUMMARY  
+// !!!ATTENZIONE!!! in routesRegiter c'è una parte di gestione del della consegna in /register (POST)
 // =================================================================================================
 //-------------------------------------------
 //POST
@@ -65,10 +66,33 @@ module.exports = function(app, moment) {
       // Caso di ritiro presso Sede Birrificio
       //--------------------------------------
       if (req.body.addressID == '0' ) {
-        //TODO : rendere parametrico l'importo shipping e i discount
         
-        req.session.shippingCost = '0.00';
-        req.session.pointDiscount = '10.00';
+        // Booze attualmente disponibili
+        console.debug('POINT DISCOUNT BOOZE: ', req.user.local.booze)
+        req.session.booze = req.user.local.booze
+        
+        // Costo spedizione
+        req.session.shippingCost = 0.00.toFixed(2);
+
+        //==============================================================================
+        // Vantaggio dai tuoi amici 
+        // Il prezzo totale di acquisto/numero di bottigli => costo di una bottiglia
+        // se i booze >= costo di una bottiglia allora faccio lo sconto
+        // lo sconto massimo è del 50% su totale di acquisto  
+        //==============================================================================
+        const c1b = req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox
+        console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
+        if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
+        	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
+        	req.session.booze = 0
+        } else if (req.user.local.booze > req.session.totalPrc/2) {
+        	req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
+        	req.session.booze = req.session.booze - (req.session.totalPrc/2)        	
+        } else {
+        	 req.session.pointDiscount = 0.00.toFixed(2); 
+        }
+
+        console.debug('NEW BOOZE: ',req.session.booze)
         
         var address = await User.aggregate([
             {$match:{"local.email": "birrificioviana@gmail.com"}}, 
@@ -81,7 +105,7 @@ module.exports = function(app, moment) {
         req.session.deliveryType =  "Ritiro"
       } else {
       //-------------------------------------------------------
-      // Caso di spedizione presso indirizzo esistente in base dati
+      // Caso di spedizione presso all'indirizzo indirizzo 
       //-------------------------------------------------------
         //TODO : rendere parametrico l'importo shipping e i discount
         
@@ -107,7 +131,6 @@ module.exports = function(app, moment) {
 
         if ( Number(dist.distanceInMeters) > 15000) {
           req.session.shippingCost = priceCurier[req.session.numProducts-1];
-          req.session.pointDiscount = '2.00';
         } else {
           if (req.session.numProducts > 5) {
             req.session.shippingCost = '0.00';
@@ -115,7 +138,23 @@ module.exports = function(app, moment) {
             console.debug('PRICE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
             req.session.shippingCost = priceLocal[req.session.numProducts-1]
           }
-          req.session.pointDiscount = '2.00';          
+        }
+        //==============================================================================
+        // Vantaggio dai tuoi amici 
+        // Il prezzo totale di acquisto/numero di bottigli => costo di una bottiglia
+        // se i booze >= costo di una bottiglia allora faccio lo sconto
+        // lo sconto massimo è del 50% su totale di acquisto  
+        //==============================================================================
+        const c1b = req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox
+        console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
+        if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
+        	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
+        	req.session.booze = 0
+        } else if (req.user.local.booze > req.session.totalPrc/2) {
+        	req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
+        	req.session.booze = req.session.booze - (req.session.totalPrc/2)        	
+        } else {
+        	req.session.pointDiscount = 0.00.toFixed(2); 
         }
       }
       

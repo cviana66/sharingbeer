@@ -523,7 +523,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
         if ( Number(dist.distanceInMeters) > 15000) {
           req.session.shippingCost = priceCurier[req.session.numProducts-1];
-          req.session.pointDiscount = '2.00';
         } else {
           if (req.session.numProducts > 5) {
             req.session.shippingCost = '0.00';
@@ -531,7 +530,24 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             console.debug('PRICE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
             req.session.shippingCost = priceLocal[req.session.numProducts-1]
           }
-          req.session.pointDiscount = '2.00';
+        }
+
+        //==============================================================================
+        // Vantaggio dai tuoi amici 
+        // Il prezzo totale di acquisto/numero di bottigli => costo di una bottiglia
+        // se i booze >= costo di una bottiglia allora faccio lo sconto
+        // lo sconto massimo è del 50% su totale di acquisto  
+        //==============================================================================
+        const c1b = req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox
+        console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
+        if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
+          req.session.pointDiscount = req.user.local.booze.toFixed(2);  
+          req.session.booze = 0
+        } else if (req.user.local.booze > req.session.totalPrc/2) {
+          req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
+          req.session.booze = req.session.booze - (req.session.totalPrc/2)          
+        } else {
+          req.session.pointDiscount = 0.00.toFixed(2); 
         }
 
         res.render('orderSummary.njk', {

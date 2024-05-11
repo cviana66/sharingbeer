@@ -160,8 +160,8 @@ var users;
       //==========================================
       if (status == "") status = "KO";
 
-      const filter = {_id: req.user._id};
-      const update = 
+      let filter = {_id: req.user._id};
+      let update = 
           {
             'orders.$[el].status'               : status,
             //'orders.$[el].paypal.transactionId' : payment_id,    
@@ -171,10 +171,11 @@ var users;
           }
 
       let updateOrder = await User.findOneAndUpdate(
-                                {_id: req.user._id},
+                                filter,
                                 {'$set':update},
                                 {arrayFilters: [{"el._id": req.session.order._id}]}
                                 ).session(session);
+      
 
       if (status == 'OK') {
         //========================================
@@ -198,6 +199,21 @@ var users;
         req.session.order = {}
         req.session.numProducts = 0
 
+        //=====================================
+        // aggiungo possibilità di invito
+        // aggiungo punto Pinta al cliente Padre
+        //=====================================        
+        let updateUser = await User.findOneAndUpdate(
+                                  {_id: req.user._id},
+                                  {'$inc': {'local.eligibleFriends': invitiPerOgniAcquisto},'local.booze': req.session.booze}
+                                ).session(session);
+        const booze = Number(req.session.totalPrc)/numBottigliePerBeerBox/puntiPintaPerUnaBottiglia
+        console.log('BOOZE: ', booze, req.session.totalPrc, numBottigliePerBeerBox, puntiPintaPerUnaBottiglia)
+        let updateUserParent = await User.findOneAndUpdate(
+                                      {'_id': mongoose.Types.ObjectId(req.user.local.idParent)},
+                                      {'$inc': {'local.booze':booze}}
+                                    ).session(session);
+
         console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
         res.render('orderOutcome.njk', {
           status  : status,
@@ -208,6 +224,7 @@ var users;
         })
 
       } else {
+        
         console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} ERROR: '+e+' '+error_code+' '+error_description);
         //==============================================
         // Ri-aggiungo i prodotti dalla disponibilità 
@@ -216,8 +233,10 @@ var users;
         for (var index = 0; index < req.session.numProductsPerId.length; index++) {
           console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
           const filter = {_id:req.session.numProductsPerId[index].id};
+          
           console.debug("FILTER: ",filter)
           let doc = await Product.findOne(filter)
+          
           const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
           let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
           console.debug('QUANTITY UPDATE: ',doc1.quantity)
@@ -234,7 +253,7 @@ var users;
       await session.commitTransaction();
 
     } catch (e) {
-      console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:bjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + req.session.order._id + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
+      console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
       //await session.abortTransaction();
 
       //==============================================
@@ -244,10 +263,12 @@ var users;
       for (var index = 0; index < req.session.numProductsPerId.length; index++) {
         console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
         const filter = {_id:req.session.numProductsPerId[index].id};
+        
         console.debug("FILTER: ",filter)
         let doc = await Product.findOne(filter)
+        
         const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
-        let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
+        let doc1 = await Product.findOneAndUpdate(filter, update, {new:true});
         console.debug('QUANTITY UPDATE ADD: ',doc1.quantity)
       }
       //=============================================

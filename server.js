@@ -85,22 +85,14 @@ global.priceLocal = ['5.50','4.20','2.80','1.50','0.40']
 global.priceCurier =  ['7.70','7.90','6.60','6.60','5.20','11.10','9.80','8.40','7.70','11.40','10.00','8.70','8.60','7.30','9.90','4.60','3.20'] 
 
 /*  =======================================================================
-    Settings Booze
-
-    1 bottiglia ogni  12  booze
-    2 bottiglie ogni  24  booze
-    3 bottiglie ogni  36  booze
-    4 bottiglie ogni  48  booze
-
-   ======================================================================= */
-global.oneBottleBoozeEquivalent   = 12;
-global.twoBottleBoozeEquivalent   = 24;
-global.threeBottleBoozeEquivalent = 36;
-global.fourBottleBoozeEquivalent  = 48;
-
-global.mktBoozeXParent = 1;
-global.mktBoozeXFriends = 4; //sono i Booze destinatia al marketing per ogni PKGx4 aquistato
-global.numAcquistiXunaBottigliaXunAmico = global.oneBottleBoozeEquivalent / global.mktBoozeXFriends;
+    inviti per ogni acquisto e punti pinta per 1 birra gratis0
+    1 punto Pinta = 1 beerbox acquistato
+    ======================================================================= */
+global.numBottigliePerBeerBox = 6
+global.invitiPerOgniAcquisto = 4;
+global.puntiPintaPerUnaBottiglia = 12;
+global.puntiPintaPerAcquisto = 1;
+// equivalente in € di 1 Punto Pinta = PrezzoBirra / numBottigliePerBeerBox / puntiPintaPerUnaBottiglia
 
 /*  =======================================================================
     Debug utility
