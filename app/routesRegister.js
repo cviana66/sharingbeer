@@ -731,7 +731,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         const user = await User.findById(req.user.id);
         user.friends.push({ 'name.first'  : firstName,
                             'token'       : token,
-                            'status'      : 'new'                              
+                            'status'      : 'new',
+                            'insertDate'  : moment().format()                            
         });
         await user.save(opts);
         //throw new Error('ERROR in RECOMM generato da me');

@@ -92,9 +92,10 @@ var users;
         user.orders.push({
           _id         : orderId,
           email       : req.user.local.email,
-          dateInsert  : moment().format(), //Date.now(),
+          dateInsert  : moment().format(),
           status      : "CREATED",
           deliveryType : req.session.deliveryType,
+          deliveryDate : lib.deliveryDate('formato_data'),
           shipping          : Number(req.session.shippingCost).toFixed(2),
           pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
           totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
@@ -224,7 +225,7 @@ var users;
         })
 
       } else {
-        
+
         console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} ERROR: '+e+' '+error_code+' '+error_description);
         //==============================================
         // Ri-aggiungo i prodotti dalla disponibilità 
