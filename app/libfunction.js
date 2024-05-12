@@ -22,6 +22,8 @@ module.exports = {
                       return next();
                   }
                   // if they aren't redirect them to the Login page
+                  console.debug('INDIRIZZO DA DOVE ARRIVO: ',req.originalUrl);
+                  global.returnTo = req.originalUrl; 
                   res.redirect('/login');
               },
   isAdmin: function isLoggedIn(req, res, next) {
@@ -155,16 +157,21 @@ module.exports = {
                         return true;
                       }
                     },
-  deliveryDate: function deliveryDate() {
+  deliveryDate: function deliveryDate(dataType) {
                     moment().tz("Europe/Rome").format();
-                    moment.locale('it');
-                    var giornoLavorativo
+                    moment.locale('it');                    
+                    var d
                     if (moment().add(3,'d').format('ddddd') == "sabato") {
-                      giornoLavorativo = moment().add(5,'d').format('dddd DD MMMM')
+                      d = moment().add(5,'d').format()
                     } else if (moment().add(3,'d').format('dddd') == "domenica") {
-                      giornoLavorativo = moment().add(4,'d').format('dddd DD MMMM')
+                      d = moment().add(4,'d').format()
                     } else {
-                      giornoLavorativo = moment().add(3,'d').format('dddd DD MMMM')
+                      d = moment().add(3,'d').format()
+                    }
+                    if (dataType == 'formato_data') {
+                      giornoLavorativo = moment(d).format()
+                    } else {
+                      giornoLavorativo = moment(d).format('dddd DD MMMM')
                     }
                     return giornoLavorativo  
                 }

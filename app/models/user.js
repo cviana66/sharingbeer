@@ -39,9 +39,10 @@ const userSchema = new Schema({
                 name  : { first: {type: String, required: true, unique: false},
                           last: {type: String},
                         },
-                status: {type: String},
-                token : {type: String, required: true, unique: true},
-                email : {type: String, unique: true},
+                status      : {type: String},
+                token       : {type: String, required: true, unique: true},
+                email       : {type: String, unique: true},
+                insertDate  : {type: Date}
             }],
   orders: [{
               email       : { type: String, required: true },
@@ -50,6 +51,7 @@ const userSchema = new Schema({
               pointsDiscount      : { type: Number},
               shipping            : { type: Number},
               deliveryType        : { type: String},
+              deliveryDate        : { type: Date},
               totalPriceBeer      : { type: String},
               totalPriceTotal     : { type: String},
               totalQty            : { type: Number},

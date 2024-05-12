@@ -157,6 +157,8 @@ module.exports = function(app, moment) {
         	req.session.pointDiscount = 0.00.toFixed(2); 
         }
       }
+      console.debug('FORAMATO DATA DATA: ', lib.deliveryDate('formato_data') )
+      console.debug('FORAMATO DATA TEXT: ', lib.deliveryDate() )
       
       res.render('orderSummary.njk', {
         cartItems   : req.session.cartItems,
