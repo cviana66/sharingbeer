@@ -87,6 +87,8 @@ async function getDistance(addressFrom, addressTo, req, res) {
   try {
     var coordinatesFrom = await getCoordinatesFromAddress(addressFrom);
 
+    await sleep(2000);
+
     var coordinatesTo = await getCoordinatesFromAddress(addressTo);
 
     // Calcola la distanza lineare tra le coordinate utilizzando geolib
@@ -116,6 +118,12 @@ function getDistancePost(app) {
       
       res.status(error.errCode).json(error);
     }
+  });
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
   });
 }
 
