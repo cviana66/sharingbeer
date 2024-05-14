@@ -42,7 +42,7 @@ const userSchema = new Schema({
                 status      : {type: String},
                 token       : {type: String, required: true, unique: true},
                 email       : {type: String, unique: true},
-                insertDate  : {type: Date}
+                insertDate  : {type: Date, default: Date.now}
             }],
   orders: [{
               email       : { type: String, required: true },

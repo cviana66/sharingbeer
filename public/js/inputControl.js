@@ -112,6 +112,7 @@ function fieldsValidationControl() {
     document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella di controllo per accettare le Condizioni";
     return false;
   }
+  console.debug('FIELDS VALIDATION CONTROL')
   return true;
 }
 

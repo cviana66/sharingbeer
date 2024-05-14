@@ -21,14 +21,14 @@ module.exports = function(app, qr, moment) {
   // read  Qrcode
   app.get('/webcam', function(req, res, next) {
   console.log("webcam-easy")
-   res.render('webcam.njk');
+   res.render('webcam.njk', {user : req.user});
   });
 
 //POST
   app.post('/webcam', function(req, res, next) {
     qrcodeInfo = req.body.qrinfo;
     req.session.qrcodeInfo = qrcodeInfo;
-    res.json({msg:'success'});
+    res.json({msg:'success', user : req.user});
   });
 
 //GET

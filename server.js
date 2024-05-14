@@ -15,8 +15,11 @@ const session       = require('express-session');   // Gestione sessione. https:
 const paypal        = require('paypal-rest-sdk');   // PayPal
 const qr            = require('qr-image');          // Generazione QR Code. https://www.npmjs.com/package/qr-image
 const nunjucks      = require('nunjucks');          // Template per Javascript. https://mozilla.github.io/nunjucks/
+const fastcsv       = require("fast-csv");          // Gestione dei file CSV. https://c2fo.github.io/fast-csv/docs/introduction/getting-started
 //const cons          = require('consolidate');       // Consolida il framework da utilizzare per package. NON USATO?. https://github.com/tj/consolidate.js
 const moment        = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
+
+global.returnTo = '/';
 
 moment().tz("Europe/Rome").format();
 moment.locale('it');
@@ -28,9 +31,6 @@ console.debug('OGGI: ',moment().format('dddd DD MMMM YYYY - HH:mm'))
 //console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('DD.MM.YYYY - HH:mm'))
 
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
-
-const fastcsv       = require("fast-csv");          // Gestione dei file CSV. https://c2fo.github.io/fast-csv/docs/introduction/getting-started
-
 // config environment variables /
 //env(__dirname + '/.env');
 
@@ -166,7 +166,7 @@ var SharingBeer = function() {
      */
     self.createRoutes = function() {
         routesAuth(self.app, passport, moment);
-        routesShop(self.app, moment);
+        routesShop(self.app, moment, mongoose);
         routesRegister(self.app, moment, mongoose, fastcsv, fs, util);
         routesQrcode(self.app, qr, moment);
         routesPaypal(self.app, mongoose, moment);
