@@ -120,7 +120,7 @@
 //----------------------CIVICNUMBER e CAP---------------------------
 async function listOfCivicNumber() {
   const ret = fieldsRegisterControl()
-  if (ret) {
+  if (!ret) {
     document.getElementById("loading").style.display = 'block';
     console.debug('CITTA: ',document.getElementById("inputCity").value);
     console.debug('VIA: ',document.getElementById("inputStreet").value);

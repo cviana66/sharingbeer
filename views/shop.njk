@@ -17,7 +17,7 @@
                   </tr>
                 </table>
                 {% if prod.quantity > 20 %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili</h5>
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili </h5>
                 {% elif prod.quantity < 20 and prod.quantity > 6 %}
                   <h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento </h5>
                 {% else %}
@@ -26,7 +26,7 @@
                 <div class="align-self-center">
                   <p class="text-white font-italic text-justify">{{prod.description}}</p>
                 </div>
-                {% if prod.quantity > 10 %}
+                {% if prod.quantity > 6 %}
                   <div style="margin: 0px 0px 10px 0px;">
                     <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv()">
                       <!-- <div>{{prod.prettyPrice}}</div> -->

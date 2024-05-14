@@ -74,6 +74,8 @@ const userSchema = new Schema({
                   address     : {type: String},
                   houseNumber : {type: String},
                   postcode    : {type: String},
+                  latitude    : {type: String},
+                  longitude   : {type: String},
               },
               paypal : {
                   shopLogin         : { type: String},
