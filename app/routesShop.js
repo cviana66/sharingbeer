@@ -4,8 +4,9 @@
 var Product = require('./models/product.js');
 var User = require('../app/models/user');
 var lib = require('./libfunction');
+var {getDistance} = require('../app/geoCoordHandler');
 
-module.exports = function(app, moment) {
+module.exports = function(app, moment, mongoose) {
 
 // =============================================================================
 // SHOPPING ====================================================================
@@ -21,7 +22,9 @@ module.exports = function(app, moment) {
 								{$sort:{'orders.dateInsert': -1} }]);
 	
 		for ( var i in  ordiniInConsegna) {			
-			ordiniInConsegna[i].orders.dateInsert = moment(ordiniInConsegna[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
+			ordiniInConsegna[i].orders.dateInsert = moment(ordiniInConsegna[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm');
+			ordiniInConsegna[i].orders.deliveryDate = moment(ordiniInConsegna[i].orders.deliveryDate).format('dddd DD MMMM');
+
 		}
 
 		var ordiniInRitiro = await User.aggregate([
@@ -47,7 +50,8 @@ module.exports = function(app, moment) {
                   ordiniInConsegna : ordiniInConsegna,
                   ordiniInRitiro : ordiniInRitiro,
                   ordiniConsegnati : ordiniConsegnati,
-                  numProducts : req.session.numProducts
+                  numProducts : req.session.numProducts,
+                  user : req.user
                })
 	})
 

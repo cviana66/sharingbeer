@@ -46,7 +46,7 @@
         </div>
         <div style="font-size:1.1em;font-weight: bold;">Indirizzo di consegna: </div>
         <div>{{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}}, {{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}}, {{purchase.orders.address.city}} - {{purchase.orders.address.postcode}} ({{purchase.orders.address.province}})</div>
-        <div>Consegan entro il: {{purchase.orders.deliveryDate}}</div> 
+        <div>Consegma entro {{purchase.orders.deliveryDate}}</div> 
       </div>
     </div>
     {% endfor %}
