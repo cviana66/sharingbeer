@@ -254,14 +254,13 @@ module.exports = function(app, moment, mongoose) {
 	  		prods.forEach(function(prod) {
 	  			prod.prettyPrice = prod.prettyPrice();
 	  		});
-
+	  		console.debug('CATALOGO PRODOTTI: ',prods)
 	  		//mette in memoria i prodotti dal carrello
 	      lib.retriveCart(req);
 
 			  var model =  { products   : prods,                   //prodotti dello shop
 	  						       user       : req.user,                //utente loggato
-	  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello
-	  						       //cart       : req.session.cartItems,   //prodotti nel carrello
+	  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello	  						       
 	                     message    : req.flash('info'),
 	                     type       : "info"
 	  					       };
