@@ -69,8 +69,7 @@ async function getCoordinatesFromAddress(address) {
     }
 
   } catch (error) {
-    console.error('ERRORE', error);
-    throw({ errCode: 500, errMsg: "Errore durante la geocodifica dell'indirizzo: " + address });
+    throw({ errCode: 500, errMsg: "Errore durante la geocodifica dell'indirizzo: " + address, error });
   }
 }
 
@@ -86,10 +85,11 @@ async function getDistance(addressFrom, addressTo, req, res) {
 
   try {
     var coordinatesFrom = await getCoordinatesFromAddress(addressFrom);
-
+console.debug('Prima', new Date(), 'coordinatesFrom', coordinatesFrom);
     await sleep(2000);
 
     var coordinatesTo = await getCoordinatesFromAddress(addressTo);
+console.debug('Dopo', new Date(), 'coordinatesTo', coordinatesTo);
 
     // Calcola la distanza lineare tra le coordinate utilizzando geolib
     const distanceInMeters = await geolib.getDistance(coordinatesFrom.puntoMappa, coordinatesTo.puntoMappa);
