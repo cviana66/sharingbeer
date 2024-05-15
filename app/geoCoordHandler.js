@@ -2,6 +2,7 @@ const axios = require('axios');
 const geolib = require('geolib'); // calcolare la distanza tra le coordinate iniziali e finali
 
 async function getAddressFromCoordinates(latitude, longitude) {
+  console.debug('Recupero indirizzo da coordinate:', 'latitude', latitude, 'longitude', longitude);
   if (!latitude || !longitude) {
     throw({ errCode: 404, errMsg: 'Coordinate non corrette'});
   }
@@ -10,6 +11,7 @@ async function getAddressFromCoordinates(latitude, longitude) {
     // Effettua una richiesta al servizio di geocodifica di Nominatim per ottenere l'indirizzo di partenza
     const geocodeResponse = await axios.get('https://nominatim.openstreetmap.org/reverse', {
       params: {
+        email: 'birrificioviana@gmail.com',
         lat: latitude,
         lon: longitude,
         format: 'jsonv2',
@@ -35,6 +37,7 @@ async function getAddressFromCoordinates(latitude, longitude) {
 
 <!-------------------------------------------------------------->
 async function getCoordinatesFromAddress(address) {
+  console.debug('Recupero coordinate da indirizzo:', address);
   if (!address) {
     throw({ errCode: 404, errMsg: 'Indirizzo di riferimento non fornito'});
   }
@@ -43,6 +46,7 @@ async function getCoordinatesFromAddress(address) {
     // Effettua una richiesta al servizio di geocodifica di Nominatim per ottenere le coordinate di partenza
     const geocodeResponse = await axios.get('https://nominatim.openstreetmap.org/search', {
       params: {
+        email: 'birrificioviana@gmail.com',
         q: address,
         format: 'json',
         polygon_kml: 1
@@ -61,7 +65,7 @@ async function getCoordinatesFromAddress(address) {
                                     'isPreciseAddress': isPreciseAddress,
                                     'latitude': geocodeResponse.data[0].lat,
                                     'longitude': geocodeResponse.data[0].lon}};
-      //console.log('Indirizzo', address, 'isPreciseAddress', isPreciseAddress, ' - coordinate', coordinates);
+      console.debug('Indirizzo', address, 'isPreciseAddress', isPreciseAddress, ' - coordinate', coordinates);
 
       return coordinates;
     } else {
@@ -74,25 +78,34 @@ async function getCoordinatesFromAddress(address) {
 }
 
 <!-------------------------------------------------------------->
-async function getDistance(addressFrom, addressTo, req, res) {
+async function getDistance(addressFrom, addressTo, inCoordinateFrom, inCoordinateTo, req, res) {
 
-  if (!addressFrom) {
-    throw({ errCode: 404, errMsg: 'Indirizzo di partenza non fornito'});
+  if (!addressFrom && !inCoordinateFrom) {
+    throw({ errCode: 404, errMsg: 'Indirizzo e coordinate di partenza non fornite'});
   }
-  if (!addressTo) {
-    throw({ errCode: 404, errMsg: 'Indirizzo di arrivo non fornito'});
+  if (!addressTo && !inCoordinateTo) {
+    throw({ errCode: 404, errMsg: 'Indirizzo e coordinate di arrivo non fornite'});
   }
 
   try {
-    var coordinatesFrom = await getCoordinatesFromAddress(addressFrom);
-console.debug('Prima', new Date(), 'coordinatesFrom', coordinatesFrom);
-    await sleep(2000);
+    var coordinatesFrom = inCoordinateFrom;
+    if (!coordinatesFrom) { 
+      var coordFrom = await getCoordinatesFromAddress(addressFrom); 
 
-    var coordinatesTo = await getCoordinatesFromAddress(addressTo);
-console.debug('Dopo', new Date(), 'coordinatesTo', coordinatesTo);
+      coordinatesFrom = coordFrom.puntoMappa;
+    }
+
+    await sleep(1200);
+
+    var coordinatesTo = inCoordinateTo;
+    if (!coordinatesTo) { 
+      var coordTo = await getCoordinatesFromAddress(addressTo); 
+
+      coordinatesTo = coordTo.puntoMappa;
+    }
 
     // Calcola la distanza lineare tra le coordinate utilizzando geolib
-    const distanceInMeters = await geolib.getDistance(coordinatesFrom.puntoMappa, coordinatesTo.puntoMappa);
+    const distanceInMeters = await geolib.getDistance(coordinatesFrom, coordinatesTo);
     
     return JSON.stringify({ addressFrom, coordinatesFrom, addressTo, coordinatesTo, distanceInMeters});
 
@@ -110,7 +123,7 @@ function getDistancePost(app) {
     const addressTo = req.query.arrivo; // Assicurati di passare l'indirizzo come parametro nella richiesta GET
 
     try {
-      const detailsJSON = JSON.parse(await getDistance(addressFrom, addressTo));
+      const detailsJSON = JSON.parse(await getDistance(addressFrom, addressTo, null, null));
 
       res.json(detailsJSON);
     } catch (error) {

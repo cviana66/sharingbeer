@@ -516,8 +516,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                           address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
                           address[0].addresses.province;
+        let customerCoordinate = null;
         let birrificioAddress ='Via Molignati 12 Candelo Biella';
-        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
+        let birrificioCoordinate =  {'latitude': 45.5447643, 'longitude': 8.1130519};
+        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress, customerCoordinate, birrificioCoordinate));
 
         console.log('DISTANZA = ', dist.distanceInMeters)
 

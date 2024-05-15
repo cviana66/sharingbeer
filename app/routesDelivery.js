@@ -14,7 +14,9 @@ async function loadDeliveryData(moment) {
 	const aggregationResultRitiro = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { $and: [{'orders.status': 'OK'}, {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
+	    { $match: { $and: [{'orders.status': 'OK'}, 
+	    				   {'orders.paypal.s2sStatus': 'OK'}, 
+	    				   {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
 	    { $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
 	  ]
 	);
@@ -22,7 +24,9 @@ async function loadDeliveryData(moment) {
 	const aggregationResultConsegna = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { $and: [{'orders.status': 'OK'}, {'orders.deliveryType': 'Consegna'}] } }
+	    { $match: { $and: [{'orders.status': 'OK'}, 
+	    				   {'orders.paypal.s2sStatus': 'OK'}, 
+	    				   {'orders.deliveryType': 'Consegna'}] } }
 	  ]
 	);
 
