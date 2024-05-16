@@ -35,13 +35,30 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       var waitingSec = 0;
 
       try {
-        coordinate = await getCoordinatesFromAddress(consegneAddressPar[i].puntoMappa.indirizzo);
+        var auxCoordLatitude;
+        var auxCoordLongitude;
 
-        consegneAddressPar[i].puntoMappa['coordinateGPS'] = {}
-        consegneAddressPar[i].puntoMappa.coordinateGPS['latitude'] = coordinate.puntoMappa.latitude;
-        consegneAddressPar[i].puntoMappa.coordinateGPS['longitude'] = coordinate.puntoMappa.longitude;
+        if (!consegneAddressPar[i].puntoMappa.coordinateGPS) {
+          console.debug('RICERCO COORDINATE DA INDIRIZZO');
+          coordinate = await getCoordinatesFromAddress(consegneAddressPar[i].puntoMappa.indirizzo);
 
-        consegneAddressPar[i].puntoMappa['isPreciseAddress'] = coordinate.puntoMappa.isPreciseAddress;
+          auxCoordLatitude = coordinate.puntoMappa.latitude;
+          auxCoordLongitude = coordinate.puntoMappa.longitude;
+
+          consegneAddressPar[i].puntoMappa['coordinateGPS'] = {}
+          consegneAddressPar[i].puntoMappa.coordinateGPS['latitude'] = auxCoordLatitude;
+          consegneAddressPar[i].puntoMappa.coordinateGPS['longitude'] = auxCoordLongitude;
+
+          consegneAddressPar[i].puntoMappa['isPreciseAddress'] = coordinate.puntoMappa.isPreciseAddress;
+        } else {
+          console.debug("UTILIZZO COORDINATE DELL'ORDINE");
+          auxCoordLatitude = consegneAddressPar[i].puntoMappa.coordinateGPS.latitude;
+          auxCoordLongitude = consegneAddressPar[i].puntoMappa.coordinateGPS.longitude;
+
+          consegneAddressPar[i].puntoMappa['isPreciseAddress'] = 'Y';
+
+          console.debug('consegneAddressPar[' + i + ']', consegneAddressPar[i]);
+        }
 
         isHighPriority = consegneAddressPar[i].puntoMappa.isHighPriority;
         if (!isHighPriority) {
@@ -60,8 +77,8 @@ async function geoMapCore(consegneAddressPar, departurePar) {
         if (consegneAddressPar[i].puntoMappa.planningSelection == 'Y' ||
             consegneAddressPar[i].puntoMappa.planningSelection == 'M') {
 
-            locationsList[locationIdx] = {lat: coordinate.puntoMappa.latitude, 
-                                lon: coordinate.puntoMappa.longitude, 
+            locationsList[locationIdx] = {lat: auxCoordLatitude, 
+                                lon: auxCoordLongitude, 
                                 type: _type, 
                                 name: consegneAddressPar[i].puntoMappa.tipoPunto + " - " + consegneAddressPar[i].puntoMappa.indirizzo,
                                 waiting: waitingSec
@@ -82,7 +99,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
         consegneAddressOk.push(consegneAddressPar[i]);
 
       } catch (error) {
-
+        console.error(error.stack);
         consegneAddressErr.push(consegneAddressPar[i]);
         consegneAddressPar[i].puntoMappa['stato'] = 'ERRORE'
         //devare consegneAddressPar[i];

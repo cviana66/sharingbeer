@@ -81,7 +81,8 @@ async function loadDeliveryData(moment) {
 							  orders.address.houseNumber + ' ' +
 							  orders.address.city +  ' ' +
 							  orders.address.province;
-
+		var customerAddressCoordinate = orders.address.coordinateGPS;
+		
 		var orderItems = orders.items;
 		
 		var insertDate = moment(orders.dateInsert);
@@ -94,7 +95,19 @@ async function loadDeliveryData(moment) {
 		
 		//Imposto indirizzo di consegna 
 		if (deliveryType == 'Consegna') {
-			var puntoMappa = {'puntoMappa': {'tipoPunto': deliveryType, 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority, orderItems}};
+			var puntoMappa = {'puntoMappa': 
+								{'tipoPunto': deliveryType, 
+								 'orderID': orderID, 
+								 'orderSeq': i+1, 
+								 'cliente': customerAnag, 
+								 'mobile': customerMobile, 
+								 'indirizzo': customerAddress, 
+								 'coordinateGPS': customerAddressCoordinate,
+								 'planningSelection': 'Y', 
+								 'isHighPriority': isHighPriority, 
+								 orderItems
+								}
+							 };
 			if (consegneAddress == null) {
 				consegneAddress = [puntoMappa];
 			} else {
