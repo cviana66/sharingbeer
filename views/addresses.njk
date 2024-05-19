@@ -51,69 +51,64 @@
       
       <form role="form" action="/register" method="post" id="addresses">
         <div class="card text-white" style="background-color:#2A0009;border-color:#903246;">
-         <div class="form-group" style="margin-left: 5px; margin-right: 5px;">
-          <!-- <label for="inputUsernameEmail" class="text-white col-form-label-lg">Indirizzo di recapito</label> -->
-          <div class="input-error" id="wrongFirstName"></div>
-          <input type="text" class="form-control" id="inputFirstName" value="{{firstName}}"
-           name="firstName" placeholder="Nome" required>
+          <div class="form-group" style="margin: 10px 10px 10px 10px;">
+            <div class="input-error" id="wrongFirstName"></div>
+            <input type="text" class="form-control" id="inputFirstName" value="{{firstName}}" name="firstName" placeholder="Nome" required>
 
-          <div class="input-error" id="wrongLastName"></div>
-          <input type="text" class="form-control" id="inputLastName" value="{{lastName}}"
-           name="lastName" placeholder="Cognome" required>
-        </div>
-        <div class="form-group" style="margin-top: 3px; margin-left: 5px; margin-right: 5px;">
+            <div class="input-error" id="wrongLastName"></div>
+            <input type="text" class="form-control" id="inputLastName" value="{{lastName}}" name="lastName" placeholder="Cognome" required>
+          </div>
           
-          <div class="input-error" id="wrongPhone"></div>
-          <div class="input-group mb-2">
-            <div class="input-group-prepend">
-              <span class="input-group-text" id="basic-addon1">+39</span>
+          <div class="form-group" style="margin: 10px 10px 10px 10px;">
+            <div class="input-error" id="wrongPhone"></div>
+            <div class="input-group mb-2">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">+39</span>
+              </div>
+              <input type="text" class="form-control" id="inputMobile" value="{{mobile}}" name="mobile" placeholder="Cellulare" required>
             </div>
-            <input type="text" class="form-control" id="inputMobile" value="{{mobile}}"
-             name="mobile" placeholder="Cellulare" required>
           </div>
-        </div>
        
-        <div class="form-group" style="margin: 10px 10px 10px 10px;">
+          <div class="form-group" style="margin: 10px 10px 10px 10px;">
           
-          <div class="input-error" id="wrongCity"></div>
-          <input type="text" class="form-control" id="inputCity" value="{{city}}"
-           name="city" placeholder="Città" required autocomplete="off" oninput="selectCity(this.value)"/>
-          <div class="w-100"></div>
-          <div id="cities"></div>
+            <div class="input-error" id="wrongCity"></div>
+            <input type="text" class="form-control" id="inputCity" value="{{city}}"
+             name="city" placeholder="Città" required autocomplete="off" oninput="selectCity(this.value)"/>
+            <div class="w-100"></div>
+            <div id="cities"></div>
 
+            
+            <div class="input-error" id="wrongProvincia"></div>
+            <input type="text" class="form-control" id="inputProvincia" value="" name="provincia" placeholder="Provincia" required readonly autocomplete="off">
+            <div class="w-100"></div>
+            <div id="provincia"></div>
           
-          <div class="input-error" id="wrongProvincia"></div>
-          <input type="text" class="form-control" id="inputProvincia" value="" name="provincia" placeholder="Provincia" required readonly autocomplete="off">
-          <div class="w-100"></div>
-          <div id="provincia"></div>
-        
-          <div class="input-error" id="wrongCap"></div>
-          <input type="text" class="form-control" id="inputCap" value="" name="cap" placeholder="Cap" required readonly autocomplete="off">
-          <div class="w-100"></div>
+            <div class="input-error" id="wrongCap"></div>
+            <input type="text" class="form-control" id="inputCap" value="" name="cap" placeholder="Cap" required readonly autocomplete="off">
+            <div class="w-100"></div>
 
+            
+            <div class="input-error" id="wrongStreet"></div>
+            <input type="text" class="form-control" id="inputStreet" value="" name="street" placeholder="Via / Piazza" required readonly autocomplete="off"
+            oninput="selectStreet(this.value)">
+            <div class="w-100"></div>
           
-          <div class="input-error" id="wrongStreet"></div>
-          <input type="text" class="form-control" id="inputStreet" value="" name="street" placeholder="Via / Piazza" required readonly autocomplete="off"
-          oninput="selectStreet(this.value)">
-          <div class="w-100"></div>
-        
-          <div id="streets"></div>
+            <div id="streets"></div>
+            
+            <div class="input-error" id="wrongNumciv"></div>
+            <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly autocomplete="off">
           
-          <div class="input-error" id="wrongNumciv"></div>
-          <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly autocomplete="off">
-          
-          <br>
-          <div>
-            <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return controlInputAndValidateAddress()">
-              Salva e vai al riepilogo
-            </button>
-            <input type="hidden" name="addressID" value="1" />
+            <br>
+            <div>
+              <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return controlInputAndValidateAddress()">
+                Salva e vai al riepilogo
+              </button>
+              <input type="hidden" name="addressID" value="1" />
+            </div>
           </div>
         </div>
-      </div>
       </form>
       <br>
-
 
 <script type="text/javascript">
 
