@@ -171,10 +171,11 @@ function fieldsResetControl() {
   return true;
 }
 
-function fieldsRegisterControl() {
+async function fieldsRegisterControl() {
   var phone = document.getElementById("inputMobile").value.replace(/\W+/g, '');
   var city = document.getElementById("inputCity").value;
   var province = document.getElementById("inputProvincia").value;
+  var cap = document.getElementById("inputCap").value;
   var address = document.getElementById("inputStreet").value;
   var numciv = document.getElementById("inputNumciv").value;
   var cognome = document.getElementById("inputLastName").value;
@@ -246,6 +247,13 @@ function fieldsRegisterControl() {
     document.getElementById("wrongProvincia").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
+  if (cap == "") {
+    text = iwar+"Inserire il CAP";
+    document.getElementById("wrongCap").innerHTML = text;
+    document.getElementById("inputCap").focus();
+    document.getElementById("wrongCap").scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  }  
   if (address == "" || document.getElementById("myselectstreet") !=null || document.getElementById("hiddenStreet").value != 'OK') {
     text = iwar+"Inserire o selezionare un indirizzo esistente";
     document.getElementById("wrongStreet").innerHTML = text;
@@ -254,14 +262,11 @@ function fieldsRegisterControl() {
     return false;
   }
   
-  if (numciv == "") { 
-    if (numciv == "") {
-      text = iwar+"Inserire il Numero Civico";  
-    } else {
-      text = iwar+"Inserire un Numero Civico valido";
-    }
+  if (numciv == "") {
+    text = iwar+"Inserire il Numero Civico";  
     document.getElementById("wrongNumciv").innerHTML = text;
     document.getElementById("inputNumciv").focus();
+    document.getElementById("wrongNumciv").scrollIntoView({ behavior: "smooth", block: "center" });
     return false
   }
   

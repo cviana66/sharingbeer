@@ -14,16 +14,17 @@
       <form role="form" action="/orderSummary" method="post" id="selectedAddress">
         <div class="card text-white" style="background-color:#6B1628;border-color:#903246;margin-bottom:10px;">
           <div class="card-body">
-            <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!<br>
+            <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!</p>
             <p style="font-size:1.0em;" class="card-text text-center">Ti aspettiamo in
             Via Molignati 12, Candelo - 13878 (Biella)</p>
             <p class="card-text text-center">mobile: +39 123 456 7890</p>
             <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton" >
               Seleziona e vai al riepilogo
             </button>
-            <input type="hidden" name="addressID" value="0" />
+            <!--input type="hidden" name="addressID" value="{{address.id}}" /-->
+            <input type="hidden" name="typeOfDelivery" value="ritiro" />
           </div>
-        </div>
+        </div> 
       </form> 
         <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:15px;margin-top:20px;">
           <span style="font-size:0.9em;">oppure scegli tra i tuoi preferiti</span>
@@ -38,6 +39,7 @@
                 Seleziona e vai al riepilogo
               </button>
               <input type="hidden" name="addressID" value="{{address.id}}" />
+              <input type="hidden" name="typeOfDelivery" value="consegna" />
             </div>
           </div>
         </form>
@@ -60,7 +62,7 @@
            name="lastName" placeholder="Cognome" required>
         </div>
         <div class="form-group" style="margin-top: 3px; margin-left: 5px; margin-right: 5px;">
-          <!-- <div ><label for="inputMobile" class="text-white col-form-label-lg">Cellulare</label></div> -->
+          
           <div class="input-error" id="wrongPhone"></div>
           <div class="input-group mb-2">
             <div class="input-group-prepend">
@@ -71,41 +73,47 @@
           </div>
         </div>
        
-        <div class="form-group" style="margin-top: 5px; margin-left: 5px; margin-right: 5px;">
-          <!-- <div ><label for="inputCity" class="text-white col-form-label-lg">Città</label></div> -->
+        <div class="form-group" style="margin: 10px 10px 10px 10px;">
+          
           <div class="input-error" id="wrongCity"></div>
           <input type="text" class="form-control" id="inputCity" value="{{city}}"
            name="city" placeholder="Città" required autocomplete="off" oninput="selectCity(this.value)"/>
           <div class="w-100"></div>
           <div id="cities"></div>
 
-          <!-- <div><label for="inputProvincia" class="text-white col-form-label-lg">Provincia</label></div> -->
+          
           <div class="input-error" id="wrongProvincia"></div>
-          <input type="text" class="form-control" id="inputProvincia" value="" name="provincia" placeholder="Provincia" required readonly>
+          <input type="text" class="form-control" id="inputProvincia" value="" name="provincia" placeholder="Provincia" required readonly autocomplete="off">
           <div class="w-100"></div>
           <div id="provincia"></div>
         
-          <!-- <div ><label for="inputStreet" class="text-white col-form-label-lg">Indirizzo</label></div> -->
+          <div class="input-error" id="wrongCap"></div>
+          <input type="text" class="form-control" id="inputCap" value="" name="cap" placeholder="Cap" required readonly autocomplete="off">
+          <div class="w-100"></div>
+
+          
           <div class="input-error" id="wrongStreet"></div>
           <input type="text" class="form-control" id="inputStreet" value="" name="street" placeholder="Via / Piazza" required readonly autocomplete="off"
           oninput="selectStreet(this.value)">
           <div class="w-100"></div>
         
           <div id="streets"></div>
-            <!-- <div ><label for="inputNumciv" class="text-white col-form-label-lg">Numero Civico</label></div> -->
-            <div class="input-error" id="wrongNumciv"></div>
-            <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly autocomplete="off">
+          
+          <div class="input-error" id="wrongNumciv"></div>
+          <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly autocomplete="off">
+          
+          <br>
+          <div>
+            <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return controlInputAndValidateAddress()">
+              Salva e vai al riepilogo
+            </button>
+            <input type="hidden" name="addressID" value="1" />
           </div>
         </div>
-        <br>
-        <div>
-          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return listOfCivicNumber()">
-            Salva e vai al riepilogo
-          </button>
-          <input type="hidden" name="addressID" value="1" />
-        </div>
+      </div>
       </form>
       <br>
+
 
 <script type="text/javascript">
 
@@ -118,12 +126,14 @@
 /*==================================================================*/
 
 //----------------------CIVICNUMBER e CAP---------------------------
-async function listOfCivicNumber() {
-  const ret = fieldsRegisterControl()
+async function controlInputAndValidateAddress() {
+  const ret = await fieldsRegisterControl()
   if (ret) {
-    document.getElementById("loading").style.display = 'block';
+    
     console.debug('CITTA: ',document.getElementById("inputCity").value);
     console.debug('VIA: ',document.getElementById("inputStreet").value);
+
+    document.getElementById("loading").style.display = 'block';
     document.getElementById("wrongNumciv").innerHTML = ''
     
     let data = {};
@@ -132,6 +142,7 @@ async function listOfCivicNumber() {
     data.via = document.getElementById("inputStreet").value;
     data.istat = document.getElementById("hiddenIstat").value;
     data.numero = document.getElementById("inputNumciv").value;
+    data.cap = document.getElementById("inputCap").value;
     
     await $.ajax({
       type: 'POST',
@@ -139,39 +150,48 @@ async function listOfCivicNumber() {
       url: '/overpass/cap',
       data: data,
       success: function(res) {
+        //console.debug('RES',res)
+        if (res.status != 'ko') {
+          
+          //var cap = res.cap;
+          console.debug('CAP: ',res.cap)
+          document.getElementById("hiddenCAP").value = res.cap
 
-        if (res.length == 2 || res.length == 1) {
-          var nc="";
-          var cap="";    
-          cap = res[0].tags['addr:postcode'];
-          if (res.length == 2) nc = res[1].tags['addr:housenumber'];
-          console.debug('CAP: ',cap)
-          console.debug('N°: ',nc)
-          document.getElementById("hiddenCAP").value = cap
-          if (cap!="" && nc!="") {
-            document.getElementById("hiddenAddressIsValid").value = 'completo'
-            console.debug('HIDDEN ADDRESS 1: ', document.getElementById("hiddenAddressIsValid").value)
-          } else if ((cap!="" && nc=="")||(cap=="" && nc!="")) {
-            document.getElementById("hiddenAddressIsValid").value = 'parziale'
-            console.debug('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
-          } else {
-            document.getElementById("hiddenAddressIsValid").value = ""
-            console.debug('HIDDEN ADDRESS 3: ', document.getElementById("hiddenAddressIsValid").value)
+          document.getElementById("hiddenAddressIsValid").value = res.status
+          console.debug('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
+
+          postData = {
+            firstName : document.getElementById("inputFirstName").value,
+            lastName  : document.getElementById("inputLastName").value,
+            mobile    : document.getElementById("inputMobile").value,
+            city      : document.getElementById("inputCity").value,
+            provincia : document.getElementById("inputProvincia").value,
+            street    : document.getElementById("inputStreet").value,
+            numberciv : document.getElementById("inputNumciv").value,
+            hiddenCAP : res.cap,
+            hiddenAddressIsValid : res.status,
+            descValidAddress : res.desStatus,
+            lat : res.lat,
+            lon : res.lon
           }
-        } else {
-          console.debug('CAP NON PRESENTE')
-          document.getElementById("hiddenCAP").value =""
-          document.getElementById("hiddenAddressIsValid").value = ""
-        }
+          console.debug('PARAM',JSON.stringify(postData,null,2));
+          post('/register',postData);
 
+        } else {
+          console.debug('ERRORE nella ricerca dello indirizzo');
+          document.getElementById("hiddenCAP").value ="";
+          document.getElementById("hiddenAddressIsValid").value = "errato";
+          post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
+        }
       },
       error: function (e) {
-        console.log("ErrorListOfNumber", e.responseText);
-        res = e;
+        console.log("OVERPASS_CAP", e);
+        //document.getElementById("loading").style.display = 'none';
+        post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
       }
     });
   }
-  document.getElementById("loading").style.display = 'none';
+  
 };
 
 //----------------------------TREET---------------------------------
@@ -234,7 +254,7 @@ async function selectStreet(v) {
       data: data,
       success: function(res) {
         
-        if (typeof res !== 'undefined' && res.length > 0 &&  document.getElementById("inputStreet").value.length > 1) {
+        if (typeof res !== undefined && res.length > 0 &&  document.getElementById("inputStreet").value.length > 1) {
           /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
           document.getElementById("inputNumciv").setAttribute('readonly', true);
           document.getElementById('inputNumciv').value = null;
@@ -322,14 +342,16 @@ async function setValueCity(comune, provincia, istat) {
 
   try {
     //*******************************************************
-    let res = await listOfStreets(comune,istat);
+    var res = await listOfStreets(comune,istat);
     //*******************************************************
   } catch (e) {
     document.getElementById('inputNumciv').removeAttribute('readonly');
   }
   console.log('RES: ',res);
   document.getElementById("loading").style.display = 'none';
-  document.getElementById("inputStreet").focus();
+  //document.getElementById("inputStreet").focus();
+  document.getElementById("inputCap").focus();
+  document.getElementById('inputCap').removeAttribute('readonly');
   document.getElementById('inputStreet').removeAttribute('readonly');
   document.getElementById('inputCity').removeAttribute('readonly');
 };
@@ -360,6 +382,8 @@ async function listOfCities(v) {
 //*******************************************************
 async function selectCity(v) {  
   document.getElementById('inputProvincia').value = null;
+  document.getElementById('inputCap').setAttribute('readonly', true);
+  document.getElementById('inputCap').value = null;
   document.getElementById('inputStreet').setAttribute('readonly', true);
   document.getElementById('inputStreet').value = null;
   document.getElementById("inputNumciv").setAttribute('readonly', true);
@@ -371,8 +395,7 @@ async function selectCity(v) {
     // RICERCA LE CITTA' A PARTIRE DALLA STRINGA INSERITA
     //*******************************************************
     try {
-      res = await listOfCities(v);
-     // if (res) {   
+      var res = await listOfCities(v);
       document.getElementById("wrongProvincia").innerHTML = "";
       document.getElementById("wrongStreet").innerHTML = "";
       document.getElementById("wrongNumciv").innerHTML = "";
@@ -389,8 +412,9 @@ async function selectCity(v) {
         document.getElementById("addresses").appendChild(input);
       }
      // }
-    } catch (e){
+    } catch (e) {
       document.getElementById("inputProvincia").removeAttribute('readonly');
+      document.getElementById("inputCap").removeAttribute('readonly');
       document.getElementById("inputStreet").removeAttribute('readonly');
       document.getElementById("inputNumciv").removeAttribute('readonly');
 
@@ -412,24 +436,23 @@ async function selectCity(v) {
     }
      
     //*******************************************************
-    if (typeof res !== 'undefined' && res.length > 0 && document.getElementById("inputCity").value.length > 1) {
+    if (typeof res !== undefined && res.length > 0 && document.getElementById("inputCity").value.length > 1) {
       /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
       let select = document.createElement('ul');
       let citta = document.getElementById("inputCity").value.toLowerCase();
       let city = res[0].Comune.toLowerCase()
 
       if (res.length == 1 && citta == city) {
-        //document.getElementById("hiddenCity").value = 'OK';
         document.getElementById("inputCity").value = res[0].Comune;
         document.getElementById("inputProvincia").value = res[0].Provincia;
         if (document.getElementById('myselectcity') != null) {
           document.getElementById('myselectcity').remove();
         };
+
         //*********************************************************
         setValueCity(res[0].Comune, res[0].Provincia, res[0].Istat);
         //*********************************************************
       } else {
-        //document.getElementById("hiddenCity").value = 'OK';
         select.setAttribute('id','myselectcity');
         select.setAttribute('class','form-control');
         select.setAttribute('style','list-style-type: none;');
@@ -440,7 +463,7 @@ async function selectCity(v) {
           a.textContent = res[i].Comune;
           a.setAttribute('href',"javascript:void(0)");
           //*******************************************************
-          a.setAttribute('onclick',"setValueCity('"+res[i].Comune +"','"+res[i].Provincia+"','"+res[i].Istat+"')");
+          a.setAttribute('onclick','setValueCity("'+res[i].Comune +'","'+res[i].Provincia+'","'+res[i].Istat+'")');
           //*******************************************************
           option.appendChild(a);
           select.appendChild(option);
@@ -474,7 +497,6 @@ var inputCN = document.createElement("input");
       inputCN.setAttribute("id","hiddenAddressIsValid");
       inputCN.setAttribute("name", "hiddenAddressIsValid");
       inputCN.setAttribute("value", "false");
-      console.log('INPUT: ',inputCN);
       document.getElementById("addresses").appendChild(inputCN);
 
   var inputCAP = document.createElement("input");
@@ -482,7 +504,6 @@ var inputCN = document.createElement("input");
       inputCAP.setAttribute("id","hiddenCAP");
       inputCAP.setAttribute("name", "hiddenCAP");
       inputCAP.setAttribute("value", "");
-      console.log('INPUT: ',inputCAP);
       document.getElementById("addresses").appendChild(inputCAP);
 
   var inputStreet = document.createElement("input");
@@ -490,7 +511,6 @@ var inputCN = document.createElement("input");
       inputStreet.setAttribute("id","hiddenStreet");
       inputStreet.setAttribute("name", "hiddenStreet");
       inputStreet.setAttribute("value", "KO");
-      console.log('INPUT: ',inputStreet);
       document.getElementById("addresses").appendChild(inputStreet);
 
   var inputIstat = document.createElement("input");
@@ -498,8 +518,34 @@ var inputCN = document.createElement("input");
       inputIstat.setAttribute("id","hiddenIstat");
       inputIstat.setAttribute("name", "hiddenIstat");
       inputIstat.setAttribute("value", "");
-      console.log('INPUT: ',inputIstat);
       document.getElementById("addresses").appendChild(inputIstat);
+
+/**
+  * sends a request to the specified url from a form. this will change the window location.
+  * @param {string} path the path to send the post request to
+  * @param {object} params the parameters to add to the url
+  * @param {string} [method=post] the method to use on the form
+  */
+  function post(path, params, method='post') {
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less verbose if you use one.
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = path;
+
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        const hiddenField = document.createElement('input');
+        hiddenField.type = 'hidden';
+        hiddenField.name = key;
+        hiddenField.value = params[key];
+        form.appendChild(hiddenField);
+      }
+    }
+    document.body.appendChild(form);
+    form.submit();
+  }
 
 </script>
 

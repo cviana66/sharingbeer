@@ -64,16 +64,18 @@ module.exports = function(app, moment, mongoose) {
 //-------------------------------------------
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
 
+  	var address = [];
+
     try{
 
       //--------------------------------------
       // Caso di ritiro presso Sede Birrificio
       //--------------------------------------
-      if (req.body.addressID == '0' ) {
-        
+      if (req.body.typeOfDelivery == 'ritiro' ) {
+        req.session.deliveryType =  "Ritiro";
         // Booze attualmente disponibili
-        console.debug('POINT DISCOUNT BOOZE: ', req.user.local.booze)
-        req.session.booze = req.user.local.booze
+        console.debug('POINT DISCOUNT BOOZE: ', req.user.local.booze);
+        req.session.booze = req.user.local.booze;
         
         // Costo spedizione
         req.session.shippingCost = 0.00.toFixed(2);
@@ -97,16 +99,24 @@ module.exports = function(app, moment, mongoose) {
         }
 
         console.debug('NEW BOOZE: ',req.session.booze)
-        
+        console.debug('ADDRESS ID:',req.body.addressID)
+        /*
         var address = await User.aggregate([
             {$match:{"local.email": "birrificioviana@gmail.com"}}, 
             {$unwind: "$addresses"}, 
             //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
+            ])*/
+        address = await User.aggregate([
+            {$match:{"_id":req.user._id}}, 
+            {$unwind: "$addresses"}, 
+            {$match :{ "addresses.main":"yes"}},
+            {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
+
         req.session.shippingAddress = address[0].addresses;  
-        //console.debug('ADDRESS[0]: ',address[0].addresses)       
-        req.session.deliveryType =  "Ritiro"
+        console.debug('ADDRESS[0]: ',address[0].addresses)       
+        
       } else {
       //-------------------------------------------------------
       // Caso di spedizione presso all'indirizzo indirizzo 

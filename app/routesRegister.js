@@ -13,6 +13,7 @@ var Address = require('../app/models/address')
 var bcrypt = require('bcrypt-nodejs');
 //TODO da spostare in libfunction
 var lib = require('./libfunction');
+var {getAddressFromOSM} = require('../app/overpassQuery')
 
 var mailfriend = require('../config/mailFriend');
 var mailparent = require('../config/mailParent');
@@ -33,6 +34,16 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 // =================================================================================================
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx
+
+
+  app.get('/testOverpass', async function(req,res){
+    //getAddressFromOSM('Candelo','096012','Via Moglia','10','13878')
+    //getAddressFromOSM('Biella','096004','Piazza Gaudenzio Sella','1','13900')
+    getAddressFromOSM('Milano','015146','Corso Buenos Aires','2')
+    //getAddressFromOSM('Buonconvento','052003','Via Bruno Buozzi','10')
+    //getAddressFromOSM('Torino','001272','Corso Stati Uniti','101')
+  })
+
 
   app.post('/overpass/istat', async function(req, res) {
     var newArr = [];
@@ -78,95 +89,24 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   });
 
 
-  app.post('/overpass/cap', async function(req,res){
-    var newArr = [];
-    //Query Overpass che restitutisce CAP se esiste in mappa OSM e valida il numero civico
-    var option =  '[out:json];'+
-                  'area[name="'+req.body.comune+'"]["ref:ISTAT"="'+req.body.istat+'"]->.code;'+
-                  '(node(area.code)'+
-                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
-                  '["addr:street"="'+req.body.via+'"]'+
-                  '["addr:housenumber"="'+req.body.numero+'"];'+
-                  'for (t["addr:postcode"])(make c "addr:postcode"=_.val;out;););'+
-                  '(node(area.code)'+
-                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
-                  '["addr:street"="'+req.body.via+'"]'+
-                  '["addr:housenumber"="'+req.body.numero+'"];'+
-                  'for (t["addr:housenumber"])(make n "addr:housenumber"=_.val;out;););'
-    
-    console.debug('OPTION1: ',option)
-    const url = 'https://overpass-api.de/api/interpreter?';
+  app.post('/overpass/cap', async function(req,res) {
+    const comune  = req.body.comune;
+    const istat   = req.body.istat;
+    const via     = req.body.via;
+    const numero  = req.body.numero;
+    const cap     = req.body.cap;
+    var indirizzo = {}
 
-    const data = await fetch(url, 
-                          {
-                            method: 'POST',
-                            headers: {'Accept': 'application/json',
-                                      "Content-Type": "application/json"},
-                            body: option
-                          })
-                          .then(function(result) {
-                                  //console.debug("RESULT -> : ",result);
-                                  return result.json();
-                          });
-      var objData = await data
-      
-      console.debug("OVERPASS DATA -> : ", objData.elements);
-
-      for (var index = 0; index < objData.elements.length; ++index) {          
-          if ( objData.elements[index].tags["addr:postcode"] != "" ) {
-              newArr.push(objData.elements[index]);
-          }
-      }
-      console.debug('ARR: ',newArr)
-      
-      if (newArr.length == 0) {        
-        //Query Overpass che restitutisce CAP anche se il numero civico non esiste o non è presente in mappa OSM
-        var option =  '[out:json];'+
-                  'area[name="'+req.body.comune+'"]["ref:ISTAT"="'+req.body.istat+'"]->.code;'+
-                  'node(area.code)'+
-                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
-                  '["addr:street"="'+req.body.via+'"]'+
-                  '["addr:postcode"];'+
-                  'for (t["addr:postcode"])(make c "addr:postcode"=_.val;out;);'
-        
-        console.debug('OPTION2: ',option)
-        const url = 'https://overpass-api.de/api/interpreter?';
-
-        const data = await fetch(url, 
-                              {
-                                method: 'POST',
-                                headers: {'Accept': 'application/json',
-                                          "Content-Type": "application/json"},
-                                body: option
-                              })
-                              .then(function(result) {
-                                      //console.debug("RESULT -> : ",result);
-                                      return result.json();
-                              });
-          objData = await data
-          console.debug("OVERPASS DATA 2-> : ", objData.elements);
-          for (var index = 0; index < objData.elements.length; ++index) {          
-          if ( objData.elements[index].tags["addr:postcode"] != "") {
-              newArr.push(objData.elements[index]);
-          }
-        }
-      console.debug('ARR: ',newArr)
-      }
-      
-      res.send(newArr)
+    try{
+      indirizzo = await getAddressFromOSM(comune, istat, via, numero, cap);      
+      console.debug('INDIRIZZO',indirizzo);
+      res.send(indirizzo)
+    } catch (e) {
+      console.log('ERRORE in overpass/cap',e)
+      res.send(indirizzo)
+    }
   });
 
-  app.post('/streets', function(req, res) {
-      var rates = req.session.elements;
-      var newArr = [];
-      for (var index = 0; index < rates.length; ++index) {
-          name = rates[index].toLowerCase();
-          if (name.indexOf(req.body.street.toLowerCase()) != -1) {
-              newArr.push(rates[index]);
-          }
-      }
-      res.send(newArr);
-  });
 
   app.post('/cities', function(req, res) {
       req.session.elements = [];
@@ -181,29 +121,18 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                    })
   });
 
-/*
-  app.post('/caps', function(req, res) {
-      //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
-      //res.render('validation.dust', { message: req.flash('validation') });
-      //console.log("city : ", req.body.city);
-      MultipleCap.find({
-          'Comune': req.body.city
-      }).sort('CAP').exec(function(err, caps) {
-          if (caps.length == 0) {
-              CityCap.find({'Comune': req.body.city},
-                            null,
-                            {sort: {Comune: 1}},
-                            function(err, cap) {
-                                //console.log('CAP: ', cap);
-                                res.send(cap)
-                            });
-          } else {
-              console.log('CAPS: ', caps);
-              res.send(caps)
+  app.post('/streets', function(req, res) {
+      var rates = req.session.elements;
+      var newArr = [];
+      for (var index = 0; index < rates.length; ++index) {
+          name = rates[index].toLowerCase();
+          if (name.indexOf(req.body.street.toLowerCase()) != -1) {
+              newArr.push(rates[index]);
           }
-      });
+      }
+      res.send(newArr);
   });
-*/
+
 
 //==================================================================================================
 // UTILITY per importare i Comuni Italiani
@@ -488,6 +417,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 main            : main,
                 preferred       : 'yes',
                 affidability    : req.body.hiddenAddressIsValid,
+                desAffidability : req.body.descValidAddress,
+                lat             : req.body.lat,
+                lon             : req.body.lon
         });
         await user.save(opts);
         await session.commitTransaction();
@@ -496,10 +428,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       // Caso di spedizione presso indirizzo inserito appena prima del pagamento
       //------------------------------------------------------------------------
 
-
         if (req.session.nextStep = 'payment') {
-
-        //TODO : rendere parametrico l'importo discount
 
         req.session.deliveryType =  "Consegna"
 

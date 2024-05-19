@@ -33,7 +33,10 @@ const userSchema = new Schema({
                   main        : {type: String}, // inserito all'atto della registrazine
                   preferred   : {type: String}, // preferito nelle spedizioni
                   postcode    : {type: String},
-                  affidability: {type: String}, // livello di verifica in fase di inserimento: completo/parziale/""
+                  affidability: {type: String}, 
+                  desAffidability : {type: String},
+                  lat             : {type: Number},
+                  lon             : {type: Number},
               }],
   friends : [{  id    : {type: String, unique: true },
                 name  : { first: {type: String, required: true, unique: false},
@@ -74,6 +77,10 @@ const userSchema = new Schema({
                   address     : {type: String},
                   houseNumber : {type: String},
                   postcode    : {type: String},
+                  affidability: {type: String}, 
+                  desAffidability : {type: String},
+                  lat             : {type: Number},
+                  lon             : {type: Number},
               },
               paypal : {
                   shopLogin         : { type: String},
