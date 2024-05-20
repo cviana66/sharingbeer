@@ -202,9 +202,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             } else {
               if (user.local.status == 'new') {
                 res.render('validation.njk', {
-                  prospect: user.local,
-                  message: req.flash('validateMessage'),
-                  type: "danger"
+                  prospect: user.local
+                  //message: req.flash('validateMessage'),
+                  //type: "danger"
                 });
               } else if (user.local.status == 'waiting') { 
                 //START TRANSACTION.local
@@ -428,7 +428,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       // Caso di spedizione presso indirizzo inserito appena prima del pagamento
       //------------------------------------------------------------------------
 
-        if (req.session.nextStep = 'payment') {
+      if (req.session.nextStep == 'payment') {
 
         req.session.deliveryType =  "Consegna"
 
