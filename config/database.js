@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const moment   = require("moment-timezone"); 
 
-moment().tz("Europe/Rome").format();
+moment().tz("Europe/Rome").tz("Europe/Rome").format();
 
 mongoose.set('strictQuery', false);
 
@@ -13,10 +13,10 @@ mongoose.connect(process.env.MONGODB_URL, {
 });
 
 mongoose.connection
-	.on("open", () => console.info(moment().format()+' [INFO] MONGODB OPEN'))
-  	.on("close", () => console.info(moment().format()+' [INFO] MONGODB CLOSED'))
+	.on("open", () => console.info(moment().tz("Europe/Rome").format()+' [INFO] MONGODB OPEN'))
+  	.on("close", () => console.info(moment().tz("Europe/Rome").format()+' [INFO] MONGODB CLOSED'))
   	.on("error", (error) => {
-    console.error(moment().format()+' [ERROR] MONGODB CONNECTION: '+error);
+    console.error(moment().tz("Europe/Rome").format()+' [ERROR] MONGODB CONNECTION: '+error);
     process.exit();
   })
 

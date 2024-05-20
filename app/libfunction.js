@@ -158,15 +158,15 @@ module.exports = {
                       }
                     },
   deliveryDate: function deliveryDate(dataType) {
-                    moment().tz("Europe/Rome").format();
+                    moment().tz("Europe/Rome").tz("Europe/Rome").format();
                     moment.locale('it');                    
                     var d
-                    if (moment().add(3,'d').format('ddddd') == "sabato") {
-                      d = moment().add(5,'d').format()
-                    } else if (moment().add(3,'d').format('dddd') == "domenica") {
-                      d = moment().add(4,'d').format()
+                    if (moment().tz("Europe/Rome").add(3,'d').format('ddddd') == "sabato") {
+                      d = moment().tz("Europe/Rome").add(5,'d').format()
+                    } else if (moment().tz("Europe/Rome").add(3,'d').format('dddd') == "domenica") {
+                      d = moment().tz("Europe/Rome").add(4,'d').format()
                     } else {
-                      d = moment().add(3,'d').format()
+                      d = moment().tz("Europe/Rome").add(3,'d').format()
                     }
                     if (dataType == 'formato_data') {
                       giornoLavorativo = moment(d).format()

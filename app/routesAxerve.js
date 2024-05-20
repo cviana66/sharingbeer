@@ -81,7 +81,7 @@ var users;
 
       if (resData.error.code != 0) {
         resData.ok = false;
-        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(resData));
+        console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(resData));
         await session.abortTransaction();
         res.status(500).json(resData);  
       } else {
@@ -92,7 +92,7 @@ var users;
         user.orders.push({
           _id         : orderId,
           email       : req.user.local.email,
-          dateInsert  : moment().format(),
+          dateInsert  : moment().tz("Europe/Rome").format(),
           status      : "CREATED",
           deliveryType : req.session.deliveryType,
           deliveryDate : lib.deliveryDate('formato_data'),
@@ -104,7 +104,7 @@ var users;
           totalQty : req.session.totalQty,        
           address : req.session.shippingAddress,
           'paypal.shopLogin'        : shopLogin,
-          'paypal.createTime'       : moment().format('DD/MM/yyyy hh:mm:ss'),
+          'paypal.createTime'       : moment().tz("Europe/Rome").format('DD/MM/yyyy hh:mm:ss'),
           'paypal.orderId'          : req.session.order._id.toString(),
           'paypal.currencyAmount'   : currency,
           'paypal.totalAmount'      : req.session.order.totalaAmount,
@@ -119,7 +119,7 @@ var users;
       }
 
     } catch (e) {
-        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
+        console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
         await session.abortTransaction();
         res.status(500).send()
     } finally {
@@ -166,7 +166,7 @@ var users;
           {
             'orders.$[el].status'               : status,
             //'orders.$[el].paypal.transactionId' : payment_id,    
-            'orders.$[el].paypal.updateTime'    : moment().format('DD/MM/yyyy hh:mm:ss'),
+            'orders.$[el].paypal.updateTime'    : moment().tz("Europe/Rome").format('DD/MM/yyyy hh:mm:ss'),
             'orders.$[el].paypal.errorCode'        : error_code,
             'orders.$[el].paypal.errorDescription' : error_description     
           }
@@ -215,7 +215,7 @@ var users;
                                       {'$inc': {'local.booze':booze}}
                                     ).session(session);
 
-        console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
+        console.error(moment().tz("Europe/Rome").format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
         res.render('orderOutcome.njk', {
           status  : status,
           orderId : orderId,
@@ -226,7 +226,7 @@ var users;
 
       } else {
 
-        console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} ERROR: '+e+' '+error_code+' '+error_description);
+        console.error(moment().tz("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} ERROR: '+e+' '+error_code+' '+error_description);
         //==============================================
         // Ri-aggiungo i prodotti dalla disponibilità 
         // per prodotto per acquisto non effettuato
@@ -254,7 +254,7 @@ var users;
       await session.commitTransaction();
 
     } catch (e) {
-      console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
+      console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
       //await session.abortTransaction();
 
       //==============================================

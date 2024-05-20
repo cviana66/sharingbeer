@@ -243,7 +243,7 @@ module.exports = function(app, moment, mongoose) {
   	Product.find(function (err, prods) {
   		if (err) {
   			let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
-  			console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+  			console.error(moment().tz("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
         req.flash('message', msg);
         return res.render('info.njk', {
             message: req.flash('message'),

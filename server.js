@@ -21,14 +21,11 @@ const moment        = require("moment-timezone");            // Formattazione de
 
 global.returnTo = '/';
 
-moment().tz("Europe/Rome").format();
+moment().tz("Europe/Rome").tz("Europe/Rome").format();
 moment.locale('it');
 
-console.debug('OGGI moment() : ',moment().format())
-
-console.debug('OGGI: ',moment().format('dddd DD MMMM YYYY - HH:mm'))
-//console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('dddd DD MMMM YYYY - HH:mm'))
-//console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('DD.MM.YYYY - HH:mm'))
+console.debug('OGGI moment().tz("Europe/Rome") : ',moment().tz("Europe/Rome").tz("Europe/Rome").format());
+console.debug('OGGI: ',moment().tz("Europe/Rome").format('dddd DD MMMM YYYY - HH:mm'))
 
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
 // config environment variables /
@@ -125,7 +122,7 @@ var SharingBeer = function() {
     self.setupVariables = function() {
         //  Set the environment variables we need.
         self.port = process.env.PORT || 3000;
-        console.info(moment().format()+' [INFO] SERVER PORT: '+self.port);
+        console.info(moment().tz("Europe/Rome").format()+' [INFO] SERVER PORT: '+self.port);
     };
 
     /**
@@ -135,10 +132,10 @@ var SharingBeer = function() {
      */
     self.terminator = function(sig){
         if (typeof sig === "string") {
-            console.info(moment().format()+' [INFO] RECEIVED '+sig+': TERMINATING SHARINGBEER APP ...');
+            console.info(moment().tz("Europe/Rome").format()+' [INFO] RECEIVED '+sig+': TERMINATING SHARINGBEER APP ...');
             process.exit(1);
         }
-        console.info(moment().format()+' [INFO] NODE SERVER STOPPED!');
+        console.info(moment().tz("Europe/Rome").format()+' [INFO] NODE SERVER STOPPED!');
 
     };
     /**
@@ -184,11 +181,11 @@ var SharingBeer = function() {
         self.app = express();
 /*
         db.on('error', err => {
-          console.error(moment().format()+' [ERROR] MONGODB CONNECTIO: '+err);
+          console.error(moment().tz("Europe/Rome").format()+' [ERROR] MONGODB CONNECTIO: '+err);
         });
 
         db.once('open', function callback() {
-          console.info(moment().format()+' [INFO] MONGODB OPEN');
+          console.info(moment().tz("Europe/Rome").format()+' [INFO] MONGODB OPEN');
         });
 */
         // set up our express application
@@ -211,7 +208,7 @@ var SharingBeer = function() {
         // required for passport and session for persistent login
         pass(passport);
 
-        console.info(moment().format()+' [INFO] ENVIRONMENT: '+process.env.NODE_ENV);
+        console.info(moment().tz("Europe/Rome").format()+' [INFO] ENVIRONMENT: '+process.env.NODE_ENV);
 
         if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
             self.app.use(morgan('dev')); // log every request to the console
@@ -275,7 +272,7 @@ var SharingBeer = function() {
     self.start = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, function() {
-          console.info(moment().format()+' [INFO] NODE SERVER STARTED');
+          console.info(moment().tz("Europe/Rome").format()+' [INFO] NODE SERVER STARTED');
         });
     };
 
