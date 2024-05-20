@@ -35,8 +35,10 @@ const userSchema = new Schema({
                   postcode    : {type: String},
                   affidability: {type: String}, 
                   desAffidability : {type: String},
-                  lat             : {type: Number},
-                  lon             : {type: Number},
+                  coordinateGPS : {
+                    lat             : {type: Number},
+                    lon             : {type: Number},  
+                  }
               }],
   friends : [{  id    : {type: String, unique: true },
                 name  : { first: {type: String, required: true, unique: false},
@@ -79,8 +81,9 @@ const userSchema = new Schema({
                   postcode    : {type: String},
                   affidability: {type: String}, 
                   desAffidability : {type: String},
-                  lat             : {type: Number},
-                  lon             : {type: Number},
+                  coordinateGPS : {
+                    lat             : {type: Number},
+                    lon             : {type: Number},  
               },
               paypal : {
                   shopLogin         : { type: String},
