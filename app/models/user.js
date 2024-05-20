@@ -83,7 +83,8 @@ const userSchema = new Schema({
                   desAffidability : {type: String},
                   coordinateGPS : {
                     lat             : {type: Number},
-                    lon             : {type: Number},  
+                    lon             : {type: Number},
+                  }  
               },
               paypal : {
                   shopLogin         : { type: String},
