@@ -349,7 +349,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //-------------------------------------------
     app.get('/register', lib.isLoggedIn, function(req, res) {
 
-        if (req.user.local.status == 'validated') {
+        if (req.user.local.status == "validatedq  ") {
             var model = { firstName: req.user.local.name.first,
                           lastName: req.user.local.name.last,
                           user: req.user,
@@ -359,10 +359,14 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
         } else if (req.user.local.status == 'customer' && req.session.numProducts > 0) {
           res.redirect('/addresses');
-
         } else {
-            console.log('User: ', req.user); //TODO: gestire il caso anomalo con un messaggio di warning e loggare
-            res.redirect('/cart');
+          var msg = "Devi validare la tua identità attraverso la mail che ti abbiamo inviato in fase di accettazione dell'invito";
+          console.error(moment().tz("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "GET /register" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FLASH:'+msg+'');
+          req.flash('warning', msg);
+          return res.render('info.njk', {
+                  message: req.flash('warning'),
+                  type: "warning"
+          })
         }
     });
 
@@ -398,7 +402,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           
         const user = await User.findById(req.user._id);
         if (user.local.status != 'customer') {
-          //console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
+          console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
           user.local.name.first              = req.body.firstName;
           user.local.name.last               = req.body.lastName;
           user.local.status                  = 'customer';
