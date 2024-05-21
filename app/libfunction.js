@@ -23,7 +23,7 @@ module.exports = {
                   }
                   // if they aren't redirect them to the Login page
                   console.debug('INDIRIZZO DA DOVE ARRIVO: ',req.originalUrl);
-                  global.returnTo = req.originalUrl; 
+                  returnTo = req.originalUrl; 
                   res.redirect('/login');
               },
   isAdmin: function isLoggedIn(req, res, next) {
