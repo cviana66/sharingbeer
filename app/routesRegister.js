@@ -202,9 +202,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             } else {
               if (user.local.status == 'new') {
                 res.render('validation.njk', {
-                  prospect: user.local
-                  //message: req.flash('validateMessage'),
-                  //type: "danger"
+                  prospect: user.local,
+                  message: req.flash('validateMessage'),
+                  type: "danger"
                 });
               } else if (user.local.status == 'waiting') { 
                 //START TRANSACTION.local
@@ -257,7 +257,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             if (err || user == null) { 
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
                 req.flash('error', msg);
-                console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:'+ user._id + '"}  FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+                console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '"}  FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                 console.log('POST VALIDATION ERROR: ', err);
                 return res.render('info.njk', {
                     message: req.flash('error'),
@@ -370,6 +370,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //POST
 //-------------------------------------------
     app.post('/register', lib.isLoggedIn, async function(req, res) {
+
       const session = await mongoose.startSession();
       try {
         session.startTransaction();
@@ -428,8 +429,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       // Caso di spedizione presso indirizzo inserito appena prima del pagamento
       //------------------------------------------------------------------------
 
-      if (req.session.nextStep == 'payment') {
-
         req.session.deliveryType =  "Consegna"
 
         address = await User.aggregate([
@@ -480,22 +479,25 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         } else {
           req.session.pointDiscount = 0.00.toFixed(2); 
         }
-
-        res.render('orderSummary.njk', {
-                cartItems   : req.session.cartItems,
-                address     : address[0].addresses,
-                numProducts : req.session.numProducts,
-                userStatus  : req.user.local.status,
-                shipping    : req.session.shippingCost,
-                deliveryType      : req.session.deliveryType,
-                deliveryDate      : lib.deliveryDate(),
-                discount    : req.session.pointDiscount,
-                user        : req.user,
-                payType     : "axerve" //"paypal"  "axerve"
-              })
+        
+        console.debug('req.user.local.status = ',req.user.local.status);
+        if (req.user.local.status == 'validated') {
+            req.user.local.status = 'customer'
+            res.redirect('/addresses');
         } else {
-          res.redirect('/addresses');
-        }
+          res.render('orderSummary.njk', {
+                  cartItems   : req.session.cartItems,
+                  address     : address[0].addresses,
+                  numProducts : req.session.numProducts,
+                  userStatus  : req.user.local.status,
+                  shipping    : req.session.shippingCost,
+                  deliveryType      : req.session.deliveryType,
+                  deliveryDate      : lib.deliveryDate(),
+                  discount    : req.session.pointDiscount,
+                  user        : req.user,
+                  payType     : "axerve" //"paypal"  "axerve"
+                })
+        }      
       } catch(err) {
           console.log('error', err);
           await session.abortTransaction();
@@ -514,10 +516,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //-------------------------------------------
     app.get('/addresses',lib.isLoggedIn, async function(req, res) {
       
-      //console.debug("ADDRESSES: ",req.user.addresses)
-
-      req.session.nextStep = 'payment'; 
-    
       try {
           res.render('addresses.njk', {
               addresses   : req.user.addresses,

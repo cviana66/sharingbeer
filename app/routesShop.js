@@ -270,11 +270,9 @@ module.exports = function(app, moment, mongoose) {
   		}
   	});
   });
+
 //POST
 	app.post('/shop', lib.isLoggedIn ,function (req, res) {
-
-    //Settings session.nextStep che guida il processo per arrivare al pagamento
-    req.session.nextStep = 'address'; 
 		//Load (or initialize) the cart and session.cart
 		var cart = req.session.cart = req.session.cart || {};
 		//Read the incoming product data from shop.njk
@@ -335,8 +333,6 @@ module.exports = function(app, moment, mongoose) {
 // =============================================================================
 //GET
 	app.get('/cart', lib.isLoggedIn, function (req, res) {
-
-    req.session.nextStep = 'address'; 
     
 		//Retrieve the shopping cart from session
 		lib.retriveCart(req);
@@ -345,8 +341,6 @@ module.exports = function(app, moment, mongoose) {
   						    numProducts: req.session.numProducts,
   						    cart       : req.session.cartItems,
                   totalPrice : req.session.totalPrc
-                  //userStatus : req.user.local.status,
-                  //nextStep   : req.session.nextStep
   					    };
 
   	res.render('cart.njk', model);
