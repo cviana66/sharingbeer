@@ -349,7 +349,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //-------------------------------------------
     app.get('/register', lib.isLoggedIn, function(req, res) {
 
-        if (req.user.local.status == "validatedq  ") {
+        if (req.user.local.status == "validated") {
             var model = { firstName: req.user.local.name.first,
                           lastName: req.user.local.name.last,
                           user: req.user,
