@@ -214,7 +214,8 @@
               console.debug("PayID: ",data.payload.paymentID);
               console.debug("PayToken",data.payload.paymentToken);
               axerve.lightBox.shop = "GESPAY96332";
-              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback);
+              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback)
+              return;
             }
           })
         } catch(e) {
