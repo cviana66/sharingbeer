@@ -190,10 +190,10 @@
         window.onfocus = function() { blurred && (location.reload()); };
       }
       
-      async function startAxerve() {
+      function startAxerve() {
         document.getElementById("mybutton").disabled = 'true';
         try {
-          await fetch('/axerve_create',{
+          fetch('/axerve_create',{
             method: 'POST',
             headers: {
               "Content-Type": "application/json"
@@ -214,8 +214,7 @@
               console.debug("PayID: ",data.payload.paymentID);
               console.debug("PayToken",data.payload.paymentToken);
               axerve.lightBox.shop = "GESPAY96332";
-              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback)
-              return;
+              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback);
             }
           })
         } catch(e) {
@@ -233,6 +232,8 @@
         console.debug('RESPONSE_URL -> ',response.responseURL)
         console.debug('TRANSACTION_ERROR_CODE -> ', response.transactionErrorCode)
         console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',response.transactionErrorDescription)
+
+        setTimeout(2000);
        
         post('/axerve_response', {'error_code': response.error.code,
                                   'error_description': response.error.description,
@@ -242,7 +243,6 @@
                                   'transaction_error_code': response.transactionErrorCode,
                                   'transaction_error_description': response.transactionErrorDescription
                                 });
-        return
       }
       
     </script>
