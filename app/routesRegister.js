@@ -379,8 +379,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       try {
         session.startTransaction();
         const opts = { session };
-        //console.log('ID: ',req.user.id);
-        //console.log('_ID: ',req.user._id);
+
+        console.log('ID POST REGISTER: ',req.user.id);
+
         // Conta quanti indirizzi main=yes ci sono 
         const Nadr = await User.aggregate([
           {$match:{"_id":req.user._id}}, 
@@ -401,13 +402,16 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         };
           
         const user = await User.findById(req.user._id);
+
         if (user.local.status != 'customer') {
           console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
           user.local.name.first              = req.body.firstName;
           user.local.name.last               = req.body.lastName;
           user.local.status                  = 'customer';
         }
+        // genero un nuovo _id
         const addressId = new mongoose.Types.ObjectId() 
+
         user.addresses.push({
                 _id             : addressId,
                 'name.first'    : req.body.firstName,     

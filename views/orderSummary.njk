@@ -190,10 +190,10 @@
         window.onfocus = function() { blurred && (location.reload()); };
       }
       
-      function startAxerve() {
+      async function startAxerve() {
         document.getElementById("mybutton").disabled = 'true';
         try {
-          fetch('/axerve_create',{
+          await fetch('/axerve_create',{
             method: 'POST',
             headers: {
               "Content-Type": "application/json"
@@ -215,7 +215,6 @@
               console.debug("PayToken",data.payload.paymentToken);
               axerve.lightBox.shop = "GESPAY96332";
               axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback);
-              return
             }
           })
         } catch(e) {
@@ -224,7 +223,7 @@
         }
 
       function pCallback(response) {
-      /* 
+       
         console.debug("Pcallback: ",response);
         console.debug('ERROR_CODE -> ', response.error.code)
         console.debug('ERROR_DESCRIPTION -> ',response.error.description)
@@ -233,7 +232,7 @@
         console.debug('RESPONSE_URL -> ',response.responseURL)
         console.debug('TRANSACTION_ERROR_CODE -> ', response.transactionErrorCode)
         console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',response.transactionErrorDescription)
-      */
+       
         post('/axerve_response', {'error_code': response.error.code,
                                   'error_description': response.error.description,
                                   'status': response.status,

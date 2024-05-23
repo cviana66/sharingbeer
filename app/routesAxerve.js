@@ -79,13 +79,13 @@ var users;
       const resData = await data
       console.debug("DATA -> : ", JSON.stringify(resData));
 
-      if (resData.error.code != 0) {
+      if (Number(resData.error.code) !== 0) {
         resData.ok = false;
         console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(resData));
         await session.abortTransaction();
         res.status(500).json(resData);  
-      } else {
 
+      } else {
         //==========================================
         // Inserimento dati in MongoDB
         //==========================================
@@ -285,6 +285,9 @@ var users;
     };
   });
 
+//=============================================================
+// Chiamata usata da Axerve per  allineamento Server TO Server
+//=============================================================
 app.get('/response', async function(req, res) {
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0,'orders.items':0}}])
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$set :{'orders.paypal.shopLogin':'CIAO'}}])
