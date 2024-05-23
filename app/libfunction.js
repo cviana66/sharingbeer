@@ -20,11 +20,12 @@ module.exports = {
                   if (req.isAuthenticated())  {                    
 
                       return next();
+                  } else {
+                    // if they aren't redirect them to the Login page
+                    console.debug('INDIRIZZO DA DOVE ARRIVO: ',req.originalUrl);
+                    req.session.returnTo = req.originalUrl;
+                    res.redirect('/login');
                   }
-                  // if they aren't redirect them to the Login page
-                  console.debug('INDIRIZZO DA DOVE ARRIVO: ',req.originalUrl);
-                  returnTo = req.originalUrl; 
-                  res.redirect('/login');
               },
   isAdmin: function isLoggedIn(req, res, next) {
 

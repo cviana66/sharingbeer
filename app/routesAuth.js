@@ -27,8 +27,9 @@ module.exports = function(app, passport, moment) {
 //GET
   // show the login form
   app.get('/login', function(req, res) {
+      console.debug('IN LOGINreq.session.returnTo',req.session.returnTo)
       // render the page and pass in any flash data if it exists
-      res.render('login.njk', { message: req.flash('loginMessage') });
+      res.render('login.njk', { message: req.flash('loginMessage'), returnTo: req.session.returnTo });
   });
 
   app.get('/login/:user', function(req, res) {
@@ -44,8 +45,8 @@ module.exports = function(app, passport, moment) {
                         failureFlash : true 
                       }),
                       function (req, res) {
-                        console.debug('LOGIN RETURN TO :',returnTo)
-                        res.redirect(returnTo || '/shop');
+                        console.debug('LOGIN RETURN TO :',req.body.returnTo)
+                        res.redirect(req.body.returnTo || '/shop');
                       }
   );
 
