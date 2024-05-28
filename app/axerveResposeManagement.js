@@ -4,11 +4,11 @@ const Product = require('./models/product.js');
 
 const moment = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
 
-function getUserByPaymentIdAndShopLogin(paymentID,shopLogin) {
+async function getUserByPaymentIdAndShopLogin(paymentID,shopLogin) {
 	// https://sb.sharingbeer.it/response_positiva?a=GESPAY96332&Status=OK&paymentID=2188249507207&paymentToken=625a9b4b-5684-45e4-8473-6e5b70573f0e
 	//db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1545619506746'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,'orders.items':0}}])
 	
-	var user = User.aggregate([ {$unwind:"$orders"},
+	var user = await User.aggregate([ {$unwind:"$orders"},
 															{$match:{$and:[{'orders.paypal.transactionId':paymentID},
 														  {'orders.paypal.shopLogin':shopLogin}]}},
 														  {$project:{addresses:0,friends:0,'orders.items':0}}]);
@@ -44,27 +44,27 @@ function addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
                         ).session(session);
 }
 
-function addItemsInProducts(paymentID,shopLogin) {
+async function addItemsInProducts(paymentID,shopLogin) {
 	//db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1804229507453'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,local:0,addresses:0,friends:0,delivery:0,paypal:0}}])
 
-	var orderUser = User.aggregate([{$unwind:"$orders"},
-																	{$match:{$and:[{'orders.paypal.transactionId':'1804229507453'},
-																	{'orders.paypal.shopLogin':'GESPAY96332'}]}},
+	var orderUser = await User.aggregate([{$unwind:"$orders"},
+																	{$match:{$and:[{'orders.paypal.transactionId':paymentID},
+																	{'orders.paypal.shopLogin':shopLogin}]}},
 																	{$project:{_id:0,local:0,addresses:0,friends:0,delivery:0,paypal:0}}]);
-	console.debug('ITEMS TO ADD', orderUser.items);
-
-	const items = orderUser.items
-
+	
+	console.debug('ITEMS TO ADD', orderUser[0].orders.items);
+	var items = orderUser[0].orders.items
+	
 	for (var index = 0; index < items.length; index++) {
-    console.debug('ID PRODOTTO: ',items[index]._id)
+    console.debug('ID PRODOTTO: ',items[index].id)
     
-    const filter = {_id:items[index]._id};
+    const filter = {_id: items[index].id};
     console.debug("FILTER: ",filter)
-    let doc = Product.findOne(filter)
+    let doc = await Product.findOne(filter)
 
-    console.debug('QUANTITY UPDATE PRIMA DELLA AGGIUNTA: ',doc.quantity)
+    console.debug('QUANTITY UPDATE PRIMA DELLA AGGIUNTA: ', doc.quantity)
     const update = { quantity: (Number(doc.quantity) + Number(items[index].qty))};
-    let doc1 = Product.findOneAndUpdate(filter,update, {new:true});
+    let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
     console.debug('QUANTITY UPDATE DOPO AGGIUNTA: ',doc1.quantity)
   }
 }

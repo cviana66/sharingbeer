@@ -201,6 +201,8 @@ var users;
         // INVIO EMAIL al CLIENTE
         //========================================
         const server = lib.getServer();
+        console.debug('SERVER',server);
+        
         if (orderId != undefined ) {
           const html = mailorder(name, orderId, lib.deliveryDate(), server)
           lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html)
@@ -319,5 +321,9 @@ app.get('/response_negativa',  function(req,res) {
           status  : 'KO'
   });
 });
+
+app.get('/testItems', function(req,res){
+   addItemsInProducts('1474899508034','GESPAY96332',mongoose);
+})
 
 };
