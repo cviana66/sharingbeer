@@ -14,11 +14,7 @@
       <form role="form" action="/orderSummary" method="post" id="selectedAddress">
         <div class="card text-white" style="background-color:#6B1628;border-color:#903246;margin-bottom:10px;">
           <div class="card-body">
-<<<<<<< HEAD
             <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!</p>
-=======
-            <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!<br>
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
             <p style="font-size:1.0em;" class="card-text text-center">Ti aspettiamo in
             Via Molignati 12, Candelo - 13878 (Biella)</p>
             <p class="card-text text-center">mobile: +39 123 456 7890</p>
@@ -101,7 +97,6 @@
             
             <div class="input-error" id="wrongNumciv"></div>
             <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly autocomplete="off">
-<<<<<<< HEAD
           
             <br>
             <div>
@@ -112,17 +107,6 @@
             </div>
           </div>
         </div>
-=======
-          </div>
-        </div>
-        <br>
-        <div>
-          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return listOfCivicNumber()">
-            Salva e vai al riepilogo
-          </button>
-          <input type="hidden" name="addressID" value="1" />
-        </div>
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       </form>
       <br>
 
@@ -137,7 +121,6 @@
 /*==================================================================*/
 
 //----------------------CIVICNUMBER e CAP---------------------------
-<<<<<<< HEAD
 async function controlInputAndValidateAddress() {
   const ret = await fieldsRegisterControl()
   if (ret) {
@@ -145,14 +128,6 @@ async function controlInputAndValidateAddress() {
     console.debug('VIA: ',document.getElementById("inputStreet").value);
 
     document.getElementById("loading").style.display = 'block';
-=======
-async function listOfCivicNumber() {
-  const ret = fieldsRegisterControl()
-  if (!ret) {
-    document.getElementById("loading").style.display = 'block';
-    console.debug('CITTA: ',document.getElementById("inputCity").value);
-    console.debug('VIA: ',document.getElementById("inputStreet").value);
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
     document.getElementById("wrongNumciv").innerHTML = ''
     
     let data = {};
@@ -161,10 +136,7 @@ async function listOfCivicNumber() {
     data.via = document.getElementById("inputStreet").value;
     data.istat = document.getElementById("hiddenIstat").value;
     data.numero = document.getElementById("inputNumciv").value;
-<<<<<<< HEAD
     data.cap = document.getElementById("inputCap").value;
-=======
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
     
     await $.ajax({
       type: 'POST',
@@ -172,7 +144,6 @@ async function listOfCivicNumber() {
       url: '/overpass/cap',
       data: data,
       success: function(res) {
-<<<<<<< HEAD
         //console.debug('RES',res)
         if (res.status != 'ko') {
           
@@ -214,42 +185,6 @@ async function listOfCivicNumber() {
       }
     });
   }
-  
-=======
-
-        if (res.length == 2 || res.length == 1) {
-          var nc="";
-          var cap="";    
-          cap = res[0].tags['addr:postcode'];
-          if (res.length == 2) nc = res[1].tags['addr:housenumber'];
-          console.debug('CAP: ',cap)
-          console.debug('N°: ',nc)
-          document.getElementById("hiddenCAP").value = cap
-          if (cap!="" && nc!="") {
-            document.getElementById("hiddenAddressIsValid").value = 'completo'
-            console.debug('HIDDEN ADDRESS 1: ', document.getElementById("hiddenAddressIsValid").value)
-          } else if ((cap!="" && nc=="")||(cap=="" && nc!="")) {
-            document.getElementById("hiddenAddressIsValid").value = 'parziale'
-            console.debug('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
-          } else {
-            document.getElementById("hiddenAddressIsValid").value = ""
-            console.debug('HIDDEN ADDRESS 3: ', document.getElementById("hiddenAddressIsValid").value)
-          }
-        } else {
-          console.debug('CAP NON PRESENTE')
-          document.getElementById("hiddenCAP").value =""
-          document.getElementById("hiddenAddressIsValid").value = ""
-        }
-
-      },
-      error: function (e) {
-        console.log("ErrorListOfNumber", e.responseText);
-        res = e;
-      }
-    });
-  }
-  document.getElementById("loading").style.display = 'none';
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 };
 
 //----------------------------TREET---------------------------------
@@ -453,12 +388,7 @@ async function selectCity(v) {
     // RICERCA LE CITTA' A PARTIRE DALLA STRINGA INSERITA
     //*******************************************************
     try {
-<<<<<<< HEAD
       var res = await listOfCities(v);
-=======
-      res = await listOfCities(v);
-     // if (res) {   
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       document.getElementById("wrongProvincia").innerHTML = "";
       document.getElementById("wrongStreet").innerHTML = "";
       document.getElementById("wrongNumciv").innerHTML = "";
@@ -475,11 +405,7 @@ async function selectCity(v) {
         document.getElementById("addresses").appendChild(input);
       }
      // }
-<<<<<<< HEAD
     } catch (e) {
-=======
-    } catch (e){
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       document.getElementById("inputProvincia").removeAttribute('readonly');
       document.getElementById("inputCap").removeAttribute('readonly');
       document.getElementById("inputStreet").removeAttribute('readonly');
@@ -566,10 +492,6 @@ var inputCN = document.createElement("input");
       inputCN.setAttribute("id","hiddenAddressIsValid");
       inputCN.setAttribute("name", "hiddenAddressIsValid");
       inputCN.setAttribute("value", "false");
-<<<<<<< HEAD
-=======
-      console.log('INPUT: ',inputCN);
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       document.getElementById("addresses").appendChild(inputCN);
 
   var inputCAP = document.createElement("input");
@@ -577,10 +499,6 @@ var inputCN = document.createElement("input");
       inputCAP.setAttribute("id","hiddenCAP");
       inputCAP.setAttribute("name", "hiddenCAP");
       inputCAP.setAttribute("value", "");
-<<<<<<< HEAD
-=======
-      console.log('INPUT: ',inputCAP);
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       document.getElementById("addresses").appendChild(inputCAP);
 
   var inputStreet = document.createElement("input");
@@ -588,10 +506,6 @@ var inputCN = document.createElement("input");
       inputStreet.setAttribute("id","hiddenStreet");
       inputStreet.setAttribute("name", "hiddenStreet");
       inputStreet.setAttribute("value", "KO");
-<<<<<<< HEAD
-=======
-      console.log('INPUT: ',inputStreet);
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       document.getElementById("addresses").appendChild(inputStreet);
 
   var inputIstat = document.createElement("input");
@@ -599,7 +513,6 @@ var inputCN = document.createElement("input");
       inputIstat.setAttribute("id","hiddenIstat");
       inputIstat.setAttribute("name", "hiddenIstat");
       inputIstat.setAttribute("value", "");
-<<<<<<< HEAD
       document.getElementById("addresses").appendChild(inputIstat);
 
 /**
@@ -629,11 +542,6 @@ var inputCN = document.createElement("input");
     form.submit();
   }
 
-=======
-      console.log('INPUT: ',inputIstat);
-      document.getElementById("addresses").appendChild(inputIstat);
-
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 </script>
 
 {% endblock %}

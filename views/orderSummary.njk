@@ -62,7 +62,6 @@
         <td width="30%" height="60px" style=";padding:0px 10px 0px 0px;" valign="middle" align="right" id="total"></td>
       </tr>
     </table>
-<<<<<<< HEAD
 
     <table class="mx-auto" width="100%" style="margin: 20px;">
       <!-- Delivery -->
@@ -94,39 +93,6 @@
       </tr>
     </table>
 
-=======
-
-    <table class="mx-auto" width="100%" style="margin: 20px;">
-      <!-- Delivery -->
-      <tr class="text-white">
-        <td colspan="2" width="100%" padding-left="15px">
-          {% if deliveryType == 'Consegna' %}
-            <i><b>Indirizzo dove verrà consegnato:</b></i>
-          {% else %}
-            <i><b>Puoi effettuare qui il ritiro:</b></i>
-          {% endif %}
-        </td>
-      </tr>
-      <tr class="text-white">
-        <td width="16%" rowspan="3" align="center"><img src="img/location_on_36dp.svg"></td>
-        <td width="84%" style="color: #FFBB35; font-size:1.3em;">{{address.name.first}} {{address.name.last}}</td>
-      </tr>
-      <tr class="text-white">
-        <td width="84%">{{address.address}} {{address.houseNumber}} - {{address.city}} - {{address.postcode}} ({{address.province}})</td>
-      </tr>
-    </table>
-    <table class="mx-auto" width="100%" style="margin: 20px;">
-      <tr class="text-white">
-        <td colspan="2" width="100%" padding-left="15px">
-          <i><b>Consegna entro il:</b></i>
-        </td>
-      <tr class="text-white">
-        <td width="16%" rowspan="3" align="center"><img src="img/event_available_black_36dp.svg"></td>
-        <td width="84%" style="font-size:1.2em;">{{deliveryDate}}</td>
-      </tr>
-    </table>
-
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
     {% if (numProducts > 0) and (userStatus == 'customer') and (address) %}
       {% if payType =='paypal' %}
         <script src="https://www.paypal.com/sdk/js?client-id=AaC3hpI3SPtJoB-FZxzBIyehflv_IhSgaefJUIgtOnYFpCb6mIFXGCvqvofV9xbSTQfupnu1w35HvrWv&currency=EUR&disable-funding=sofort,venmo,mybank,card"> </script>
@@ -212,12 +178,7 @@
       </div>
       
 
-<<<<<<< HEAD
       <script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
-=======
-
-      <script script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       <script type="text/javascript">
 
 
@@ -248,7 +209,6 @@
             }
           })
           .then(function(data){
-<<<<<<< HEAD
             console.log('Axerve.data->',JSON.stringify(data,null,2));            
             if (data.error.code == "0") {
               console.log("PayID: ",data.payload.paymentID);
@@ -274,47 +234,12 @@
                                           'transaction_error_description': response.transactionErrorDescription
                                         });
               });
-=======
-            console.log('Axerve.data->',JSON.stringify(data));            
-            if (data.error.code == 0) {
-              console.debug("PayID: ",data.payload.paymentID);
-              console.debug("PayToken",data.payload.paymentToken);
-              axerve.lightBox.shop = "GESPAY96332";
-              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, pCallback);
-              return
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
             }
           })
         } catch(e) {
           post('/orderOutcome',{status:"KO"})
           }
-<<<<<<< HEAD
         }      
-=======
-        }
-
-      function pCallback(response) {
-      /* 
-        console.debug("Pcallback: ",response);
-        console.debug('ERROR_CODE -> ', response.error.code)
-        console.debug('ERROR_DESCRIPTION -> ',response.error.description)
-        console.debug('STATUS -> ', response.status)
-        console.debug('PAYMENT_ID -> ',response.paymentId)
-        console.debug('RESPONSE_URL -> ',response.responseURL)
-        console.debug('TRANSACTION_ERROR_CODE -> ', response.transactionErrorCode)
-        console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',response.transactionErrorDescription)
-      */
-        post('/axerve_response', {'error_code': response.error.code,
-                                  'error_description': response.error.description,
-                                  'status': response.status,
-                                  'payment_id': response.paymentId,
-                                  'response_URL': response.responseURL,
-                                  'transaction_error_code': response.transactionErrorCode,
-                                  'transaction_error_description': response.transactionErrorDescription
-                                });
-        return
-      }
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       
     </script>
 

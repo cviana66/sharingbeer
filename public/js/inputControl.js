@@ -247,7 +247,6 @@ async function fieldsRegisterControl() {
     document.getElementById("wrongProvincia").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
-<<<<<<< HEAD
   if (cap == "") {
     text = iwar+"Inserire il CAP";
     document.getElementById("wrongCap").innerHTML = text;
@@ -255,8 +254,6 @@ async function fieldsRegisterControl() {
     document.getElementById("wrongCap").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }  
-=======
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
   if (address == "" || document.getElementById("myselectstreet") !=null || document.getElementById("hiddenStreet").value != 'OK') {
     text = iwar+"Inserire o selezionare un indirizzo esistente";
     document.getElementById("wrongStreet").innerHTML = text;
@@ -265,22 +262,11 @@ async function fieldsRegisterControl() {
     return false;
   }
   
-<<<<<<< HEAD
   if (numciv == "") {
     text = iwar+"Inserire il Numero Civico";  
     document.getElementById("wrongNumciv").innerHTML = text;
     document.getElementById("inputNumciv").focus();
     document.getElementById("wrongNumciv").scrollIntoView({ behavior: "smooth", block: "center" });
-=======
-  if (numciv == "") { 
-    if (numciv == "") {
-      text = iwar+"Inserire il Numero Civico";  
-    } else {
-      text = iwar+"Inserire un Numero Civico valido";
-    }
-    document.getElementById("wrongNumciv").innerHTML = text;
-    document.getElementById("inputNumciv").focus();
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
     return false
   }
   
