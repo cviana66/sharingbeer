@@ -35,7 +35,6 @@ async function geoMapCore(consegneAddressPar, departurePar) {
       var waitingSec = 0;
 
       try {
-<<<<<<< HEAD
         var auxCoordLatitude;
         var auxCoordLongitude;
 
@@ -60,15 +59,6 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
           console.debug('consegneAddressPar[' + i + ']', consegneAddressPar[i]);
         }
-=======
-        coordinate = await getCoordinatesFromAddress(consegneAddressPar[i].puntoMappa.indirizzo);
-
-        consegneAddressPar[i].puntoMappa['coordinateGPS'] = {}
-        consegneAddressPar[i].puntoMappa.coordinateGPS['latitude'] = coordinate.puntoMappa.latitude;
-        consegneAddressPar[i].puntoMappa.coordinateGPS['longitude'] = coordinate.puntoMappa.longitude;
-
-        consegneAddressPar[i].puntoMappa['isPreciseAddress'] = coordinate.puntoMappa.isPreciseAddress;
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 
         isHighPriority = consegneAddressPar[i].puntoMappa.isHighPriority;
         if (!isHighPriority) {
@@ -87,13 +77,8 @@ async function geoMapCore(consegneAddressPar, departurePar) {
         if (consegneAddressPar[i].puntoMappa.planningSelection == 'Y' ||
             consegneAddressPar[i].puntoMappa.planningSelection == 'M') {
 
-<<<<<<< HEAD
             locationsList[locationIdx] = {lat: auxCoordLatitude, 
                                 lon: auxCoordLongitude, 
-=======
-            locationsList[locationIdx] = {lat: coordinate.puntoMappa.latitude, 
-                                lon: coordinate.puntoMappa.longitude, 
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
                                 type: _type, 
                                 name: consegneAddressPar[i].puntoMappa.tipoPunto + " - " + consegneAddressPar[i].puntoMappa.indirizzo,
                                 waiting: waitingSec
@@ -114,11 +99,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
         consegneAddressOk.push(consegneAddressPar[i]);
 
       } catch (error) {
-<<<<<<< HEAD
         console.error(error.stack);
-=======
-
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         consegneAddressErr.push(consegneAddressPar[i]);
         consegneAddressPar[i].puntoMappa['stato'] = 'ERRORE'
         //devare consegneAddressPar[i];

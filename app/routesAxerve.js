@@ -4,14 +4,11 @@ const User          = require('../app/models/user');
 const mailorder     = require('../config/mailOrder');
 const {transMsg}    = require("./msgHandler");
 const Product = require('./models/product.js');
-<<<<<<< HEAD
 
 var {getUserByPaymentIdAndShopLogin}  = require('../app/axerveResposeManagement');
 var {updateStatusPayment}             = require('../app/axerveResposeManagement');
 var {addInviteAndPoint}               = require('../app/axerveResposeManagement');
 var {addItemsInProducts}              = require('../app/axerveResposeManagement');
-=======
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 
 module.exports = function(app,mongoose, moment) {
 
@@ -44,7 +41,6 @@ var users;
       // per ciacun prodotto in acquisto
       //=============================================
       for (var index = 0; index < req.session.numProductsPerId.length; index++) {
-<<<<<<< HEAD
         
         const filter = {_id:req.session.numProductsPerId[index].id};
         console.debug("FILTER: ",filter)
@@ -55,15 +51,6 @@ var users;
         const update = { quantity: (Number(doc.quantity) - Number(req.session.numProductsPerId[index].qty))};
         let doc1 = await Product.findOneAndUpdate(filter,update, {new:true}).session(session);
         console.debug('QUANTITY UPDATE DOPO LA DECURTAZIONE: ',doc1.quantity)
-=======
-        console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
-        const filter = {_id:req.session.numProductsPerId[index].id};
-        console.debug("FILTER: ",filter)
-        let doc = await Product.findOne(filter)
-        const update = { quantity: (Number(doc.quantity) - Number(req.session.numProductsPerId[index].qty))};
-        let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
-        console.debug('QUANTITY UPDATE MINUS: ',doc1.quantity)
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       }
       //=============================================
 
@@ -86,22 +73,15 @@ var users;
             "Authorization" : process.env.APIKEY
           },
           body: JSON.stringify({  
-<<<<<<< HEAD
             "shopLogin"         : shopLogin,
             "amount"            : req.session.order.totalaAmount,
             "currency"          : currency,
-=======
-            "shopLogin": shopLogin,
-            "amount": (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2),
-            "currency": currency,
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
             "shopTransactionID" : req.session.order._id.toString()
           })
         }
       ).then(function(result) {
         console.debug("RESULT -> : ",JSON.stringify(result));
         return result.json();
-<<<<<<< HEAD
       }).then (async function(data){
         console.debug("DATA -> : ", JSON.stringify(data));
 
@@ -145,51 +125,6 @@ var users;
           res.status(200).json(data);  
         }
       })
-=======
-      });
-
-      const resData = await data
-      console.debug("DATA -> : ", JSON.stringify(resData));
-
-      if (resData.error.code != 0) {
-        resData.ok = false;
-        console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(resData));
-        await session.abortTransaction();
-        res.status(500).json(resData);  
-      } else {
-
-        //==========================================
-        // Inserimento dati in MongoDB
-        //==========================================
-        user.orders.push({
-          _id         : orderId,
-          email       : req.user.local.email,
-          dateInsert  : moment().format(),
-          status      : "CREATED",
-          deliveryType : req.session.deliveryType,
-          deliveryDate : lib.deliveryDate('formato_data'),
-          shipping          : Number(req.session.shippingCost).toFixed(2),
-          pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
-          totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
-          totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
-          items : req.session.cartItems.items,
-          totalQty : req.session.totalQty,        
-          address : req.session.shippingAddress,
-          'paypal.shopLogin'        : shopLogin,
-          'paypal.createTime'       : moment().format('DD/MM/yyyy hh:mm:ss'),
-          'paypal.orderId'          : req.session.order._id.toString(),
-          'paypal.currencyAmount'   : currency,
-          'paypal.totalAmount'      : req.session.order.totalaAmount,
-          'paypal.transactionId'    : resData.payload.paymentID,
-          'paypal.token'            : resData.payload.paymentToken,
-          'paypal.errorCode'        : resData.error.code,
-          'paypal.errorDescription' : resData.error.description     
-        });
-        let saveOrder = await user.save(opts);
-        await session.commitTransaction();
-        res.status(200).json(resData);  
-      }
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 
     } catch (e) {
         console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
@@ -206,7 +141,6 @@ var users;
   app.post('/axerve_response', lib.isLoggedIn, async function(req, res) {
 
     const error_code = req.body.error_code; 
-<<<<<<< HEAD
     const error_description = req.body.error_description;    
     
     const response_URL = req.body.response_URL;
@@ -234,33 +168,12 @@ var users;
     const name    = req.user.local.name.first;
     const userEmail = req.user.local.email
 
-    
-    
-=======
-    const error_description = req.body.error_description;
-    var status = req.body.status;
-    const payment_id = req.body.payment_id;
-    const response_URL = req.body.response_URL;
-    const transaction_error_code = req.body.transaction_error_code;
-    const transaction_error_description = req.body.transaction_error_description;
-    const orderId = req.session.order._id
-  
-    console.debug('ERROR_CODE -> ', error_code)
-    console.debug('ERROR_DESCRIPTION -> ',error_description)
-    console.debug('STATUS -> ', status)
-    console.debug('PAYMENT_ID -> ',payment_id)
-    console.debug('RESPONSE_URL -> ',response_URL)
-    console.debug('TRANSACTION_ERROR_CODE -> ', transaction_error_code)
-    console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)
-  
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
     //==========================================
     // Inizializzo la Transazione
     //==========================================
     const session = await mongoose.startSession();
     session.startTransaction();
   
-<<<<<<< HEAD
     try {  
       //==========================================
       // UPDATE Esito del pagamento 
@@ -309,96 +222,6 @@ var users;
         //=============================================
          addItemsInProducts(paymentId,shopLogin);
 
-=======
-    try {      
-      //==========================================
-      // UPDATE Esito del pagamento 
-      //==========================================
-      if (status == "") status = "KO";
-
-      let filter = {_id: req.user._id};
-      let update = 
-          {
-            'orders.$[el].status'               : status,
-            //'orders.$[el].paypal.transactionId' : payment_id,    
-            'orders.$[el].paypal.updateTime'    : moment().format('DD/MM/yyyy hh:mm:ss'),
-            'orders.$[el].paypal.errorCode'        : error_code,
-            'orders.$[el].paypal.errorDescription' : error_description     
-          }
-
-      let updateOrder = await User.findOneAndUpdate(
-                                filter,
-                                {'$set':update},
-                                {arrayFilters: [{"el._id": req.session.order._id}]}
-                                ).session(session);
-      
-
-      if (status == 'OK') {
-        //========================================
-        // INVIO EMAIL al CLIENTE
-        //========================================
-        let server;
-        if (process.env.NODE_ENV== "development") {
-          server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-        } else {
-          server = req.protocol+'://'+req.hostname;
-        }
-        if (orderId != undefined ) {
-          const html = mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server)
-          lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
-        }
-        
-        //=====================================
-        // Svuoto il carrello
-        //=====================================
-        req.session.cart = {}
-        req.session.order = {}
-        req.session.numProducts = 0
-
-        //=====================================
-        // aggiungo possibilità di invito
-        // aggiungo punto Pinta al cliente Padre
-        //=====================================        
-        let updateUser = await User.findOneAndUpdate(
-                                  {_id: req.user._id},
-                                  {'$inc': {'local.eligibleFriends': invitiPerOgniAcquisto},'local.booze': req.session.booze}
-                                ).session(session);
-        const booze = Number(req.session.totalPrc)/numBottigliePerBeerBox/puntiPintaPerUnaBottiglia
-        console.log('BOOZE: ', booze, req.session.totalPrc, numBottigliePerBeerBox, puntiPintaPerUnaBottiglia)
-        let updateUserParent = await User.findOneAndUpdate(
-                                      {'_id': mongoose.Types.ObjectId(req.user.local.idParent)},
-                                      {'$inc': {'local.booze':booze}}
-                                    ).session(session);
-
-        console.error(moment().format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
-        res.render('orderOutcome.njk', {
-          status  : status,
-          orderId : orderId,
-          user    : req.user,
-          deliveryDate: lib.deliveryDate(),
-          numProducts : req.session.numProducts
-        })
-
-      } else {
-
-        console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} ERROR: '+e+' '+error_code+' '+error_description);
-        //==============================================
-        // Ri-aggiungo i prodotti dalla disponibilità 
-        // per prodotto per acquisto non effettuato
-        //=============================================
-        for (var index = 0; index < req.session.numProductsPerId.length; index++) {
-          console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
-          const filter = {_id:req.session.numProductsPerId[index].id};
-          
-          console.debug("FILTER: ",filter)
-          let doc = await Product.findOne(filter)
-          
-          const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
-          let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
-          console.debug('QUANTITY UPDATE: ',doc1.quantity)
-        }
-        //=============================================
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         res.render('orderOutcome.njk', {
           status  : status,
           orderId : orderId,
@@ -410,38 +233,15 @@ var users;
       await session.commitTransaction();
 
     } catch (e) {
-<<<<<<< HEAD
       console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + userId + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} CATCH: '+e+' '+transaction_error_code+' '+transaction_error_description+' '+error_code+' '+error_description);
       await session.abortTransaction();
-=======
-      console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} FUNCTION: User.findOneAndUpdate: ERROR: '+e+' '+error_code+' '+error_description);
-      //await session.abortTransaction();
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 
       //==============================================
       // Ri-aggiungo i prodotti nella disponibilità 
       // per prodotto per acquisto non effettuato
       //=============================================
-<<<<<<< HEAD
       addItemsInProducts(paymentId,shopLogin);
       
-     
-=======
-      for (var index = 0; index < req.session.numProductsPerId.length; index++) {
-        console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
-        const filter = {_id:req.session.numProductsPerId[index].id};
-        
-        console.debug("FILTER: ",filter)
-        let doc = await Product.findOne(filter)
-        
-        const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
-        let doc1 = await Product.findOneAndUpdate(filter, update, {new:true});
-        console.debug('QUANTITY UPDATE ADD: ',doc1.quantity)
-      }
-      //=============================================
-     
-      await session.commitTransaction();
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       res.render('orderOutcome.njk', {
           status  : 'KO',
           user    : req.user,
@@ -452,12 +252,9 @@ var users;
     };
   });
 
-<<<<<<< HEAD
 //=============================================================
 // Chiamata usata da Axerve per  allineamento Server TO Server
 //=============================================================
-=======
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 app.get('/response', async function(req, res) {
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0,'orders.items':0}}])
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$set :{'orders.paypal.shopLogin':'CIAO'}}])
@@ -485,7 +282,6 @@ app.get('/response', async function(req, res) {
   res.redirect('/');
 });
 
-<<<<<<< HEAD
 
 app.get('/response_positiva', async function(req,res) {  
   //response_positiva?a=GESPAY96332&Status=OK&paymentID=1244109507430&paymentToken=2fbc938d-547a-4431-8da8-31539f967ccf
@@ -521,6 +317,4 @@ app.get('/response_negativa',  function(req,res) {
   });
 });
 
-=======
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 };

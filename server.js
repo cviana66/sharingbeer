@@ -18,8 +18,6 @@ const nunjucks      = require('nunjucks');          // Template per Javascript. 
 const fastcsv       = require("fast-csv");          // Gestione dei file CSV. https://c2fo.github.io/fast-csv/docs/introduction/getting-started
 //const cons          = require('consolidate');       // Consolida il framework da utilizzare per package. NON USATO?. https://github.com/tj/consolidate.js
 const moment        = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
-<<<<<<< HEAD
-
 
 moment.locale('it');
 console.debug('OGGI moment().utc("Europe/Rome"): ',moment().utc("Europe/Rome").format().toString());
@@ -28,20 +26,6 @@ let d = new Date(moment().utc("Europe/Rome").format())
 console.debug('OGGI FORMATO DATE:', d )
 
 
-=======
-
-global.returnTo = '/';
-
-moment().tz("Europe/Rome").format();
-moment.locale('it');
-
-console.debug('OGGI moment() : ',moment().format())
-
-console.debug('OGGI: ',moment().format('dddd DD MMMM YYYY - HH:mm'))
-//console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('dddd DD MMMM YYYY - HH:mm'))
-//console.debug('DATA INSERIMENTO: ',moment('2024-04-18T06:51:01.000+00:00').format('DD.MM.YYYY - HH:mm'))
-
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
 // config environment variables /
 //env(__dirname + '/.env');

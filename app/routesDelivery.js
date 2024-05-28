@@ -14,13 +14,9 @@ async function loadDeliveryData(moment) {
 	const aggregationResultRitiro = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-<<<<<<< HEAD
 	    { $match: { $and: [{'orders.status': 'OK'}, 
 	    				   {'orders.paypal.s2sStatus': 'OK'}, 
 	    				   {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
-=======
-	    { $match: { $and: [{'orders.status': 'OK'}, {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 	    { $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
 	  ]
 	);
@@ -28,13 +24,9 @@ async function loadDeliveryData(moment) {
 	const aggregationResultConsegna = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-<<<<<<< HEAD
 	    { $match: { $and: [{'orders.status': 'OK'}, 
 	    				   {'orders.paypal.s2sStatus': 'OK'}, 
 	    				   {'orders.deliveryType': 'Consegna'}] } }
-=======
-	    { $match: { $and: [{'orders.status': 'OK'}, {'orders.deliveryType': 'Consegna'}] } }
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 	  ]
 	);
 
@@ -89,12 +81,8 @@ async function loadDeliveryData(moment) {
 							  orders.address.houseNumber + ' ' +
 							  orders.address.city +  ' ' +
 							  orders.address.province;
-<<<<<<< HEAD
 		var customerAddressCoordinate = orders.address.coordinateGPS;
 		
-=======
-
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 		var orderItems = orders.items;
 		
 		var insertDate = moment(orders.dateInsert);
@@ -107,7 +95,6 @@ async function loadDeliveryData(moment) {
 		
 		//Imposto indirizzo di consegna 
 		if (deliveryType == 'Consegna') {
-<<<<<<< HEAD
 			var puntoMappa = {'puntoMappa': 
 								{'tipoPunto': deliveryType, 
 								 'orderID': orderID, 
@@ -121,9 +108,6 @@ async function loadDeliveryData(moment) {
 								 orderItems
 								}
 							 };
-=======
-			var puntoMappa = {'puntoMappa': {'tipoPunto': deliveryType, 'orderID': orderID, 'orderSeq': i+1, 'cliente': customerAnag, 'mobile': customerMobile, 'indirizzo': customerAddress, 'planningSelection': 'Y', 'isHighPriority': isHighPriority, orderItems}};
->>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 			if (consegneAddress == null) {
 				consegneAddress = [puntoMappa];
 			} else {
