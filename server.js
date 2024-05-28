@@ -19,7 +19,6 @@ const fastcsv       = require("fast-csv");          // Gestione dei file CSV. ht
 //const cons          = require('consolidate');       // Consolida il framework da utilizzare per package. NON USATO?. https://github.com/tj/consolidate.js
 const moment        = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
 
-
 moment.locale('it');
 console.debug('OGGI moment().utc("Europe/Rome"): ',moment().utc("Europe/Rome").format().toString());
 console.debug('OGGI: ',moment().utc("Europe/Rome").format('dddd DD MMMM YYYY - HH:mm'));

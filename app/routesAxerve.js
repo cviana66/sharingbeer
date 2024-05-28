@@ -168,8 +168,6 @@ var users;
     const name    = req.user.local.name.first;
     const userEmail = req.user.local.email
 
-    
-    
     //==========================================
     // Inizializzo la Transazione
     //==========================================
@@ -246,7 +244,6 @@ var users;
       //=============================================
       addItemsInProducts(paymentId,shopLogin);
       
-     
       res.render('orderOutcome.njk', {
           status  : 'KO',
           user    : req.user,

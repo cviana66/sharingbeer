@@ -392,6 +392,7 @@ async function selectCity(v) {
       let city = res[0].Comune.toLowerCase()
 
       if (res.length == 1 && citta == city) {
+        //document.getElementById("hiddenCity").value = 'OK';
         document.getElementById("inputCity").value = res[0].Comune;
         document.getElementById("inputProvincia").value = res[0].Provincia;
         if (document.getElementById('myselectcity') != null) {
@@ -402,6 +403,7 @@ async function selectCity(v) {
         setValueCity(res[0].Comune, res[0].Provincia, res[0].Istat);
         //*********************************************************
       } else {
+        //document.getElementById("hiddenCity").value = 'OK';
         select.setAttribute('id','myselectcity');
         select.setAttribute('class','form-control');
         select.setAttribute('style','list-style-type: none;');
