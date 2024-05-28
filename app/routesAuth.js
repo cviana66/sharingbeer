@@ -45,8 +45,14 @@ module.exports = function(app, passport, moment) {
                         failureFlash : true 
                       }),
                       function (req, res) {
+<<<<<<< HEAD
                         console.debug('LOGIN RETURN TO :',req.body.returnTo)
                         res.redirect(req.body.returnTo || '/shop');
+=======
+                        console.debug('LOGIN RETURN TO :',returnTo)
+                        res.redirect(returnTo || '/shop');
+                        returnTo = '/'
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
                       }
   );
 

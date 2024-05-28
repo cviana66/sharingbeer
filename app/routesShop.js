@@ -64,18 +64,29 @@ module.exports = function(app, moment, mongoose) {
 //-------------------------------------------
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
 
+<<<<<<< HEAD
   	var address = [];
 
+=======
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
     try{
 
       //--------------------------------------
       // Caso di ritiro presso Sede Birrificio
       //--------------------------------------
+<<<<<<< HEAD
       if (req.body.typeOfDelivery == 'ritiro' ) {
         req.session.deliveryType =  "Ritiro";
         // Booze attualmente disponibili
         console.debug('POINT DISCOUNT BOOZE: ', req.user.local.booze);
         req.session.booze = req.user.local.booze;
+=======
+      if (req.body.addressID == '0' ) {
+        
+        // Booze attualmente disponibili
+        console.debug('POINT DISCOUNT BOOZE: ', req.user.local.booze)
+        req.session.booze = req.user.local.booze
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         
         // Costo spedizione
         req.session.shippingCost = 0.00.toFixed(2);
@@ -99,13 +110,18 @@ module.exports = function(app, moment, mongoose) {
         }
 
         console.debug('NEW BOOZE: ',req.session.booze)
+<<<<<<< HEAD
         console.debug('ADDRESS ID:',req.body.addressID)
         /*
+=======
+        
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         var address = await User.aggregate([
             {$match:{"local.email": "birrificioviana@gmail.com"}}, 
             {$unwind: "$addresses"}, 
             //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
+<<<<<<< HEAD
             ])*/
         address = await User.aggregate([
             {$match:{"_id":req.user._id}}, 
@@ -117,6 +133,12 @@ module.exports = function(app, moment, mongoose) {
         req.session.shippingAddress = address[0].addresses;  
         console.debug('ADDRESS[0]: ',address[0].addresses)       
         
+=======
+            ])
+        req.session.shippingAddress = address[0].addresses;  
+        //console.debug('ADDRESS[0]: ',address[0].addresses)       
+        req.session.deliveryType =  "Ritiro"
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       } else {
       //-------------------------------------------------------
       // Caso di spedizione presso all'indirizzo indirizzo 
@@ -138,10 +160,15 @@ module.exports = function(app, moment, mongoose) {
                           address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
                           address[0].addresses.province;
+<<<<<<< HEAD
         let customerCoordinate = null;
         let birrificioAddress ='via molignati 10 candelo biella';
         let birrificioCoordinate = {'latitude': 45.5447643, 'longitude': 8.1130519} ;
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress, customerCoordinate, birrificioCoordinate));
+=======
+        let birrificioAddress ='via molignati 10 candelo biella';
+        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 
         console.log('DISTANZA = ', dist.distanceInMeters)
 
@@ -243,7 +270,11 @@ module.exports = function(app, moment, mongoose) {
   	Product.find(function (err, prods) {
   		if (err) {
   			let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
+<<<<<<< HEAD
   			console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+=======
+  			console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         req.flash('message', msg);
         return res.render('info.njk', {
             message: req.flash('message'),
@@ -332,6 +363,11 @@ module.exports = function(app, moment, mongoose) {
 // =============================================================================
 //GET
 	app.get('/cart', lib.isLoggedIn, function (req, res) {
+<<<<<<< HEAD
+=======
+
+    req.session.nextStep = 'address'; 
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
     
 		//Retrieve the shopping cart from session
 		lib.retriveCart(req);
@@ -340,6 +376,11 @@ module.exports = function(app, moment, mongoose) {
   						    numProducts: req.session.numProducts,
   						    cart       : req.session.cartItems,
                   totalPrice : req.session.totalPrc
+<<<<<<< HEAD
+=======
+                  //userStatus : req.user.local.status,
+                  //nextStep   : req.session.nextStep
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
   					    };
 
   	res.render('cart.njk', model);

@@ -26,6 +26,13 @@ module.exports = {
                     req.session.returnTo = req.originalUrl;
                     res.redirect('/login');
                   }
+<<<<<<< HEAD
+=======
+                  // if they aren't redirect them to the Login page
+                  console.debug('INDIRIZZO DA DOVE ARRIVO: ',req.originalUrl);
+                  global.returnTo = req.originalUrl; 
+                  res.redirect('/login');
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
               },
   isAdmin: function isLoggedIn(req, res, next) {
 
@@ -126,9 +133,15 @@ module.exports = {
                       totalQty = 0
                   req.session.numProducts = 0;
                   req.session.numProductsPerId = [];
+<<<<<<< HEAD
 
                   console.debug('CART: ', cart)
 
+=======
+
+                  console.debug('CART: ', cart)
+
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
                  // if (!cart) {
                  //   req.session.numProducts = 0;
                  // } else {
@@ -158,6 +171,7 @@ module.exports = {
                         return true;
                       }
                     },
+<<<<<<< HEAD
   deliveryDate: function deliveryDate(dataType) {                    
                     moment.locale('it');                    
                     var d;
@@ -170,10 +184,26 @@ module.exports = {
                     }
                     if (dataType == 'formato_data') {
                       giornoLavorativo = new Date(moment(d).format())
+=======
+  deliveryDate: function deliveryDate(dataType) {
+                    moment().tz("Europe/Rome").format();
+                    moment.locale('it');                    
+                    var d
+                    if (moment().add(3,'d').format('ddddd') == "sabato") {
+                      d = moment().add(5,'d').format()
+                    } else if (moment().add(3,'d').format('dddd') == "domenica") {
+                      d = moment().add(4,'d').format()
+                    } else {
+                      d = moment().add(3,'d').format()
+                    }
+                    if (dataType == 'formato_data') {
+                      giornoLavorativo = moment(d).format()
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
                     } else {
                       giornoLavorativo = moment(d).format('dddd DD MMMM')
                     }
                     return giornoLavorativo  
+<<<<<<< HEAD
                 },
   getseSver:  function getServer() {
                 if (process.env.NODE_ENV== "development") {
@@ -183,6 +213,9 @@ module.exports = {
                 }
                 return server;
               }
+=======
+                }
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 }
 
 

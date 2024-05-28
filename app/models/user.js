@@ -33,12 +33,16 @@ const userSchema = new Schema({
                   main        : {type: String}, // inserito all'atto della registrazine
                   preferred   : {type: String}, // preferito nelle spedizioni
                   postcode    : {type: String},
+<<<<<<< HEAD
                   affidability: {type: String}, 
                   desAffidability : {type: String},
                   coordinateGPS : {
                     lat             : {type: Number},
                     lon             : {type: Number},  
                   }
+=======
+                  affidability: {type: String}, // livello di verifica in fase di inserimento: completo/parziale/""
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
               }],
   friends : [{  id    : {type: String, unique: true },
                 name  : { first: {type: String, required: true, unique: false},
@@ -79,12 +83,17 @@ const userSchema = new Schema({
                   address     : {type: String},
                   houseNumber : {type: String},
                   postcode    : {type: String},
+<<<<<<< HEAD
                   affidability: {type: String}, 
                   desAffidability : {type: String},
                   coordinateGPS : {
                     lat             : {type: Number},
                     lon             : {type: Number},
                   }  
+=======
+                  latitude    : {type: String},
+                  longitude   : {type: String},
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
               },
               paypal : {
                   shopLogin         : { type: String},

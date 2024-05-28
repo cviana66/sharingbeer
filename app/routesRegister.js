@@ -34,6 +34,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 // =================================================================================================
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv
 //https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.xlsx
+<<<<<<< HEAD
 
 
   app.get('/testOverpass', async function(req,res){
@@ -134,6 +135,180 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   });
 
 
+=======
+
+  app.post('/overpass/istat', async function(req, res) {
+    var newArr = [];
+    var option = '[out:json];'+
+             'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.body.istat+'"]->.a;' +
+             '(node(area.a)["addr:street"];for (t["addr:street"])(make via name=_.val;out;););' +
+             '(way(area.a)[highway]["name"];for (t["name"])(make via name=_.val;out;););'
+
+    const url = 'https://overpass-api.de/api/interpreter?data='+option;
+
+    console.debug('OVERPASS: ',option);
+
+    const request = await https.request(url, (response) => {
+        let data = '';
+        response.on('data', (chunk) => {
+            data = data + chunk.toString();
+        });
+        
+            response.on('end', () => {
+              try {
+                const parseJSON = JSON.parse(data);
+                const elements = parseJSON.elements;
+                //console.debug('STREET: ', elements);
+                for (var index = 0; index < elements.length; ++index) {
+                  newArr.push(elements[index].tags.name);
+                }
+                //console.debug('STREET: ', newArr);
+                req.session.elements = newArr.filter((elem,indexx,self) => {return indexx === self.indexOf(elem);});
+                
+                res.send('{"status":"200", "statusText":"OK"}');
+              } catch (e) {
+                console.debug('Error', e);
+                res.send('{"status":"500","statusText":'+e+'"}'); 
+              }
+            });
+        
+    });
+    request.on('error', (error) => {
+        console.log('Error', error);
+          res.send('{"status":"500","statusText":'+error+'"}');
+    });
+    request.end()
+  });
+
+
+  app.post('/overpass/cap', async function(req,res){
+    var newArr = [];
+    //Query Overpass che restitutisce CAP se esiste in mappa OSM e valida il numero civico
+    var option =  '[out:json];'+
+                  'area[name="'+req.body.comune+'"]["ref:ISTAT"="'+req.body.istat+'"]->.code;'+
+                  '(node(area.code)'+
+                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
+                  '["addr:street"="'+req.body.via+'"]'+
+                  '["addr:housenumber"="'+req.body.numero+'"];'+
+                  'for (t["addr:postcode"])(make c "addr:postcode"=_.val;out;););'+
+                  '(node(area.code)'+
+                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
+                  '["addr:street"="'+req.body.via+'"]'+
+                  '["addr:housenumber"="'+req.body.numero+'"];'+
+                  'for (t["addr:housenumber"])(make n "addr:housenumber"=_.val;out;););'
+    
+    console.debug('OPTION1: ',option)
+    const url = 'https://overpass-api.de/api/interpreter?';
+
+    const data = await fetch(url, 
+                          {
+                            method: 'POST',
+                            headers: {'Accept': 'application/json',
+                                      "Content-Type": "application/json"},
+                            body: option
+                          })
+                          .then(function(result) {
+                                  //console.debug("RESULT -> : ",result);
+                                  return result.json();
+                          });
+      var objData = await data
+      
+      console.debug("OVERPASS DATA -> : ", objData.elements);
+
+      for (var index = 0; index < objData.elements.length; ++index) {          
+          if ( objData.elements[index].tags["addr:postcode"] != "" ) {
+              newArr.push(objData.elements[index]);
+          }
+      }
+      console.debug('ARR: ',newArr)
+      
+      if (newArr.length == 0) {        
+        //Query Overpass che restitutisce CAP anche se il numero civico non esiste o non è presente in mappa OSM
+        var option =  '[out:json];'+
+                  'area[name="'+req.body.comune+'"]["ref:ISTAT"="'+req.body.istat+'"]->.code;'+
+                  'node(area.code)'+
+                  //'["addr:city"="'+req.body.comune+'"]'+ //tolto perchè non sempre il tag è presente
+                  '["addr:street"="'+req.body.via+'"]'+
+                  '["addr:postcode"];'+
+                  'for (t["addr:postcode"])(make c "addr:postcode"=_.val;out;);'
+        
+        console.debug('OPTION2: ',option)
+        const url = 'https://overpass-api.de/api/interpreter?';
+
+        const data = await fetch(url, 
+                              {
+                                method: 'POST',
+                                headers: {'Accept': 'application/json',
+                                          "Content-Type": "application/json"},
+                                body: option
+                              })
+                              .then(function(result) {
+                                      //console.debug("RESULT -> : ",result);
+                                      return result.json();
+                              });
+          objData = await data
+          console.debug("OVERPASS DATA 2-> : ", objData.elements);
+          for (var index = 0; index < objData.elements.length; ++index) {          
+          if ( objData.elements[index].tags["addr:postcode"] != "") {
+              newArr.push(objData.elements[index]);
+          }
+        }
+      console.debug('ARR: ',newArr)
+      }
+      
+      res.send(newArr)
+  });
+
+  app.post('/streets', function(req, res) {
+      var rates = req.session.elements;
+      var newArr = [];
+      for (var index = 0; index < rates.length; ++index) {
+          name = rates[index].toLowerCase();
+          if (name.indexOf(req.body.street.toLowerCase()) != -1) {
+              newArr.push(rates[index]);
+          }
+      }
+      res.send(newArr);
+  });
+
+  app.post('/cities', function(req, res) {
+      req.session.elements = [];
+      //throw('Genera ERRORE');
+      //console.log("city : ", req.body.city);
+      CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},
+                   null,
+                   {sort: {Comune: 1}},
+                   function(err, city) {
+                     //console.log("Got city : ", city);
+                     res.send(city)
+                   })
+  });
+
+/*
+  app.post('/caps', function(req, res) {
+      //res.send(mailfriend('Roberta', 'rbtvna@gmail.com', '123XyZ', 'Carlo', 'Viana'));
+      //res.render('validation.dust', { message: req.flash('validation') });
+      //console.log("city : ", req.body.city);
+      MultipleCap.find({
+          'Comune': req.body.city
+      }).sort('CAP').exec(function(err, caps) {
+          if (caps.length == 0) {
+              CityCap.find({'Comune': req.body.city},
+                            null,
+                            {sort: {Comune: 1}},
+                            function(err, cap) {
+                                //console.log('CAP: ', cap);
+                                res.send(cap)
+                            });
+          } else {
+              console.log('CAPS: ', caps);
+              res.send(caps)
+          }
+      });
+  });
+*/
+
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 //==================================================================================================
 // UTILITY per importare i Comuni Italiani
 //==================================================================================================
@@ -322,12 +497,20 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   if (e.code === 11000) {
                     let msg = 'Indirizzo e-mail già registrato';
                     req.flash('validateMessage', msg);
+<<<<<<< HEAD
                     console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
+=======
+                    console.info(moment().format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
                     res.redirect("/validation?token=" + req.body.token);
                   } else {
                     let msg = 'Spiacente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';      
                     req.flash('error', msg);
+<<<<<<< HEAD
                     console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+=======
+                    console.error(moment().format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
                     return res.render('info.njk', {
                         message: req.flash('error'),
                         type: "danger"
@@ -359,6 +542,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
         } else if (req.user.local.status == 'customer' && req.session.numProducts > 0) {
           res.redirect('/addresses');
+<<<<<<< HEAD
+=======
+
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         } else {
           var msg = "Devi validare la tua identità attraverso la mail che ti abbiamo inviato in fase di accettazione dell'invito";
           console.error(moment().utc("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "GET /register" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FLASH:'+msg+'');
@@ -409,9 +596,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           user.local.name.last               = req.body.lastName;
           user.local.status                  = 'customer';
         }
+<<<<<<< HEAD
         // genero un nuovo _id
         const addressId = new mongoose.Types.ObjectId() 
 
+=======
+        const addressId = new mongoose.Types.ObjectId() 
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         user.addresses.push({
                 _id             : addressId,
                 'name.first'    : req.body.firstName,     
@@ -426,9 +617,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 main            : main,
                 preferred       : 'yes',
                 affidability    : req.body.hiddenAddressIsValid,
+<<<<<<< HEAD
                 desAffidability : req.body.descValidAddress,
                 'coordinateGPS.lat' : req.body.lat,
                 'coordinateGPS.lon' : req.body.lon
+=======
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         });
         await user.save(opts);
         await session.commitTransaction();
@@ -437,6 +631,14 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       // Caso di spedizione presso indirizzo inserito appena prima del pagamento
       //------------------------------------------------------------------------
 
+<<<<<<< HEAD
+=======
+
+        if (req.session.nextStep = 'payment') {
+
+        //TODO : rendere parametrico l'importo discount
+
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         req.session.deliveryType =  "Consegna"
 
         address = await User.aggregate([
@@ -452,10 +654,15 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                           address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
                           address[0].addresses.province;
+<<<<<<< HEAD
         let customerCoordinate = null;
         let birrificioAddress ='Via Molignati 12 Candelo Biella';
         let birrificioCoordinate =  {'latitude': 45.5447643, 'longitude': 8.1130519};
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress, customerCoordinate, birrificioCoordinate));
+=======
+        let birrificioAddress ='Via Molignati 12 Candelo Biella';
+        let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress));
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 
         console.log('DISTANZA = ', dist.distanceInMeters)
 
@@ -487,6 +694,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         } else {
           req.session.pointDiscount = 0.00.toFixed(2); 
         }
+<<<<<<< HEAD
         
         console.debug('req.user.local.status = ',req.user.local.status);
         if (req.user.local.status == 'validated') {
@@ -507,6 +715,24 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   
                 })
         }      
+=======
+
+        res.render('orderSummary.njk', {
+                cartItems   : req.session.cartItems,
+                address     : address[0].addresses,
+                numProducts : req.session.numProducts,
+                userStatus  : req.user.local.status,
+                shipping    : req.session.shippingCost,
+                deliveryType      : req.session.deliveryType,
+                deliveryDate      : lib.deliveryDate(),
+                discount    : req.session.pointDiscount,
+                user        : req.user,
+                payType     : "axerve" //"paypal"  "axerve"
+              })
+        } else {
+          res.redirect('/addresses');
+        }
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       } catch(err) {
           console.log('error', err);
           await session.abortTransaction();
@@ -525,6 +751,13 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //-------------------------------------------
     app.get('/addresses',lib.isLoggedIn, async function(req, res) {
       
+<<<<<<< HEAD
+=======
+      //console.debug("ADDRESSES: ",req.user.addresses)
+
+      req.session.nextStep = 'payment'; 
+    
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       try {
           res.render('addresses.njk', {
               addresses   : req.user.addresses,
@@ -558,7 +791,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       // conto quanti amici ha già lo User
       User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)}, async function(err, user) {
           if (err) {
+<<<<<<< HEAD
               console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
+=======
+              console.error(moment().format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
               req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
               return res.render('info.njk', {
                   message: req.flash('error'),
@@ -670,7 +907,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         user.friends.push({ 'name.first'  : firstName,
                             'token'       : token,
                             'status'      : 'new',
+<<<<<<< HEAD
                             'insertDate'  : moment().utc("Europe/Rome").format()                            
+=======
+                            'insertDate'  : moment().format()                            
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
         });
         await user.save(opts);
         //throw new Error('ERROR in RECOMM generato da me');
@@ -698,7 +939,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         })
       } catch (e) {
           await session.abortTransaction();
+<<<<<<< HEAD
           console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
+=======
+          console.error(moment().format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
           return res.status(500).send({err:e, ok:false})
       } finally {
           await session.endSession();
@@ -712,7 +957,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       let msg = req.query.msg;
       let msgType = req.query.type;
       let err = req.body.err;
+<<<<<<< HEAD
       console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+=======
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "GET /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       req.flash('message', msg);
       res.render('info.njk', {
           message : req.flash('message'),
@@ -726,7 +975,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       let msg = req.body.msg;
       let msgType = req.body.type;
       let err = req.body.err;
+<<<<<<< HEAD
       console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+=======
+      console.error(moment().format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
       req.flash('message', msg);
       res.render('info.njk', {
           message : req.flash('message'),
@@ -929,6 +1182,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.get('/redirect', function(req, res) {
         req.flash('info', 'SHOP');
         res.redirect('/shop');
+<<<<<<< HEAD
     });
     app.get('/redirectType', function(req, res) {
         req.flash('info', 'SHOP');
@@ -941,6 +1195,20 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
       res.redirect('/shop');
     });
+=======
+    });
+    app.get('/redirectType', function(req, res) {
+        req.flash('info', 'SHOP');
+        res.redirect('/shop/warning');
+    });
+
+    app.get('/testflash', function(req,res) {
+      let msg = 'Email Verificata. Utente validato e autenticato';
+      req.flash('info', msg);
+      console.info(moment().format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
+      res.redirect('/shop');
+    });
+>>>>>>> 94e856d48674cf175d63810012f7c6afa78489f1
 
     app.get('/emailvalidation', function(req,res) {
       res.render('emailValidation.njk', { email: 'indirizzo@email.mio'});  
