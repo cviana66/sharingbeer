@@ -1,5 +1,5 @@
 #!/bin/env node
-//develop
+
 const express  = require('express');                // Express. https://expressjs.com/
 const fs       = require('fs');                     // File System. https://nodejs.org/api/fs.html
 const util     = require('util');                   // Utilità. https://nodejs.org/api/util.html
@@ -19,11 +19,13 @@ const fastcsv       = require("fast-csv");          // Gestione dei file CSV. ht
 //const cons          = require('consolidate');       // Consolida il framework da utilizzare per package. NON USATO?. https://github.com/tj/consolidate.js
 const moment        = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
 
-moment().tz("Europe/Rome").tz("Europe/Rome").format();
-moment.locale('it');
 
-console.debug('OGGI moment().tz("Europe/Rome") : ',moment().tz("Europe/Rome").tz("Europe/Rome").format());
-console.debug('OGGI: ',moment().tz("Europe/Rome").format('dddd DD MMMM YYYY - HH:mm'))
+moment.locale('it');
+console.debug('OGGI moment().utc("Europe/Rome"): ',moment().utc("Europe/Rome").format().toString());
+console.debug('OGGI: ',moment().utc("Europe/Rome").format('dddd DD MMMM YYYY - HH:mm'));
+let d = new Date(moment().utc("Europe/Rome").format())
+console.debug('OGGI FORMATO DATE:', d )
+
 
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
 // config environment variables /
@@ -120,7 +122,7 @@ var SharingBeer = function() {
     self.setupVariables = function() {
         //  Set the environment variables we need.
         self.port = process.env.PORT || 3000;
-        console.info(moment().tz("Europe/Rome").format()+' [INFO] SERVER PORT: '+self.port);
+        console.info(moment().utc("Europe/Rome").format()+' [INFO] SERVER PORT: '+self.port);
     };
 
     /**
@@ -130,10 +132,10 @@ var SharingBeer = function() {
      */
     self.terminator = function(sig){
         if (typeof sig === "string") {
-            console.info(moment().tz("Europe/Rome").format()+' [INFO] RECEIVED '+sig+': TERMINATING SHARINGBEER APP ...');
+            console.info(moment().utc("Europe/Rome").format()+' [INFO] RECEIVED '+sig+': TERMINATING SHARINGBEER APP ...');
             process.exit(1);
         }
-        console.info(moment().tz("Europe/Rome").format()+' [INFO] NODE SERVER STOPPED!');
+        console.info(moment().utc("Europe/Rome").format()+' [INFO] NODE SERVER STOPPED!');
 
     };
     /**
@@ -179,11 +181,11 @@ var SharingBeer = function() {
         self.app = express();
 /*
         db.on('error', err => {
-          console.error(moment().tz("Europe/Rome").format()+' [ERROR] MONGODB CONNECTIO: '+err);
+          console.error(moment().utc("Europe/Rome").format()+' [ERROR] MONGODB CONNECTIO: '+err);
         });
 
         db.once('open', function callback() {
-          console.info(moment().tz("Europe/Rome").format()+' [INFO] MONGODB OPEN');
+          console.info(moment().utc("Europe/Rome").format()+' [INFO] MONGODB OPEN');
         });
 */
         // set up our express application
@@ -206,45 +208,48 @@ var SharingBeer = function() {
         // required for passport and session for persistent login
         pass(passport);
 
-        console.info(moment().tz("Europe/Rome").format()+' [INFO] ENVIRONMENT: '+process.env.NODE_ENV);
+        console.info(moment().utc("Europe/Rome").format()+' [INFO] ENVIRONMENT: '+process.env.NODE_ENV);
 
         if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
             self.app.use(morgan('dev')); // log every request to the console
             self.app.use(session({
-              name: '_sb',
-              secret: process.env.SESSION_SECRET,
-              saveUninitialized: false,
-              resave: false,
-              cookie: { secure: false,
-                        expires: 6000000,
-                        sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
-              //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
-              store: MongoStore.create({
-                client: mongoose.connection.getClient(),
-                dbName: "dbm1",
-                stringify: false,
-                autoRemove: 'interval',
-                autoRemoveInterval: 1 // removing expired sessions, using defined interval in minutes
-              })
+                name: '_sb',
+                secret: process.env.SESSION_SECRET,
+                saveUninitialized: false,
+                resave: false,
+                cookie: {   secure: false,
+                            expires: 3600000,
+                            sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
+                store: MongoStore.create({
+                    client: mongoose.connection.getClient(),
+                    dbName: "dbm1",
+                    stringify: false,
+                    autoRemove: 'interval',
+                    autoRemoveInterval: 1 // removing expired sessions, using defined interval in minutes
+                })
 
             }));
         } else {
             self.app.set('trust proxy', true); // trust first proxy
-            self.app.use(session({secret: process.env.SESSION_SECRET, //modify: 18/02/2022
-                              saveUninitialized: false,
-                              resave: false,
-                              cookie: { secure: true, // serve secure cookies
-                                        expires: 600000,
-                                        sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
-                              //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
-                              store: MongoStore.create({
-                                client: mongoose.connection.getClient(),
-                                dbName: "cluster0",
-                                stringify: false,
-                                autoRemove: 'interval',
-                                autoRemoveInterval: 2 // emoving expired sessions, using defined interval in minutes
-                              })
-                            }));
+            self.app.use(morgan('tiny'));
+            self.app.use(session({
+                name: '_sb',
+                secret: process.env.SESSION_SECRET, //modify: 18/02/2022
+                saveUninitialized: false,
+                resave: false,
+                cookie: {   secure: true, // serve secure cookies
+                            expires: 3600000,
+                            sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                  //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
+                  store: MongoStore.create({
+                    client: mongoose.connection.getClient(),
+                    dbName: "cluster0",
+                    stringify: false,
+                    autoRemove: 'interval',
+                    autoRemoveInterval: 1 // emoving expired sessions, using defined interval in minutes
+                  })
+                }));
         }
 
         self.app.use(passport.initialize());
@@ -270,7 +275,7 @@ var SharingBeer = function() {
     self.start = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, function() {
-          console.info(moment().tz("Europe/Rome").format()+' [INFO] NODE SERVER STARTED');
+          console.info(moment().utc("Europe/Rome").format()+' [INFO] NODE SERVER STARTED');
         });
     };
 

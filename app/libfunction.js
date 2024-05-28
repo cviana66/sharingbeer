@@ -158,24 +158,31 @@ module.exports = {
                         return true;
                       }
                     },
-  deliveryDate: function deliveryDate(dataType) {
-                    moment().tz("Europe/Rome").tz("Europe/Rome").format();
+  deliveryDate: function deliveryDate(dataType) {                    
                     moment.locale('it');                    
-                    var d
-                    if (moment().tz("Europe/Rome").add(3,'d').format('ddddd') == "sabato") {
-                      d = moment().tz("Europe/Rome").add(5,'d').format()
-                    } else if (moment().tz("Europe/Rome").add(3,'d').format('dddd') == "domenica") {
-                      d = moment().tz("Europe/Rome").add(4,'d').format()
+                    var d;
+                    if (moment().utc("Europe/Rome").add(3,'d').format('ddddd') == "sabato") {
+                      d = moment().utc("Europe/Rome").add(5,'d').format()
+                    } else if (moment().utc("Europe/Rome").add(3,'d').format('dddd') == "domenica") {
+                      d = moment().utc("Europe/Rome").add(4,'d').format()
                     } else {
-                      d = moment().tz("Europe/Rome").add(3,'d').format()
+                      d = moment().utc("Europe/Rome").add(3,'d').format()
                     }
                     if (dataType == 'formato_data') {
-                      giornoLavorativo = moment(d).format()
+                      giornoLavorativo = new Date(moment(d).format())
                     } else {
                       giornoLavorativo = moment(d).format('dddd DD MMMM')
                     }
                     return giornoLavorativo  
+                },
+  getseSver:  function getServer() {
+                if (process.env.NODE_ENV== "development") {
+                  server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+                } else {
+                  server = req.protocol+'://'+req.hostname;
                 }
+                return server;
+              }
 }
 
 

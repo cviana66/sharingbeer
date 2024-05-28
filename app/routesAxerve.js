@@ -5,6 +5,11 @@ const mailorder     = require('../config/mailOrder');
 const {transMsg}    = require("./msgHandler");
 const Product = require('./models/product.js');
 
+var {getUserByPaymentIdAndShopLogin}  = require('../app/axerveResposeManagement');
+var {updateStatusPayment}             = require('../app/axerveResposeManagement');
+var {addInviteAndPoint}               = require('../app/axerveResposeManagement');
+var {addItemsInProducts}              = require('../app/axerveResposeManagement');
+
 module.exports = function(app,mongoose, moment) {
 
 var counter;
@@ -36,13 +41,16 @@ var users;
       // per ciacun prodotto in acquisto
       //=============================================
       for (var index = 0; index < req.session.numProductsPerId.length; index++) {
-        console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
+        
         const filter = {_id:req.session.numProductsPerId[index].id};
         console.debug("FILTER: ",filter)
+        
         let doc = await Product.findOne(filter)
+        console.debug('QUANTITY UPDATE PRIMA DELLA DECURTAZIONE: ',doc.quantity)
+        
         const update = { quantity: (Number(doc.quantity) - Number(req.session.numProductsPerId[index].qty))};
-        let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
-        console.debug('QUANTITY UPDATE MINUS: ',doc1.quantity)
+        let doc1 = await Product.findOneAndUpdate(filter,update, {new:true}).session(session);
+        console.debug('QUANTITY UPDATE DOPO LA DECURTAZIONE: ',doc1.quantity)
       }
       //=============================================
 
@@ -56,70 +64,70 @@ var users;
       //==========================================
       // Chiamo Axerve per ottenere ID e Token
       //==========================================
-      
-      const data = await fetch('https://sandbox.gestpay.net/api/v1/payment/create/', //TODO: modificare quando PRODUZIONE
+      console.debug('IMPORTO', (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2));
+      await fetch('https://sandbox.gestpay.net/api/v1/payment/create/', //TODO: modificare quando PRODUZIONE
         {
           method: 'POST',
           headers: {
-            "Content-Type": "application/json",  
-            "Authorization": process.env.APIKEY
+            "Content-Type"  : "application/json",  
+            "Authorization" : process.env.APIKEY
           },
           body: JSON.stringify({  
-            "shopLogin": shopLogin,
-            "amount": (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2),
-            "currency": currency,
+            "shopLogin"         : shopLogin,
+            "amount"            : req.session.order.totalaAmount,
+            "currency"          : currency,
             "shopTransactionID" : req.session.order._id.toString()
           })
         }
       ).then(function(result) {
         console.debug("RESULT -> : ",JSON.stringify(result));
         return result.json();
-      });
+      }).then (async function(data){
+        console.debug("DATA -> : ", JSON.stringify(data));
 
-      const resData = await data
-      console.debug("DATA -> : ", JSON.stringify(resData));
+        if (data.error.code !== "0") {
+          data.ok = false;
+          console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(data));
+          await session.abortTransaction();
+          res.status(500).json(data);  
 
-      if (Number(resData.error.code) !== 0) {
-        resData.ok = false;
-        console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(resData));
-        await session.abortTransaction();
-        res.status(500).json(resData);  
-
-      } else {
-        //==========================================
-        // Inserimento dati in MongoDB
-        //==========================================
-        user.orders.push({
-          _id         : orderId,
-          email       : req.user.local.email,
-          dateInsert  : moment().tz("Europe/Rome").format(),
-          status      : "CREATED",
-          deliveryType : req.session.deliveryType,
-          deliveryDate : lib.deliveryDate('formato_data'),
-          shipping          : Number(req.session.shippingCost).toFixed(2),
-          pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
-          totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
-          totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
-          items : req.session.cartItems.items,
-          totalQty : req.session.totalQty,        
-          address : req.session.shippingAddress,
-          'paypal.shopLogin'        : shopLogin,
-          'paypal.createTime'       : moment().tz("Europe/Rome").format('DD/MM/yyyy hh:mm:ss'),
-          'paypal.orderId'          : req.session.order._id.toString(),
-          'paypal.currencyAmount'   : currency,
-          'paypal.totalAmount'      : req.session.order.totalaAmount,
-          'paypal.transactionId'    : resData.payload.paymentID,
-          'paypal.token'            : resData.payload.paymentToken,
-          'paypal.errorCode'        : resData.error.code,
-          'paypal.errorDescription' : resData.error.description     
-        });
-        let saveOrder = await user.save(opts);
-        await session.commitTransaction();
-        res.status(200).json(resData);  
-      }
+        } else {
+          //==========================================
+          // Inserimento dati in MongoDB
+          //==========================================
+          user.orders.push({
+            _id         : orderId,
+            email       : req.user.local.email,
+            dateInsert  : new Date(moment().utc("Europe/Rome").format()),
+            status      : "CREATED",
+            deliveryType : req.session.deliveryType,
+            deliveryDate : lib.deliveryDate('formato_data'),
+            shipping          : Number(req.session.shippingCost).toFixed(2),
+            pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
+            totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
+            totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
+            items     : req.session.cartItems.items,
+            totalQty  : req.session.totalQty,        
+            address   : req.session.shippingAddress,
+            'paypal.shopLogin'        : shopLogin,
+            'paypal.createTime'       : moment().utc("Europe/Rome").format('DD/MM/yyyy HH:mm:ss'),
+            'paypal.orderId'          : req.session.order._id.toString(),
+            'paypal.currencyAmount'   : currency,
+            'paypal.totalAmount'      : req.session.order.totalaAmount,
+            'paypal.transactionId'    : data.payload.paymentID,
+            'paypal.token'            : data.payload.paymentToken,
+            'paypal.errorCode'        : data.error.code,
+            'paypal.errorDescription' : data.error.description     
+          });
+          let saveOrder = await user.save(opts);
+          await session.commitTransaction();
+          data.shopLogin = shopLogin;
+          res.status(200).json(data);  
+        }
+      })
 
     } catch (e) {
-        console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
+        console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
         await session.abortTransaction();
         res.status(500).send()
     } finally {
@@ -133,42 +141,34 @@ var users;
   app.post('/axerve_response', lib.isLoggedIn, async function(req, res) {
 
     const error_code = req.body.error_code; 
-    const error_description = req.body.error_description;
-    var status = req.body.status;
-    const payment_id = req.body.payment_id;
+    const error_description = req.body.error_description;    
+    
     const response_URL = req.body.response_URL;
     const transaction_error_code = req.body.transaction_error_code;
     const transaction_error_description = req.body.transaction_error_description;
-    const orderId = req.session.order._id
-  
+
+    const paymentId = req.body.payment_id;
+    const shopLogin = process.env.SHOPLOGIN
+    var status      = req.body.status; if (status == "") status = "KO";
+
     console.debug('ERROR_CODE -> ', error_code)
     console.debug('ERROR_DESCRIPTION -> ',error_description)
     console.debug('STATUS -> ', status)
-    console.debug('PAYMENT_ID -> ',payment_id)
+    console.debug('PAYMENT_ID -> ',paymentId)
     console.debug('RESPONSE_URL -> ',response_URL)
     console.debug('TRANSACTION_ERROR_CODE -> ', transaction_error_code)
     console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)
 
-    //==========================================
-    // UPDATE Esito del pagamento 
-    //==========================================
-    if (status == "") status = "KO";
+    
+    const userId  = req.user._id;
+    const orderId = req.session.order._id;
+    var booze     = req.session.booze;
+    const totalPrc= req.session.totalPrc;
+    const parentId= req.user.local.idParent;
+    const name    = req.user.local.name.first;
+    const userEmail = req.user.local.email
 
-    let filter = {_id: req.user._id};
-    let update = 
-        {
-          'orders.$[el].status'               : status,
-          //'orders.$[el].paypal.transactionId' : payment_id,    
-          'orders.$[el].paypal.updateTime'    : moment().tz("Europe/Rome").format('DD/MM/yyyy hh:mm:ss'),
-          'orders.$[el].paypal.errorCode'        : error_code,
-          'orders.$[el].paypal.errorDescription' : error_description     
-        }
-
-    let updateOrder = await User.findOneAndUpdate(
-                              filter,
-                              {'$set':update},
-                              {arrayFilters: [{"el._id": req.session.order._id}]}
-                              );
+    
     
     //==========================================
     // Inizializzo la Transazione
@@ -176,24 +176,19 @@ var users;
     const session = await mongoose.startSession();
     session.startTransaction();
   
-    try {      
-      
+    try {  
+      //==========================================
+      // UPDATE Esito del pagamento 
+      //==========================================
+      await updateStatusPayment(userId, orderId, status, session, mongoose);
+
       if (status == 'OK') {      
 
         //=====================================
         // aggiungo possibilità di invito
         // aggiungo punto Pinta al cliente Padre
         //=====================================        
-        let updateUser = await User.findOneAndUpdate(
-                                  {_id: req.user._id},
-                                  {'$inc': {'local.eligibleFriends': invitiPerOgniAcquisto},'local.booze': req.session.booze}
-                                ).session(session);
-        const booze = Number(req.session.totalPrc)/numBottigliePerBeerBox/puntiPintaPerUnaBottiglia
-        console.log('BOOZE: ', booze, req.session.totalPrc, numBottigliePerBeerBox, puntiPintaPerUnaBottiglia)
-        let updateUserParent = await User.findOneAndUpdate(
-                                      {'_id': mongoose.Types.ObjectId(req.user.local.idParent)},
-                                      {'$inc': {'local.booze':booze}}
-                                    ).session(session);
+        await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
 
         //=====================================
         // Svuoto il carrello
@@ -205,18 +200,13 @@ var users;
         //========================================
         // INVIO EMAIL al CLIENTE
         //========================================
-        let server;
-        if (process.env.NODE_ENV== "development") {
-          server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-        } else {
-          server = req.protocol+'://'+req.hostname;
-        }
+        const server = lib.getServer();
         if (orderId != undefined ) {
-          const html = mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server)
-          lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
+          const html = mailorder(name, orderId, lib.deliveryDate(), server)
+          lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html)
         } //gestire se orderId == undefined
 
-        console.error(moment().tz("Europe/Rome").format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
+        console.error(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + userId + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
         res.render('orderOutcome.njk', {
           status  : status,
           orderId : orderId,
@@ -227,23 +217,13 @@ var users;
 
       } else {
 
-        console.error(moment().tz("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} Status pagamento KO - '+error_code+' '+error_description);
+        console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + userId + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} Status pagamento KO - '+error_code+' '+error_description);
         //==============================================
         // Ri-aggiungo i prodotti dalla disponibilità 
         // per prodotto per acquisto non effettuato
         //=============================================
-        for (var index = 0; index < req.session.numProductsPerId.length; index++) {
-          console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
-          const filter = {_id:req.session.numProductsPerId[index].id};
-          
-          console.debug("FILTER: ",filter)
-          let doc = await Product.findOne(filter)
-          
-          const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
-          let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
-          console.debug('QUANTITY UPDATE: ',doc1.quantity)
-        }
-        //=============================================
+         addItemsInProducts(paymentId,shopLogin);
+
         res.render('orderOutcome.njk', {
           status  : status,
           orderId : orderId,
@@ -255,25 +235,15 @@ var users;
       await session.commitTransaction();
 
     } catch (e) {
-      console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + req.user._id + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} CATCH: '+e+' '+error_code+' '+error_description);
+      console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + userId + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} CATCH: '+e+' '+transaction_error_code+' '+transaction_error_description+' '+error_code+' '+error_description);
       await session.abortTransaction();
 
       //==============================================
       // Ri-aggiungo i prodotti nella disponibilità 
       // per prodotto per acquisto non effettuato
       //=============================================
-      for (var index = 0; index < req.session.numProductsPerId.length; index++) {
-        console.debug('ID PRODOTTO: ',req.session.numProductsPerId[index].id)
-        const filter = {_id:req.session.numProductsPerId[index].id};
-        
-        console.debug("FILTER: ",filter)
-        let doc = await Product.findOne(filter)
-        
-        const update = { quantity: (Number(doc.quantity) + Number(req.session.numProductsPerId[index].qty))};
-        let doc1 = await Product.findOneAndUpdate(filter, update, {new:true});
-        console.debug('QUANTITY UPDATE ADD: ',doc1.quantity)
-      }
-      //=============================================
+      addItemsInProducts(paymentId,shopLogin);
+      
      
       res.render('orderOutcome.njk', {
           status  : 'KO',
@@ -315,19 +285,39 @@ app.get('/response', async function(req, res) {
   res.redirect('/');
 });
 
-/*
-app.get('/response_positiva', function(req,res) {
-  res.render('orderOutcome.njk', {
-          status  : 'OK',
-          user    : req.user
-          //numProducts : req.session.numProducts
-  });
+
+app.get('/response_positiva', async function(req,res) {  
+  //response_positiva?a=GESPAY96332&Status=OK&paymentID=1244109507430&paymentToken=2fbc938d-547a-4431-8da8-31539f967ccf
+  //const user = await getUserByPaymentIdAndShopLogin('1244109507430','GESPAY96332'); // TEST
+
+  console.debug('PARAMETRI RISPOSTA POSITIVA: ',req.query);
+  try {
+    const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a); 
+    console.debug("USER:",user) 
+
+
+    res.render('orderOutcome.njk', {
+          status  : req.query.Status,
+          deliveryDate : moment(user.orders.deliveryDate).format('dddd DD MMMM'),
+          user : user
+    });
+  }catch (e){
+    console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /response_positiva"  PARAMETRI RISPOSTA POSITIVA: '+req.query+' ERRORE:'+e);
+    let msg = 'Ci dspiace, si è verificato un errore inatteso. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
+    req.flash('error', msg);
+    return res.render('info.njk', {
+                                    message: req.flash('error'),
+                                    type: "danger"
+                                  });
+  }    
 });
 
-app.get('/response_negativa', function(req,res) {
+app.get('/response_negativa',  function(req,res) {
+  
+  console.debug('PARAMETRI RISPOSTA NEGATIVA: ',req.query);
   res.render('orderOutcome.njk', {
           status  : 'KO'
   });
 });
-*/
+
 };

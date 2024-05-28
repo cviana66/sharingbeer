@@ -184,7 +184,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             if (err) {
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired'
                 req.flash('error', msg);
-                console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+                console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                 return res.render('info.njk', {
                                 message: req.flash('error'),
                                 type: "warning"
@@ -194,7 +194,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             if (!user) {
                 let msg = 'Invito non più valido o scaduto'; //Invitation is invalid or has expired';
                 req.flash('warning', msg);
-                console.info(moment().tz("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err);
+                console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err);
                 return res.render('info.njk', {
                                     message: req.flash('warning'),
                                     type: "warning"
@@ -223,7 +223,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   console.log("errore: ",e)
                   await session.abortTransaction();
                   req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                  console.error(moment().tz("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: '+e);
+                  console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: '+e);
                   return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 
                 } finally {
@@ -232,11 +232,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 req.logIn(user, function(err) {
                   if (err) {
                       req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                      console.info(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /validation" FUNCTION: req.logIn ERROR: ' +err);
+                      console.info(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /validation" FUNCTION: req.logIn ERROR: ' +err);
                       res.render('info.njk', {message: req.flash('error'), type: "danger"});
                   } else {
                       // Email Verificata - Utente validato e autenticato'
-                      console.info(moment().tz("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {_id:bjectId("' + req.user._id + '"}');
+                      console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {_id:bjectId("' + req.user._id + '"}');
                       res.render('conferme.njk', { 
                         user: req.user,
                         numProducts : req.session.numProducts
@@ -257,7 +257,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             if (err || user == null) { 
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
                 req.flash('error', msg);
-                console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '"}  FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+                console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '"}  FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                 console.log('POST VALIDATION ERROR: ', err);
                 return res.render('info.njk', {
                     message: req.flash('error'),
@@ -270,7 +270,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 if (!lib.emailValidation(email)) {
                     let msg = 'Indirizzo mail non valido'; //'Please provide a valid email';
                     req.flash('validateMessage', msg)
-                    console.info(moment().tz("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "POST /validation" OKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:'+ user._id + '"} FLASH: ' + msg);
+                    console.info(moment().utc("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "POST /validation" OKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:'+ user._id + '"} FLASH: ' + msg);
                     return res.redirect("/validation?token=" + req.body.token);
                 }
                 //end email validation
@@ -309,7 +309,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
                   await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme',server);
                   let msg = 'Inviata email di verifica'; //'Validated and Logged';
-                  console.info(moment().tz("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
+                  console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
 
                   await session.commitTransaction();
 
@@ -322,12 +322,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   if (e.code === 11000) {
                     let msg = 'Indirizzo e-mail già registrato';
                     req.flash('validateMessage', msg);
-                    console.info(moment().tz("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
+                    console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
                     res.redirect("/validation?token=" + req.body.token);
                   } else {
                     let msg = 'Spiacente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';      
                     req.flash('error', msg);
-                    console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+                    console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
                     return res.render('info.njk', {
                         message: req.flash('error'),
                         type: "danger"
@@ -361,7 +361,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           res.redirect('/addresses');
         } else {
           var msg = "Devi validare la tua identità attraverso la mail che ti abbiamo inviato in fase di accettazione dell'invito";
-          console.error(moment().tz("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "GET /register" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FLASH:'+msg+'');
+          console.error(moment().utc("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "GET /register" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FLASH:'+msg+'');
           req.flash('warning', msg);
           return res.render('info.njk', {
                   message: req.flash('warning'),
@@ -504,6 +504,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   discount    : req.session.pointDiscount,
                   user        : req.user,
                   payType     : "axerve" //"paypal"  "axerve"
+                  
                 })
         }      
       } catch(err) {
@@ -557,7 +558,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       // conto quanti amici ha già lo User
       User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)}, async function(err, user) {
           if (err) {
-              console.error(moment().tz("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
+              console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
               req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
               return res.render('info.njk', {
                   message: req.flash('error'),
@@ -669,7 +670,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         user.friends.push({ 'name.first'  : firstName,
                             'token'       : token,
                             'status'      : 'new',
-                            'insertDate'  : moment().tz("Europe/Rome").format()                            
+                            'insertDate'  : moment().utc("Europe/Rome").format()                            
         });
         await user.save(opts);
         //throw new Error('ERROR in RECOMM generato da me');
@@ -697,7 +698,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         })
       } catch (e) {
           await session.abortTransaction();
-          console.error(moment().tz("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
+          console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e);
           return res.status(500).send({err:e, ok:false})
       } finally {
           await session.endSession();
@@ -711,7 +712,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       let msg = req.query.msg;
       let msgType = req.query.type;
       let err = req.body.err;
-      console.error(moment().tz("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+      console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
       req.flash('message', msg);
       res.render('info.njk', {
           message : req.flash('message'),
@@ -725,7 +726,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       let msg = req.body.msg;
       let msgType = req.body.type;
       let err = req.body.err;
-      console.error(moment().tz("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+      console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "POST /infoMessage" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
       req.flash('message', msg);
       res.render('info.njk', {
           message : req.flash('message'),
@@ -836,7 +837,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           } else {
             let msg = 'Something bad happened! Please try again';
             req.flash('error', msg);
-            console.error(moment().tz("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
+            console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
           }
         }
@@ -937,7 +938,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.get('/testflash', function(req,res) {
       let msg = 'Email Verificata. Utente validato e autenticato';
       req.flash('info', msg);
-      console.info(moment().tz("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
+      console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
       res.redirect('/shop');
     });
 
