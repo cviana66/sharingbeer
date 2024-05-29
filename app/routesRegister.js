@@ -427,8 +427,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 preferred       : 'yes',
                 affidability    : req.body.hiddenAddressIsValid,
                 desAffidability : req.body.descValidAddress,
-                'coordinateGPS.lat' : req.body.lat,
-                'coordinateGPS.lon' : req.body.lon
+                'coordinateGPS.latitude' : req.body.lat,
+                'coordinateGPS.longitude' : req.body.lon
         });
         await user.save(opts);
         await session.commitTransaction();

@@ -16,6 +16,32 @@ function fieldLoginControl(){
   }
 };
 
+function fieldsFatturaControl() {
+  document.getElementById("wrongPEC").innerHTML = "";
+  document.getElementById("wrongSDI").innerHTML = "";
+
+  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  var fatturaPEC = document.getElementById("inFatturaPEC").value;
+  var fatturaSDI = document.getElementById("inFatturaSDI").value;
+  
+  if (document.getElementById("isFatturaRequired").checked == true) {
+    if(fatturaPEC =="" || !re.test(String(fatturaPEC))) {    
+      document.getElementById("wrongPEC").innerHTML = iwar+"Inserisci una PEC valida";
+      document.getElementById("inFatturaPEC").focus();
+      return false;
+    };
+
+    re = /^[a-zA-Z0-9]+$/i;
+    if(fatturaSDI.length > 0) {
+      if (fatturaSDI.length != 7 || !re.test(String(fatturaSDI))) {    
+        document.getElementById("wrongSDI").innerHTML = iwar+"Inserisci un codice SDI valido";
+        document.getElementById("inFatturaSDI").focus();
+        return false;
+      }
+    };
+  }
+}
+
 function fieldsValidationControl() {
   document.getElementById("wrongMail").innerHTML = "";
   document.getElementById("wrongPwd").innerHTML = "";

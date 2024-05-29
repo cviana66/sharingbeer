@@ -36,8 +36,8 @@ const userSchema = new Schema({
                   affidability: {type: String}, 
                   desAffidability : {type: String},
                   coordinateGPS : {
-                    lat             : {type: Number},
-                    lon             : {type: Number},  
+                    latitude      : {type: Number},
+                    longitude     : {type: Number},  
                   }
               }],
   friends : [{  id    : {type: String, unique: true },
@@ -53,6 +53,8 @@ const userSchema = new Schema({
               email       : { type: String, required: true },
               dateInsert  : { type: Date, required: true },
               status      : { type: String, required: true},
+              fatturaPEC          : { type: String},
+              fatturaSDI          : { type: String},
               pointsDiscount      : { type: Number},
               shipping            : { type: Number},
               deliveryType        : { type: String},
@@ -82,8 +84,8 @@ const userSchema = new Schema({
                   affidability: {type: String}, 
                   desAffidability : {type: String},
                   coordinateGPS : {
-                    lat             : {type: Number},
-                    lon             : {type: Number},
+                    latitude        : {type: Number},
+                    longitude       : {type: Number},
                   }  
               },
               paypal : {

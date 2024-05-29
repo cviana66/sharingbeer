@@ -271,7 +271,7 @@ module.exports = function(app, mongoose, moment) {
 										orderSeq: 0,
 										indirizzo: gpsAddress.puntoMappa.indirizzo,
 										planningSelection: 'M',
-										coordinateGPS: {latiture: gpsLatitude, longitude: gpsLongitude}}
+										coordinateGPS: {latitude: gpsLatitude, longitude: gpsLongitude}}
     								}
 
 		} else {
