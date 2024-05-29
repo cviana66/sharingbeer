@@ -175,7 +175,7 @@ module.exports = {
                     }
                     return giornoLavorativo  
                 },
-  getServer:  function getServer() {
+  getServer:  function getServer(req) {
                 if (process.env.NODE_ENV== "development") {
                   server = req.protocol+'://'+req.hostname+':'+process.env.PORT
                 } else {

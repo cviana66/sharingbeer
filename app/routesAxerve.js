@@ -92,6 +92,7 @@ var users;
           res.status(500).json(data);  
 
         } else {
+          req.session.paymentId = data.payload.paymentID;
           //==========================================
           // Inserimento dati in MongoDB
           //==========================================
@@ -147,7 +148,7 @@ var users;
     const transaction_error_code = req.body.transaction_error_code;
     const transaction_error_description = req.body.transaction_error_description;
 
-    const paymentId = req.body.payment_id;
+    const paymentId = req.session.paymentId;
     const shopLogin = process.env.SHOPLOGIN
     var status      = req.body.status; if (status == "") status = "KO";
 
@@ -160,13 +161,13 @@ var users;
     console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)
 
     
-    const userId  = req.user._id;
-    const orderId = req.session.order._id;
-    var booze     = req.session.booze;
-    const totalPrc= req.session.totalPrc;
-    const parentId= req.user.local.idParent;
-    const name    = req.user.local.name.first;
-    const userEmail = req.user.local.email
+    const userId    = req.user.id;
+    const orderId   = req.session.order._id.toString();
+    var booze       = req.session.booze;
+    const totalPrc  = req.session.totalPrc;
+    const parentId  = req.user.local.idParent;
+    const name      = req.user.local.name.first;
+    const userEmail = req.user.local.email;
 
     //==========================================
     // Inizializzo la Transazione
@@ -178,6 +179,7 @@ var users;
       //==========================================
       // UPDATE Esito del pagamento 
       //==========================================
+      console.debug('updateStatusPayment PARAMETER:',userId, orderId, status )
       await updateStatusPayment(userId, orderId, status, session, mongoose);
 
       if (status == 'OK') {      
@@ -198,15 +200,12 @@ var users;
         //========================================
         // INVIO EMAIL al CLIENTE
         //========================================
-        const server = lib.getServer();
+        const server = lib.getServer(req);
         console.debug('SERVER',server);
         
-        if (orderId != undefined ) {
-          const html = mailorder(name, orderId, lib.deliveryDate(), server)
-          lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html)
-        } //gestire se orderId == undefined
-
-        console.error(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + userId + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")}');
+        const html = mailorder(name, orderId, lib.deliveryDate(), server)
+        lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html)
+        
         res.render('orderOutcome.njk', {
           status  : status,
           orderId : orderId,
@@ -292,7 +291,9 @@ app.get('/response_positiva', async function(req,res) {
   console.debug('PARAMETRI RISPOSTA POSITIVA: ',req.query);
   try {
     const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a); 
-    console.debug("USER:",user) 
+    console.debug("USER:",user);
+
+    //await updateStatusPayment(userId, orderId, status, session, mongoose);
 
 
     res.render('orderOutcome.njk', {

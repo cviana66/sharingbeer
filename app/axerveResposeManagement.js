@@ -16,17 +16,24 @@ async function getUserByPaymentIdAndShopLogin(paymentID,shopLogin) {
 	return user[0];
 };
 
-function updateStatusPayment(userId, orderId, status, session, mongoose) {
-	let filter = {_id: userId};
+async function updateStatusPayment(userId, orderId, status, session, mongoose) {
+	let filter = {_id: mongoose.Types.ObjectId(userId)};
   let update = 
       {
         'orders.$[el].status'            : status,
         'orders.$[el].paypal.updateTime' : moment().utc("Europe/Rome").format('DD/MM/yyyy HH:mm:ss')          
       }
-  User.findOneAndUpdate(
-                filter,
-                {'$set':update},
-                {arrayFilters: [{"el._id": orderId}]}).session(session);
+  try {    
+	  let doc = await User.findOneAndUpdate(
+	                filter,
+	                {'$set':update},
+	                {arrayFilters: [{"el._id": mongoose.Types.ObjectId(orderId)}]}).session(session);
+	  console.debug('UPDATE STATUS', JSON.stringify(doc,null,2))
+	}catch (e){ 
+		console.error('Errore in function updateStatusPayment ->',e);
+		throw new Error("updateStatusPayment fallito")
+	}
+
 };
 
 function addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose) {
@@ -42,7 +49,7 @@ function addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
                         {'_id': mongoose.Types.ObjectId(parentId)},
                         {'$inc': {'local.booze':booze}}
                         ).session(session);
-}
+};
 
 async function addItemsInProducts(paymentID,shopLogin) {
 	//db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1804229507453'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,local:0,addresses:0,friends:0,delivery:0,paypal:0}}])
@@ -67,6 +74,6 @@ async function addItemsInProducts(paymentID,shopLogin) {
     let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
     console.debug('QUANTITY UPDATE DOPO AGGIUNTA: ',doc1.quantity)
   }
-}
+};
 
 module.exports = { getUserByPaymentIdAndShopLogin, updateStatusPayment, addInviteAndPoint, addItemsInProducts };
