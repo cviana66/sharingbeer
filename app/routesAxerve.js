@@ -339,9 +339,6 @@ app.get('/response_positiva', async function(req,res) {
     const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a); 
     console.debug("USER:",user);
 
-    //await updateStatusPayment(userId, orderId, status, session, mongoose);
-
-
     res.render('orderOutcome.njk', {
           status  : req.query.Status,
           deliveryDate : moment(user.orders.deliveryDate).format('dddd DD MMMM'),
