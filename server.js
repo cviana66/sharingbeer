@@ -25,6 +25,8 @@ console.debug('OGGI: ',moment().utc("Europe/Rome").format('dddd DD MMMM YYYY - H
 let d = new Date(moment().utc("Europe/Rome").format())
 console.debug('OGGI FORMATO DATE:', d )
 
+console.debug('GESTPAY =', process.env.SHOPLOGIN)
+console.debug('process.env.APIKEY=', process.env.APIKEY)
 
 //const env           = require('node-env-file');     // Gestione del file ENV. Alternativa a dotenv. https://www.npmjs.com/package/node-env-file
 // config environment variables /

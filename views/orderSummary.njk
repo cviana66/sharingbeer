@@ -211,8 +211,9 @@
           .then(function(data){
             console.log('Axerve.data->',JSON.stringify(data,null,2));            
             if (data.error.code == "0") {
-              console.log("PayID: ",data.payload.paymentID);
-              console.log("PayToken",data.payload.paymentToken);
+              console.log("PayID =",data.payload.paymentID);
+              console.log("PayToken =",data.payload.paymentToken);
+              console.log("GESPAY = ",data.shopLogin);
               
               axerve.lightBox.shop = data.shopLogin;              
               axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, function(response) {       

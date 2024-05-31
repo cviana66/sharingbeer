@@ -27,8 +27,7 @@ async function updateStatusPayment(userId, orderId, status, session, mongoose) {
 	  let doc = await User.findOneAndUpdate(
 	                filter,
 	                {'$set':update},
-	                {arrayFilters: [{"el._id": mongoose.Types.ObjectId(orderId)}]},
-	                {new:true}).session(session);
+	                {arrayFilters: [{"el._id": mongoose.Types.ObjectId(orderId)}]}).session(session);
 	  console.debug('UPDATE STATUS', JSON.stringify(doc,null,2))
 	}catch (e){ 
 		console.error('Errore in function updateStatusPayment ->',e);
