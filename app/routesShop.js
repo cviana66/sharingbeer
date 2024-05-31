@@ -97,25 +97,27 @@ module.exports = function(app, moment, mongoose) {
         } else {
         	 req.session.pointDiscount = 0.00.toFixed(2); 
         }
-
-        console.debug('NEW BOOZE: ',req.session.booze)
-        console.debug('ADDRESS ID:',req.body.addressID)
-        /*
-        var address = await User.aggregate([
+        console.debug('NEW BOOZE: ',req.session.booze)        
+        
+        var addressRitiro = await User.aggregate([
             {$match:{"local.email": "birrificioviana@gmail.com"}}, 
             {$unwind: "$addresses"}, 
             //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
-            ])*/
-        address = await User.aggregate([
+            ])
+        address = addressRitiro
+
+        var addressCliente = await User.aggregate([
             {$match:{"_id":req.user._id}}, 
             {$unwind: "$addresses"}, 
             {$match :{ "addresses.main":"yes"}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
 
-        req.session.shippingAddress = address[0].addresses;  
-        console.debug('ADDRESS[0]: ',address[0].addresses)       
+        req.session.shippingAddress = addressCliente[0].addresses;  
+
+        console.debug('ADDRESS CLIENTE: ',addressCliente[0].addresses)       
+        console.debug('ADDRESS RITIRO: ', addressRitiro[0].addresses)       
         
       } else {
       //-------------------------------------------------------
@@ -191,7 +193,7 @@ module.exports = function(app, moment, mongoose) {
     }
     catch (e) {
       console.log ('ERROR ',e)
-      req.flash('error', 'Mi dspiace, si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com') 
+      req.flash('error', 'Si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com') 
       res.render('info.njk', {
           message: req.flash('error'),
           type: "danger"

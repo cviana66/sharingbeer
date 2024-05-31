@@ -259,18 +259,64 @@ var users;
 app.get('/response', async function(req, res) {
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0,'orders.items':0}}])
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$set :{'orders.paypal.shopLogin':'CIAO'}}])
-
-  var updateStatus = await User.findOneAndUpdate(
+  try {  
+    //==========================================
+    // Inizializzo la Transazione
+    //==========================================
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    //==========================================
+    // Update Status
+    //==========================================
+    var updateStatus = await User.findOneAndUpdate(
                                 {'orders.paypal.transactionId':req.query.paymentID, 'orders.paypal.shopLogin':req.query.a, 'orders.paypal.token':req.query.paymentToken},
                                 {$set :{'orders.$[elem].paypal.s2sStatus':req.query.Status}},
-                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:req.query.paymentID}}]});                        
-                              /*  
-                                {'orders.paypal.transactionId':'1519209477078', 'orders.paypal.shopLogin':'GESPAY96332', 'orders.paypal.token':'09955144-f17c-4e42-8468-d7818ae00480'},
-                                {$set :{'orders.$[elem].paypal.s2sStatus':'OK'}},
-                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:'1519209477078'}}]}
-                                )
-                              */
+                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:req.query.paymentID}}]}).session(session);                        
     
+    if (req.query.Status == 'OK') {
+      var user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a)
+      const userId    = user._id.toString;
+      const orderId   = user.orders._id.toString();
+      var booze       = user.local.booze;
+      const totalPrc  = user.orders.totalPriceBeer;
+      const parentId  = user.local.idParent;
+      const name      = user.local.name.first;
+      const userEmail = user.local.email;
+  
+      //=====================================
+      // aggiungo possibilità di invito
+      // aggiungo punto Pinta al cliente Padre
+      //=====================================        
+      await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
+
+      //=====================================
+      // Svuoto il carrello
+      //=====================================
+      req.session.cart = {}
+      req.session.order = {}
+      req.session.numProducts = 0
+
+      //========================================
+      // INVIO EMAIL al CLIENTE
+      //========================================
+      const server = lib.getServer(req);
+      console.debug('SERVER',server);
+      
+      const html = mailorder(name, orderId, lib.deliveryDate(), server)
+      lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html)
+      
+      res.render('orderOutcome.njk', {
+        status  : status,
+        orderId : orderId,
+        //user    : req.user,
+        deliveryDate: lib.deliveryDate(),
+        numProducts : 0
+      })
+    }
+  } catch(e) {
+      console.error(e);
+  }
+  
   console.debug('PARAMETRI: ',req.query);
 /*
   PARAMETRI:  {
@@ -320,8 +366,9 @@ app.get('/response_negativa',  function(req,res) {
   });
 });
 
-app.get('/testItems', function(req,res){
-   addItemsInProducts('1474899508034','GESPAY96332',mongoose);
+app.get('/testAx', async function(req,res){
+  var ret =  await getUserByPaymentIdAndShopLogin('2298099506915','GESPAY96332',mongoose);
+  console.debug('RET: ',ret)
 })
 
 };
