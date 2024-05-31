@@ -259,19 +259,29 @@ var users;
 app.get('/response', async function(req, res) {
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0,'orders.items':0}}])
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$set :{'orders.paypal.shopLogin':'CIAO'}}])
+  console.debug('PARAMETRI RESPONSE: ',req.query);
   try {  
     //==========================================
     // Inizializzo la Transazione
     //==========================================
     const session = await mongoose.startSession();
     session.startTransaction();
+    
     //==========================================
     // Update Status
     //==========================================
-    var updateStatus = await User.findOneAndUpdate(
+    var updateStatusS2S = await User.findOneAndUpdate(
                                 {'orders.paypal.transactionId':req.query.paymentID, 'orders.paypal.shopLogin':req.query.a, 'orders.paypal.token':req.query.paymentToken},
                                 {$set :{'orders.$[elem].paypal.s2sStatus':req.query.Status}},
-                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:req.query.paymentID}}]}).session(session);                        
+                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:req.query.paymentID}}]}).session(session);    
+
+    console.debug('RESPONSE updateStatusS2S', updateStatusS2S)     
+
+    //==========================================
+    // UPDATE Esito del pagamento 
+    //==========================================
+    console.debug('updateStatusPayment PARAMETER:',userId, orderId, status )
+    await updateStatusPayment(userId, orderId, status, session, mongoose);               
     
     if (req.query.Status == 'OK') {
       var user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a)
@@ -303,21 +313,14 @@ app.get('/response', async function(req, res) {
       console.debug('SERVER',server);
       
       const html = mailorder(name, orderId, lib.deliveryDate(), server)
-      lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html)
-      
-      res.render('orderOutcome.njk', {
-        status  : status,
-        orderId : orderId,
-        //user    : req.user,
-        deliveryDate: lib.deliveryDate(),
-        numProducts : 0
-      })
+      lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html); 
     }
+    await session.commitTransaction();
   } catch(e) {
       console.error(e);
+      await session.abortTransaction();
   }
   
-  console.debug('PARAMETRI: ',req.query);
 /*
   PARAMETRI:  {
   a: 'GESPAY96332',
@@ -326,7 +329,6 @@ app.get('/response', async function(req, res) {
   paymentToken: '09955144-f17c-4e42-8468-d7818ae00480'
 }
 */
-  res.redirect('/');
 });
 
 
