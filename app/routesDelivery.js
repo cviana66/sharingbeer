@@ -6,7 +6,7 @@ async function loadDeliveryData(moment) {
 	var consegneAddress = [];
 	var ritiroOrders = [];
 
-	var birrificioAddress = {'puntoMappa': {'tipoPunto': 'Birrificio', 'orderSeq':0, 'indirizzo':'via molignati 10 candelo biella', 'planningSelection':'M'}};
+	var birrificioAddress = {'puntoMappa': {'tipoPunto': 'Birrificio', 'orderSeq':0, 'indirizzo':'via molignati 10 candelo biella', 'planningSelection':'M', 'affidability': 'valido'}};
 
 	//Imposto indirizzo di partenza delle consegne: Birrificio
 	consegneAddress.push(birrificioAddress);
@@ -82,6 +82,7 @@ async function loadDeliveryData(moment) {
 							  orders.address.city +  ' ' +
 							  orders.address.province;
 		var customerAddressCoordinate = orders.address.coordinateGPS;
+		var customerAddressAffidability = orders.address.affidability;
 		
 		var orderItems = orders.items;
 		
@@ -103,6 +104,7 @@ async function loadDeliveryData(moment) {
 								 'mobile': customerMobile, 
 								 'indirizzo': customerAddress, 
 								 'coordinateGPS': customerAddressCoordinate,
+								 'affidability': customerAddressAffidability,
 								 'planningSelection': 'Y', 
 								 'isHighPriority': isHighPriority, 
 								 orderItems

@@ -74,6 +74,17 @@ async function geoMapCore(consegneAddressPar, departurePar) {
           waitingSec = 1800;
         }
 
+        console.debug('consegneAddressPar[' + i + '].puntoMappa.affidability ', consegneAddressPar[i].puntoMappa.affidability);
+        var affidability = consegneAddressPar[i].puntoMappa.affidability;
+
+        if (affidability === undefined || affidability == 'verificare') {
+          throw new Error('Indirizzo non verificato');
+        }
+
+        if (auxCoordLatitude === undefined || auxCoordLongitude === undefined) {
+          throw new Error("Errore coordinate per l'indirizzo: " + consegneAddressPar[i].puntoMappa.indirizzo);          
+        }
+
         if (consegneAddressPar[i].puntoMappa.planningSelection == 'Y' ||
             consegneAddressPar[i].puntoMappa.planningSelection == 'M') {
 
@@ -113,7 +124,7 @@ async function geoMapCore(consegneAddressPar, departurePar) {
 
 
     // Costruisci l'URL del server Valhalla all'interno del container Docker
-    //var valhallaUrl = 'http://192.168.0.111:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
+    //var valhallaUrl = 'http://127.0.0.1:8002/optimized_route'; // Sostituisci con l'URL effettivo del server Valhalla
     var valhallaUrl = 'https://valh.sharingbeer.it/optimized_route';
 
     // Esegui la richiesta HTTP POST al server Valhalla per calcolare il percorso
@@ -238,7 +249,10 @@ async function geoMapCore(consegneAddressPar, departurePar) {
                       geoJSONManevString: JSON.stringify(geoJSONmanev), 
                       avgCoord: JSON.stringify([avgLat, avgLon]) };
 
-    }) 
+    }).catch((e) => {
+        console.debug(e);
+        throw new Error('Servizio per la geolocalizzazione delle consegne non attivo (' + valhallaUrl + ')');
+    })
   } catch(error) {
       console.debug(error);
       throw('Errore nel core Mappa', error);
