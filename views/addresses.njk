@@ -1,13 +1,48 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark">Dove vuoi riceverlo</h3>
+      <h3 class="text-white text-center bg-dark">Sul tuo ordine</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
       <div id="loading">
         <img  src="img/ajax-loader-1.gif" alt="Loading..." />
       </div>
-      
+
+      <div>
+        <form role="form" method="post" id="fatturaForm">
+          <table width="100%">
+            <tr class="text-white">
+              <td width="16%" align="center"><img src="img/receipt_long_36dp.svg"></td>
+              <td width="84%" style="font-size:1.2em;">
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" id="isFatturaRequired" onclick="toggleFatturaDetails();" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <b>Richesta fattura</b>
+              </td>
+            </tr>
+            <tr class="text-white">
+              <td width="16%" align="center">&nbsp;</td>
+              <td width="84%">
+                <table width="100%" id="fatturaDetails" style="display: none;">
+                  <tr class="text-white">
+                    <td width="100%" style="font-size:1.2em;">
+                      <div class="input-error" id="wrongPEC"></div>
+                      <input type="text" width="100%" class="form-control" id="inFatturaPEC" value="" name="inFatturaPEC" placeholder="Indirizzo PEC" autocomplete="off"/>
+                    </td>
+                  </tr>
+                  <tr class="text-white">
+                    <td width="100%" style="font-size:1.2em;">
+                      <div class="input-error" id="wrongSDI"></div>
+                      <input type="text" width="100%" class="form-control" id="inFatturaSDI" value="" name="inFatturaSDI" placeholder="Codice SDI (opzionale)" autocomplete="off">
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </div>
+
+      <hr style="border-top: 1px solid #5375BD;">
+
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:15px;">
         <span style="font-size:0.9em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
       </div>
@@ -21,7 +56,7 @@
             <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton" >
               Seleziona e vai al riepilogo
             </button>
-            <!--input type="hidden" name="addressID" value="{{address.id}}" /-->
+            <input type="hidden" name="addressID" value="{{address.id}}"/>
             <input type="hidden" name="typeOfDelivery" value="ritiro" />
           </div>
         </div> 
@@ -112,9 +147,62 @@
 
 <script type="text/javascript">
 
+  function toggleFatturaDetails() {
+
+    var fatturaDetailsDisplay = document.getElementById("fatturaDetails").style.display;
+
+    if (fatturaDetailsDisplay == "none") {
+      document.getElementById("fatturaDetails").style.display = "inline-block";
+    } else if (fatturaDetailsDisplay == "inline-block") {
+      document.getElementById("fatturaDetails").style.display = "none";
+    }
+  }
+
+  function checkFatturaDetails() {
+    var refFatturaPEC = '';
+    var refFatturaSDI = '';
+    var isFatturaDetailsOk = true;
+
+    if (document.getElementById("isFatturaRequired").checked) {
+      isFatturaDetailsOk = fieldsFatturaControl();
+
+      if (!isFatturaDetailsOk) {
+        event.preventDefault();
+      }
+
+      var auxFatturaPEC = document.getElementById("inFatturaPEC").value;
+      var auxFatturaSDI = document.getElementById("inFatturaSDI").value;
+
+      refFatturaPEC = auxFatturaPEC;
+      refFatturaSDI = auxFatturaSDI;
+    }
+    
+    var form = event.target;
+
+    var inputPEC = document.createElement("input");
+        inputPEC.setAttribute("type", "hidden");
+        inputPEC.setAttribute("id","refFatturaPEC");
+        inputPEC.setAttribute("name", "refFatturaPEC");
+        inputPEC.setAttribute("value", refFatturaPEC);
+        form.appendChild(inputPEC);
+
+    var inputSDI = document.createElement("input");
+        inputSDI.setAttribute("type", "hidden");
+        inputSDI.setAttribute("id","refFatturaSDI");
+        inputSDI.setAttribute("name", "refFatturaSDI");
+        inputSDI.setAttribute("value", refFatturaSDI);
+        form.appendChild(inputSDI);
+
+    return isFatturaDetailsOk;
+  }
+
+  document.addEventListener("submit", function(event) {
+    checkFatturaDetails();
+  });
+
   document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("loading").style.display = 'none';
-    });
+    document.getElementById("loading").style.display = 'none';
+  });
 /*==================================================================*/
 /* GESTIONE della CITTA' con query MONGODB                          */
 /* Gestione delle VIE con query su OpenStreetMaps (Overpass)        */
@@ -122,6 +210,11 @@
 
 //----------------------CIVICNUMBER e CAP---------------------------
 async function controlInputAndValidateAddress() {
+  var auxCheckFatturaDetails = checkFatturaDetails();
+  if (!auxCheckFatturaDetails) {
+    return auxCheckFatturaDetails;
+  }
+
   const ret = await fieldsRegisterControl()
   if (ret) {
     console.debug('CITTA: ',document.getElementById("inputCity").value);

@@ -39,6 +39,8 @@ function fieldsFatturaControl() {
         return false;
       }
     };
+
+    return true;
   }
 }
 

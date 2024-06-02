@@ -82,6 +82,7 @@
         <td width="84%">{{address.address}} {{address.houseNumber}} - {{address.city}} - {{address.postcode}} ({{address.province}})</td>
       </tr>
     </table>
+    
     <table class="mx-auto" width="100%" style="margin: 20px;">
       <tr class="text-white">
         <td colspan="2" width="100%" padding-left="15px">
@@ -93,6 +94,29 @@
         <td width="84%" style="font-size:1.2em;">{{deliveryDate}}</td>
       </tr>
     </table>
+    
+    {% if fatturaPEC %}
+      <table class="mx-auto" width="100%" style="margin: 20px;">
+        <tr class="text-white">
+          <td colspan="2" width="100%" padding-left="15px">
+            <i><b>Dettagli fattura:</b></i>
+          </td>
+        </tr>
+        <tr class="text-white">
+          <td width="16%" rowspan="2" align="center"><img src="img/receipt_long_36dp.svg"></td>
+          <td width="84%"><span style="color: #FFBB35;">Indirizzo PEC</span><br>&nbsp;&nbsp;&nbsp;&nbsp;{{fatturaPEC}}</td>
+        </tr>
+        <tr class="text-white">
+          <td width="84%"><span style="color: #FFBB35;">Codice SDI</span><br>&nbsp;&nbsp;&nbsp;&nbsp;
+            {% if fatturaSDI %}
+              {{fatturaPEC}}
+            {% else %}
+              <i>Non inserito</i>
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    {% endif %}
 
     {% if (numProducts > 0) and (userStatus == 'customer') and (address) %}
       {% if payType =='paypal' %}

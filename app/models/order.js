@@ -5,6 +5,8 @@ const Schema = mongoose.Schema;
 const OrderSchema = new Schema({
     userId      : { type: String, required: true },
     email       : { type: String, required: true },
+    fatturaPEC  : { type: String},
+    fatturaSDI  : { type: String},
     dateInsert  : { type: Date, required: true },
     status      : { type: String, required: true},
     idPayment   : { type: String},

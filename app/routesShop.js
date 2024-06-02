@@ -66,6 +66,22 @@ module.exports = function(app, moment, mongoose) {
 
   	var address = [];
 
+  	var refFatturaPEC = req.body.refFatturaPEC;
+  	var refFatturaSDI = req.body.refFatturaSDI;
+
+  	if (refFatturaPEC instanceof Array) {
+  		refFatturaPEC = req.body.refFatturaPEC[req.body.refFatturaPEC.length - 1];
+  	}
+  	if (refFatturaSDI instanceof Array) {
+  		refFatturaSDI = req.body.refFatturaSDI[req.body.refFatturaSDI.length - 1];
+  	}
+
+  	req.session.fatturaPEC = refFatturaPEC;
+  	req.session.fatturaSDI = refFatturaSDI;
+
+  	console.debug('refFatturaPEC', refFatturaPEC);
+  	console.debug('refFatturaSDI', refFatturaSDI);
+
     try{
 
       //--------------------------------------
@@ -188,7 +204,9 @@ module.exports = function(app, moment, mongoose) {
         deliveryDate      : lib.deliveryDate(),
         discount    : req.session.pointDiscount,
         user        : req.user,
-        payType     : "axerve" //"paypal"  "axerve"
+        payType     : "axerve", //"paypal"  "axerve"
+        fatturaPEC  : refFatturaPEC,
+        fatturaSDI  : refFatturaSDI
       })
     }
     catch (e) {
