@@ -41,7 +41,7 @@ async function updateStatusPayment(userId, orderId, status, session, mongoose) {
 	                filter,
 	                {'$set':update},
 	                {arrayFilters: [{"el._id": mongoose.Types.ObjectId(orderId)}]}).session(session);
-	  console.debug('UPDATE STATUS', JSON.stringify(doc,null,2))
+	  //console.debug('UPDATE STATUS', JSON.stringify(doc,null,2))
 	}catch (e){ 
 		console.error('Errore in function updateStatusPayment ->',e);
 		throw new Error("updateStatusPayment fallito")
