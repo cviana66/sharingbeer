@@ -365,6 +365,14 @@ app.get('/response_positiva', async function(req,res) {
     const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a); 
     //console.debug("USER:",user);
 
+    //console.debug('REQ SESSION',req.session);
+    //=====================================
+    // Svuoto il carrello
+    //=====================================
+    req.session.cart = {}
+    req.session.order = {}
+    req.session.numProducts = 0 
+
     res.render('orderOutcome.njk', {
           status  : req.query.Status,
           deliveryDate : moment(user.orders.deliveryDate).format('dddd DD MMMM'),
