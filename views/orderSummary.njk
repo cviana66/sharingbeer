@@ -211,21 +211,8 @@
           .then(function(data){
             console.log('Axerve.data->',JSON.stringify(data,null,2));            
             if (data.error.code == "0") {
-              console.log("PayID =",data.payload.paymentID);
-              console.log("PayToken =",data.payload.paymentToken);
-              console.log("GESPAY = ",data.shopLogin);
-              
               axerve.lightBox.shop = data.shopLogin;              
               axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, function(response) {       
-                console.log("Pcallback: ",response);
-                console.log('ERROR_CODE -> ', response.error.code)
-                console.log('ERROR_DESCRIPTION -> ',response.error.description)
-                console.log('STATUS -> ', response.status)
-                console.log('PAYMENT_ID -> ',response.paymentId)
-                console.log('RESPONSE_URL -> ',response.responseURL)
-                console.log('TRANSACTION_ERROR_CODE -> ', response.transactionErrorCode)
-                console.log('TRANSACTION_ERROR_DESCRIPTION -> ',response.transactionErrorDescription)
-               
                 post('/axerve_response', {'error_code': response.error.code,
                                           'error_description': response.error.description,
                                           'status': response.status,

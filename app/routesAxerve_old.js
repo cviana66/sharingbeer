@@ -19,7 +19,6 @@ var users;
 //POST
   app.post('/axerve_new', function(req, res) {
     console.log("REQ:BODY",req.body)
-    console.log("APIKEY",process.env.APIKEY)
     var amount = req.body.amountEur;
     var transactionID = req.body.transactionID;
     var error = req.body.error;

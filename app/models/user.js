@@ -82,8 +82,8 @@ const userSchema = new Schema({
                   affidability: {type: String}, 
                   desAffidability : {type: String},
                   coordinateGPS : {
-                    lat             : {type: Number},
-                    lon             : {type: Number},
+                    latitude  : {type: Number},
+                    longitude : {type: Number},
                   }  
               },
               paypal : {
@@ -91,6 +91,7 @@ const userSchema = new Schema({
                   orderId           : { type: String},
                   transactionId     : { type: String},
                   token             : { type: String},
+                  responseUrl       : { type: String},
                   errorCode         : { type: String},
                   errorDescription  : { type: String},
                   createTime        : { type: String},

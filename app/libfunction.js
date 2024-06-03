@@ -115,7 +115,7 @@ module.exports = {
                         console.log("MAIL INFO: ", info);
                       } catch (e) {
                         console.log("MAIL ERROR: ", e);
-                        throw new Error(e);
+                        throw new Error('SENDMAIL' +e);
                       }
                   },
   retriveCart:  function retriveCart (req) {

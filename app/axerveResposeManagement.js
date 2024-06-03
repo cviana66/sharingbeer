@@ -4,13 +4,26 @@ const Product = require('./models/product.js');
 
 const moment = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
 
-async function getUserByPaymentIdAndShopLogin(paymentID,shopLogin) {
+async function getUserByPaymentIdAndShopLoginAndToken(paymentID,shopLogin,token) {
 	// https://sb.sharingbeer.it/response_positiva?a=GESPAY96332&Status=OK&paymentID=2188249507207&paymentToken=625a9b4b-5684-45e4-8473-6e5b70573f0e
 	//db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1545619506746'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,'orders.items':0}}])
 	
 	var user = await User.aggregate([ {$unwind:"$orders"},
-															{$match:{$and:[{'orders.paypal.transactionId':paymentID},
-														  {'orders.paypal.shopLogin':shopLogin}]}},
+															{$match:{$and:[	{'orders.paypal.transactionId':paymentID},
+														  								{'orders.paypal.shopLogin':shopLogin},
+														  								{'orders.paypal.token':token}
+														  							]}},
+														  {$project:{addresses:0,friends:0,'orders.items':0}}]);
+	
+	return user[0];
+};
+
+async function getUserByPaymentIdAndShopLogin(paymentID,shopLogin) {	
+	
+	var user = await User.aggregate([ {$unwind:"$orders"},
+															{$match:{$and:[	{'orders.paypal.transactionId':paymentID},
+														  								{'orders.paypal.shopLogin':shopLogin}
+														  							]}},
 														  {$project:{addresses:0,friends:0,'orders.items':0}}]);
 	
 	return user[0];
@@ -36,19 +49,24 @@ async function updateStatusPayment(userId, orderId, status, session, mongoose) {
 
 };
 
-function addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose) {
-	User.findOneAndUpdate(
-	                      {_id: userId},
-	                      {'$inc': {'local.eligibleFriends': invitiPerOgniAcquisto},'local.booze': booze}
-	                      ).session(session);
+async function addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose) {
+	try {
+		await User.findOneAndUpdate(
+		                      {_id: userId},
+		                      {'$inc': {'local.eligibleFriends': invitiPerOgniAcquisto},'local.booze': booze}
+		                      ).session(session);
 
-  booze = Number(totalPrc)/numBottigliePerBeerBox/puntiPintaPerUnaBottiglia
-  console.log('BOOZE: ', booze, totalPrc, numBottigliePerBeerBox, puntiPintaPerUnaBottiglia)
-        
-  User.findOneAndUpdate(
-                        {'_id': mongoose.Types.ObjectId(parentId)},
-                        {'$inc': {'local.booze':booze}}
-                        ).session(session);
+	  booze = Number(totalPrc)/numBottigliePerBeerBox/puntiPintaPerUnaBottiglia
+	  console.debug('BOOZE: ', booze, totalPrc, numBottigliePerBeerBox, puntiPintaPerUnaBottiglia)
+	        
+	  await User.findOneAndUpdate(
+	                        {'_id': mongoose.Types.ObjectId(parentId)},
+	                        {'$inc': {'local.booze':booze}}
+	                        ).session(session);
+	}catch(e){
+		console.error('Erore in funzione addInviteAndPoint',e);
+		throw new Error("addInviteAndPoint fallito")
+	}
 };
 
 async function addItemsInProducts(paymentID,shopLogin) {
@@ -76,4 +94,4 @@ async function addItemsInProducts(paymentID,shopLogin) {
   }
 };
 
-module.exports = { getUserByPaymentIdAndShopLogin, updateStatusPayment, addInviteAndPoint, addItemsInProducts };
+module.exports = { getUserByPaymentIdAndShopLoginAndToken, updateStatusPayment, addInviteAndPoint, addItemsInProducts };
