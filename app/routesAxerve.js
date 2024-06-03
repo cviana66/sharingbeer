@@ -293,6 +293,7 @@ app.get('/response', async function(req, res) {
     const name      = user.local.name.first;
     const userEmail = user.local.email;
     const status    = req.query.Status;
+    const paymentId = req.query.paymentID;
 
     //==========================================
     // UPDATE Esito del pagamento 
