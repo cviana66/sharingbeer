@@ -365,7 +365,7 @@ app.get('/response_positiva', async function(req,res) {
     const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a); 
     //console.debug("USER:",user);
 
-    //console.debug('REQ SESSION',req.session);
+    console.debug('REQ SESSION',req.session);
     //=====================================
     // Svuoto il carrello
     //=====================================
