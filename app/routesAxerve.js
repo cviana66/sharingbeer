@@ -1,16 +1,17 @@
 const lib           = require('./libfunction');
 const fetch         = require("node-fetch");
+const bcrypt        = require('bcrypt-nodejs');
 const User          = require('../app/models/user');
 const mailorder     = require('../config/mailOrder');
 const {transMsg}    = require("./msgHandler");
 const Product = require('./models/product.js');
 
-var {getUserByPaymentIdAndShopLogin}  = require('../app/axerveResposeManagement');
+var {getUserByPaymentIdAndShopLoginAndToken}  = require('../app/axerveResposeManagement');
 var {updateStatusPayment}             = require('../app/axerveResposeManagement');
 var {addInviteAndPoint}               = require('../app/axerveResposeManagement');
 var {addItemsInProducts}              = require('../app/axerveResposeManagement');
 
-module.exports = function(app,mongoose, moment) {
+module.exports = function(app,mongoose,moment) {
 
 var counter;
 var users;
@@ -171,26 +172,26 @@ var users;
     const name      = req.user.local.name.first;
     const userEmail = req.user.local.email;
 
-    //==========================================
+    /*==========================================
     // Inizializzo la Transazione
     //==========================================
     const session = await mongoose.startSession();
-    session.startTransaction();
+    session.startTransaction(); */
   
     try {  
-      //==========================================
+      /*==========================================
       // UPDATE Esito del pagamento 
       //==========================================
       console.debug('updateStatusPayment PARAMETER:',userId, orderId, status )
-      await updateStatusPayment(userId, orderId, status, session, mongoose);
+      await updateStatusPayment(userId, orderId, status, session, mongoose); */
 
       if (status == 'OK') {      
 
-        //=====================================
+        /*=====================================
         // aggiungo possibilità di invito
         // aggiungo punto Pinta al cliente Padre
         //=====================================        
-        await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
+        await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose) */
 
         //=====================================
         // Svuoto il carrello
@@ -199,14 +200,14 @@ var users;
         req.session.order = {}
         req.session.numProducts = 0
 
-        //========================================
+        /*========================================
         // INVIO EMAIL al CLIENTE
         //========================================
         const server = lib.getServer(req);
         console.debug('SERVER',server);
         
         const html = mailorder(name, orderId, lib.deliveryDate(), server)
-        lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html)
+        await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html) */
         
         res.render('orderOutcome.njk', {
           status  : status,
@@ -219,11 +220,11 @@ var users;
       } else {
 
         console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + userId + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} Status pagamento KO - '+error_code+' '+error_description);
-        //==============================================
+        /*==============================================
         // Ri-aggiungo i prodotti dalla disponibilità 
         // per prodotto per acquisto non effettuato
         //=============================================
-         addItemsInProducts(paymentId,shopLogin);
+         addItemsInProducts(paymentId,shopLogin);*/
 
         res.render('orderOutcome.njk', {
           status  : status,
@@ -233,17 +234,17 @@ var users;
         })
       }
       
-      await session.commitTransaction();
+      //await session.commitTransaction();
 
     } catch (e) {
       console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + userId + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} CATCH: '+e+' '+transaction_error_code+' '+transaction_error_description+' '+error_code+' '+error_description);
-      await session.abortTransaction();
+      //await session.abortTransaction();
 
-      //==============================================
+      /*==============================================
       // Ri-aggiungo i prodotti nella disponibilità 
       // per prodotto per acquisto non effettuato
       //=============================================
-      addItemsInProducts(paymentId,shopLogin);
+      addItemsInProducts(paymentId,shopLogin); */
       
       res.render('orderOutcome.njk', {
           status  : 'KO',
@@ -251,7 +252,7 @@ var users;
           numProducts : req.session.numProducts
         })
     } finally {
-        await session.endSession();
+        // session.endSession();
     };
   });
 
@@ -262,38 +263,44 @@ app.get('/response', async function(req, res) {
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0,'orders.items':0}}])
   //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$set :{'orders.paypal.shopLogin':'CIAO'}}])
   console.debug('PARAMETRI RESPONSE: ',req.query);
+  //==========================================
+  // Inizializzo la Transazione
+  //==========================================
+  const session = await mongoose.startSession();
+  console.debug('SESSION',session)
+  session.startTransaction();
   try {  
-    //==========================================
-    // Inizializzo la Transazione
-    //==========================================
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    
-    //==========================================
-    // Update Status
-    //==========================================
-    var updateStatusS2S = await User.findOneAndUpdate(
+    //========================================================================
+    // Update Status S2S e Token in modo da invalidare una successiva chiamata
+    //========================================================================
+    const newToken = bcrypt.hashSync(req.query.paymentToken, bcrypt.genSaltSync(8), null);
+    console.debug('NEW TOKEN',newToken);
+    var updateStatusS2sAndToken = await User.findOneAndUpdate(
                                 {'orders.paypal.transactionId':req.query.paymentID, 'orders.paypal.shopLogin':req.query.a, 'orders.paypal.token':req.query.paymentToken},
-                                {$set :{'orders.$[elem].paypal.s2sStatus':req.query.Status}},
+                                {$set :{'orders.$[elem].paypal.s2sStatus':req.query.Status,
+                                        'orders.$[elem].paypal.token':newToken}},
                                 {arrayFilters:[{'elem.paypal.transactionId':{$eq:req.query.paymentID}}]}).session(session);    
 
-    console.debug('RESPONSE updateStatusS2S', updateStatusS2S)     
+    //console.debug('RESPONSE updateStatusS2S', updateStatusS2S)     
+
+    const user = await getUserByPaymentIdAndShopLoginAndToken(req.query.paymentID,req.query.a, req.query.paymentToken);
+
+    const userId    = user._id.toString();
+    const orderId   = user.orders._id.toString();
+    var booze       = user.local.booze;
+    const totalPrc  = user.orders.totalPriceBeer;
+    const parentId  = user.local.idParent;
+    const name      = user.local.name.first;
+    const userEmail = user.local.email;
+    const status    = req.query.Status;
 
     //==========================================
     // UPDATE Esito del pagamento 
     //==========================================
     console.debug('updateStatusPayment PARAMETER:',userId, orderId, status )
     await updateStatusPayment(userId, orderId, status, session, mongoose);               
-    
-    if (req.query.Status == 'OK') {
-      var user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a)
-      const userId    = user._id.toString;
-      const orderId   = user.orders._id.toString();
-      var booze       = user.local.booze;
-      const totalPrc  = user.orders.totalPriceBeer;
-      const parentId  = user.local.idParent;
-      const name      = user.local.name.first;
-      const userEmail = user.local.email;
+
+    if ( status == 'OK') {            
   
       //=====================================
       // aggiungo possibilità di invito
@@ -301,26 +308,35 @@ app.get('/response', async function(req, res) {
       //=====================================        
       await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
 
-      //=====================================
+      /*=====================================
       // Svuoto il carrello
       //=====================================
       req.session.cart = {}
       req.session.order = {}
-      req.session.numProducts = 0
-
+      req.session.numProducts = 0 */
+      
       //========================================
       // INVIO EMAIL al CLIENTE
       //========================================
       const server = lib.getServer(req);
-      console.debug('SERVER',server);
+      console.debug('MAIL',name, userEmail, orderId, lib.deliveryDate(), server);
       
       const html = mailorder(name, orderId, lib.deliveryDate(), server)
-      lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html); 
+      await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html); 
+    } else {
+      //==============================================
+      // Ri-aggiungo i prodotti nella disponibilità 
+      // per prodotto per acquisto non effettuato
+      //=============================================
+      addItemsInProducts(paymentId,shopLogin);
     }
     await session.commitTransaction();
   } catch(e) {
-      console.error(e);
-      await session.abortTransaction();
+    console.error('ERRORE IN RESPONSE:',e);
+    await session.abortTransaction();
+  } finally {
+    await session.endSession();
+    setTimeout(() => res.send('Fatto!'), 500);
   }
   
 /*
