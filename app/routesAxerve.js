@@ -275,13 +275,20 @@ app.get('/response', async function(req, res) {
     //========================================================================
     const newToken = bcrypt.hashSync(req.query.paymentToken, bcrypt.genSaltSync(8), null);
     console.debug('NEW TOKEN',newToken);
+
+    const status    = req.query.Status;
+    const paymentId = req.query.paymentID;
+    const shopLogin = req.query.a;
+    const paymentToken = req.query.paymentToken;
+
     var updateStatusS2sAndToken = await User.findOneAndUpdate(
-                                {'orders.paypal.transactionId':req.query.paymentID, 'orders.paypal.shopLogin':req.query.a, 'orders.paypal.token':req.query.paymentToken},
-                                {$set :{'orders.$[elem].paypal.s2sStatus':req.query.Status,
+                                {'orders.paypal.transactionId':paymentId, 'orders.paypal.shopLogin':shopLogin, 'orders.paypal.token':paymentToken},
+                                {$set :{'orders.$[elem].paypal.s2sStatus':status,
                                         'orders.$[elem].paypal.token':newToken}},
-                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:req.query.paymentID}}]}).session(session);    
+                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:paymentId}}]}).session(session);    
 
     //console.debug('RESPONSE updateStatusS2S', updateStatusS2S)     
+
 
     const user = await getUserByPaymentIdAndShopLoginAndToken(req.query.paymentID,req.query.a, req.query.paymentToken);
 
@@ -292,8 +299,6 @@ app.get('/response', async function(req, res) {
     const parentId  = user.local.idParent;
     const name      = user.local.name.first;
     const userEmail = user.local.email;
-    const status    = req.query.Status;
-    const paymentId = req.query.paymentID;
 
     //==========================================
     // UPDATE Esito del pagamento 
