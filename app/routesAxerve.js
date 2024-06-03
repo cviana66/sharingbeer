@@ -357,7 +357,7 @@ app.get('/response_positiva', async function(req,res) {
   console.debug('PARAMETRI RISPOSTA POSITIVA: ',req.query);
   try {
     const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a); 
-    console.debug("USER:",user);
+    //console.debug("USER:",user);
 
     res.render('orderOutcome.njk', {
           status  : req.query.Status,
