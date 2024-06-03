@@ -7,6 +7,7 @@ const {transMsg}    = require("./msgHandler");
 const Product = require('./models/product.js');
 
 var {getUserByPaymentIdAndShopLoginAndToken}  = require('../app/axerveResposeManagement');
+var {getUserByPaymentIdAndShopLogin}  = require('../app/axerveResposeManagement');
 var {updateStatusPayment}             = require('../app/axerveResposeManagement');
 var {addInviteAndPoint}               = require('../app/axerveResposeManagement');
 var {addItemsInProducts}              = require('../app/axerveResposeManagement');
@@ -383,6 +384,8 @@ app.get('/response_negativa',  function(req,res) {
   });
 });
 
+
+/*
 app.get('/testAx', async function(req,res){
   try {
     const session = await mongoose.startSession();
@@ -395,8 +398,7 @@ app.get('/testAx', async function(req,res){
   }catch(e){
     console.error(e)
   }
-
-
 })
+*/
 
 };

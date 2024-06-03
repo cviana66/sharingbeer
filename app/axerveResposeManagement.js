@@ -94,4 +94,4 @@ async function addItemsInProducts(paymentID,shopLogin) {
   }
 };
 
-module.exports = { getUserByPaymentIdAndShopLoginAndToken, updateStatusPayment, addInviteAndPoint, addItemsInProducts };
+module.exports = { getUserByPaymentIdAndShopLoginAndToken, getUserByPaymentIdAndShopLogin, updateStatusPayment, addInviteAndPoint, addItemsInProducts };
