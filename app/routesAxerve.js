@@ -85,7 +85,7 @@ var users;
         console.debug("RESULT -> : ",JSON.stringify(result));
         return result.json();
       }).then (async function(data){
-        console.debug("DATA -> : ", JSON.stringify(data));
+        console.debug("DATA -> ", JSON.stringify(data));
 
         if (data.error.code !== "0") {
           data.ok = false;
@@ -268,7 +268,6 @@ app.get('/response', async function(req, res) {
   // Inizializzo la Transazione
   //==========================================
   const session = await mongoose.startSession();
-  console.debug('SESSION',session)
   session.startTransaction();
   try {  
     //========================================================================
