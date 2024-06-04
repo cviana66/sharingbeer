@@ -125,39 +125,7 @@ module.exports = function(passport) {
 
                 // all is well, return successful user
                 console.info(moment().utc("Europe/Rome").format()+' [INFO] "/login" USERS_ID: {"_id":ObjectId("'+user._id+'")}');
-
-                /* if the user status  is "new" then it is the first access --> validation put status = confirmed
-                if (user.local.status == 'new') {
-                    User.findByIdAndUpdate(user._id, { $set: { status: "confirmed" }}, function (err, req) {
-
-                        if (err) {
-                            req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
-                            return done(err) }
-                        else {
-
-                            // booze to add to parent for invitatition done
-                            User.findOne({'_id': user.idParent }, function(err, parent) {
-                                // if there are any errors, return the error
-                                if (err) {
-                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
-                                    return done(err);
-                                }
-
-                                console.log('PARENT ID: ', parent._id);
-
-                                parent.booze += global.cost; //add Booze to Parent
-
-                                User.update({'_id':parent._id}, {$set: {booze: parent.booze}}, function (err, req, res) {
-
-                                  if (err) {
-                                    req.flash('error','Something bad happened! There are problems with the network connection. Please try again later');
-                                    return done(err);
-                                    }
-                                });
-                            });
-                        };
-                    });
-                } */
+                
                 return done(null, user)
             });
         }

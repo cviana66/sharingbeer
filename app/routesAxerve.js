@@ -362,17 +362,10 @@ app.get('/response_positiva', async function(req,res) {
 
   console.debug('PARAMETRI RISPOSTA POSITIVA: ',req.query);
   try {
-    const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a); 
-    //console.debug("USER:",user);
-
+    const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a);     
+    req.user = user
+    console.debug('REQ USER',req.user);
     console.debug('REQ SESSION',req.session);
-    //=====================================
-    // Svuoto il carrello
-    //=====================================
-    req.session.cart = {}
-    req.session.order = {}
-    req.session.numProducts = 0 
-
     res.render('orderOutcome.njk', {
           status  : req.query.Status,
           deliveryDate : moment(user.orders.deliveryDate).format('dddd DD MMMM'),
