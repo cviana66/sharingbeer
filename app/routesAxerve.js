@@ -313,13 +313,6 @@ app.get('/response', async function(req, res) {
       // aggiungo punto Pinta al cliente Padre
       //=====================================        
       await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
-
-      /*=====================================
-      // Svuoto il carrello
-      //=====================================
-      req.session.cart = {}
-      req.session.order = {}
-      req.session.numProducts = 0 */
       
       //========================================
       // INVIO EMAIL al CLIENTE
@@ -359,17 +352,19 @@ app.get('/response', async function(req, res) {
 app.get('/response_positiva', async function(req,res) {  
   //response_positiva?a=GESPAY96332&Status=OK&paymentID=1244109507430&paymentToken=2fbc938d-547a-4431-8da8-31539f967ccf
   //const user = await getUserByPaymentIdAndShopLogin('1244109507430','GESPAY96332'); // TEST
-
+  
   console.debug('PARAMETRI RISPOSTA POSITIVA: ',req.query);
   try {
-    const user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a);     
-    req.user = user
+    req.user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a);     
+    
     console.debug('REQ USER',req.user);
     console.debug('REQ SESSION',req.session);
+
     res.render('orderOutcome.njk', {
           status  : req.query.Status,
-          deliveryDate : moment(user.orders.deliveryDate).format('dddd DD MMMM'),
-          user : user
+          deliveryDate : moment(req.user.orders.deliveryDate).format('dddd DD MMMM'),
+          user : req.user,
+          numProducts : 0
     });
   }catch (e){
     console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /response_positiva"  PARAMETRI RISPOSTA POSITIVA: '+req.query+' ERRORE:'+e);

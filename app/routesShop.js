@@ -230,7 +230,7 @@ module.exports = function(app, moment, mongoose) {
 	//TODO da finire l'implemetazione ... solo abbozzata 
 
     res.render('orderOutcome.njk', {
-      status  : 'KO',
+      status  : 'OK',
       user    : req.user,
       deliveryDate: lib.deliveryDate(),
       numProducts : req.session.numProducts
