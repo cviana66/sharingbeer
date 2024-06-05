@@ -10,10 +10,11 @@
             <ul class="list-group">
               <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.name.first}} {{user.name.last}} </li>
               <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.email}} </li>
-              <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.booze}} booze </li>
+              <li class="list-group-item text-white" style="background-color:#2A0009"> {{booze}} punti Pinta </li>
           {% endif %}
         
-              <li class="list-group-item text-white" style="background-color:#2A0009"> {{numFriends}} friends </li> 
+              <li class="list-group-item text-white" style="background-color:#2A0009"> Inviti effettuati: {{invites.length}} </li> 
+              <li class="list-group-item text-white" style="background-color:#2A0009"> Amici che hanno accettato l'invito: {{friends.length}} </li> 
              
               {% for friend in friendsMap %}
                 <li class="list-group-item text-white" style="background-color:#2A0009"> {{friend.firstNameFriend}} : {{friend.emailFriend}} </li>

@@ -2,7 +2,6 @@
 
 const transporter   = require('../config/mailer');
 
-const Friends       = require('./models/friend');
 const Users         = require('./models/user');
 const lib           = require('./libfunction');
 
@@ -56,29 +55,47 @@ module.exports = function(app, passport, moment) {
 //GET
   // we will want this protected so you have to be logged in to visit
   // we will use route middleware to verify this (the isLoggedIn function)
-  app.get('/profile', lib.isLoggedIn, function(req, res) {
+  app.get('/profile', lib.isLoggedIn, async function(req, res) {
 
-    console.log('REQ.USER: ', req.user)
-    console.log('ORADATA -> ', moment().utc("Europe/Rome").format('DD/MM/yyyy hh:mm:ss'))
-    Friends.find({id : req.user._id }, function(err, friends) {
+    try {
 
-        if (err) {
-          req.flash('error','Something bad happened while retriving friends! Please retry');
-          console.log('ERROR PROFILE FIND FRIENDS:', err );
+      // Conta quanti amici invitati  
+      const nF = await Users.aggregate([
+        {$match:{"_id":req.user._id}}, 
+        {$unwind: "$friends"}, 
+        //{$match :{ "friends.status":"accepted"}},
+        {$project:{_id:0,addresses:0,orders:0,local:0}}
+        //{$group:{_id:null,count:{$count:{ }}}}
+        ]);
+      console.debug('AMICI', nF)
+      // Conta quanti amici invitati hanno accettato 
+      const nFa = await Users.aggregate([
+        {$match:{"_id":req.user._id}}, 
+        {$unwind: "$friends"}, 
+        {$match :{ "friends.status":"accepted"}},
+        {$project:{_id:0,addresses:0,orders:0,local:0}}
+        //{$group:{_id:null,count:{$count:{ }}}}
+        ]);      
+      
+      let msg = req.flash('success');
+      console.log('MESSAGGIO',msg );
+      res.render('profile.njk', {
+          user     : req.user.local, // get the user out of session and pass to template
+          booze    : req.user.local.booze.toFixed(1),
+          friends  : nFa,         
+          invites  : nF,
+          message  : msg,
+          type     : "info",
+          numProducts: req.session.numProducts, //numero di proodotti nel carrello
+      });
+
+    } catch (e) {
+          req.flash('error','Qualche cosa non ha funzionato nella conta dei tui amici. Per favore riprova');
+          console.log('ERROR PROFILE FIND FRIENDS:', e );
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
-        }
-        let msg = req.flash('success');
-        console.log('MESSAGGIO',msg );
-        res.render('profile.njk', {
-            user : req.user.local, // get the user out of session and pass to template
-            numFriends  : friends.length,
-            friendsMap  : friends,
-            message     : msg,
-            type        : "info",
-            numProducts: req.session.numProducts, //numero di proodotti nel carrello
-        });
+    }
+        
     });
-  });
 
 // =====================================
 // LOGOUT ==============================
