@@ -8,16 +8,14 @@
           <input type="hidden" name="token" value="{{token}}">
           <input type="hidden" name="email" id="email" value="{{email}}">
           <div class="form-group">
-            <label for="inputPassword" class="text-white col-form-label-lg">Password</label>
-            <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">di almeno di 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p> 
+            <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">La password deve essere di almeno 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p> 
             <div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd"></div>
-            <input autocomplete="new-password" type="password" class="form-control" id="inputPassword" name="password" autofocus  required>
+            <input placeholder="Password" autocomplete="new-password" type="password" class="form-control" id="inputPassword" name="password" autofocus  required>
           </div>
 
-          <div class="form-group">
-            <label for="inputPassword" class="text-white col-form-label-lg">Confirm Password</label>
+          <div class="form-group">            
             <div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd2"></div>
-            <input type="password" class="form-control" id="confirmPassword" name="confirm" required>
+            <input placeholder="Conferma Password" type="password" class="form-control" id="confirmPassword" name="confirm" required>
           </div>
           <div style="margin-bottom: 40px; margin-top:40px;">
             <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsResetControl()">

@@ -123,25 +123,26 @@ app.get('/logout', function(req, res, next) {
   });
 //POST
   app.post('/forgot', function(req, res) {
-    Users.findOne({ email: req.body.email }, function(err, user) {
+    var email =  req.body.email.toLowerCase();
+    Users.findOne({'local.email': email }, function(err, user) {
         // Handle error: best practicies
         if (err) {
           let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
-          console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+          console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
           req.flash('error', msg);
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 
         };
 
         if (!user) {
-          let msg = 'Nessun utente è registrato con l\'indirizzo email '+ req.body.email;
-          console.info(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
+          let msg = 'Nessun utente è registrato con l\'indirizzo email '+email;
+          console.info(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
           req.flash('info', msg);
           return res.render('forgot.njk', {message: req.flash('info'), type: "warning"});
         } else {
           var token = lib.generateToken(20);
-          user.resetPasswordToken = token;
-          user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+          user.local.resetPasswordToken = token;
+          user.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
           console.log('POST FORGOT USER: ',user)
 
@@ -149,7 +150,7 @@ app.get('/logout', function(req, res, next) {
 
             if(err) {
               let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
-              console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: user.save: '+err+' FLASH: '+msg);
+              console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: user.save: '+err+' FLASH: '+msg);
               req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
@@ -162,40 +163,16 @@ app.get('/logout', function(req, res, next) {
             try {
               await lib.sendmailToPerson('',user.local.email,'',token,'','','','reset',server);
               let msg = '!';
-              console.info(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
+              console.info(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
               req.flash('loginMessage', 'Il messaggio con le istruzioni per reimpostare la password è stato inviato a ' + user.local.email );
               res.redirect('/login');
             } catch (e) {
               let msg = 'Spiacente ma qualche cosa non ha funzionato nell\'invio dell\'email. Per cortesia riprova';
-              console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: transporter.sendMail: '+err+' FLASH: '+msg);
+              console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: transporter.sendMail: '+err+' FLASH: '+msg);
               req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
             
-            /*var mailOptions = {
-              to: user.local.email,
-              from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com',
-              subject: 'SharingBeer Password Reset',
-              text: 'Ciao, hai ricevuto questa mail perchè Tu (o qualcuno altro) ha richiesto di reimpostare la password del Tuo account\n\n' +
-                
-                'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-                server + '/reset?token=' + token + '\n\n' +
-                'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-            };
-
-            transporter.sendMail(mailOptions, function(err, info){
-                if(err){
-                  let msg = 'Something bad happened! I can not send the email. Please retry';
-                  console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: transporter.sendMail: '+err+' FLASH: '+msg);
-                  req.flash('error',msg);
-                  return res.render('info.njk', {message: req.flash('error'), type: "danger"});
-                } else {
-                  let msg = 'Message reset password sent!';
-                  console.info(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+req.body.email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
-                  req.flash('loginMessage', 'An e-mail has been sent to ' + user.local.email + ' with further instructions.');
-                  res.redirect('/login');
-                };
-            }); */
           });
         };
       });
@@ -207,7 +184,7 @@ app.get('/logout', function(req, res, next) {
 //GET
   app.get('/reset', function(req, res) {
 
-    Users.findOne({ resetPasswordToken: req.query.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+    Users.findOne({ 'local.resetPasswordToken': req.query.token, 'local.resetPasswordExpires': { $gt: Date.now() } }, function(err, user) {
 
       if(err) {
         let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
@@ -236,7 +213,7 @@ app.get('/logout', function(req, res, next) {
 
     } else {
 
-      Users.findOne({ resetPasswordToken: req.body.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+      Users.findOne({ "local.resetPasswordToken": req.body.token, "local.resetPasswordExpires": { $gt: Date.now() } }, function(err, user) {
 
         if(err) {
           req.flash('error','Spiacente, si è verificato un errore inatteso! Per cortesia riprova');
@@ -279,7 +256,7 @@ app.get('/logout', function(req, res, next) {
 //GET
   app.get('/change', lib.isLoggedIn, function(req, res) {
 
-    Users.findOne({ email: req.user.local.email }, function(err, user) {
+    Users.findOne({ "local.email": req.user.local.email }, function(err, user) {
 
       if(err) {
         let msg = 'Something bad happened! Please retry';
@@ -296,11 +273,11 @@ app.get('/logout', function(req, res, next) {
     if (req.body.password != req.body.confirm) {
 
       req.flash('error', 'Password do not match');
-      res.render('Change.njk', {message: req.flash('error') });
+      res.render('change.njk', {message: req.flash('error') });
 
     } else {
 
-      Users.findOne({ email: req.user.local.email }, function(err, user) {
+      Users.findOne({ "local.email": req.user.local.email }, function(err, user) {
 
         if(err) {
           let msg = 'Something bad happened! Please retry';
