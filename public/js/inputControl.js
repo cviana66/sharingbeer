@@ -220,6 +220,7 @@ async function fieldsRegisterControl() {
   if (document.getElementById("wrongCity") != null) document.getElementById("wrongCity").innerHTML = "";
   if (document.getElementById("wrongProvincia") != null) document.getElementById("wrongProvincia").innerHTML = "";
   if (document.getElementById("wrongStreet") != null) document.getElementById("wrongStreet").innerHTML = "";
+  if (document.getElementById("wrongCap") != null) document.getElementById("wrongCap").innerHTML = "";
   if (document.getElementById("wrongNumciv") != null) document.getElementById("wrongNumciv").innerHTML = "";
 
   if (nome == "") {
@@ -283,7 +284,7 @@ async function fieldsRegisterControl() {
     return false;
   }  
   if (address == "" || document.getElementById("myselectstreet") !=null || document.getElementById("hiddenStreet").value != 'OK') {
-    text = iwar+"Inserire o selezionare un indirizzo esistente";
+    text = iwar+"Inserire il nome della via anche parziale e selezionare l'indirizzo dalla lista proposta."
     document.getElementById("wrongStreet").innerHTML = text;
     document.getElementById("inputStreet").focus();
     document.getElementById("wrongStreet").scrollIntoView({ behavior: "smooth", block: "center" });

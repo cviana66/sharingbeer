@@ -206,7 +206,7 @@ app.get('/logout', function(req, res, next) {
 //POST 
   app.post('/reset', function(req, res) {
 
-    if (req.body.password != req.body.confirm) {
+    if (req.body.password != req.body.confirmPassword) {
 
       req.flash('error', 'Le password non corrispondono');
       res.render('reset.njk', {message: req.flash('error'), token:req.body.token });
@@ -227,7 +227,7 @@ app.get('/logout', function(req, res, next) {
         } else {
 
           var common = new Users();
-          user.local.password = common.generateHash(req.body.password);
+          user.local.password = common.generateHash(req.body.confirmPassword);
           user.local.resetPasswordToken = undefined;
           user.local.resetPasswordExpires = undefined;
 
@@ -264,9 +264,13 @@ app.get('/logout', function(req, res, next) {
         console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "GET /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       }
-      res.render('change.njk');
+      res.render('change.njk',{        
+        user        : req.user,
+        numProducts : req.session.numProducts
+      });
     });
   });
+
 //POST
   app.post('/change', function(req, res) {
 
