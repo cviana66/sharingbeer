@@ -177,7 +177,11 @@ module.exports = {
                 },
   getServer:  function getServer(req) {
                 if (process.env.NODE_ENV== "development") {
-                  server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+                  if (req.hostname == 'sb.sharingbeer.it') {                  
+                    server = req.protocol+'://'+req.hostname
+                  }else{
+                    server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+                  }
                 } else {
                   server = req.protocol+'://'+req.hostname;
                 }

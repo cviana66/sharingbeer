@@ -14,6 +14,10 @@ module.exports = function(app, passport, moment) {
 // =====================================
 //GET
   app.get('/', function(req, res) {
+      
+
+      console.debug(req.session)
+      
       res.render('index.njk', {
           user: req.user,
           numProducts : req.session.numProducts
@@ -26,7 +30,7 @@ module.exports = function(app, passport, moment) {
 //GET
   // show the login form
   app.get('/login', function(req, res) {
-      console.debug('IN LOGINreq.session.returnTo',req.session.returnTo)
+      console.debug('IN LOGIN req.session.returnTo',req.session.returnTo)
       // render the page and pass in any flash data if it exists
       res.render('login.njk', { message: req.flash('loginMessage'), returnTo: req.session.returnTo });
   });

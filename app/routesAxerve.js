@@ -4,7 +4,8 @@ const bcrypt        = require('bcrypt-nodejs');
 const User          = require('../app/models/user');
 const mailorder     = require('../config/mailOrder');
 const {transMsg}    = require("./msgHandler");
-const Product = require('./models/product.js');
+const Product       = require('./models/product.js');
+const Recovery      = require('./models/recovery');
 
 var {getUserByPaymentIdAndShopLoginAndToken}  = require('../app/axerveResposeManagement');
 var {getUserByPaymentIdAndShopLogin}  = require('../app/axerveResposeManagement');
@@ -326,13 +327,30 @@ app.get('/response', async function(req, res) {
       //==============================================
       // Ri-aggiungo i prodotti nella disponibilità 
       // per prodotto per acquisto non effettuato
-      //=============================================
+      //==============================================
       addItemsInProducts(paymentId,shopLogin);
     }
     await session.commitTransaction();
+  
   } catch(e) {
     console.error('ERRORE IN RESPONSE:',e);
     await session.abortTransaction();
+    
+    //==============================================
+    //RECOVERY in documento per recupero transazione    
+    //==============================================
+    console.debug('URL = ',lib.getServer(req)+'/response?a='+req.query.a+'&Status='+req.query.Status+'&paymentID='+req.query.paymentID+'&paymentToken='+req.query.paymentToken)
+    
+    const recoveryUrl = lib.getServer(req)+'/response?a='+req.query.a+'&Status='+req.query.Status+'&paymentID='+req.query.paymentID+'&paymentToken='+req.query.paymentToken;
+    const recoveryOrder = new Recovery({ url: recoveryUrl})
+    
+    recoveryOrder.save()
+    .then(function (doc) {
+      console.debug("RECOVERY ID",doc._id.toString());
+    }).catch(function (error) {
+      console.error(error);
+    });
+  
   } finally {
     await session.endSession();
     setTimeout(() => res.send('Fatto!'), 500);
