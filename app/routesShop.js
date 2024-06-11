@@ -22,7 +22,7 @@ module.exports = function(app, moment, mongoose) {
 								{$sort:{'orders.dateInsert': -1} }]);
 	
 		for ( var i in  ordiniInConsegna) {			
-			console.debug('DATA-ORA',ordiniInConsegna[i].orders.dateInsert)
+			//console.debug('DATA-ORA',ordiniInConsegna[i].orders.dateInsert)
 			ordiniInConsegna[i].orders.dateInsert = moment(ordiniInConsegna[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm');
 			ordiniInConsegna[i].orders.deliveryDate = moment(ordiniInConsegna[i].orders.deliveryDate).format('dddd DD MMMM');
 
@@ -45,14 +45,24 @@ module.exports = function(app, moment, mongoose) {
 		for ( var i in  ordiniConsegnati) {			
 			ordiniConsegnati[i].orders.dateInsert = moment(ordiniConsegnati[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
 		}
+		console.debug('ORDINI CONSEGNATI', JSON.stringify(ordiniConsegnati,null,2))
 
 		//console.debug('ORDINI IN CONSEGNA: ',JSON.stringify(ordiniInConsegna, null, 2))
+
+		var addressRitiro = await User.aggregate([
+            {$match:{"local.email": "birrificioviana@gmail.com"}}, 
+            {$unwind: "$addresses"}, 
+            //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
+            {$project:{_id:0,friends:0,orders:0,local:0}}
+            ])
+
 		res.render('shopping.njk', {
-                  ordiniInConsegna : ordiniInConsegna,
-                  ordiniInRitiro : ordiniInRitiro,
-                  ordiniConsegnati : ordiniConsegnati,
-                  numProducts : req.session.numProducts,
-                  user : req.user
+                  ordiniInConsegna 	: ordiniInConsegna,
+                  ordiniInRitiro 		: ordiniInRitiro,
+                  ordiniConsegnati 	: ordiniConsegnati,
+                  numProducts 			: req.session.numProducts,
+                  user 							: req.user,
+                  addressRitiro 		: addressRitiro[0].addresses
                })
 	})
 

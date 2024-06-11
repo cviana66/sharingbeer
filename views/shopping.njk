@@ -75,9 +75,46 @@
         <span style="font-size:0.8em;">(con sconti e trasporto)</span> 
         <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
       </div>
-      <div style="font-size:1.1em;font-weight: bold;">Indirizzo di consegna: </div>
-      <div>{{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}}, {{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}}, {{purchase.orders.address.city}} - {{purchase.orders.address.postcode}} ({{purchase.orders.address.province}})</div>
+      <div style="font-size:1.1em;font-weight: bold;">Indirizzo di ritiro: </div>
+      <div>{{addressRitiro.address}} {{addressRitiro.houseNumber}} - {{addressRitiro.city}} - {{addressRitiro.postcode}} ({{addressRitiro.province}})</div>
     </div>
+    {% endfor %}
+  </div>
+
+  <div class="tab-pane text-white " id="messages" role="tabpanel" aria-labelledby="messages-tab" style="margin: 0px 0px 20px 0px;">
+    {% for purchase in ordiniConsegnati %}
+    <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 0px 0px;">
+      <div><span style="font-size:1.1em;font-weight: bold;">ORDINE #</span>{{purchase.orders._id}}</div>
+      <div><span style="font-size:1.1em;font-weight: normal;"> Effettuato</span> il {{purchase.orders.dateInsert}}</div>      
+      
+      {% for prod in purchase.orders.items %}
+      <table style="margin: 5px 5px 5px 5px;">
+        <tr >
+          <td width="16%" rowspan="3" style="padding: 5px;">  <img src="{{prod.linkImage}}" width="100%" height="100%"> </td>
+          <td>{{prod.name}}</td>
+        </tr>
+        <tr>
+          <td class="text-white text-left">N° BeerBox {{prod.qty}}</td>
+        </tr>
+        <tr>
+          <td>Prezzo per BeerBox €{{prod.price}}</td>
+        </tr>      
+      </table>      
+      {% endfor %}
+      <div>
+        <span style="font-size:1.1em;font-weight: bold;">Totale</span> 
+        <span style="font-size:0.8em;">(con sconti e trasporto)</span> 
+        <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
+      </div>
+      {%if purchase.orders.deliveryType == 'Consegna'%}
+        <div style="font-size:1.1em;font-weight: bold;">Consegnato: </div>
+        <div>{{addressRitiro.address}} {{addressRitiro.houseNumber}} - {{addressRitiro.city}} - {{addressRitiro.postcode}} ({{addressRitiro.province}})</div>
+      {%else%}
+        <div style="font-size:1.1em;font-weight: bold;">Ritirato: </div>
+        <div>{{addressRitiro.address}} {{addressRitiro.houseNumber}} - {{addressRitiro.city}} - {{addressRitiro.postcode}} ({{addressRitiro.province}})</div>
+      {%endif%}
+    </div>
+
     {% endfor %}
   </div>
 
