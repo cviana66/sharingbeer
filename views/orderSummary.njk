@@ -234,11 +234,11 @@
             }
           })
           .then(function(data){
-            console.log('Axerve.data->',JSON.stringify(data,null,2));            
+            console.log('Axerve.data->', JSON.stringify(data,null,2));
+            console.log('LIGHTBOX', JSON.stringify (axerve.lightBox, null, 2))            
+            
             if (data.error.code == "0") {
-              if (axerve.lightBox.IsiOS) {
-                axerve.lightBox.requestType = 'Desktop';
-              }
+              axerve.debug = 'true'
               axerve.lightBox.shop = data.shopLogin;              
               axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, function(response) {       
                 post('/axerve_response', {'error_code': response.error.code,
