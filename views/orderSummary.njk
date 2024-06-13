@@ -203,8 +203,8 @@
       </div>
       
 
-      <!--script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script-->
-      <script src="/js/axerve.js"></script>
+      <script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
+      <!--script src="/js/axerve.js"></script-->
       <script type="text/javascript">
 
 
@@ -239,7 +239,7 @@
             console.log('LIGHTBOX', JSON.stringify (axerve.lightBox, null, 2))            
             
             if (data.error.code == "0") {
-              axerve.debug = 'true'
+              //axerve.debug = 'true'
               axerve.lightBox.shop = data.shopLogin;              
               axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, function(response) {       
                 post('/axerve_response', {'error_code': response.error.code,

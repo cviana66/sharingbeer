@@ -146,33 +146,34 @@ var users;
 //-------------------------------------------
   app.post('/axerve_response', lib.isLoggedIn, async function(req, res) {
 
-    const error_code = req.body.error_code; 
-    const error_description = req.body.error_description;    
-    
-    const response_URL = req.body.response_URL;
-    const transaction_error_code = req.body.transaction_error_code;
-    const transaction_error_description = req.body.transaction_error_description;
-
-    const paymentId = req.session.paymentId;
     const shopLogin = process.env.SHOPLOGIN
-    var status      = req.body.status; if (status == "") status = "KO";
 
-    console.debug('ERROR_CODE -> ', error_code)
+    const error_code                    = req.body.error_code; 
+    const error_description             = req.body.error_description;    
+    const response_URL                  = req.body.response_URL;
+    const transaction_error_code        = req.body.transaction_error_code;
+    const transaction_error_description = req.body.transaction_error_description;
+    var status                          = req.body.status; if (status == "") status = "KO";
+    
+    //const paymentId = req.session.paymentId;
+    var orderId     = req.session.order._id; if (orderId != undefined) orderId = orderId.toString();
+    //var booze       = req.session.booze;
+    const totalPrc  = req.session.totalPrc;
+    
+    
+    const userId    = req.user.id.toString();
+    
+    //const parentId  = req.user.local.idParent;
+    //const name      = req.user.local.name.first;
+    //const userEmail = req.user.local.email;
+
+    /*console.debug('ERROR_CODE -> ', error_code)
     console.debug('ERROR_DESCRIPTION -> ',error_description)
     console.debug('STATUS -> ', status)
     console.debug('PAYMENT_ID -> ',paymentId)
     console.debug('RESPONSE_URL -> ',response_URL)
     console.debug('TRANSACTION_ERROR_CODE -> ', transaction_error_code)
-    console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)
-
-    
-    const userId    = req.user.id.toString();
-    const orderId   = req.session.order._id.toString();
-    var booze       = req.session.booze;
-    const totalPrc  = req.session.totalPrc;
-    const parentId  = req.user.local.idParent;
-    const name      = req.user.local.name.first;
-    const userEmail = req.user.local.email;
+    console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)*/
 
     /*==========================================
     // Inizializzo la Transazione
@@ -213,7 +214,7 @@ var users;
         
         res.render('orderOutcome.njk', {
           status  : status,
-          orderId : orderId,
+          //orderId : orderId,
           user    : req.user,
           deliveryDate: lib.deliveryDate(),
           numProducts : req.session.numProducts
@@ -230,7 +231,7 @@ var users;
 
         res.render('orderOutcome.njk', {
           status  : status,
-          orderId : orderId,
+          //orderId : orderId,
           user    : req.user,
           numProducts : req.session.numProducts
         })
@@ -295,7 +296,7 @@ app.get('/response', async function(req, res) {
 
     const userId    = user._id.toString();
     const orderId   = user.orders._id.toString();
-    var booze       = user.local.booze;
+    var   booze     = user.local.booze;
     const totalPrc  = user.orders.totalPriceBeer;
     const parentId  = user.local.idParent;
     const name      = user.local.name.first;
@@ -322,7 +323,8 @@ app.get('/response', async function(req, res) {
       console.debug('MAIL',name, userEmail, orderId, lib.deliveryDate(), server);
       
       const html = mailorder(name, orderId, lib.deliveryDate(), server)
-      await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html); 
+      await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html);      
+
     } else {
       //==============================================
       // Ri-aggiungo i prodotti nella disponibilità 
@@ -342,7 +344,9 @@ app.get('/response', async function(req, res) {
     console.debug('URL = ',lib.getServer(req)+'/response?a='+req.query.a+'&Status='+req.query.Status+'&paymentID='+req.query.paymentID+'&paymentToken='+req.query.paymentToken)
     
     const recoveryUrl = lib.getServer(req)+'/response?a='+req.query.a+'&Status='+req.query.Status+'&paymentID='+req.query.paymentID+'&paymentToken='+req.query.paymentToken;
-    const recoveryOrder = new Recovery({ url: recoveryUrl})
+    const recoveryOrder = new Recovery({dateInsert: moment().utc("Europe/Rome").format(),
+                                        orderId:orderId, 
+                                        url:recoveryUrl})
     
     recoveryOrder.save()
     .then(function (doc) {
@@ -375,8 +379,8 @@ app.get('/response_positiva', async function(req,res) {
   try {
     req.user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a);     
     
-    console.debug('REQ USER',req.user);
-    console.debug('REQ SESSION',req.session);
+    //console.debug('REQ USER',req.user);
+    console.debug('REQ',req);
 
     res.render('orderOutcome.njk', {
           status  : req.query.Status,
