@@ -27,6 +27,11 @@ console.debug('OGGI FORMATO DATE:', d )
 
 console.debug('GESTPAY =', process.env.SHOPLOGIN)
 
+
+/*const aia = 'https://sandbox.gestpay.net/pagam/src/index.html'
+console.debug('SPLIT', aia.split("/pagam/"));*/
+
+
 //=================================================
 // Connect to our database
 const mongoose = require('./config/database.js');
