@@ -1,0 +1,158 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: #333; }
+
+@font-face {
+  font-family: 'AvertaPE';
+  src: url("assets/fonts/Averta/37B0E9_2_0.eot");
+  src: url("assets/fonts/Averta/37B0E9_2_0.eot?#iefix") format("embedded-opentype"), url("assets/fonts/Averta/37B0E9_2_0.woff2") format("woff2"), url("assets/fonts/Averta/37B0E9_2_0.woff") format("woff"), url("assets/fonts/Averta/37B0E9_2_0.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal; }
+@font-face {
+  font-family: 'AvertaPE';
+  src: url("assets/fonts/Averta/37B0E9_3_0.eot");
+  src: url("assets/fonts/Averta/37B0E9_3_0.eot?#iefix") format("embedded-opentype"), url("assets/fonts/Averta/37B0E9_3_0.woff2") format("woff2"), url("assets/fonts/Averta/37B0E9_3_0.woff") format("woff"), url("assets/fonts/Averta/37B0E9_3_0.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic; }
+@font-face {
+  font-family: 'AvertaPE';
+  src: url("assets/fonts/Averta/37B0E9_9_0.eot");
+  src: url("assets/fonts/Averta/37B0E9_9_0.eot?#iefix") format("embedded-opentype"), url("assets/fonts/Averta/37B0E9_9_0.woff2") format("woff2"), url("assets/fonts/Averta/37B0E9_9_0.woff") format("woff"), url("assets/fonts/Averta/37B0E9_9_0.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal; }
+@font-face {
+  font-family: 'AvertaPE';
+  src: url("assets/fonts/Averta/37B0E9_A_0.eot");
+  src: url("assets/fonts/Averta/37B0E9_A_0.eot?#iefix") format("embedded-opentype"), url("assets/fonts/Averta/37B0E9_A_0.woff2") format("woff2"), url("assets/fonts/Averta/37B0E9_A_0.woff") format("woff"), url("assets/fonts/Averta/37B0E9_A_0.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic; }
+@font-face {
+  font-family: 'AvertaPE';
+  src: url("assets/fonts/Averta/37B0E9_C_0.eot");
+  src: url("assets/fonts/Averta/37B0E9_C_0.eot?#iefix") format("embedded-opentype"), url("assets/fonts/Averta/37B0E9_C_0.woff2") format("woff2"), url("assets/fonts/Averta/37B0E9_C_0.woff") format("woff"), url("assets/fonts/Averta/37B0E9_C_0.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal; }
+@font-face {
+  font-family: 'AvertaPE';
+  src: url("assets/fonts/Averta/37B0E9_D_0.eot");
+  src: url("assets/fonts/Averta/37B0E9_D_0.eot?#iefix") format("embedded-opentype"), url("assets/fonts/Averta/37B0E9_D_0.woff2") format("woff2"), url("assets/fonts/Averta/37B0E9_D_0.woff") format("woff"), url("assets/fonts/Averta/37B0E9_D_0.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic; }
+.c-background {
+  height: 100vh;
+  width: 100vw;
+  font-family: 'AvertaPE'; }
+  .c-background .c-background__logo {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    height: 32;
+    width: 168px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-image: url("assets/axerve-logo.svg"); }
+  .c-background .c-background__links {
+    position: absolute;
+    right: 32px; }
+    .c-background .c-background__links a {
+      color: #80a3b7;
+      font-size: 14px;
+      text-decoration: none; }
+      .c-background .c-background__links a + a {
+        margin-left: 24px; }
+    @media screen and (max-width: 500px) {
+      .c-background .c-background__links {
+        bottom: 32px; } }
+    @media screen and (min-width: 501px) {
+      .c-background .c-background__links {
+        top: 32px; } }
+
+.c-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+  .c-container .c-container__content {
+    display: flex;
+    flex-direction: column;
+    min-width: calc(100vw - 96px);
+    max-width: 400px;
+    min-height: 300px;
+    overflow: hidden; }
+    @media screen and (min-width: 500px) {
+      .c-container .c-container__content {
+        min-width: 400px; } }
+    .c-container .c-container__content .c-container__inputs {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 16px; }
+      .c-container .c-container__content .c-container__inputs .c-container__input {
+        flex-grow: 2;
+        display: flex;
+        flex-direction: column; }
+        .c-container .c-container__content .c-container__inputs .c-container__input.currency {
+          flex-grow: 1; }
+        .c-container .c-container__content .c-container__inputs .c-container__input + .c-container__input {
+          margin-left: 8px; }
+      @media screen and (max-width: 500px) {
+        .c-container .c-container__content .c-container__inputs {
+          flex-direction: column; }
+          .c-container .c-container__content .c-container__inputs .c-container__input.currency {
+            flex-grow: 2;
+            margin-left: 0;
+            margin-top: 16px;
+            margin-bottom: 16px; } }
+    .c-container .c-container__content .c-container__messages {
+      padding: 8px;
+      margin-top: 16px;
+      border-radius: 4px;
+      display: none; }
+      .c-container .c-container__content .c-container__messages.success {
+        display: block;
+        color: #00B7FF;
+        background-color: #ccecff;
+        border: 1px solid #00B7FF; }
+      .c-container .c-container__content .c-container__messages.error {
+        display: block;
+        color: #ca152b;
+        background-color: #ffcad0;
+        border: 1px solid #ca152b; }
+    .c-container .c-container__content label {
+      margin-right: 16px; }
+    .c-container .c-container__content input, .c-container .c-container__content select {
+      display: block;
+      height: 40px;
+      border-radius: 4px;
+      font-size: 16px;
+      margin-top: 4px;
+      border: 1px solid #bfd1db; }
+    .c-container .c-container__content input[type='number'] {
+      padding: 0 16px;
+      text-align: right; }
+      .c-container .c-container__content input[type='number']::-webkit-outer-spin-button, .c-container .c-container__content input[type='number']::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0; }
+    .c-container .c-container__content button {
+      height: 48px;
+      background: #00b7ff;
+      border-radius: 4px;
+      font-family: AvertaPE, Arial, Helvetica, sans-serif;
+      font-size: 14px;
+      line-height: 24px;
+      align-items: center;
+      text-align: center;
+      text-transform: uppercase;
+      color: #fff;
+      border-color: #00b7ff;
+      vertical-align: middle;
+      white-space: nowrap;
+      text-decoration: none;
+      border: 1px solid transparent;
+      outline: 0 none !important;
+      touch-action: manipulation;
+      cursor: pointer; }
+
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,161 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+
+    <div class="c-background">
+      <div class="c-background__logo"></div>
+      <div class="c-background__links">
+        <a href="http://doc.gestpay.it">Documentazione</a>
+        <a href="http://api.gestpay.it">API</a>
+      </div>
+      <div class="c-container">
+        <div class="c-container__content">
+          <div class="c-container__inputs">
+            <div class="c-container__input">
+              <label>Amount</label>
+              <input type="number" value="5.00" name="amount" id="amount" min="0">
+            </div>
+            <div class="c-container__input currency">
+              <label>Currency</label>
+              <select name="currency" id="currency">
+                <option checked value="EUR">EUR</option>
+              </select>
+            </div>
+          </div>
+          <button id="submitButton" >Test Lightbox</button>
+          <div class="c-container__messages" id="box-risultato">
+            <b>Codice</b>: <span id="codice"></span><br>
+            <b>Messaggio</b>: <span id=messaggio></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
+
+<script>
+  const amountInput = document.getElementById("amount")
+  const currencyInput = document.getElementById("currency")
+  const button = document.getElementById("submitButton");
+  const boxRisultato = document.getElementById("box-risultato")
+  const codice = document.getElementById("codice")
+  const messaggio = document.getElementById("messaggio")
+
+  const browsers = getBrowser()
+  button.onclick = function() {
+    callSandbox()
+  }
+
+  callSandbox = function() {
+    boxRisultato.classList.remove("error");
+    boxRisultato.classList.remove("success");
+
+    var amount = amountInput.value;
+    var currency = currencyInput.value
+
+    if(browsers.isIE) {
+      openSandboxIE(amount, currency)
+    } else {
+      openSandboxStandard(amount, currency)
+    }
+  }
+
+  manageLightbox = function(data) {
+    const paymentIdentity = {
+      paymentId: data.payload.paymentID,
+      paymentToken: data.payload.paymentToken
+    }
+
+    axerve.lightBox.shop = "LightboxTest";
+    axerve.lightBox.open(paymentIdentity.paymentId, paymentIdentity.paymentToken, function(response) {
+      console.log(response);
+      if(response.error.code !== "0" && response.error.code !== null && response.status !== "OK" && response.status !== "XX") {
+        boxRisultato.classList.add("error")
+        boxRisultato.classList.remove("success")
+        boxRisultato.innerHTML = "<b>Codice:</b> " + response.error.code +"<br><b>Messaggio:</b> " + response.error.description
+      } else {
+        boxRisultato.classList.add("success")
+        boxRisultato.classList.remove("error");
+        boxRisultato.innerHTML = "<b>paymentId:</b> " + response.paymentId +"<br><b>responseUrl:</b> <a href='" + response.responseURL + "'>" + response.responseURL + "</a>"
+      }
+    });
+  }
+
+  openSandboxIE = function(amount, currency) {
+    var xhr = new XMLHttpRequest()
+
+    xhr.onreadystatechange = function(response) {
+      if (xhr.readyState === 4) {
+        manageLightbox(JSON.parse(xhr.responseText))
+      }
+    }
+
+    xhr.open('POST', 'https://sandbox.gestpay.net/api/v1/payment/create/', true)
+    xhr.setRequestHeader('Authorization', 'apikey TGlnaHRib3hUZXN0IyNlc2VyY2VudGUgcGVyIHRlc3Qgc3UgbGlnaHRib3gjIzE4LzEwLzIwMTkgMTE6MDc6NDY=')
+    xhr.setRequestHeader('Content-Type', 'application/json')
+    xhr.setRequestHeader('Accept', 'application/json')
+    xhr.send(JSON.stringify({  
+      "shopLogin": "LightboxTest",
+      "amount": amount,
+      "currency": currency,
+      "shopTransactionID": "my-custom-id"
+    }))    
+  }  
+
+  openSandboxStandard = function(amount, currency) {
+  
+    fetch('https://sandbox.gestpay.net/api/v1/payment/create/',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': 'apikey TGlnaHRib3hUZXN0IyNlc2VyY2VudGUgcGVyIHRlc3Qgc3UgbGlnaHRib3gjIzE4LzEwLzIwMTkgMTE6MDc6NDY=',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({  
+          "shopLogin": "LightboxTest",
+          "amount": amount,
+          "currency": currency,
+          "shopTransactionID": "my-custom-id"
+        })
+      }
+    ).then(function(result) {
+      return result.json();
+    }).then(function(data) {
+      if(data.error.code !== "0") {
+        alert(data.error.description)
+      } else {
+        manageLightbox(data)
+      }
+    })
+
+  }
+
+  function getBrowser() {
+    // Opera 8.0+
+    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    // Safari 3.0+ "[object HTMLElementConstructor]" 
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+    // Internet Explorer 6-11
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    // Edge 20+
+    var isEdge = !isIE && !!window.StyleMedia;
+    // Chrome 1 - 71
+    var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+
+    if(!isChrome && !(isOpera || isFirefox || isSafari || isIE || isEdge)) {
+      isChrome = true
+    }
+    
+    return {
+      isOpera: isOpera,
+      isFirefox: isFirefox,
+      isSafari: isSafari,
+      isIE: isIE,
+      isEdge: isEdge,
+      isChrome: isChrome
+    }
+  }
+</script>
+
+{% endblock %}

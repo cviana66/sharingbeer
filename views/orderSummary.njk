@@ -241,8 +241,8 @@
             if (data.error.code == "0") {
               //axerve.debug = 'true'
               axerve.lightBox.shop = data.shopLogin;              
-              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken, function(response) {       
-                post('/axerve_response', {'error_code': response.error.code,
+              axerve.lightBox.open(data.payload.paymentID, data.payload.paymentToken,  function(response) {       
+                 post('/axerve_response', {'error_code': response.error.code,
                                           'error_description': response.error.description,
                                           'status': response.status,
                                           'payment_id': response.paymentId,

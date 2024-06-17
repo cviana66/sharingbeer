@@ -408,20 +408,9 @@ app.get('/response_negativa',  function(req,res) {
 });
 
 
-/*
-app.get('/testAx', async function(req,res){
-  try {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    
-    var ret =  await updateStatusPayment('664e2e0d6823b9f6750a2b42','6659d8bd19cb077db92f13ac','OK',session,mongoose);
-    //console.debug('RET: ',ret)  userId, orderId, status, session, mongoose)
-    
-    await session.commitTransaction();
-  }catch(e){
-    console.error(e)
-  }
-})
-*/
 
+app.get('/ax', async function(req,res){
+ res.render('ax.njk') 
+})
+ 
 };
