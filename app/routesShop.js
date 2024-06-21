@@ -70,10 +70,17 @@ module.exports = function(app, moment, mongoose) {
 // ORDER SUMMARY  
 // !!!ATTENZIONE!!! in routesRegiter c'è una parte di gestione del della consegna in /register (POST)
 // =================================================================================================
+
+	app.get('/orderSummary_', lib.isLoggedIn, async function(req,res){
+		//return res.render('info.njk', {message: 'in attesa', type: "danger"});
+		console.debug('ORDER SUMMARY GET query',req.query)
+		console.debug('ORDER SUMMARY GET body',req.body)
+
+	});
 //-------------------------------------------
 //POST
 //-------------------------------------------
-  app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
+  app.all('/orderSummary', lib.isLoggedIn, async function(req,res){
 
   	var address = [];
 
@@ -98,7 +105,7 @@ module.exports = function(app, moment, mongoose) {
       //--------------------------------------
       // Caso di ritiro presso Sede Birrificio
       //--------------------------------------
-      if (req.body.typeOfDelivery == 'ritiro' ) {
+      if (req.query.typeOfDelivery == 'ritiro' ) {
         req.session.deliveryType =  "Ritiro";
         // Booze attualmente disponibili
         console.debug('POINT DISCOUNT BOOZE: ', req.user.local.booze);
@@ -157,7 +164,7 @@ module.exports = function(app, moment, mongoose) {
         address = await User.aggregate([
             {$match:{"_id":req.user._id}}, 
             {$unwind: "$addresses"}, 
-            {$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
+            {$match :{ "addresses._id":mongoose.Types.ObjectId(req.query.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
         req.session.shippingAddress = address[0].addresses;         

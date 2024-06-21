@@ -46,7 +46,7 @@
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:15px;">
         <span style="font-size:0.9em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
       </div>
-      <form role="form" action="/orderSummary" method="post" id="selectedAddress">
+      <form role="form" action="/orderSummary?addressID={{address.id}}&typeOfDelivery=ritiro" method="get" id="selectedAddress">
         <div class="card text-white" style="background-color:#6B1628;border-color:#903246;margin-bottom:10px;">
           <div class="card-body">
             <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!</p>
@@ -65,7 +65,7 @@
           <span style="font-size:0.9em;">oppure scegli tra i tuoi preferiti</span>
         </div>
       {%for address in addresses %}
-        <form role="form" action="/orderSummary" method="post" id="selectedAddress">
+        <form role="form" action="/orderSummary?addressID={{address.id}}&typeOfDelivery=consegna" method="get" id="selectedAddress">
           <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
             <div class="card-body">
               <p class="card-text text-center" style="font-size:1.0em;">{{address.name.first}} {{address.name.last}}, {{address.address}} {{address.houseNumber}}, {{address.city}} - {{address.postcode}} ({{address.province}})</p>

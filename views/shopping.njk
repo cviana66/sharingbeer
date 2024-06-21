@@ -25,7 +25,11 @@
       {% for prod in purchase.orders.items %}
       <table style="margin: 5px 5px 5px 5px;">
         <tr>
-          <td width="16%" rowspan="3" style="padding: 5px;"> <img src="{{prod.linkImage}}" width="100%" height="100%"> </td>
+          <td width="16%" rowspan="3" style="padding: 5px;"> 
+            <div>
+              <img src="{{prod.linkImage}}" width="100%" height="100%"> 
+            </div>
+          </td>
           <td>{{prod.name}}</td>
         </tr>
         <tr>
@@ -58,8 +62,12 @@
       
       {% for prod in purchase.orders.items %}
       <table style="margin: 5px 5px 5px 5px;">
-        <tr >
-          <td width="16%" rowspan="3" style="padding: 5px;">  <img src="{{prod.linkImage}}" width="100%" height="100%"> </td>
+        <tr>
+          <td width="16%" rowspan="3" style="padding: 5px;">  
+            <div></div>
+              <img src="{{prod.linkImage}}" width="100%" height="100%"> 
+            </div>
+          </td>
           <td>{{prod.name}}</td>
         </tr>
         <tr>
@@ -89,8 +97,12 @@
       
       {% for prod in purchase.orders.items %}
       <table style="margin: 5px 5px 5px 5px;">
-        <tr >
-          <td width="16%" rowspan="3" style="padding: 5px;">  <img src="{{prod.linkImage}}" width="100%" height="100%"> </td>
+        <tr>
+          <td width="16%" rowspan="3" style="padding: 5px;">
+            <div>
+              <img src="{{prod.linkImage}}" width="100%" height="100%"> 
+            </div>
+          </td>
           <td>{{prod.name}}</td>
         </tr>
         <tr>
