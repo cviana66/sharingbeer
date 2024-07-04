@@ -25,11 +25,7 @@ console.debug('OGGI: ',moment().utc("Europe/Rome").format('dddd DD MMMM YYYY - H
 let d = new Date(moment().utc("Europe/Rome").format())
 console.debug('OGGI FORMATO DATE:', d )
 
-console.debug('GESTPAY =', process.env.SHOPLOGIN)
-
-
-/*const aia = 'https://sandbox.gestpay.net/pagam/src/index.html'
-console.debug('SPLIT', aia.split("/pagam/"));*/
+console.debug('GESTPAY =', process.env.SHOPLOGIN);
 
 
 //=================================================
@@ -79,8 +75,8 @@ global.debug = true;
     Delivery price
     ======================================================================= */
 
-global.priceLocal = ['5.50','4.20','2.80','1.50','0.40'] 
-global.priceCurier =  ['7.70','7.90','6.60','6.60','5.20','11.10','9.80','8.40','7.70','11.40','10.00','8.70','8.60','7.30','9.90','4.60','3.20'] 
+global.priceLocal = ['5.50','4.20','2.80','1.50','0.40'];
+global.priceCurier =  ['7.70','7.90','6.60','6.60','5.20','11.10','9.80','8.40','7.70','11.40','10.00','8.70','8.60','7.30','9.90','4.60','3.20'];
 
 /*  =======================================================================
     inviti per ogni acquisto e punti pinta per 1 birra gratis0
@@ -91,6 +87,7 @@ global.invitiPerOgniAcquisto = 4;
 global.puntiPintaPerUnaBottiglia = 12;
 global.puntiPintaPerAcquisto = 1;
 // equivalente in € di 1 Punto Pinta = PrezzoBirra / numBottigliePerBeerBox / puntiPintaPerUnaBottiglia
+global.mkt = 0.45;
 
 /*  =======================================================================
     Debug utility
@@ -220,7 +217,8 @@ var SharingBeer = function() {
                 resave: false,
                 cookie: {   secure: false,
                             expires: 3600000,
-                            sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                            sameSite: 'Lax'
+                        }, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                 //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                 store: MongoStore.create({
                     client: mongoose.connection.getClient(),
@@ -241,7 +239,8 @@ var SharingBeer = function() {
                 resave: false,
                 cookie: {   secure: true, // serve secure cookies
                             expires: 3600000,
-                            sameSite: 'strict'}, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+                            sameSite: 'Lax'
+                        }, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                   //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                   store: MongoStore.create({
                     client: mongoose.connection.getClient(),

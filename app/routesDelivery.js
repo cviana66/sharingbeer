@@ -15,7 +15,7 @@ async function loadDeliveryData(moment) {
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
 	    { $match: { $and: [{'orders.status': 'OK'}, 
-	    				   {'orders.paypal.s2sStatus': 'OK'}, 
+	    				   {'orders.payment.s2sStatus': 'OK'}, 
 	    				   {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
 	    { $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
 	  ]
@@ -25,7 +25,7 @@ async function loadDeliveryData(moment) {
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
 	    { $match: { $and: [{'orders.status': 'OK'}, 
-	    				   {'orders.paypal.s2sStatus': 'OK'}, 
+	    				   {'orders.payment.s2sStatus': 'OK'}, 
 	    				   {'orders.deliveryType': 'Consegna'}] } }
 	  ]
 	);

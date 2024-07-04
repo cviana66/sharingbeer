@@ -31,8 +31,12 @@
       </div>
     </div>
     <script src="https://sandbox.gestpay.net/pagam/javascript/axerve.js"></script>
-
+  
 <script>
+  if (axerve.lightBox.IsiOS) {
+    axerve.lightBox.requestType = 'Desktop';
+  }
+
   const amountInput = document.getElementById("amount")
   const currencyInput = document.getElementById("currency")
   const button = document.getElementById("submitButton");

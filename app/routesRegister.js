@@ -45,7 +45,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   })
 
 
-  app.post('/overpass/istat', async function(req, res) {
+  app.post('/overpass/istat', lib.isLoggedIn, async function(req, res) {
     var newArr = [];
     var option = '[out:json];'+
              'area[name="'+req.body.city+'"]["ref:ISTAT"="'+req.body.istat+'"]->.a;' +
@@ -480,10 +480,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
           req.session.pointDiscount = req.user.local.booze.toFixed(2);  
-          req.session.booze = 0
         } else if (req.user.local.booze > req.session.totalPrc/2) {
           req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
-          req.session.booze = req.session.booze - (req.session.totalPrc/2)          
         } else {
           req.session.pointDiscount = 0.00.toFixed(2); 
         }
@@ -749,100 +747,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           res.render('video.njk')
     });
 
-
-    /************************************
-    /* versione con invio mail che 
-    /* per privacy non si può utilizzare
-    /************************************
-    app.post('/recomm', lib.isLoggedIn, async (req, res) => {
-
-        // controllo che ci siano ancora inviti diposnibili
-        if (req.session.friendsInvited >= req.session.invitationAvailable) {
-            req.flash('error', "Purtropo non hai inviti disponibili! Acquista per ricevere nuoi Punti Invitamici");
-            return res.render('friend.njk', {
-                message: req.flash('error'),
-                type: "warning",
-                invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                friendsInvited: req.session.friendsInvited,
-                percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-            });
-        }
-        //START TRANSACTION
-        const session = await mongoose.startSession();
-        session.startTransaction();
-
-        try {
-          const opts = { session };
-
-          // creo nuovo user con i dati segnalati dal PARENT
-          var password = lib.generatePassword(6);
-          const newUser = await new User();
-          // set the user's local credentials
-          newUser.local.email = req.body.email;
-          newUser.local.invitationEmail = req.body.email;
-          newUser.local.password = newUser.generateHash(password);
-          newUser.local.name.first = lib.capitalizeFirstLetter(req.body.firstName);
-          newUser.local.idParent = req.user._id;
-          //id parent
-          newUser.local.status = 'new';
-          // status
-          newUser.local.resetPasswordToken = lib.generateToken(20);
-          // token
-          newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365);
-          // 1 hour in secondi * 24 * 365 = 1 anno
-
-          await newUser.save(opts);
-
-          // Save a new friends in mongodb
-          var newFriend = new Friend();
-          newFriend.id = req.user._id;            // id parent
-          newFriend.emailParent = req.user.email; // mail user
-          newFriend.emailFriend = newUser.email;  // mail friend
-          newFriend.firstNameFriend = newUser.name.first; //name's friend
-
-          await newFriend.save(opts);
-
-          // send email to Friend
-          await lib.sendmailToPerson(newUser.name.first, newUser.email, '', newUser.resetPasswordToken, req.user.name.first, req.user.name.last, req.user.email, 'friend')
-          await lib.sendmailToPerson(req.user.name.first, req.user.email, '', '', newUser.name.first, '', newUser.email, 'parent')
-
-          await session.commitTransaction();
-          await session.endSession();
-
-          req.session.friendsInvited += 1;
-          req.flash('message', 'You have added a new Friend');
-          res.render('friend.njk', {
-              message: req.flash('message'),
-              type: "info",
-              invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-              friendsInvited: req.session.friendsInvited,
-              percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-          });
-
-        } catch (e) {
-          console.log("ERRORE TRANSAZIONE", e);
-          await session.abortTransaction();
-          await session.endSession();
-          if (e.code === 11000) {
-            //duplicate key: email
-            let msg = 'That email is already taken, please try another';
-            req.flash('error', msg);
-            res.render('friend.njk', {
-                message: req.flash('error'),
-                type: "warning",
-                invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-                friendsInvited: req.session.friendsInvited,
-                percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
-            });
-          } else {
-            let msg = 'Something bad happened! Please try again';
-            req.flash('error', msg);
-            console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /recomm" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} TRANSACTION: '+e+' FLASH: '+msg);
-            return res.render('info.njk', {message: req.flash('error'), type: "danger"});
-          }
-        }
-    }); */
-
 // =================================================================================================
 // UTILITY
 // =================================================================================================
@@ -897,9 +801,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         server = req.protocol+'://'+req.hostname;
       }
       
-      const html = mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server)
+      const html = mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate(), server)
       lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
-      res.send(mailorder(req.user.local.name.first, req.session.order._id, lib.deliveryDate(), server))
+      res.send(mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate(), server))
       return
 
     }) 

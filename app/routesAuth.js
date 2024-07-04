@@ -85,7 +85,7 @@ module.exports = function(app, passport, moment) {
       console.log('MESSAGGIO',msg );
       res.render('profile.njk', {
           user     : req.user.local, // get the user out of session and pass to template
-          booze    : req.user.local.booze.toFixed(1),
+          booze    : req.user.local.booze.toFixed(2),
           friends  : nFa,         
           invites  : nF,
           message  : msg,

@@ -18,7 +18,6 @@ module.exports = {
 
                   // if user is authenticated in the session, carry on
                   if (req.isAuthenticated())  {                    
-
                       return next();
                   } else {
                     // if they aren't redirect them to the Login page
@@ -27,7 +26,7 @@ module.exports = {
                     res.redirect('/login');
                   }
               },
-  isAdmin: function isLoggedIn(req, res, next) {
+  isAdmin: function isLoggedAsAdmin(req, res, next) {
 
                   // if user is authenticated in the session, carry on
                   if (req.isAuthenticated() && req.user.local.status == 'admin')  {                    

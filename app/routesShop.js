@@ -17,7 +17,7 @@ module.exports = function(app, moment, mongoose) {
 		var ordiniInConsegna = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Consegna'},{'orders.paypal.s2sStatus':'OK'}]}},
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Consegna'},{'orders.payment.s2sStatus':'OK'}]}},
 								{$project:{_id:0,addresses:0,friends:0,local:0}},
 								{$sort:{'orders.dateInsert': -1} }]);
 	
@@ -31,8 +31,8 @@ module.exports = function(app, moment, mongoose) {
 		var ordiniInRitiro = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Ritiro'},{'orders.paypal.s2sStatus':'OK'}]}},
-								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}])
+								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Ritiro'},{'orders.payment.s2sStatus':'OK'}]}},
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}}])
 		for ( var i in  ordiniInRitiro) {			
 			ordiniInRitiro[i].orders.dateInsert = moment(ordiniInRitiro[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
 		}
@@ -41,7 +41,7 @@ module.exports = function(app, moment, mongoose) {
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
 								{$match:{'orders.status':'OK - CONSEGNATO'}},
-								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0}}]);
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}}]);
 		for ( var i in  ordiniConsegnati) {			
 			ordiniConsegnati[i].orders.dateInsert = moment(ordiniConsegnati[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
 		}
@@ -69,18 +69,11 @@ module.exports = function(app, moment, mongoose) {
 // =================================================================================================
 // ORDER SUMMARY  
 // !!!ATTENZIONE!!! in routesRegiter c'è una parte di gestione del della consegna in /register (POST)
-// =================================================================================================
-
-	app.get('/orderSummary_', lib.isLoggedIn, async function(req,res){
-		//return res.render('info.njk', {message: 'in attesa', type: "danger"});
-		console.debug('ORDER SUMMARY GET query',req.query)
-		console.debug('ORDER SUMMARY GET body',req.body)
-
-	});
+// ==============================================================================================
 //-------------------------------------------
 //POST
 //-------------------------------------------
-  app.all('/orderSummary', lib.isLoggedIn, async function(req,res){
+  app.get('/orderSummary', lib.isLoggedIn, async function(req,res){
 
   	var address = [];
 
@@ -103,16 +96,14 @@ module.exports = function(app, moment, mongoose) {
     try{
 
       //--------------------------------------
-      // Caso di ritiro presso Sede Birrificio
+      // Caso di RITIRO presso Sede Birrificio
       //--------------------------------------
       if (req.query.typeOfDelivery == 'ritiro' ) {
-        req.session.deliveryType =  "Ritiro";
-        // Booze attualmente disponibili
-        console.debug('POINT DISCOUNT BOOZE: ', req.user.local.booze);
-        req.session.booze = req.user.local.booze;
+        req.session.deliveryType =  "Ritiro"; //session usata in Axerve
+        console.debug('POINT DISCOUNT BOOZE DISPONIBILI: ', req.user.local.booze);
         
         // Costo spedizione
-        req.session.shippingCost = 0.00.toFixed(2);
+        req.session.shippingCost = 0.00.toFixed(2); //session usata in Axerve
 
         //==============================================================================
         // Vantaggio dai tuoi amici 
@@ -124,19 +115,15 @@ module.exports = function(app, moment, mongoose) {
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
         	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
-        	req.session.booze = 0
         } else if (req.user.local.booze > req.session.totalPrc/2) {
         	req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
-        	req.session.booze = req.session.booze - (req.session.totalPrc/2)        	
         } else {
         	 req.session.pointDiscount = 0.00.toFixed(2); 
         }
-        console.debug('NEW BOOZE: ',req.session.booze)        
         
         var addressRitiro = await User.aggregate([
             {$match:{"local.email": "birrificioviana@gmail.com"}}, 
             {$unwind: "$addresses"}, 
-            //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
         address = addressRitiro
@@ -155,10 +142,8 @@ module.exports = function(app, moment, mongoose) {
         
       } else {
       //-------------------------------------------------------
-      // Caso di spedizione presso all'indirizzo indirizzo 
+      // Caso di CONSEGNA presso all'indirizzo indirizzo 
       //-------------------------------------------------------
-        //TODO : rendere parametrico l'importo shipping e i discount
-        
         req.session.deliveryType =  "Consegna"
         
         address = await User.aggregate([
@@ -168,7 +153,6 @@ module.exports = function(app, moment, mongoose) {
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
         req.session.shippingAddress = address[0].addresses;         
-        //console.debug('ADDRESS[0]: ',address[0].addresses)
 
         let customerAddress = address[0].addresses.address + ' ' + 
                           address[0].addresses.houseNumber + ' ' +
@@ -188,7 +172,7 @@ module.exports = function(app, moment, mongoose) {
             req.session.shippingCost = '0.00';
           } else {
             console.debug('PRICE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
-            req.session.shippingCost = priceLocal[req.session.numProducts-1]
+            req.session.shippingCost = priceLocal[req.session.numProducts-1] // array Global definita in server.js con i prezzi di trasporto
           }
         }
         //==============================================================================
@@ -201,16 +185,12 @@ module.exports = function(app, moment, mongoose) {
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
         	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
-        	req.session.booze = 0
         } else if (req.user.local.booze > req.session.totalPrc/2) {
         	req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
-        	req.session.booze = req.session.booze - (req.session.totalPrc/2)        	
         } else {
         	req.session.pointDiscount = 0.00.toFixed(2); 
         }
       }
-      console.debug('FORAMATO DATA DATA: ', lib.deliveryDate('formato_data') )
-      console.debug('FORAMATO DATA TEXT: ', lib.deliveryDate() )
       
       res.render('orderSummary.njk', {
         cartItems   : req.session.cartItems,
@@ -241,7 +221,7 @@ module.exports = function(app, moment, mongoose) {
 // =============================================================================
 // ORDER OUTCOME ===============================================================
 // =============================================================================
-//GET
+/*GET
 	app.get('/orderOutcome', lib.isLoggedIn, function(req, res) {
 	
 	//TODO da finire l'implemetazione ... solo abbozzata 
@@ -254,21 +234,17 @@ module.exports = function(app, moment, mongoose) {
     })
 
   });
-
+*/
   //POST
 	app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
-	
-   	const status = req.body.status;
-    const err = req.body.err;
-    console.debug('ERR: ', err)
-      
+   	const status = req.body.status;    
+    
     res.render('orderOutcome.njk', {
       status  : status,
       user    : req.user,
       deliveryDate: lib.deliveryDate(),
       numProducts : req.session.numProducts
     })
-
   });
 
 

@@ -6,26 +6,22 @@ const mailorder     = require('../config/mailOrder');
 const {transMsg}    = require("./msgHandler");
 const Product       = require('./models/product.js');
 const Recovery      = require('./models/recovery');
-
-var {getUserByPaymentIdAndShopLoginAndToken}  = require('../app/axerveResposeManagement');
-var {getUserByPaymentIdAndShopLogin}  = require('../app/axerveResposeManagement');
-var {updateStatusPayment}             = require('../app/axerveResposeManagement');
-var {addInviteAndPoint}               = require('../app/axerveResposeManagement');
-var {addItemsInProducts}              = require('../app/axerveResposeManagement');
+const GestpayService = require('./gestpay_service/GestpayService');
+const axerveResMgm  = require('../app/axerveResposeManagement');
 
 module.exports = function(app,mongoose,moment) {
 
 var counter;
 var users;
+const gestpayService = new GestpayService();
 
 //-------------------------------------------
 //POST
 //-------------------------------------------
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
+    
     var cart = req.session.cart;
     const currency='EUR';
-
-    //const shopLogin='GESPAY63388' 
     const shopLogin=process.env.SHOPLOGIN;
 
     req.session.order = {};
@@ -57,360 +53,245 @@ var users;
       }
       //=============================================
 
-      const user = await User.findById(req.user._id);
-      const orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
-      req.session.order._id = orderId;                // _id in sessione usato per update ordine in axerve_response
-      req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2)
+      const _orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
+      const orderId  = _orderId.toString();
+      const amount   = req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2)
       
-      console.debug('Sharingbeer ORDER ID :', req.session.order._id.toString());
+      //================================================
+      // Chiamo Axerve per ottenere la stringa ENCRYPT
+      //================================================
+      console.debug('IMPORTO CALCOLATO', (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2));
+      console.debug('IMPORTO in SESSIONE', req.session.order.totalaAmount)
 
+      const url = 'https://sandbox.gestpay.net/pagam/pagam.aspx'; 
+      if (process.env.MODE_ENV == 'Production') {
+            const url = 'https://ecomm.sella.it/pagam/pagam.aspx';
+      } 
+
+      const cryptedString = await gestpayService.encrypt({
+          amount,
+          orderId
+        })
+        .then(cryptedString => {          
+          return cryptedString;        
+        })
+        .catch(err => {
+          console.log('ERRORE in encrypt', err)
+          throw new Error("Encrypt fallita")
+        });  
+      
       //==========================================
-      // Chiamo Axerve per ottenere ID e Token
+      // Inserimento dati in MongoDB
       //==========================================
-      console.debug('IMPORTO', (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2));
-      await fetch('https://sandbox.gestpay.net/api/v1/payment/create/', //TODO: modificare quando PRODUZIONE
-        {
-          method: 'POST',
-          headers: {
-            "Content-Type"  : "application/json",  
-            "Authorization" : process.env.APIKEY
-          },
-          body: JSON.stringify({  
-            "shopLogin"         : shopLogin,
-            "amount"            : req.session.order.totalaAmount,
-            "currency"          : currency,
-            "shopTransactionID" : req.session.order._id.toString()
-          })
-        }
-      ).then(function(result) {
-        console.debug("RESULT -> : ",JSON.stringify(result));
-        return result.json();
-      }).then (async function(data){
-        console.debug("DATA -> ", JSON.stringify(data));
+      const user = await User.findById(req.user._id);
+      user.orders.push({
+        _id         : _orderId,
+        email       : req.user.local.email,
+        dateInsert  : new Date(moment().utc("Europe/Rome").format()),
+        status      : "CREATED",
+        fatturaPEC  : req.session.fatturaPEC,
+        fatturaSDI  : req.session.fatturaSDI,
+        pointsDiscount  : Number(req.session.pointDiscount).toFixed(2),
+        shippingCost    : Number(req.session.shippingCost).toFixed(2),
+        deliveryType    : req.session.deliveryType,
+        deliveryDate    : lib.deliveryDate('formato_data'),
+        totalPriceBeer  : Number(req.session.totalPrc).toFixed(2),
+        totalPriceTotal : Number(req.session.order.totalaAmount).toFixed(2),
+        items     : req.session.cartItems.items,
+        totalQty  : req.session.totalQty,        
+        address   : req.session.shippingAddress,
+        'payment.shopLogin'        : shopLogin,
+        'payment.createTime'       : moment().utc("Europe/Rome").format('DD/MM/yyyy HH:mm:ss'),
+        'payment.orderId'          : orderId,
+        'payment.currencyAmount'   : currency,
+        'payment.totalAmount'      : req.session.order.totalaAmount,
+        'payment.paymentType'      : 'Banca Sella'        
+      });          
+      let saveOrder = await user.save(opts);
+      await session.commitTransaction();
 
-        if (data.error.code !== "0") {
-          data.ok = false;
-          console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} ' + JSON.stringify(data));
-          await session.abortTransaction();
-          res.status(500).json(data);  
-
-        } else {
-          req.session.paymentId = data.payload.paymentID;
-          //==========================================
-          // Inserimento dati in MongoDB
-          //==========================================
-          user.orders.push({
-            _id         : orderId,
-            email       : req.user.local.email,
-            dateInsert  : new Date(moment().utc("Europe/Rome").format()),
-            status      : "CREATED",
-            fatturaPEC  : req.session.fatturaPEC,
-            fatturaSDI  : req.session.fatturaSDI,
-            pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),
-            shipping          : Number(req.session.shippingCost).toFixed(2),
-            deliveryType : req.session.deliveryType,
-            deliveryDate : lib.deliveryDate('formato_data'),
-            totalPriceBeer    : Number(req.session.totalPrc).toFixed(2),
-            totalPriceTotal   : Number(req.session.order.totalaAmount).toFixed(2),
-            items     : req.session.cartItems.items,
-            totalQty  : req.session.totalQty,        
-            address   : req.session.shippingAddress,
-            'paypal.shopLogin'        : shopLogin,
-            'paypal.createTime'       : moment().utc("Europe/Rome").format('DD/MM/yyyy HH:mm:ss'),
-            'paypal.orderId'          : req.session.order._id.toString(),
-            'paypal.currencyAmount'   : currency,
-            'paypal.totalAmount'      : req.session.order.totalaAmount,
-            'paypal.transactionId'    : data.payload.paymentID,
-            'paypal.token'            : data.payload.paymentToken,
-            'paypal.errorCode'        : data.error.code,
-            'paypal.errorDescription' : data.error.description     
-          });
-          let saveOrder = await user.save(opts);
-          await session.commitTransaction();
-          data.shopLogin = shopLogin;
-          res.status(200).json(data);  
-        }
-      })
+      let data = {}
+      data.shopLogin = shopLogin;
+      data.cryptedString = cryptedString,
+      data.url = url;
+      console.debug('DATA', JSON.stringify(data,null,2))
+      res.status(200).send(data);  
 
     } catch (e) {
         console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
         await session.abortTransaction();
-        res.status(500).send()
+        res.status(400).send(e)
     } finally {
         await session.endSession();
     };
   });
 
-//-------------------------------------------
-//POST
-//-------------------------------------------
-  app.post('/axerve_response', lib.isLoggedIn, async function(req, res) {
-
-    const shopLogin = process.env.SHOPLOGIN
-
-    const error_code                    = req.body.error_code; 
-    const error_description             = req.body.error_description;    
-    const response_URL                  = req.body.response_URL;
-    const transaction_error_code        = req.body.transaction_error_code;
-    const transaction_error_description = req.body.transaction_error_description;
-    var status                          = req.body.status; if (status == "") status = "KO";
+//=============================================================
+// Chiamata usata da Axerve per allineamento Server TO Server
+//=============================================================
+  app.get('/response', async function(req, res) {
     
-    //const paymentId = req.session.paymentId;
-    var orderId     = req.session.order._id; if (orderId != undefined) orderId = orderId.toString();
-    //var booze       = req.session.booze;
-    const totalPrc  = req.session.totalPrc;
+    //================================================
+    // Chiamo Axerve per ottenere la stringa DENCRYPT
+    //================================================
+    let shopLogin     = req.query.a;
+    let cryptedString = req.query.b;
     
-    
-    const userId    = req.user.id.toString();
-    
-    //const parentId  = req.user.local.idParent;
-    //const name      = req.user.local.name.first;
-    //const userEmail = req.user.local.email;
+    const decryptedString = await gestpayService
+      .decrypt({
+        shopLogin,
+        cryptedString
+      })
+      .then(result => {
+        console.debug('Decrypt =>',result);
+        return result
+      })
+      .catch(err => {
+        console.log('ERRORE in encrypt', err)
+        throw new Error("Dencrypt fallita")
+      });
 
-    /*console.debug('ERROR_CODE -> ', error_code)
-    console.debug('ERROR_DESCRIPTION -> ',error_description)
-    console.debug('STATUS -> ', status)
-    console.debug('PAYMENT_ID -> ',paymentId)
-    console.debug('RESPONSE_URL -> ',response_URL)
-    console.debug('TRANSACTION_ERROR_CODE -> ', transaction_error_code)
-    console.debug('TRANSACTION_ERROR_DESCRIPTION -> ',transaction_error_description)*/
-
-    /*==========================================
+    //==========================================
     // Inizializzo la Transazione
     //==========================================
     const session = await mongoose.startSession();
-    session.startTransaction(); */
-  
+    session.startTransaction();
+    
     try {  
-      /*==========================================
-      // UPDATE Esito del pagamento 
-      //==========================================
-      console.debug('updateStatusPayment PARAMETER:',userId, orderId, status )
-      await updateStatusPayment(userId, orderId, status, session, mongoose); */
+    
+      const status  = decryptedString.TransactionResult;
+      const orderId = decryptedString.ShopTransactionID;
+      const user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin, orderId);
 
-      if (status == 'OK') {      
+      if (user.orders.status === 'CREATED') {
 
-        /*=====================================
-        // aggiungo possibilità di invito
-        // aggiungo punto Pinta al cliente Padre
-        //=====================================        
-        await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose) */
+        const _userId   = user._id;
+        const userId    = user._id.toString();
+        var   booze     = user.local.booze; //X
+        const totalPrc  = user.orders.totalPriceBeer; //X
+        const parentId  = user.local.idParent;
+        const name      = user.local.name.first;
+        const userEmail = user.local.email;
 
-        //=====================================
-        // Svuoto il carrello
-        //=====================================
-        req.session.cart = {}
-        req.session.order = {}
-        req.session.numProducts = 0
-
-        /*========================================
-        // INVIO EMAIL al CLIENTE
-        //========================================
-        const server = lib.getServer(req);
-        console.debug('SERVER',server);
+        //==========================================
+        // UPDATE Esito del pagamento 
+        //==========================================
+        let doc = await axerveResMgm.updateResponsePayment(_userId, decryptedString, session, mongoose);               
         
-        const html = mailorder(name, orderId, lib.deliveryDate(), server)
-        await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html) */
-        
-        res.render('orderOutcome.njk', {
-          status  : status,
-          //orderId : orderId,
-          user    : req.user,
-          deliveryDate: lib.deliveryDate(),
-          numProducts : req.session.numProducts
-        })
+        if ( status == 'OK') {            
+      
+          //=====================================
+          // aggiungo possibilità di invito
+          // aggiungo punto Pinta al cliente Padre
+          // decurto punti pinta al Cliente
+          //=====================================        
+          await axerveResMgm.updateInviteAndPoint(user, session, mongoose)
+          
+          //========================================
+          // INVIO EMAIL al CLIENTE
+          //========================================
+          const server = lib.getServer(req);
+          console.debug('MAIL',name, userEmail, orderId, lib.deliveryDate(), server);
+          
+          const html = mailorder(name, orderId, lib.deliveryDate(), server)
+          await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html);      
 
-      } else {
-
-        console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "GET /axerve_response" USERS_ID: {"_id":ObjectId("' + userId + '")} ORDER_ID: {"_id":ObjectId("' +orderId+ '")} Status pagamento KO - '+error_code+' '+error_description);
-        /*==============================================
-        // Ri-aggiungo i prodotti dalla disponibilità 
-        // per prodotto per acquisto non effettuato
-        //=============================================
-         addItemsInProducts(paymentId,shopLogin);*/
-
-        res.render('orderOutcome.njk', {
-          status  : status,
-          //orderId : orderId,
-          user    : req.user,
-          numProducts : req.session.numProducts
-        })
+        } else {
+          //==============================================
+          // Ri-aggiungo i prodotti nella disponibilità 
+          // per prodotto per acquisto non effettuato
+          //==============================================
+          axerveResMgm.addItemsInProductsByOrderId(orderId,shopLogin);
+        }
+        await session.commitTransaction();
       }
+    
+    } catch(e) {
+      console.error('ERRORE IN RESPONSE:',e);
+      await session.abortTransaction();
       
-      //await session.commitTransaction();
-
-    } catch (e) {
-      console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_response" USER: {_id:ObjectId("' + userId + '"} ORDER_ID: {"_id":ObjectId("' + orderId + '")} CATCH: '+e+' '+transaction_error_code+' '+transaction_error_description+' '+error_code+' '+error_description);
-      //await session.abortTransaction();
-
-      /*==============================================
-      // Ri-aggiungo i prodotti nella disponibilità 
-      // per prodotto per acquisto non effettuato
-      //=============================================
-      addItemsInProducts(paymentId,shopLogin); */
+      //==============================================
+      //RECOVERY in documento per recupero transazione    
+      //==============================================
+      console.debug('URL = ',lib.getServer(req)+'/response?a='+req.query.a+'&b='+req.query.b);
       
-      res.render('orderOutcome.njk', {
-          status  : 'KO',
-          user    : req.user,
-          numProducts : req.session.numProducts
-        })
+      const recoveryUrl = lib.getServer(req)+'/response?a='+req.query.a+'&b='+req.query.b;
+      const recoveryOrder = new Recovery({dateInsert: moment().utc("Europe/Rome").format(),
+                                          orderId:decryptedString.ShopTransactionID, 
+                                          url:recoveryUrl});
+      
+      recoveryOrder.save()
+      .then(function (doc) {
+        console.debug("RECOVERY ID",doc._id.toString());
+      }).catch(function (error) {
+        console.error(error);
+      });
+    
     } finally {
-        // session.endSession();
-    };
-  });
-
-//=============================================================
-// Chiamata usata da Axerve per  allineamento Server TO Server
-//=============================================================
-app.get('/response', async function(req, res) {
-  //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$project:{_id:0,addresses:0,friends:0,local:0,'orders.paypal':0,'orders.items':0}}])
-  //db.users.aggregate([{$unwind:"$orders"},{$match:{$and:[{'orders.paypal.transactionId':'1519209477078'},{'orders.paypal.shopLogin':'GESPAY96332'}]}},{$set :{'orders.paypal.shopLogin':'CIAO'}}])
-  console.debug('PARAMETRI RESPONSE: ',req.query);
-  //==========================================
-  // Inizializzo la Transazione
-  //==========================================
-  const session = await mongoose.startSession();
-  session.startTransaction();
-  try {  
-    //========================================================================
-    // Update Status S2S e Token in modo da invalidare una successiva chiamata
-    //========================================================================
-    const newToken = bcrypt.hashSync(req.query.paymentToken, bcrypt.genSaltSync(8), null);
-    console.debug('NEW TOKEN',newToken);
-
-    const status    = req.query.Status;
-    const paymentId = req.query.paymentID;
-    const shopLogin = req.query.a;
-    const paymentToken = req.query.paymentToken;
-
-    var updateStatusS2sAndToken = await User.findOneAndUpdate(
-                                {'orders.paypal.transactionId':paymentId, 'orders.paypal.shopLogin':shopLogin, 'orders.paypal.token':paymentToken},
-                                {$set :{'orders.$[elem].paypal.s2sStatus':status,
-                                        'orders.$[elem].paypal.token':newToken}},
-                                {arrayFilters:[{'elem.paypal.transactionId':{$eq:paymentId}}]}).session(session);    
-
-    //console.debug('RESPONSE updateStatusS2S', updateStatusS2S)     
-
-
-    const user = await getUserByPaymentIdAndShopLoginAndToken(req.query.paymentID,req.query.a, req.query.paymentToken);
-
-    const userId    = user._id.toString();
-    const orderId   = user.orders._id.toString();
-    var   booze     = user.local.booze;
-    const totalPrc  = user.orders.totalPriceBeer;
-    const parentId  = user.local.idParent;
-    const name      = user.local.name.first;
-    const userEmail = user.local.email;
-
-    //==========================================
-    // UPDATE Esito del pagamento 
-    //==========================================
-    console.debug('updateStatusPayment PARAMETER:',userId, orderId, status )
-    await updateStatusPayment(userId, orderId, status, session, mongoose);               
-
-    if ( status == 'OK') {            
-  
-      //=====================================
-      // aggiungo possibilità di invito
-      // aggiungo punto Pinta al cliente Padre
-      //=====================================        
-      await addInviteAndPoint(userId, parentId, booze, totalPrc, session, mongoose)
-      
-      //========================================
-      // INVIO EMAIL al CLIENTE
-      //========================================
-      const server = lib.getServer(req);
-      console.debug('MAIL',name, userEmail, orderId, lib.deliveryDate(), server);
-      
-      const html = mailorder(name, orderId, lib.deliveryDate(), server)
-      await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html);      
-
-    } else {
-      //==============================================
-      // Ri-aggiungo i prodotti nella disponibilità 
-      // per prodotto per acquisto non effettuato
-      //==============================================
-      addItemsInProducts(paymentId,shopLogin);
+      await session.endSession();
+      setTimeout(() => res.send('Fatto!'), 500);
     }
-    await session.commitTransaction();
-  
-  } catch(e) {
-    console.error('ERRORE IN RESPONSE:',e);
-    await session.abortTransaction();
-    
-    //==============================================
-    //RECOVERY in documento per recupero transazione    
-    //==============================================
-    console.debug('URL = ',lib.getServer(req)+'/response?a='+req.query.a+'&Status='+req.query.Status+'&paymentID='+req.query.paymentID+'&paymentToken='+req.query.paymentToken)
-    
-    const recoveryUrl = lib.getServer(req)+'/response?a='+req.query.a+'&Status='+req.query.Status+'&paymentID='+req.query.paymentID+'&paymentToken='+req.query.paymentToken;
-    const recoveryOrder = new Recovery({dateInsert: moment().utc("Europe/Rome").format(),
-                                        orderId:orderId, 
-                                        url:recoveryUrl})
-    
-    recoveryOrder.save()
-    .then(function (doc) {
-      console.debug("RECOVERY ID",doc._id.toString());
-    }).catch(function (error) {
-      console.error(error);
-    });
-  
-  } finally {
-    await session.endSession();
-    setTimeout(() => res.send('Fatto!'), 500);
-  }
-  
-/*
-  PARAMETRI:  {
-  a: 'GESPAY96332',
-  Status: 'KO',
-  paymentID: '1614179477016',
-  paymentToken: '09955144-f17c-4e42-8468-d7818ae00480'
-}
-*/
-});
-
-
-app.get('/response_positiva', async function(req,res) {  
-  //response_positiva?a=GESPAY96332&Status=OK&paymentID=1244109507430&paymentToken=2fbc938d-547a-4431-8da8-31539f967ccf
-  //const user = await getUserByPaymentIdAndShopLogin('1244109507430','GESPAY96332'); // TEST
-  
-  console.debug('PARAMETRI RISPOSTA POSITIVA: ',req.query);
-  try {
-    req.user = await getUserByPaymentIdAndShopLogin(req.query.paymentID,req.query.a);     
-    
-    //console.debug('REQ USER',req.user);
-    console.debug('REQ',req);
-
-    res.render('orderOutcome.njk', {
-          status  : req.query.Status,
-          deliveryDate : moment(req.user.orders.deliveryDate).format('dddd DD MMMM'),
-          user : req.user,
-          numProducts : 0
-    });
-  }catch (e){
-    console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /response_positiva"  PARAMETRI RISPOSTA POSITIVA: '+req.query+' ERRORE:'+e);
-    let msg = 'Ci dspiace, si è verificato un errore inatteso. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
-    req.flash('error', msg);
-    return res.render('info.njk', {
-                                    message: req.flash('error'),
-                                    type: "danger"
-                                  });
-  }    
-});
-
-app.get('/response_negativa',  function(req,res) {
-  
-  console.debug('PARAMETRI RISPOSTA NEGATIVA: ',req.query);
-  res.render('orderOutcome.njk', {
-          status  : 'KO'
   });
-});
 
+//====================================================
+// RESPONSE POSITIVA
+//====================================================
+  app.get('/response_positiva',lib.isLoggedIn, async function(req,res) {  
+    
+    //================================================
+    // Chiamo Axerve per ottenere la stringa DENCRYPT
+    //================================================
+    let shopLogin = req.query.a;
+    let cryptedString = req.query.b;
+    const decryptedString = await gestpayService
+      .decrypt({
+        shopLogin,
+        cryptedString
+      })
+      .then(result => {
+        console.log(result);
+        return result
+        //resultJson = JSON.stringify(result, null, 2);
+      })
+      .catch(err => {
+        console.log('ERRORE in encrypt', err)
+        throw new Error("Dencrypt fallita")
+      });
 
+    try {
+            
+      req.user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin,decryptedString.ShopTransactionID);
+          
+      //=====================================
+      // Svuoto il carrello
+      //=====================================
+      req.session.cart = {}
+      req.session.order = {}
+      req.session.numProducts = 0
 
-app.get('/ax', async function(req,res){
- res.render('ax.njk') 
-})
- 
+      res.render('orderOutcome.njk', {
+            status  : decryptedString.TransactionResult,
+            deliveryDate : moment(req.user.orders.deliveryDate).format('dddd DD MMMM'),
+            user : req.user,
+            numProducts : 0
+      });
+
+    }catch (e){
+      console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /response_positiva"  PARAMETRI RISPOSTA POSITIVA: '+req.query.toString()+' ERRORE:'+e);
+      let msg = 'Ci dispiace, si è verificato un errore inatteso. L\'esito del pagamento sarà verificato e ti manterremo informato. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
+      req.flash('error', msg);
+      return res.render('info.njk', {
+                                      message: req.flash('error'),
+                                      type: "danger"
+                                    });
+    }    
+  });
+
+  app.get('/response_negativa', lib.isLoggedIn, function(req,res) {
+
+    console.debug('PARAMETRI RISPOSTA NEGATIVA: ',req.query);
+    res.render('orderOutcome.njk', {
+            status  : 'KO'
+    });
+  });
 };
