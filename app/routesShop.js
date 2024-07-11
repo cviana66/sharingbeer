@@ -13,13 +13,16 @@ module.exports = function(app, moment, mongoose) {
 // =============================================================================
 //GET
 	app.get('/shopping', lib.isLoggedIn, async function (req,res) {
-
+		//====================================
+		// ORDINI IN CONSEGNA
+		//====================================
 		var ordiniInConsegna = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
 								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Consegna'},{'orders.payment.s2sStatus':'OK'}]}},
 								{$project:{_id:0,addresses:0,friends:0,local:0}},
-								{$sort:{'orders.dateInsert': -1} }]);
+								{$sort:{'orders.dateInsert': -1}}
+				]);
 	
 		for ( var i in  ordiniInConsegna) {			
 			//console.debug('DATA-ORA',ordiniInConsegna[i].orders.dateInsert)
@@ -27,34 +30,45 @@ module.exports = function(app, moment, mongoose) {
 			ordiniInConsegna[i].orders.deliveryDate = moment(ordiniInConsegna[i].orders.deliveryDate).format('dddd DD MMMM');
 
 		}
-
+		//====================================
+		// ORDINI IN RITIRO
+		//====================================
 		var ordiniInRitiro = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
 								{$match:{ $and: [{'orders.status':'OK'},{'orders.deliveryType':'Ritiro'},{'orders.payment.s2sStatus':'OK'}]}},
-								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}}])
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}},
+								{$sort:{'orders.dateInsert': -1}}
+				])
 		for ( var i in  ordiniInRitiro) {			
 			ordiniInRitiro[i].orders.dateInsert = moment(ordiniInRitiro[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
 		}
-
+		//====================================
+		// ORDINI CONSEGNATI
+		//====================================
 		var ordiniConsegnati = await User.aggregate([
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
-								{$match:{'orders.status':'OK - CONSEGNATO'}},
-								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}}]);
+								{$match:{'orders.delivery.status':'OK - CONSEGNATO'}},
+								//{$match:{'orders.status':'OK - CONSEGNATO'}}, //da rimettere quella sopra che questa è solo per fare la prova di visualizzazone
+								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}},
+								{$sort:{'orders.delivery.date_ref': -1}}
+								]);
 		for ( var i in  ordiniConsegnati) {			
-			ordiniConsegnati[i].orders.dateInsert = moment(ordiniConsegnati[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
+			ordiniConsegnati[i].orders.delivery.date_ref = moment(ordiniConsegnati[i].orders.delivery.date_ref).format('DD.MM.YYYY - HH:mm')
 		}
 		console.debug('ORDINI CONSEGNATI', JSON.stringify(ordiniConsegnati,null,2))
-
-		//console.debug('ORDINI IN CONSEGNA: ',JSON.stringify(ordiniInConsegna, null, 2))
-
+    
+    //---------------------
+		// INDIRIZZO DI RITIRO
+		//---------------------
 		var addressRitiro = await User.aggregate([
             {$match:{"local.email": "birrificioviana@gmail.com"}}, 
             {$unwind: "$addresses"}, 
             //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
+	  //console.debug('INDIRIZZO RITIRO', JSON.stringify(addressRitiro,null,2))
 
 		res.render('shopping.njk', {
                   ordiniInConsegna 	: ordiniInConsegna,
