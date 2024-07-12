@@ -52,7 +52,7 @@
         </tr>      
       </table>      
       {% endfor %}
-      <div class="text-center" style="margin: 5px 5px 5px 5px;">
+      <div class="text-center" style="margin: 0px 5px 5px 5px;">
         <span style="font-size:1.0em;font-weight: bold;">Totale</span> 
         <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span> 
         <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
@@ -152,13 +152,17 @@
           <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span> 
           <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
         </div>
-        <div class="text-center" style="margin: 5px 5px 10px 5px;">
+        <div class="text-center" style="margin: 10px 5px 0px 5px;">
         {%if purchase.orders.deliveryType == 'Consegna'%}
-          <div class="text-white font-weight-light"> <span style="font-size:1.1em;font-weight: bold;">Consegnato </span> il {{purchase.orders.delivery.date_ref}} <br>in <br> </div>
-          <div class="text-white font-weight-light">{{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}} - {{purchase.orders.address.city}} - {{purchase.orders.address.postcode}} ({{purchase.orders.address.province}})</div>
+          <div class="text-white font-weight-light"> <span style="font-size:1.1em;font-weight: bold;">Consegnato </span> il {{purchase.orders.delivery.date_ref}} <br> in <br> </div>
+          <div class="text-white font-weight-light">
+            {{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}} <br>
+            {{purchase.orders.address.postcode}} - {{purchase.orders.address.city}} ({{purchase.orders.address.province}})</div>
         {%else%}
-          <div class="text-white font-weight-light"><span style="font-size:1.1em;font-weight: bold;">Ritirato </span> il {{purchase.orders.delivery.date_ref}} in </div>
-          <div class="text-white font-weight-light">{{addressRitiro.address}} {{addressRitiro.houseNumber}} - {{addressRitiro.city}} - {{addressRitiro.postcode}} ({{addressRitiro.province}})</div>
+          <div class="text-white font-weight-light"><span style="font-size:1.1em;font-weight: bold;">Ritirato </span> il {{purchase.orders.delivery.date_ref}} <br> in <br> </div>
+          <div class="text-white font-weight-light">
+            {{addressRitiro.address}} {{addressRitiro.houseNumber}} <br> 
+            {{addressRitiro.postcode}} - {{addressRitiro.city}} ({{addressRitiro.province}})</div>
         {%endif%}
         </div>
       </div>

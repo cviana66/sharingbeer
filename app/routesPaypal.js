@@ -41,7 +41,7 @@ app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
 
     user.orders.push({
         email       : req.user.local.email,
-        dateInsert  : moment().utc("Europe/Rome").format(), //Date.now(),
+        dateInsert  : lib.nowDate("Europe/Rome"),
         status      : order.status,
         shipping          : Number(req.session.shippingCost).toFixed(2),
         pointsDiscount    : Number(req.session.pointDiscount).toFixed(2),

@@ -20,10 +20,25 @@ const fastcsv       = require("fast-csv");          // Gestione dei file CSV. ht
 const moment        = require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
 
 moment.locale('it');
-console.debug('OGGI moment().utc("Europe/Rome"): ',moment().utc("Europe/Rome").format().toString());
-console.debug('OGGI: ',moment().utc("Europe/Rome").format('dddd DD MMMM YYYY - HH:mm'));
-let d = new Date(moment().utc("Europe/Rome").format())
-console.debug('OGGI FORMATO DATE:', d )
+
+
+/*
+moment.tz.setDefault("America/Los_Angeles"); 
+d = moment().utc("America/Los_Angeles").format()
+console.debug(d)
+giornoLavorativo = new Date(moment(d).format())
+console.debug(giornoLavorativo)
+*/
+
+data = new Date()
+console.log('New Date',data) 
+
+var c = moment.tz(data, "Europe/Rome");
+c.utc("Europe/Rome").format()
+
+console.debug('TZ Europe/Rome',c.format()); 
+console.debug('UTC Europe/Rome',c.utc("Europe/Rome").format()); 
+console.debug("Date Europe/Rome",new Date(moment(c).format()))
 
 console.debug('GESTPAY =', process.env.SHOPLOGIN);
 

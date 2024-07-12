@@ -174,6 +174,23 @@ module.exports = {
                     }
                     return giornoLavorativo  
                 },
+  nowDate: function nowDate(timeZone) {
+                      var data = new Date()
+                      var a = moment.tz(data, timeZone);
+                      a.utc(timeZone).format();
+                      var now =  new Date(moment(a).format())
+                      console.debug('DATA-ORA',timeZone,now)
+                      return now;
+                    },
+  formatTextDate: function formatTextDate(data,format) {
+                console.debug('DB Data =',data);
+                var dataInUTC = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
+                console.debug('dataInUTC =',dataInUTC);
+                var c = moment.tz(dataInUTC, "Europe/Rome");
+                c.utc("Europe/Rome").format();
+                console.debug('DATA FORMAT =', c.format(format))
+                return c.format(format);
+              },
   getServer:  function getServer(req) {
                 if (process.env.NODE_ENV== "development") {
                   if (req.hostname == 'sb.sharingbeer.it') {                  

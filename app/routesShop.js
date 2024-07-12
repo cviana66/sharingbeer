@@ -23,11 +23,11 @@ module.exports = function(app, moment, mongoose) {
 								{$project:{_id:0,addresses:0,friends:0,local:0}},
 								{$sort:{'orders.dateInsert': -1}}
 				]);
-	
-		for ( var i in  ordiniInConsegna) {			
-			//console.debug('DATA-ORA',ordiniInConsegna[i].orders.dateInsert)
-			ordiniInConsegna[i].orders.dateInsert = moment(ordiniInConsegna[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm');
-			ordiniInConsegna[i].orders.deliveryDate = moment(ordiniInConsegna[i].orders.deliveryDate).format('dddd DD MMMM');
+	 	console.debug('ORDINI IN CONSEGNA', JSON.stringify(ordiniInConsegna,null,2))
+		for ( var i in  ordiniInConsegna) {	
+		  console.debug('DB DELIVERY DATE',ordiniInConsegna[i].orders.deliveryDate);
+			ordiniInConsegna[i].orders.dateInsert = lib.formatTextDate(ordiniInConsegna[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm');
+			ordiniInConsegna[i].orders.deliveryDate = lib.formatTextDate(ordiniInConsegna[i].orders.deliveryDate, 'dddd DD MMMM');
 
 		}
 		//====================================
@@ -41,7 +41,7 @@ module.exports = function(app, moment, mongoose) {
 								{$sort:{'orders.dateInsert': -1}}
 				])
 		for ( var i in  ordiniInRitiro) {			
-			ordiniInRitiro[i].orders.dateInsert = moment(ordiniInRitiro[i].orders.dateInsert).format('DD.MM.YYYY - HH:mm')
+			ordiniInRitiro[i].orders.dateInsert = lib.formatTextDate(ordiniInRitiro[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm')
 		}
 		//====================================
 		// ORDINI CONSEGNATI
@@ -54,10 +54,12 @@ module.exports = function(app, moment, mongoose) {
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}},
 								{$sort:{'orders.delivery.date_ref': -1}}
 								]);
-		for ( var i in  ordiniConsegnati) {			
-			ordiniConsegnati[i].orders.delivery.date_ref = moment(ordiniConsegnati[i].orders.delivery.date_ref).format('DD.MM.YYYY - HH:mm')
-		}
 		console.debug('ORDINI CONSEGNATI', JSON.stringify(ordiniConsegnati,null,2))
+		for ( var i in  ordiniConsegnati) {			
+			ordiniConsegnati[i].orders.dateInsert = lib.formatTextDate(ordiniConsegnati[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm');
+			ordiniConsegnati[i].orders.delivery.date_ref = lib.formatTextDate(ordiniConsegnati[i].orders.delivery[0].date_ref, 'DD.MM.YYYY - HH:mm')
+		}
+		
     
     //---------------------
 		// INDIRIZZO DI RITIRO

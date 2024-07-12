@@ -79,15 +79,16 @@ const gestpayService = new GestpayService();
           console.log('ERRORE in encrypt', err)
           throw new Error("Encrypt fallita")
         });  
-      
+
       //==========================================
       // Inserimento dati in MongoDB
       //==========================================
+
       const user = await User.findById(req.user._id);
       user.orders.push({
         _id         : _orderId,
         email       : req.user.local.email,
-        dateInsert  : new Date(moment().utc("Europe/Rome").format()),
+        dateInsert  : lib.nowDate("Europe/Rome"),
         status      : "CREATED",
         fatturaPEC  : req.session.fatturaPEC,
         fatturaSDI  : req.session.fatturaSDI,
@@ -101,10 +102,10 @@ const gestpayService = new GestpayService();
         totalQty  : req.session.totalQty,        
         address   : req.session.shippingAddress,
         'payment.shopLogin'        : shopLogin,
-        'payment.createTime'       : moment().utc("Europe/Rome").format('DD/MM/yyyy HH:mm:ss'),
+        'payment.createTime'       : lib.nowDate("Europe/Rome"),
         'payment.orderId'          : orderId,
         'payment.currencyAmount'   : currency,
-        'payment.totalAmount'      : req.session.order.totalaAmount,
+        'payment.totalAmount'      : Number(req.session.order.totalaAmount).toFixed(2),
         'payment.paymentType'      : 'Banca Sella'        
       });          
       let saveOrder = await user.save(opts);
@@ -216,7 +217,7 @@ const gestpayService = new GestpayService();
       console.debug('URL = ',lib.getServer(req)+'/response?a='+req.query.a+'&b='+req.query.b);
       
       const recoveryUrl = lib.getServer(req)+'/response?a='+req.query.a+'&b='+req.query.b;
-      const recoveryOrder = new Recovery({dateInsert: moment().utc("Europe/Rome").format(),
+      const recoveryOrder = new Recovery({dateInsert: lib.nowDate("Europe/Rome"),
                                           orderId:decryptedString.ShopTransactionID, 
                                           url:recoveryUrl});
       

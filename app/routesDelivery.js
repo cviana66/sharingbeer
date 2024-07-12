@@ -1,6 +1,7 @@
 const User          = require('./models/user');
 const {geoMapCore}	= require('./routesGeoMap');
 const {getAddressFromCoordinates} = require('./geoCoordHandler'); 
+const lib           = require('./libfunction');
 
 async function loadDeliveryData(moment) {
 	var consegneAddress = [];
@@ -179,8 +180,9 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 			}
 
 			var deliveryDocUpd = {_id: new mongoose.Types.ObjectId(),
-												status: deliveryStatus,
-												note: deliveryStatusDesc
+												status 		: deliveryStatus,
+												note  		: deliveryStatusDesc,
+												date_ref 	: lib.nowDate("Europe/Rome")
 											};
 
 			//order['delivery'] = deliveryDocUpd;

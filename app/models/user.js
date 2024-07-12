@@ -59,13 +59,13 @@ const userSchema = new Schema({
               shippingCost        : { type: Number},
               deliveryType        : { type: String},
               deliveryDate        : { type: Date},
-              totalPriceBeer      : { type: String},
-              totalPriceTotal     : { type: String},
+              totalPriceBeer      : { type: Number}, // 
+              totalPriceTotal     : { type: Number}, //
               totalQty            : { type: Number},
               items : [{ 
                   id        : {type: String},
                   name      : {type: String},
-                  price     : {type: String},
+                  price     : {type: Number},
                   qty       : {type: Number},
                   linkImage : {type: String},
               }],
@@ -96,18 +96,18 @@ const userSchema = new Schema({
                   authorizationCode : { type: String},
                   errorCode         : { type: String},
                   errorDescription  : { type: String},
-                  createTime        : { type: String}, 
-                  updateTime        : { type: String},
-                  totalAmount       : { type: String}, 
+                  createTime        : { type: Date}, 
+                  updateTime        : { type: Date},
+                  totalAmount       : { type: Number}, 
                   country           : { type: String},
                   currencyAmount    : { type: String},                   
                   s2sStatus         : { type: String},
               },
               delivery : [{ 
-                  id : {type: String},
-                  status : {type: String},
-                  note : {type: String},
-                  date_ref : {type: Date, default: Date.now}
+                  id        : {type: String},
+                  status    : {type: String},
+                  note      : {type: String},
+                  date_ref  : {type: Date}
               }]
           }]
 });

@@ -1,7 +1,8 @@
 const fetch 	= require("node-fetch");
 const User  	= require('../app/models/user');
-const Product = require('./models/product.js');
-const moment 	= require("moment-timezone");            // Formattazione delle date. https://www.npmjs.com/package/moment
+const Product 	= require('./models/product.js');
+const moment 	= require("moment-timezone"); 
+const lib		= require('./libfunction');
 
 module.exports = {
 
@@ -68,12 +69,12 @@ module.exports = {
 	      {
 	        'orders.$[el].status'            		: data.TransactionResult,
 	        'orders.$[el].payment.s2sStatus'		: data.TransactionResult,
-	        'orders.$[el].payment.updateTime' 	: moment().utc("Europe/Rome").format('DD/MM/yyyy HH:mm:ss'),
-	        'orders.$[el].payment.bankTransactionId' : data.BankTransactionID,
-	        'orders.$[el].payment.authorizationCode' : data.AuthorizationCode,
- 	        'orders.$[el].payment.errorCode' 				 : data.ErrorCode,
-	        'orders.$[el].payment.errorDescription'  : data.ErrorDescription,	       
-	        'orders.$[el].payment.country' 					 : data.Country
+	        'orders.$[el].payment.updateTime' 		: lib.nowDate("Europe/Rome"),
+	        'orders.$[el].payment.bankTransactionId': data.BankTransactionID,
+	        'orders.$[el].payment.authorizationCode': data.AuthorizationCode,
+ 	        'orders.$[el].payment.errorCode' 		: data.ErrorCode,
+	        'orders.$[el].payment.errorDescription' : data.ErrorDescription,	       
+	        'orders.$[el].payment.country' 			: data.Country
 	      }
 	  try {    
 		  let doc = await User.findOneAndUpdate(
