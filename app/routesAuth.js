@@ -14,13 +14,16 @@ module.exports = function(app, passport, moment) {
 // =====================================
 //GET
   app.get('/', function(req, res) {
-      
-
+      var video = "video/BiarraViannaColor_Final_Logo_ligth_24.mp4";
       console.debug(req.session)
+      if (process.env.NODE_ENV === 'development') {
+        video = ""
+      }
       
       res.render('index.njk', {
           user: req.user,
-          numProducts : req.session.numProducts
+          numProducts : req.session.numProducts,
+          video : video
       }); // load the index.ejs file
   });
 
