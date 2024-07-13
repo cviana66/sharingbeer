@@ -40,6 +40,8 @@ console.debug('TZ Europe/Rome',c.format());
 console.debug('UTC Europe/Rome',c.utc("Europe/Rome").format()); 
 console.debug("Date Europe/Rome",new Date(moment(c).format()))
 
+console.debug(moment().utc("Europe/Rome").format('dddd'))
+
 console.debug('GESTPAY =', process.env.SHOPLOGIN);
 
 

@@ -159,14 +159,53 @@ module.exports = {
                     },
   deliveryDate: function deliveryDate(dataType) {                    
                     moment.locale('it');                    
-                    var d;
-                    if (moment().utc("Europe/Rome").add(3,'d').format('ddddd') == "sabato") {
-                      d = moment().utc("Europe/Rome").add(5,'d').format()
-                    } else if (moment().utc("Europe/Rome").add(3,'d').format('dddd') == "domenica") {
+                    var d = moment().utc("Europe/Rome").format('dddd');
+                    
+                    if (d == "sabato") {
                       d = moment().utc("Europe/Rome").add(4,'d').format()
-                    } else {
+                      console.debug('DATA DELIVERY =',d)  
+                    } else if (d == "domenica") {
                       d = moment().utc("Europe/Rome").add(3,'d').format()
+                    } else if (d == "lunedì") {
+                      d = moment().utc("Europe/Rome").add(3,'d').format()
+                    } else if (d == "martedì") {
+                      d = moment().utc("Europe/Rome").add(3,'d').format()
+                    } else if (d == "mercoledì") {
+                      d = moment().utc("Europe/Rome").add(3,'d').format()
+                    } else if (d == "giovedì") {
+                      d = moment().utc("Europe/Rome").add(4,'d').format()
+                    } else if (d == "venerdì") {
+                      d = moment().utc("Europe/Rome").add(4,'d').format()
                     }
+                    console.debug('DATA DELIVERY =',d)
+                    if (dataType == 'formato_data') {
+                      giornoLavorativo = new Date(moment(d).format())
+                    } else {
+                      giornoLavorativo = moment(d).format('dddd DD MMMM')
+                    }
+                    return giornoLavorativo  
+                },
+  ritiroDate: function ritiroDate(dataType) {                    
+                    moment.locale('it');                    
+                    var d = moment().utc("Europe/Rome").format('dddd');
+                    
+                    if (d == "sabato") {
+                      d = moment().utc("Europe/Rome").add(10,'d').format()
+                      console.debug('DATA DELIVERY =',d)  
+                    } else if (d == "domenica") {
+                      d = moment().utc("Europe/Rome").add(9,'d').format()
+                    } else if (d == "lunedì") {
+                      d = moment().utc("Europe/Rome").add(9,'d').format()
+                    } else if (d == "martedì") {
+                      d = moment().utc("Europe/Rome").add(9,'d').format()
+                    } else if (d == "mercoledì") {
+                      d = moment().utc("Europe/Rome").add(9,'d').format()
+                    } else if (d == "giovedì") {
+                      d = moment().utc("Europe/Rome").add(11,'d').format()
+                    } else if (d == "venerdì") {
+                      d = moment().utc("Europe/Rome").add(11,'d').format()
+                    }
+                    console.debug('DATA DELIVERY =',d)
                     if (dataType == 'formato_data') {
                       giornoLavorativo = new Date(moment(d).format())
                     } else {

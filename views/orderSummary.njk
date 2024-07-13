@@ -84,15 +84,34 @@
     </table>
     
     <table class="mx-auto" width="100%" style="margin: 20px;">
-      <tr class="text-white">
+      {% if deliveryType == 'Consegna' %}
+      <tr class="text-white">        
         <td colspan="2" width="100%" padding-left="15px">
-          <i><b>Consegna entro il:</b></i>
+          <i><b>Consegna entro il:</b></i>          
         </td>
       </tr>
       <tr class="text-white">
         <td width="16%" rowspan="3" align="center"><img src="img/event_available_black_36dp.svg"></td>
         <td width="84%" style="font-size:1.2em;">{{deliveryDate}}</td>
       </tr>
+      {% else %}
+      <tr class="text-white">        
+        <td colspan="2" width="100%" padding-left="15px">
+          <i><b>Disponibilità immediata, ritiro entro il: </b></i>          
+        </td>
+      </tr>
+      <tr class="text-white">
+        <td width="16%" rowspan="3" align="center"><img src="img/event_available_black_36dp.svg"></td>
+        <td width="84%" style="font-size:1.2em;">
+          <div>
+            {{ritiroDate}}
+          </div>
+          <div>
+            <a href="#" onclick="return openDocument('infoOrari.njk')">vedi orari di apertura</a>
+          </div>
+        </td>
+      </tr>
+      {% endif %}
     </table>
     
     {% if fatturaPEC %}

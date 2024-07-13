@@ -216,6 +216,7 @@ module.exports = function(app, moment, mongoose) {
         shipping    : req.session.shippingCost,
         deliveryType      : req.session.deliveryType,
         deliveryDate      : lib.deliveryDate(),
+        ritiroDate  			: lib.ritiroDate(),
         discount    : req.session.pointDiscount,
         user        : req.user,
         payType     : "axerve", //"paypal"  "axerve"
