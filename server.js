@@ -86,7 +86,11 @@ const {geoMap}        = require('./app/routesGeoMap');
 // percorso consegne ===========================================================
 const routesDelivery  = require('./app/routesDelivery');
 
-global.debug = true;
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
+    global.debug = true;
+} else {
+    global.debug = false;
+}
 
 /*  =======================================================================
     Delivery price
