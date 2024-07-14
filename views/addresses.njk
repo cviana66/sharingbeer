@@ -39,9 +39,9 @@
             </tr>
           </table>
         </form>
-      </div-->
+      </div>
 
-      <hr style="border-top: 1px solid #5375BD;">
+      <hr style="border-top: 1px solid #5375BD;"-->
 
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:15px;">
         <span style="font-size:0.9em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
@@ -209,11 +209,12 @@
 
 //----------------------CIVICNUMBER e CAP---------------------------
 async function controlInputAndValidateAddress() {
+/*
   var auxCheckFatturaDetails = checkFatturaDetails();
   if (!auxCheckFatturaDetails) {
     return auxCheckFatturaDetails;
   }
-
+*/
   const ret = await fieldsRegisterControl()
   if (ret) {
     console.debug('CITTA: ',document.getElementById("inputCity").value);

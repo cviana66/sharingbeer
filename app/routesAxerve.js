@@ -192,9 +192,12 @@ const gestpayService = new GestpayService();
           // INVIO EMAIL al CLIENTE
           //========================================
           const server = lib.getServer(req);
-          console.debug('MAIL',name, userEmail, orderId, lib.deliveryDate(), server);
-          
-          const html = mailorder(name, orderId, lib.deliveryDate(), server)
+
+          var data = lib.deliveryDate()
+          if (user.orders.deliveryType == 'Ritiro') data = lib.ritiroDate();          
+          console.debug('MAIL',name, userEmail, orderId, data, user.orders.deliveryType, server);
+
+          const html = mailorder(name, orderId, data, user.orders.deliveryType, server)
           await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html);      
 
         } else {
@@ -252,7 +255,6 @@ const gestpayService = new GestpayService();
       .then(result => {
         console.log(result);
         return result
-        //resultJson = JSON.stringify(result, null, 2);
       })
       .catch(err => {
         console.log('ERRORE in encrypt', err)
@@ -266,15 +268,16 @@ const gestpayService = new GestpayService();
       //=====================================
       // Svuoto il carrello
       //=====================================
-      req.session.cart = {}
-      req.session.order = {}
-      req.session.numProducts = 0
+      req.session.cart = {};
+      req.session.order = {};
+      req.session.numProducts = 0;
 
       res.render('orderOutcome.njk', {
-            status  : decryptedString.TransactionResult,
-            deliveryDate : moment(req.user.orders.deliveryDate).format('dddd DD MMMM'),
-            user : req.user,
-            numProducts : 0
+            status        : decryptedString.TransactionResult,
+            deliveryDate  : lib.deliveryDate(),
+            ritiroDate    : lib.ritiroDate(),
+            user          : req.user,
+            numProducts   : 0
       });
 
     }catch (e){
@@ -288,11 +291,47 @@ const gestpayService = new GestpayService();
     }    
   });
 
-  app.get('/response_negativa', lib.isLoggedIn, function(req,res) {
+  app.get('/response_negativa', lib.isLoggedIn, async function(req,res) {
 
-    console.debug('PARAMETRI RISPOSTA NEGATIVA: ',req.query);
-    res.render('orderOutcome.njk', {
-            status  : 'KO'
-    });
+    console.debug('PARAMETRI RISPOSTA NEGATIVA: ',req.session);
+
+
+    //================================================
+    // Chiamo Axerve per ottenere la stringa DENCRYPT
+    //================================================
+    let shopLogin = req.query.a;
+    let cryptedString = req.query.b;
+    const decryptedString = await gestpayService
+      .decrypt({
+        shopLogin,
+        cryptedString
+      })
+      .then(result => {
+        console.log(result);
+        return result        
+      })
+      .catch(err => {
+        console.log('ERRORE in encrypt', err)
+        throw new Error("Dencrypt fallita")
+      });
+
+    try {
+            
+      req.user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin,decryptedString.ShopTransactionID);    
+      res.render('orderOutcome.njk', {
+              status  : 'KO',
+              user    : req.user,
+              numProducts : req.session.numProducts 
+      });
+
+    }catch (e){
+      console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /response_negativa"  PARAMETRI RISPOSTA POSITIVA: '+req.query.toString()+' ERRORE:'+e);
+      let msg = 'Ci dispiace, si è verificato un errore inatteso. L\'esito del pagamento sarà verificato e ti manterremo informato. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
+      req.flash('error', msg);
+      return res.render('info.njk', {
+                                      message: req.flash('error'),
+                                      type: "danger"
+                                    });
+    }
   });
 };

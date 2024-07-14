@@ -10,8 +10,13 @@
 	    <div class="flex-row">
         <div class="align-self-center">
 		      <p class="text-white font-weight-light text-center"> Grazie {{user.local.name.first}} per aver acquistato <br><span class="sb-font" style="font-size:1.5em;color:#FF9139;">birra Viana</span></p>
-          <p class="text-white font-weight-light text-center" style="font-size:1.2em"> Il tuo ordine è stato completato ed il tuo acquisto è in preparazione.</p>      
-          <p class="text-white font-weight-light text-center" style="font-size:1.1em"> Dovresti ricevere il tuo ordine entro <br><b>{{deliveryDate}}</b> </p>
+          {% if user.orders.deliveryType == 'Consegna' %}
+            <p class="text-white font-weight-light text-center" style="font-size:1.2em"> Il tuo ordine è stato completato ed il tuo acquisto è in preparazione per la consegna.</p>      
+            <p class="text-white font-weight-light text-center" style="font-size:1.1em"> Dovresti ricevere il tuo ordine entro <br><b>{{deliveryDate}}</b> </p>        
+          {% else %}
+            <p class="text-white font-weight-light text-center" style="font-size:1.2em"> Il tuo acquisto è stato completato ed il tuo ordine è già disponibile per il ritiro.</p>      
+            <p class="text-white font-weight-light text-center" style="font-size:1.1em"> Ti chiedo la cortesia di ritirare il tuo ordine entro <br><b>{{ritiroDate}}</b> </p>
+          {% endif %}
           <p class="text-white font-weight-light text-left"> Ti abbiamo inviato una e-mail di conferma al tuo indirizzo: <b>{{user.local.email}}</b> </p>
           <br>
           <p class="text-white font-weight-light text-lect"> Mi raccomando, bevi in modo responsabile :)</p>

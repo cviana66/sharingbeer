@@ -220,6 +220,10 @@
             Conferma e paga
           </button>
       </div>
+
+      <div id="loading">
+        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
+      </div>
       
 
     <script type="text/javascript">
@@ -233,8 +237,23 @@
         window.onfocus = function() { blurred && (location.reload()); };
       }
       
+
+      // Ricarico la pagina se l'utente clicca INDIETRO sul bottone del browser
+      window.addEventListener('pageshow', function(event) {
+        // Controlla se la pagina è stata effettivamente caricata dal server
+        if (event.persisted) {
+          // Ricarica la pagina
+          location.reload();
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("loading").style.display = 'none';
+        document.getElementById("mybutton").removeAttribute("disabled")
+      });
       function startAxerve() {
-        document.getElementById("mybutton").disabled = 'true';
+        document.getElementById("mybutton").setAttribute("disabled","disabled");        
+        document.getElementById("loading").style.display = 'block';
         $.ajax({
           type: 'POST',
           dataType: 'json',
@@ -243,7 +262,7 @@
                       post(result.url, {
                                         a:result.shopLogin,
                                         b:result.cryptedString
-                      });                    
+                      });                                  
                     },
           error:  function (e) {
                     post('/orderOutcome',{status:"KO"});
