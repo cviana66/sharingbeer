@@ -28,7 +28,12 @@ module.exports = function(app, moment, mongoose) {
 		  console.debug('DB DELIVERY DATE',ordiniInConsegna[i].orders.deliveryDate);
 			ordiniInConsegna[i].orders.dateInsert = lib.formatTextDate(ordiniInConsegna[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm');
 			ordiniInConsegna[i].orders.deliveryDate = lib.formatTextDate(ordiniInConsegna[i].orders.deliveryDate, 'dddd DD MMMM');
-
+			ordiniInConsegna[i].orders.shippingCost = ordiniInConsegna[i].orders.shippingCost.toFixed(2)
+			ordiniInConsegna[i].orders.totalPriceBeer = ordiniInConsegna[i].orders.totalPriceBeer.toFixed(2)
+			ordiniInConsegna[i].orders.totalPriceTotal = ordiniInConsegna[i].orders.totalPriceTotal.toFixed(2)
+			ordiniInConsegna[i].orders.items.forEach(function(prod) {	  			
+  			prod.price = prod.price.toFixed(2)
+  		});
 		}
 		//====================================
 		// ORDINI IN RITIRO
@@ -42,6 +47,12 @@ module.exports = function(app, moment, mongoose) {
 				])
 		for ( var i in  ordiniInRitiro) {			
 			ordiniInRitiro[i].orders.dateInsert = lib.formatTextDate(ordiniInRitiro[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm')
+			ordiniInRitiro[i].orders.shippingCost = ordiniInRitiro[i].orders.shippingCost.toFixed(2)
+			ordiniInRitiro[i].orders.totalPriceBeer = ordiniInRitiro[i].orders.totalPriceBeer.toFixed(2)
+			ordiniInRitiro[i].orders.totalPriceTotal = ordiniInRitiro[i].orders.totalPriceTotal.toFixed(2)
+			ordiniInRitiro[i].orders.items.forEach(function(prod) {	  			
+  			prod.price = prod.price.toFixed(2)
+  		});
 		}
 		//====================================
 		// ORDINI CONSEGNATI
@@ -58,6 +69,12 @@ module.exports = function(app, moment, mongoose) {
 		for ( var i in  ordiniConsegnati) {			
 			ordiniConsegnati[i].orders.dateInsert = lib.formatTextDate(ordiniConsegnati[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm');
 			ordiniConsegnati[i].orders.delivery.date_ref = lib.formatTextDate(ordiniConsegnati[i].orders.delivery[0].date_ref, 'DD.MM.YYYY - HH:mm')
+			ordiniConsegnati[i].orders.shippingCost = ordiniConsegnati[i].orders.shippingCost.toFixed(2)
+			ordiniConsegnati[i].orders.totalPriceBeer = ordiniConsegnati[i].orders.totalPriceBeer.toFixed(2)
+			ordiniConsegnati[i].orders.totalPriceTotal = ordiniConsegnati[i].orders.totalPriceTotal.toFixed(2)
+			ordiniConsegnati[i].orders.items.forEach(function(prod) {	  			
+  			prod.price = prod.price.toFixed(2)
+  		});
 		}
 		
     
@@ -284,6 +301,7 @@ module.exports = function(app, moment, mongoose) {
   			req.flash('info', req.query.msg);
 	  		prods.forEach(function(prod) {
 	  			prod.prettyPrice = prod.prettyPrice();
+	  			prod.price = prod.price.toFixed(2)
 	  		});
 	  		console.debug('CATALOGO PRODOTTI: ',prods)
 	  		//mette in memoria i prodotti dal carrello

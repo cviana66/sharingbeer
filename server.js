@@ -86,7 +86,7 @@ const {geoMap}        = require('./app/routesGeoMap');
 // percorso consegne ===========================================================
 const routesDelivery  = require('./app/routesDelivery');
 
-if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production' || process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
     global.debug = true;
 } else {
     global.debug = false;
