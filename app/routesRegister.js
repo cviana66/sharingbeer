@@ -498,7 +498,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   userStatus  : req.user.local.status,
                   shipping    : req.session.shippingCost,
                   deliveryType      : req.session.deliveryType,
-                  deliveryDate      : lib.deliveryDate(),
+                  deliveryDate      : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM',req.session.deliveryType),
                   discount    : req.session.pointDiscount,
                   user        : req.user,
                   payType     : "axerve" //"paypal"  "axerve"
@@ -801,9 +801,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         server = req.protocol+'://'+req.hostname;
       }
       
-      const html = mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate(), server)
+      const html = mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'), server)
       lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
-      res.send(mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate(), server))
+      res.send(mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM', 'Consegna'), server))
       return
 
     }) 

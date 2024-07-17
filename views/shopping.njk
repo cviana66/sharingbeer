@@ -19,7 +19,7 @@
   <div class="tab-pane active text-white " id="home" role="tabpanel" aria-labelledby="home-tab" style="margin: 20px 0px 0px 0px;">
     {% for purchase in ordiniInConsegna %}
     <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 20px 0px;">
-      <div class="flex-row" style="margin: 10px 0px 0px 0px;">
+      <div class="flex-row" style="margin: 10px 0px 10px 0px;">
         <div class="text-white font-weight-light text-center">
           ORDINE <br> <span style="font-size:0.9em;">{{purchase.orders._id}}</span>
         </div>
@@ -28,7 +28,7 @@
         </div>
       </div>
       
-      <div class="text-white font-weight-light text-center" style="margin: 5px 5px 10px 5px;">
+      <div class="text-white font-weight-light text-center" style="margin: 5px 5px 20px 5px;">
         <div><span style="font-size:0.9em">Consegna entro </span> {{purchase.orders.deliveryDate}}</div>     
       </div>
 
@@ -79,6 +79,10 @@
         <div class="text-white font-weight-light text-center">
            del <span style="font-size:0.9em;"> {{purchase.orders.dateInsert}} </span>            
         </div>
+      </div>
+
+       <div class="text-white font-weight-light text-center" style="margin: 5px 5px 20px 5px;">
+        <div><span style="font-size:0.9em">Ritiro entro </span> {{purchase.orders.deliveryDate}}</div>     
       </div>
 
       {% for prod in purchase.orders.items %}

@@ -157,78 +157,79 @@ module.exports = {
                         return true;
                       }
                     },
-  deliveryDate: function deliveryDate(dataType) {                    
+  deliveryDate: function deliveryDate(timeZone, dataType, format, deliveryType) {    
                     moment.locale('it');                    
-                    var d = moment().utc("Europe/Rome").format('dddd');
+                    var d = moment(data).utc(timeZone).format('dddd');
+                    var data = new Date();                    
+
+                    Date.prototype.addDays = function(days) {
+                      var date = new Date(this.valueOf());
+                      date.setDate(date.getDate() + days);
+                      return date;
+                    }
                     
-                    if (d == "sabato") {
-                      d = moment().utc("Europe/Rome").add(4,'d').format()
-                      console.debug('DATA DELIVERY =',d)  
-                    } else if (d == "domenica") {
-                      d = moment().utc("Europe/Rome").add(3,'d').format()
-                    } else if (d == "lunedì") {
-                      d = moment().utc("Europe/Rome").add(3,'d').format()
-                    } else if (d == "martedì") {
-                      d = moment().utc("Europe/Rome").add(3,'d').format()
-                    } else if (d == "mercoledì") {
-                      d = moment().utc("Europe/Rome").add(3,'d').format()
-                    } else if (d == "giovedì") {
-                      d = moment().utc("Europe/Rome").add(4,'d').format()
-                    } else if (d == "venerdì") {
-                      d = moment().utc("Europe/Rome").add(4,'d').format()
+                    if (deliveryType == 'Consegna') {
+                      var daysToAdd = 0
+                      if (d == "sabato") {
+                        daysToAdd = 4
+                      } else if (d == "domenica") {
+                        daysToAdd = 3
+                      } else if (d == "lunedì") {
+                        daysToAdd = 3
+                      } else if (d == "martedì") {
+                        daysToAdd = 3
+                      } else if (d == "mercoledì") {
+                        daysToAdd = 3
+                      } else if (d == "giovedì") {
+                        daysToAdd = 4
+                      } else if (d == "venerdì") {
+                        daysToAdd = 4
+                      }
+                    }else if (deliveryType == 'Ritiro') {
+                      if (d == "sabato") {
+                        daysToAdd = 10
+                      } else if (d == "domenica") {
+                        daysToAdd = 9
+                      } else if (d == "lunedì") {
+                        daysToAdd = 9
+                      } else if (d == "martedì") {
+                        daysToAdd = 9
+                      } else if (d == "mercoledì") {
+                        daysToAdd = 9
+                      } else if (d == "giovedì") {
+                        daysToAdd = 11
+                      } else if (d == "venerdì") {
+                        daysToAdd = 11
+                      }
+                    }                    
+
+                    var dataDelivery = data.addDays(daysToAdd)
+
+                    var a = moment.tz(dataDelivery, timeZone);
+                    a.utc(timeZone).format();
+                    var now =  new Date(moment(a).format());
+                    //console.debug('DATA-ORA deliveryDate',timeZone,now);
+
+                    if (dataType == 'DATA') {
+                      giornoLavorativo = now
+                    } else if (dataType == 'TXT') {
+                      giornoLavorativo = moment(now).utc().format(format)
                     }
-                    console.debug('DATA DELIVERY =',d)
-                    if (dataType == 'formato_data') {
-                      giornoLavorativo = new Date(moment(d).format())
-                    } else {
-                      giornoLavorativo = moment(d).format('dddd DD MMMM')
-                    }
-                    return giornoLavorativo  
-                },
-  ritiroDate: function ritiroDate(dataType) {                    
-                    moment.locale('it');                    
-                    var d = moment().utc("Europe/Rome").format('dddd');
-                    
-                    if (d == "sabato") {
-                      d = moment().utc("Europe/Rome").add(10,'d').format()
-                      console.debug('DATA DELIVERY =',d)  
-                    } else if (d == "domenica") {
-                      d = moment().utc("Europe/Rome").add(9,'d').format()
-                    } else if (d == "lunedì") {
-                      d = moment().utc("Europe/Rome").add(9,'d').format()
-                    } else if (d == "martedì") {
-                      d = moment().utc("Europe/Rome").add(9,'d').format()
-                    } else if (d == "mercoledì") {
-                      d = moment().utc("Europe/Rome").add(9,'d').format()
-                    } else if (d == "giovedì") {
-                      d = moment().utc("Europe/Rome").add(11,'d').format()
-                    } else if (d == "venerdì") {
-                      d = moment().utc("Europe/Rome").add(11,'d').format()
-                    }
-                    console.debug('DATA DELIVERY =',d)
-                    if (dataType == 'formato_data') {
-                      giornoLavorativo = new Date(moment(d).format())
-                    } else {
-                      giornoLavorativo = moment(d).format('dddd DD MMMM')
-                    }
+                    console.debug('DATA-ORA deliveryDate',dataType, giornoLavorativo)
                     return giornoLavorativo  
                 },
   nowDate: function nowDate(timeZone) {
-                      var data = new Date()
+                      var data = new Date();
                       var a = moment.tz(data, timeZone);
                       a.utc(timeZone).format();
-                      var now =  new Date(moment(a).format())
-                      console.debug('DATA-ORA',timeZone,now)
+                      var now =  new Date(moment(a).format());
+                      console.debug('DATA-ORA',timeZone,now);
                       return now;
                     },
   formatTextDate: function formatTextDate(data,format) {
-                console.debug('DB Data =',data);
-                var dataInUTC = new Date(data.getTime() + data.getTimezoneOffset() * 60000);
-                console.debug('dataInUTC =',dataInUTC);
-                var c = moment.tz(dataInUTC, "Europe/Rome");
-                c.utc("Europe/Rome").format();
-                console.debug('DATA FORMAT =', c.format(format))
-                return c.format(format);
+                      var d = moment(data).utc().format(format)
+                      console.debug('DATA-ORA formatTextDate',d)
+                      return d;
               },
   getServer:  function getServer(req) {
                 if (process.env.NODE_ENV== "development") {

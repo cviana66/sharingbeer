@@ -95,7 +95,7 @@ const gestpayService = new GestpayService();
         pointsDiscount  : Number(req.session.pointDiscount).toFixed(2),
         shippingCost    : Number(req.session.shippingCost).toFixed(2),
         deliveryType    : req.session.deliveryType,
-        deliveryDate    : lib.deliveryDate('formato_data'),
+        deliveryDate    : lib.deliveryDate('Europe/Rome','DATA','',req.session.deliveryType),
         totalPriceBeer  : Number(req.session.totalPrc).toFixed(2),
         totalPriceTotal : Number(req.session.order.totalaAmount).toFixed(2),
         items     : req.session.cartItems.items,
@@ -193,8 +193,7 @@ const gestpayService = new GestpayService();
           //========================================
           const server = lib.getServer(req);
 
-          var data = lib.deliveryDate()
-          if (user.orders.deliveryType == 'Ritiro') data = lib.ritiroDate();          
+          var data = lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM',user.orders.deliveryType)
           console.debug('MAIL',name, userEmail, orderId, data, user.orders.deliveryType, server);
 
           const html = mailorder(name, orderId, data, user.orders.deliveryType, server)
@@ -274,8 +273,8 @@ const gestpayService = new GestpayService();
 
       res.render('orderOutcome.njk', {
             status        : decryptedString.TransactionResult,
-            deliveryDate  : lib.deliveryDate(),
-            ritiroDate    : lib.ritiroDate(),
+            deliveryDate  : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'),
+            ritiroDate    : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Ritiro'),
             user          : req.user,
             numProducts   : 0
       });

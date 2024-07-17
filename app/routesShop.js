@@ -47,6 +47,7 @@ module.exports = function(app, moment, mongoose) {
 				])
 		for ( var i in  ordiniInRitiro) {			
 			ordiniInRitiro[i].orders.dateInsert = lib.formatTextDate(ordiniInRitiro[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm')
+			ordiniInRitiro[i].orders.deliveryDate = lib.formatTextDate(ordiniInRitiro[i].orders.deliveryDate, 'dddd DD MMMM');
 			ordiniInRitiro[i].orders.shippingCost = ordiniInRitiro[i].orders.shippingCost.toFixed(2)
 			ordiniInRitiro[i].orders.totalPriceBeer = ordiniInRitiro[i].orders.totalPriceBeer.toFixed(2)
 			ordiniInRitiro[i].orders.totalPriceTotal = ordiniInRitiro[i].orders.totalPriceTotal.toFixed(2)
@@ -232,8 +233,8 @@ module.exports = function(app, moment, mongoose) {
         userStatus  : req.user.local.status,
         shipping    : req.session.shippingCost,
         deliveryType      : req.session.deliveryType,
-        deliveryDate      : lib.deliveryDate(),
-        ritiroDate  			: lib.ritiroDate(),
+        deliveryDate      : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'),
+        ritiroDate  			: lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Ritiro'),
         discount    : req.session.pointDiscount,
         user        : req.user,
         payType     : "axerve", //"paypal"  "axerve"
@@ -276,7 +277,7 @@ module.exports = function(app, moment, mongoose) {
     res.render('orderOutcome.njk', {
       status  : status,
       user    : req.user,
-      deliveryDate: lib.deliveryDate(),
+      deliveryDate: lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM',req.user.orders.deliveryType),
       numProducts : req.session.numProducts
     })
   });

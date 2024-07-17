@@ -15,11 +15,17 @@ module.exports = function(app, passport, moment) {
 //GET
   app.get('/', function(req, res) {
       var video = "video/BiarraViannaColor_Final_Logo_ligth_24.mp4";
-      console.debug(req.session)
+      //console.debug(req.session)
       if (process.env.NODE_ENV === 'development') {
         video = ""
       }
       
+    
+      //lib.formatTextDate(lib.nowDate('America/Los_Angeles'),'DD.MM.YYYY - HH:mm', 'Europe/Rome') 
+      //lib.deliveryDate('Europe/Rome','DATA')
+      //lib.deliveryDate('Europe/Rome','TXT','DD.MM.YYYY - HH:mm')
+
+
       res.render('index.njk', {
           user: req.user,
           numProducts : req.session.numProducts,
