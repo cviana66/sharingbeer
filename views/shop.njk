@@ -5,8 +5,8 @@
       <hr style="border-top: 1px solid #5375BD;">
 
       {% for prod in products %}
-        <form method="POST" action="/shop">
-          <input type="hidden" name="item_id" value="{{prod.id}}">
+        <form id="shop" method="POST" action="/shop">
+          <input type="hidden" id="item_id" name="item_id" value="{{prod.id}}">
             <div class="card h-100 border-1" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
               <div class=" card-body">
                 <div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
@@ -28,7 +28,7 @@
                 </div>
                 {% if prod.quantity > 6 %}
                   <div style="margin: 0px 0px 10px 0px;">
-                    <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv()">
+                    <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}')">
                       <!-- <div>{{prod.prettyPrice}}</div> -->
                       <div>Aggiungi al Carrello</div>
                     </button>
@@ -44,8 +44,26 @@
 
 <script type="text/javascript">
   let content = document.getElementById("carrello");
-  function animateDiv() {
+  function animateDiv(item_id) {
     document.querySelector('#carrello').classList.add('animate-div');
+/*
+  var data = {}
+  data.item_id = item_id;
+  console.log(data)
+ 
+  await $.ajax({
+      type: 'POST',
+      dataType: 'json',
+      url: '/shop',
+      data: data,
+      success: function(res) {
+        console.log('Success',res)
+      },
+      error: function (e) {
+        console.log('Errore',e)
+      }
+  })
+ */
   }
 </script>
 

@@ -13,7 +13,7 @@ function openDocument (htmlFile) {
   };
   const myRequest = new Request("info/"+htmlFile, init);
 
-  fetch(myRequest, init)
+  fetch("info/"+htmlFile, init)
     .then((response) => {
       if (!response.ok) {
         throw new Error("HTTP error! Status: "+response.status);

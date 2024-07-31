@@ -350,7 +350,7 @@ app.get('/logout', function(req, res, next) {
   });
 
   //UTILITY
- app.get('/mailvalidatemail', function(req, res) {
+  app.get('/mailvalidatemail', function(req, res) {
       let server;
       if (process.env.NODE_ENV == "development") {
         server = req.protocol+'://'+req.hostname+':'+process.env.PORT
@@ -358,7 +358,18 @@ app.get('/logout', function(req, res, next) {
         server = req.protocol+'://'+req.hostname;
       } 
       res.send(mailvalidatemail('Token', server))
-    }) 
+    }); 
 
+  app.get('/infoCookie', (req,res) => {
+    res.render('infoCookie.njk')
+  });
+
+  app.get('/infoPrivacy', (req,res) => {
+    res.render('infoPrivacy.njk')
+  });
+
+  app.get('/infoCondizioniVendita', (req,res) => {
+    res.render('infoCondizioniVendita.njk')
+  });
 
 };
