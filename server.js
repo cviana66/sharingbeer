@@ -214,6 +214,7 @@ var SharingBeer = function() {
 
         //To serve static files such as images, CSS files, and JavaScript files
         self.app.use(express.static(__dirname + '/public'));
+        self.app.use(express.static(__dirname + '/views/info'));
 
         //use to ovwrride method in form: put, delete
         //self.app.use(methodOverride('_method')); //commentato in data 15/10/22 per capire se usato no

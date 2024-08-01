@@ -1,0 +1,50 @@
+{% extends "layouts/main.njk" %} 
+{% block body %}
+
+<style type="text/css">
+  .container {
+   height: 2000px; /* Aumenta quest altezza per testare lo scroll */
+  }
+
+  #icona {
+   transition: transform 0.5s eae-in-out;
+   width: 100%; /* Dimensioni niziali dell'icona */
+   height: auto; /* Mantieni le proporzioni dell'immagine */
+  }  
+</style>
+
+<div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
+
+<div class="embed-responsive embed-responsive-16by9" style="margin:10px 0px 0px 0px; border-radius:5px 5px 5px 5px">
+  <video class="embed-responsive-item" src={{video}} controls autoplay="true" muted></video>
+</div>
+<div class="text-white text-center" style="margin:5px 0px 0px 0px; font-size:1.5em"> 
+  <span class="sb-font" style="font-size:1.3em;color:#FF9139;">+</span>inviti 
+  <span class="sb-font" style="font-size:1.3em;color:#FF9139;">+</span>risparmi
+  <span class="sb-font" style="font-size:1.3em;color:#FF9139;">+</span>bevi!
+</div>
+
+<div class="container-logo"><img id="icona" class="mx-auto d-block" src="img/logoBirraViana.png"></div>
+
+<div class="text-white text-center" style="margin:5px 0px 0px 0px; font-size:1.2em">
+  Invita amici e per <span class="sb-font" style="font-size:1.3em;color:#FF9139;">Loro</span> una birra omaggio e per 
+  <span class="sb-font" style="font-size:1.3em;color:#FF9139;">Te</span> sconti incredibili!
+</div>
+
+<script type="text/javascript">
+  window.addEventListener('scroll', function() {
+    var scrollPos = window.pageYOffset;
+    var icona = document.getElementById('icona');
+    var newScale = 1 - (scrollPos / 500); // Cambia le dimensioni dell'immagine
+    //var newRotate = scrollPos * 0.05; // Ruota l'immagine
+    //icona.style.transform = 'translateY(' + (-scrollPos / 10) + 'px) scale(' + newScale + ') rotate(' + newRotate + 'deg)';
+    icona.style.transform = 'translateY(' + (-scrollPos / 100) + 'px) scale(' + newScale + ')';
+  });
+/*
+  $(window).scroll(function(){
+    $("#icona").stop().animate({"marginTop": ($(window).scrollTop()) + "px", "marginLeft":($(window).scrollLeft()) + "px"}, "slow" );
+  });
+*/
+</script>
+
+{% endblock %}

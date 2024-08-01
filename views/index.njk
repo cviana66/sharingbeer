@@ -1,7 +1,45 @@
 {% extends "layouts/main.njk" %} 
 {% block body %}
 
-<div class="text-white text-center" style="margin:5px 0px 0px 0px; font-size:1.5em"> Sharingbeer </div>
+<style type="text/css">
+  .image-container {
+    position: relative;
+    width: 100%;
+    height: 50vh; /* Altezza iniziale dell'immagine */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.image {
+    max-width: 100%;
+    height: auto;
+    transition: all 0.3s ease-in-out;
+}
+
+.scrolled .image-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100px; /* Dimensioni ridotte */
+    height: auto; /* Ricalcoliamo l'altezza in base alla nuova larghezza */
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.scrolled .image {
+    width: 100px; /* Dimensioni ridotte */
+    height: auto;
+}
+
+.content {
+    padding: 20px;
+    font-size: 1.3em;
+}
+</style>
+
+<div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
 
 <div class="embed-responsive embed-responsive-16by9" style="margin:10px 0px 0px 0px; border-radius:5px 5px 5px 5px">
   <video class="embed-responsive-item" src={{video}} controls autoplay="true" muted></video>
@@ -11,7 +49,32 @@
   <span class="sb-font" style="font-size:1.3em;color:#FF9139;">+</span>risparmi
   <span class="sb-font" style="font-size:1.3em;color:#FF9139;">+</span>bevi!
 </div>
-<div ><img class="mx-auto d-block" src="img/logoBirraViana.png" style="height:100%;width:100%;margin:10px 0px 40px 0px"></div>
 
+<div class="image-container">
+  <img src="img/logoBirraViana.png" alt="Immagine" class="image" id="image">
+</div>
+<div class="content text-white text-center">
+        <p>Invita amici e per <span class="sb-font" style="font-size:1.2em;color:#FF9139;">Loro</span> una birra omaggio e per 
+  <span class="sb-font" style="font-size:1.3em;color:#FF9139;">Te</span> sconti incredibili!</p>
+</div>
+    
+
+<div class="text-white text-center" style="margin:5px 0px 0px 0px; font-size:1.2em">
+  Invita amici e per <span class="sb-font" style="font-size:1.3em;color:#FF9139;">Loro</span> una birra omaggio e per 
+  <span class="sb-font" style="font-size:1.3em;color:#FF9139;">Te</span> sconti incredibili!
+</div>
+
+<script type="text/javascript">
+document.addEventListener('scroll', function() {
+    const imageContainer = document.querySelector('.image-container');
+    const scrollPosition = window.scrollY;
+
+    if (scrollPosition > 50) { // Puoi regolare il valore per cambiare quando avviene l'effetto
+        document.body.classList.add('scrolled');
+    } else {
+        document.body.classList.remove('scrolled');
+    }
+});
+</script>
 
 {% endblock %}
