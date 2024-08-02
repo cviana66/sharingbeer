@@ -18,7 +18,7 @@ module.exports = function(app, passport, moment) {
       var video = "video/BirraViannaColor_Final_Logo_38.mp4";
       //console.debug(req.session)
       if (process.env.NODE_ENV === 'development') {
-        video = ""
+        video = "video/BirraViannaColor_Final_Logo_38.mp4"
       }
       
       //lib.formatTextDate(lib.nowDate('America/Los_Angeles'),'DD.MM.YYYY - HH:mm', 'Europe/Rome') 
