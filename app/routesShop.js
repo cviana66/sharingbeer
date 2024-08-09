@@ -62,7 +62,6 @@ module.exports = function(app, moment, mongoose) {
 								{$match:{"_id":req.user._id}},
 								{$unwind:"$orders"},
 								{$match:{'orders.delivery.status':'OK - CONSEGNATO'}},
-								//{$match:{'orders.status':'OK - CONSEGNATO'}}, //da rimettere quella sopra che questa è solo per fare la prova di visualizzazone
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}},
 								{$sort:{'orders.delivery.date_ref': -1}}
 								]);
@@ -300,17 +299,42 @@ module.exports = function(app, moment, mongoose) {
         })
   		} else {
   			req.flash('info', req.query.msg);
+
+        //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+        lib.retriveCart(req);
+        var cart = req.session.cart
+        console.debug('SHOP CART', cart)
+        var numProds = req.session.numProducts
+
 	  		prods.forEach(function(prod) {
 	  			prod.prettyPrice = prod.prettyPrice();
 	  			prod.price = prod.price.toFixed(2)
-	  		});
-	  		console.debug('CATALOGO PRODOTTI: ',prods)
-	  		//mette in memoria i prodotti dal carrello
-	      lib.retriveCart(req);
+          prodId = prod._id.toString()
+          if (cart != undefined) {
 
-			  var model =  { products   : prods,                   //prodotti dello shop
-	  						       user       : req.user,                //utente loggato
-	  						       numProducts: req.session.numProducts, //numero di proodotti nel carrello	  						       
+            //tolgo dallo shop quanto ho in carrello            
+            if (cart[prodId] != undefined) {
+              prod.quantity = prod.quantity - cart[prodId].qty              
+              // controlo che nel frattempo non abbiano acquistato beerbox
+              // e nel caso aggiusto i quantitativi 
+              if (prod.quantity < 0 ) {                
+                cart[prodId].qty = cart[prodId].qty + prod.quantity
+                numProds = numProds + prod.quantity
+                prod.quantity = 0
+                req.flash('info','Mi dispiace, ma la quantità disponibile dei beerbox per la birra '+prod.name+' è inferiore alla richieste rivevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo '+cart[prodId].qty+' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.')
+              } 
+            }
+
+          }
+	  		});
+        req.session.cart = cart
+        //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+        lib.retriveCart(req);
+	  		console.debug('CATALOGO PRODOTTI: ',prods)
+
+			  var model =  { products   : prods,                     //prodotti dello shop
+	  						       user       : req.user,                  //utente loggato
+	  						       numProducts: req.session.numProducts,   //numero di proodotti nel carrello	  						       
 	                     message    : req.flash('info'),
 	                     type       : "info"
 	  					       };
@@ -321,11 +345,12 @@ module.exports = function(app, moment, mongoose) {
   });
 
 //POST
-	app.post('/shop', lib.isLoggedIn ,function (req, res) {
+	app.post('/shop', lib.isLoggedIn ,async function (req, res) {
 		//Load (or initialize) the cart and session.cart
 		var cart = req.session.cart = req.session.cart || {};
 		//Read the incoming product data from shop.njk
 		var id = req.body.item_id;
+    console.debug('SHOP ITEM ID',id )
 
 		//Locate the product to be added
 		Product.findById(id, function (err, prod) {
@@ -347,32 +372,39 @@ module.exports = function(app, moment, mongoose) {
 				/ La verifica finale è fatta in orderSummary.
 				/------------------------------------------------------------------------------*/
 				var q =  (!cart[id]) ? 0 : cart[id].qty; //se il carrello è vuoto
-				
-				if ((Number(prod.quantity) - Number(q)) > 0) {
-					console.debug('DISPONIBILITA: ', Number(prod.quantity), Number(q))
-					//Increase quantity or add the product in the shopping cart.
-					if (cart[id]) {
-						cart[id].qty++;
-						cart[id].subtotal=(cart[id].qty*cart[id].price).toFixed(2);
-						req.session.numProducts++;
-					}	else { //il prodotto è scelto per la prima volta
-						cart[id] = {
-							id : prod._id,
-							name: prod.name,
-		          linkImage: prod.linkImage,
-		          quantity: prod.quantity,
-							price: prod.price.toFixed(2),
-							prettyPrice: prod.prettyPrice(),
-							qty: 1,
-							subtotal: prod.price.toFixed(2)
-						};
-						req.session.numProducts++;
-					}
-					res.redirect('/shop');
-				} else {
-					const msg = 'La birra '+prod.name+' è esaurita e sarà a breve in riassortimento'
-					res.redirect('/shop?msg='+ msg);
-				}
+
+				console.debug('DISPONIBILITA: ', Number(prod.quantity), Number(q), priceCurier.length)
+
+				if (req.session.numProducts < priceCurier.length) { // verifico il numero massimo di beerbox spedibili
+          if ((Number(prod.quantity) - Number(q)) > 0) {
+  					
+  					//Increase quantity or add the product in the shopping cart.
+  					if (cart[id]) {
+  						cart[id].qty++;
+  						cart[id].subtotal=(cart[id].qty*cart[id].price).toFixed(2);
+  						req.session.numProducts++;
+  					}	else { //il prodotto è scelto per la prima volta
+  						cart[id] = {
+  							id : prod._id,
+  							name: prod.name,
+  		          linkImage: prod.linkImage,
+  		          quantity: prod.quantity,
+  							price: prod.price.toFixed(2),
+  							prettyPrice: prod.prettyPrice(),
+  							qty: 1,
+  							subtotal: prod.price.toFixed(2)
+  						};
+  						req.session.numProducts++;
+  					}
+            res.status(200).send('{"statusText":"ok", "msg": ""}');
+  				} else {
+  					const msg = 'Hai aggiunto l\'ultimo beerBox disponibile. La birra '+prod.name+' è ora esaurita. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.'
+            res.status(200).send('{"statusText":"ko", "msg":"'+msg+'"}');
+  				}
+        } else { 
+          const msg = "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'\indirizzo email birrificioviana@gmail.com"
+          res.status(200).send('{"statusText":"ko", "msg":"'+msg+'"}');
+        }
 			}
 
 		});
@@ -383,17 +415,57 @@ module.exports = function(app, moment, mongoose) {
 //GET
 	app.get('/cart', lib.isLoggedIn, function (req, res) {
     
-		//Retrieve the shopping cart from session
-		lib.retriveCart(req);
+		Product.find(function (err, prods) {
+      if (err) {
+        let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
+        console.error(moment().utc("Europe/Rome").format()+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
+        req.flash('message', msg);
+        return res.render('info.njk', {
+            message: req.flash('message'),
+            type: "warning"
+        })
+      } else {
+        if (req.session.numProducts <= priceCurier.length) { // verifico il numero massimo di beerbox spedibili
+          //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+          lib.retriveCart(req);
+          var cart = req.session.cart
+          console.debug('CART in CART', cart)
+          var numProds = req.session.numProducts
 
-		var model = { user       : req.user.local,
-  						    numProducts: req.session.numProducts,
-  						    cart       : req.session.cartItems,
-                  totalPrice : req.session.totalPrc
-  					    };
-
-  	res.render('cart.njk', model);
+          prods.forEach(function(prod) {
+            prodId = prod._id.toString()
+            if (cart != undefined) {
+              
+              if (cart[prodId] != undefined) {
+                // controlo che nel frattempo non abbiano acquistato beerbox
+                // e nel caso aggiusto i quantitativi 
+                prod.quantity = prod.quantity - cart[prodId].qty                            
+                if (prod.quantity < 0 ) {                
+                  cart[prodId].qty = cart[prodId].qty + prod.quantity
+                  numProds = numProds + prod.quantity
+                  prod.quantity = 0
+                  req.flash('cartMessage','Mi dispiace, ma la quantità disponibile dei beerbox per la birra '+prod.name+' è inferiore alla richieste rivevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo '+cart[prodId].qty+' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.')
+                } 
+              }
+            }
+          });
+          req.session.cart = cart
+          //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+          lib.retriveCart(req);
+        }else{
+          req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'\indirizzo email birrificioviana@gmail.com")
+        }
+    		var model = { user       : req.user.local,
+      						    numProducts: req.session.numProducts,
+      						    cart       : req.session.cartItems,
+                      totalPrice : req.session.totalPrc,
+                      message    : req.flash('cartMessage'),
+      					    };
+      	res.render('cart.njk', model);
+      }
+    });
 	});
+
 //POST MINUS ===================================================================
 	app.post('/cart/minus', lib.isLoggedIn, function (req, res) {
 		//Load (or initialize) the cart
@@ -415,6 +487,7 @@ module.exports = function(app, moment, mongoose) {
   				cart[id].qty--;
   				cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
   				req.session.numProducts--;
+          //prod.quantity++;
   			}
       }
   			res.redirect('/cart');
@@ -436,11 +509,26 @@ module.exports = function(app, moment, mongoose) {
 				res.redirect('/shop');
 				return;
 			} else {
-  			if (cart[id]) {
-  				cart[id].qty++;
-  				cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
-  				req.session.numProducts++;
-  			}
+        console.debug('PROD QUANTITY in PLUS',prod.quantity)
+        console.debug('PROD QUANTITY in PLUS test',prod.quantity-cart[id].qty)
+        console.debug('PROD TEST',req.session.numProducts, priceCurier.length)
+  			if (cart[id] && req.session.numProducts < priceCurier.length) { // verifico il numero massimo di beerbox spedibili
+          if (prod.quantity-cart[id].qty > 0) { // quantità disponibile > quantità nel carrello
+    				cart[id].qty++;
+    				cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
+    				req.session.numProducts++;
+            //prod.quantity--;
+          } else if (prod.quantity-cart[id].qty < 0){  // quantità disponibile è inferiore a quella nel carrello. Può succedere se viene fatto acquiaro da altro cliente
+            console.debug('PROD QUANTITY in PLUS < 0')
+            cart[id].qty = cart[id].qty - prod.quantity;
+            cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
+            req.flash('cartMessage', 'Mi spiace ma la disponibilità è inferiore alla richiesta a causa di acquisti simultanei. I beerbox disponibili per la birra '+prod.name+' sono '+cart[id].qty+'. A breve sarà in riassortimento');
+          } else {
+            req.flash('cartMessage', 'Mi spiace ma la disponibilità di birra '+prod.name+' è di solo '+cart[id].qty+' beerBox e non puoi più aggiungerne. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
+          }
+        } else {
+          req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'\indirizzo email birrificioviana@gmail.com")
+        }
       }
 			res.redirect('/cart');
 		});

@@ -18,15 +18,21 @@ body {
 
 /* Animate DIV */
 .animate-div {
-  animation: my-animation 0.7s ease-in-out;
+  animation: my-animation 0.9s ease-in-out;
 }
 @keyframes my-animation {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+
+/*  
   0% {
     transform: translateX(0);
   }
   100% {
     transform: translateX(350px)
   }
+  */
 }
 /*-------------*/
 
@@ -43,15 +49,15 @@ body {
   background-color: #c67605;
 }
 #lblCartCount {
-    font-size: 16px;
-    background: #1140A4;
-    color: #fff;
+    font-size: 18px;
+    background: #FFBB35;
+    color: #2A0009;
     padding: 0 8px;
     vertical-align: top;
     margin-left: -22px; 
 }
 
-
+/*------------------*/
 .btn-my{
   background-color:#5375BD;
   color: #fff;

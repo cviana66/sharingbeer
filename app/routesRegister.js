@@ -201,10 +201,16 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                                   });
             } else {
               if (user.local.status == 'new') {
+                var video = "video/BirraViannaColor_Final_Logo_38.mp4";
+                //console.debug(req.session)
+                if (process.env.NODE_ENV === 'development') {
+                  video = "";
+                }
                 res.render('validation.njk', {
                   prospect: user.local,
-                  message: req.flash('validateMessage'),
-                  type: "danger"
+                  message : req.flash('validateMessage'),
+                  type    : "danger",
+                  video   : video
                 });
               } else if (user.local.status == 'waiting') { 
                 //START TRANSACTION.local

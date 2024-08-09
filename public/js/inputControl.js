@@ -137,7 +137,7 @@ function fieldsValidationControl() {
     return false;
   }
   if(!document.getElementById('checkPrivacy').checked) {
-    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella di controllo per accettare le Condizioni";
+    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella di controllo per accettare le Condizioni generali di vendita e la Privacy";
     return false;
   }
   console.debug('FIELDS VALIDATION CONTROL')

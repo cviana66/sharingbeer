@@ -140,7 +140,7 @@ module.exports = {
                         req.session.numProducts += cart[item].qty;
                         let npXid = { "id":cart[item].id.toString(), "qty":cart[item].qty}
                         req.session.numProductsPerId.push(npXid);  
-                        console.debug('PRODOTTI NEL CARRELLO: ITEM=',item, ' PRODOTTO: ', cart[item])
+                        console.debug('PRODOTTI NEL CARRELLO: ITEM =',item, ' PRODOTTO: ', cart[item])
                       }
                     }
                     console.debug('NUMERO PRODOTTI PER ID: ',req.session.numProductsPerId.length, req.session.numProductsPerId)

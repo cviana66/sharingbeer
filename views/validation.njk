@@ -41,12 +41,12 @@
 
 <div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
 
-<div class="font-weight-light text-center" style="margin:5px 0px 0px 0px; font-size:0.9em; color:#FF9139;"> 
+<div class="font-weight-light text-center" style="margin:5px 0px 0px 0px; font-size:0.8em; color:#FF9139;"> 
   Condividi il gusto, moltiplica il risparmio
 </div>
 
 <div class="embed-responsive embed-responsive-16by9" style="margin:10px 0px 0px 0px; border-radius:5px 5px 5px 5px">
-  <video class="embed-responsive-item" src="video/BirraViannaColor_Final_Logo_38.mp4" controls autoplay="true" muted></video>
+  <video class="embed-responsive-item" src={{video}} controls autoplay="true" muted></video>
 </div>
 
 <div class="text-white font-weight-light text-center" style="margin:10px 0px 10px 0px; font-size:1.2em"> 
@@ -92,12 +92,8 @@
                  name="firstName" placeholder="Nome" required>
               </div>
               <div class="form-group" style="margin-top: 30px;">
-                <!--<label class="text-white col-form-label-lg" for="inputUsernameEmail">Indirizzo Email</label>-->
                 <div class="input-error" id="wrongMail"></div>
-                <!--p class="text-white font-weight-light text-justify" style="font-size:0.7rem;">questo è l'indirizzo email proposto dalla persona che ti ha invitato, se vuoi modificarlo ricorda che deve essere una mail valida e sarà il tuo utente per gli accessi futuri</p-->
                 <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="Indirizzo email" required>
-
-                <!--<label class="text-white col-form-label-lg" for="inputUsernameEmail">Conferma indirizzo Email</label>-->
                 <div class="input-error" id="wrongControlMail"></div>
                 <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value="" 
                 placeholder="Conferma Indirizzo email" required>
@@ -109,7 +105,6 @@
                   <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password" required>
                   <a class="password-toggle-icon"><i class="bi bi-eye" id="togglePassword"></i></a>
                 </div>
-
                 <div class="input-error" id="wrongConfirmPwd"></div>
                 <div class="contenitore">
                   <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Conferma Password" required><a class="passwordConfirm-toggle-icon"><i class="bi bi-eye" id="toggleConfirmPassword"></i></a>
@@ -134,7 +129,7 @@
                 <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
               </div>
               <div class="form-group">
-               <p class="text-white font-weight-light text-center" style="font-size:0.7em;">L'accettazione NON ha vincoli ne obblighi di acquisto</p>
+               <p class="text-white font-weight-light text-center" style="font-size:0.6em;">L'accettazione NON ha vincoli ne obblighi di acquisto</p>
               </div>
             </fieldset>
           </form>

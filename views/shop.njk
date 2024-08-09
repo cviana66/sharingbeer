@@ -17,19 +17,18 @@
                   </tr>
                 </table>
                 {% if prod.quantity > 20 %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili </h5>
-                {% elif prod.quantity < 20 and prod.quantity > 6 %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento </h5>
+                  <!--h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili {{prod.quantity}}</h5-->
+                {% elif prod.quantity < 20 and prod.quantity > 0 %}
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento {{prod.quantity}}</h5>
                 {% else %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox finiti e in assortimento </h5>
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox finiti e in riassortimento {{prod.quantity}}</h5>
                 {% endif %}
                 <div class="align-self-center">
                   <p class="text-white font-italic text-justify">{{prod.description}}</p>
                 </div>
-                {% if prod.quantity > 6 %}
+                {% if prod.quantity > 0 %}
                   <div style="margin: 0px 0px 10px 0px;">
-                    <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}')">
-                      <!-- <div>{{prod.prettyPrice}}</div> -->
+                    <button type="Button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}')">
                       <div>Aggiungi al Carrello</div>
                     </button>
                   </div>
@@ -43,27 +42,48 @@
       {% endfor %}
 
 <script type="text/javascript">
-  let content = document.getElementById("carrello");
-  function animateDiv(item_id) {
-    document.querySelector('#carrello').classList.add('animate-div');
-/*
-  var data = {}
-  data.item_id = item_id;
-  console.log(data)
- 
-  await $.ajax({
-      type: 'POST',
-      dataType: 'json',
-      url: '/shop',
-      data: data,
-      success: function(res) {
-        console.log('Success',res)
-      },
-      error: function (e) {
-        console.log('Errore',e)
-      }
-  })
- */
+  //let content = document.getElementById("carrello");
+  
+  async function animateDiv(item_id) {
+    document.querySelector('#carrello').classList.add('animate-div'); //animazione 
+    document.getElementById("mybutton").setAttribute("disabled","disabled"); //disattivo il pulsante
+
+    var data = {}
+    data.item_id = item_id;
+    await $.ajax({
+        type: 'POST',
+        dataType: 'json',
+        url: '/shop',
+        data: data,
+        success: function(res) { 
+          console.log(res.statusText)          
+          console.log(res.msg)       
+          if (res.statusText == 'ok') {
+            var spanElement = document.getElementById('lblCartCount');
+            var num = Number(document.getElementById('lblCartCount').textContent) + 1
+            console.log('NUMERO DI ITEM', num.toString())
+            spanElement.textContent = num.toString(); 
+            
+            document.querySelector('#carrello').classList.remove('animate-div'); //animazione
+            sleep(500)
+            document.getElementById("mybutton").removeAttribute("disabled")  //riattivo il pulsante
+          
+          } else {
+            window.location.href = '/shop?msg='+ res.msg;
+          }
+        },
+        error: function (e) {
+          console.log('Errore',e)
+        }
+    });
+
+    
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    })
   }
 </script>
 
