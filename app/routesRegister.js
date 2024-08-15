@@ -413,7 +413,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
           user.local.name.first              = req.body.firstName;
           user.local.name.last               = req.body.lastName;
-          user.local.status                  = 'customer';
+          user.privacy.optional              = req.body.checkPrivacyOptional;
+          user.privacy.transfer              = req.body.checkPrivacyCessione;
+          //user.local.status                  = 'customer';
+          console.debug('USER in REGISTER',user)
+          console.debug('req.body.checkPrivacyOptional in REGISTER',req.body.checkPrivacyOptional)
+          console.debug('req.body.checkPrivacyCessione in REGISTER',req.body.checkPrivacyCessione)
         }
         // genero un nuovo _id
         const addressId = new mongoose.Types.ObjectId() 

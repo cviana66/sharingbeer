@@ -52,13 +52,48 @@
 
           <div class="input-error" id="wrongNumciv"></div>
           <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly>        
-
-          <br>
-          <div>
-            <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return controlInputAndValidateAddress()">
-              Salva i dati
-            </button>
+        </div>
+        
+        <div class="form-group"style="margin: 10px 10px 10px 10px;">
+          <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">Consenso Privacy (<span style="font-size:0.7em">per dettagli vedere</span> <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy) </a>
+          
+          <div class="input-error" id="wrongPrivacyDefault"></div>
+          <div class="form-check" style="margin-top: 10px;" >
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyDefault" checked onclick="return false;"/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault" style="font-size:0.7em">Per 
+              adempiere a tutti gli obblighi legali, regolamentari, normativi e commerciali correnti in materia fiscale/tributaria.
+            </label>
           </div>
+          
+          
+          <div class="form-check" style="margin-top: 20px;" >
+            <div class="input-error" id="wrongPrivacyNeed"></div>
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyNeed"/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyNeed">(Necessario) 
+              <span style="font-size:0.7em">Per Invio di comunicazioni informative relativi a servizi offerti, a seguito dell'acquisto effettuato sul sito web, della richiesta di ritiro della merce o consegna a domicilio, inclusi aggornamenti su disponibilità di prodotti in riassortimento o nuovi. Utilizzo dei dati per scopi accessori o correlati alle funzionalità principali del sito web, ma sempre all'interno delle sue attività.</span> 
+            </label>
+          </div>
+                    
+          <div class="form-check" style="margin: 20px 0px 0px 0px;" >
+            <div class="input-error" id="wrongPrivacyOptional"></div>
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyOptional" name="checkPrivacyOptional" />
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyOptional">(Facoltativo)
+               <span style="font-size:0.7em">Per l’invio di informazioni ed offerte promozionali e commerciali e per attività di profilazione a fini di marketing;</span>
+            </label>
+          </div>
+
+          <div class="form-check" style="margin: 20px 0px 30px 0px;" >
+            <div class="input-error" id="wrongPrivacyCessione"></div>
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyCessione" name="checkPrivacyCessione" />
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyCessione">(Facoltativo)
+              <span style="font-size:0.7em">Per cessione dei Dati a società e/o soggetti terzi con cui il Titolare collabora o ha stipulato convenzioni </span>
+            </label>
+          </div>
+        <div>
+          <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return controlInputAndValidateAddress()">
+            Salva i dati
+          </button>
+        </div>
         </div>
       </div>
     </form>
@@ -79,8 +114,8 @@ async function controlInputAndValidateAddress() {
   const ret = await fieldsRegisterControl()
   if (ret) {
     
-    console.debug('CITTA: ',document.getElementById("inputCity").value);
-    console.debug('VIA: ',document.getElementById("inputStreet").value);
+    console.log('CITTA: ',document.getElementById("inputCity").value);
+    console.log('VIA: ',document.getElementById("inputStreet").value);
 
     document.getElementById("loading").style.display = 'block';
     document.getElementById("wrongNumciv").innerHTML = ''
@@ -98,16 +133,13 @@ async function controlInputAndValidateAddress() {
       dataType: 'json',
       url: '/overpass/cap',
       data: data,
-      success: function(res) {
-        //console.debug('RES',res)
-        if (res.status != 'ko') {
-          
-          //var cap = res.cap;
-          console.debug('CAP: ',res.cap)
+      success: function(res) {        
+        if (res.status != 'ko') {          
+          console.log('CAP: ',res.cap)
           document.getElementById("hiddenCAP").value = res.cap
 
           document.getElementById("hiddenAddressIsValid").value = res.status
-          console.debug('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
+          console.log('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
 
           postData = {
             firstName : document.getElementById("inputFirstName").value,
@@ -121,13 +153,15 @@ async function controlInputAndValidateAddress() {
             hiddenAddressIsValid : res.status,
             descValidAddress : res.desStatus,
             lat : res.lat,
-            lon : res.lon
+            lon : res.lon,
+            checkPrivacyOptional : document.getElementById('checkPrivacyOptional').checked,
+            checkPrivacyCessione : document.getElementById('checkPrivacyCessione').checked
           }
-          console.debug('PARAM',JSON.stringify(postData,null,2));
+          console.log('PARAM',JSON.stringify(postData,null,2));
           post('/register',postData);
 
         } else {
-          console.debug('ERRORE nella ricerca dello indirizzo');
+          console.error('ERRORE nella ricerca dello indirizzo');
           document.getElementById("hiddenCAP").value ="";
           document.getElementById("hiddenAddressIsValid").value = "errato";
           post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});

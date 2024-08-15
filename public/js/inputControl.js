@@ -208,10 +208,11 @@ async function fieldsRegisterControl() {
   var numciv = document.getElementById("inputNumciv").value;
   var cognome = document.getElementById("inputLastName").value;
   var nome = document.getElementById("inputFirstName").value;
+  console.log('CHECK',document.getElementById('checkPrivacyNeed').checked)
+
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
   var submit = true;
-
 
   // init messaggi di warning
   if (document.getElementById("wrongFirstName") != null) document.getElementById("wrongFirstName").innerHTML = "";
@@ -222,6 +223,7 @@ async function fieldsRegisterControl() {
   if (document.getElementById("wrongStreet") != null) document.getElementById("wrongStreet").innerHTML = "";
   if (document.getElementById("wrongCap") != null) document.getElementById("wrongCap").innerHTML = "";
   if (document.getElementById("wrongNumciv") != null) document.getElementById("wrongNumciv").innerHTML = "";
+  if (document.getElementById("wrongPrivacyNeed") != null) document.getElementById("wrongPrivacyNeed").innerHTML = "";
 
   if (nome == "") {
     text = iwar+"Inserire il Nome";
@@ -289,8 +291,7 @@ async function fieldsRegisterControl() {
     document.getElementById("inputStreet").focus();
     document.getElementById("wrongStreet").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
-  }
-  
+  }  
   if (numciv == "") {
     text = iwar+"Inserire il Numero Civico";  
     document.getElementById("wrongNumciv").innerHTML = text;
@@ -298,7 +299,12 @@ async function fieldsRegisterControl() {
     document.getElementById("wrongNumciv").scrollIntoView({ behavior: "smooth", block: "center" });
     return false
   }
-  
+
+  if(!document.getElementById('checkPrivacyNeed').checked) {
+    document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella di controllo per poter proseguire";
+    return false;
+  }
+
   return true;
    
 };

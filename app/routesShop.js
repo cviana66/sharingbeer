@@ -425,9 +425,10 @@ module.exports = function(app, moment, mongoose) {
             type: "warning"
         })
       } else {
+        //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+        lib.retriveCart(req);
         if (req.session.numProducts <= priceCurier.length) { // verifico il numero massimo di beerbox spedibili
-          //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
-          lib.retriveCart(req);
+          
           var cart = req.session.cart
           console.debug('CART in CART', cart)
           var numProds = req.session.numProducts

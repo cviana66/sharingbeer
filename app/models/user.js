@@ -21,6 +21,11 @@ const userSchema = new Schema({
               resetPasswordExpires  : {type: Date},
               role                  : {type: String}
             },
+  privacy : {
+              needs     : {type: Boolean, default: true},
+              optional  : {type: Boolean},
+              transfer  : {type: Boolean},
+            },
   addresses : [{  name: { first: {type: String},
                           last : {type: String},
                         },
