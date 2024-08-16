@@ -359,7 +359,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             var model = { firstName: req.user.local.name.first,
                           lastName: req.user.local.name.last,
                           user: req.user,
-                          numProducts : req.session.numProducts
+                          numProducts : req.session.numProducts,
+                          message : req.flash('validateMessage'),
+                          type: "warning"
                         }
             res.render('registration.njk', model);
 
@@ -382,9 +384,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     app.post('/register', lib.isLoggedIn, async function(req, res) {
 
       const session = await mongoose.startSession();
-      try {
-        session.startTransaction();
-        const opts = { session };
+      session.startTransaction();
+      const opts = { session };
+      try {        
 
         console.log('ID POST REGISTER: ',req.user.id);
 
@@ -411,11 +413,19 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
         if (user.local.status != 'customer') {
           console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
+          
+          //Test unicità del num. tel 
+          const countMobileNumber = await User.aggregate([{$match:{"local.mobileNumber":req.body.mobile}},{$count:"count"}])
+          console.debug('REGISTER countMobileNumber:',countMobileNumber, 'LENGTH',countMobileNumber.length)
+          if (countMobileNumber.length > 0) throw({code:11000})
+
           user.local.name.first              = req.body.firstName;
           user.local.name.last               = req.body.lastName;
           user.privacy.optional              = req.body.checkPrivacyOptional;
           user.privacy.transfer              = req.body.checkPrivacyCessione;
-          //user.local.status                  = 'customer';
+          user.local.status                  = 'customer';
+          user.local.mobilePrefix    = '+39';
+          user.local.mobileNumber    = req.body.mobile;
           console.debug('USER in REGISTER',user)
           console.debug('req.body.checkPrivacyOptional in REGISTER',req.body.checkPrivacyOptional)
           console.debug('req.body.checkPrivacyCessione in REGISTER',req.body.checkPrivacyCessione)
@@ -516,14 +526,22 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   
                 })
         }      
-      } catch(err) {
-          console.log('error', err);
-          await session.abortTransaction();
-          req.flash('error', 'L\'applicazione ha riscontrato un errore inatteso') 
-          res.render('info.njk', {
+      } catch(e) {
+        await session.abortTransaction();
+        if (e.code === 11000) {
+          let msg = 'Numero telefonico già registrato. Ti ricordo che tutte le comunicazioni importanti relative alla consegna e al ritiro dei prodotti saranno trasmesse via messaggistica telefonica. Inserisci un numero di telefono che ti appartiene.';
+          req.flash('validateMessage', msg);
+          console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /register" ID: {"id":"' + req.user.id + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
+          res.redirect("/register");
+        } else {
+          let msg = 'Spiacente ma l\'applicazione ha riscontrato un errore inatteso. Riprova';      
+          req.flash('error', msg);
+          console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /register" ID: {"email":"' + req.user.id + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+          return res.render('info.njk', {
               message: req.flash('error'),
               type: "danger"
-          });
+          })              
+        }
       } finally {
         await session.endSession();
       }

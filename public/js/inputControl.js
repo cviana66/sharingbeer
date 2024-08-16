@@ -302,6 +302,7 @@ async function fieldsRegisterControl() {
 
   if(!document.getElementById('checkPrivacyNeed').checked) {
     document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella di controllo per poter proseguire";
+    document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
 
