@@ -208,7 +208,6 @@ async function fieldsRegisterControl() {
   var numciv = document.getElementById("inputNumciv").value;
   var cognome = document.getElementById("inputLastName").value;
   var nome = document.getElementById("inputFirstName").value;
-  console.log('CHECK',document.getElementById('checkPrivacyNeed').checked)
 
   var phoneno = /^\d{10}$/;
   var capno = /^\d{5}$/;
@@ -299,12 +298,14 @@ async function fieldsRegisterControl() {
     document.getElementById("wrongNumciv").scrollIntoView({ behavior: "smooth", block: "center" });
     return false
   }
-
-  if(!document.getElementById('checkPrivacyNeed').checked) {
-    document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella di controllo per poter proseguire";
-    document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
-    return false;
+  if (document.getElementById("wrongPrivacyNeed") != null) {
+    if(!document.getElementById('checkPrivacyNeed').checked) {
+      document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella di controllo per poter proseguire";
+      document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }  
   }
+  
 
   return true;
    
