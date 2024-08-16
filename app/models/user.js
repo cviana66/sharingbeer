@@ -11,7 +11,7 @@ const userSchema = new Schema({
               password        : {type: String, required: true},
               status          : {type: String, required: true},
               mobilePrefix : {type: String},
-              mobileNumber : {type: String, unique: true},
+              mobileNumber : {type: String},
               fiscalCode      : {type: String},  
               eligibleFriends : {type: Number, default: 0},
               idParent        : {type: String, required: true, unique: true}, //id della persona che ha fatto l'invito

@@ -19,9 +19,9 @@
                 {% if prod.quantity > 20 %}
                   <!--h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili {{prod.quantity}}</h5-->
                 {% elif prod.quantity < 20 and prod.quantity > 0 %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento {{prod.quantity}}</h5>
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento</h5>
                 {% else %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox finiti e in riassortimento {{prod.quantity}}</h5>
+                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox finiti e in riassortimento</h5>
                 {% endif %}
                 <div class="align-self-center">
                   <p class="text-white font-italic text-justify">{{prod.description}}</p>
