@@ -32,14 +32,14 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
                   <p> Dovresti ricevere il tuo ordine entro '+date+' \
                   <p> Accedi ai tuoi ordini cliccando su </p> \
                   <div align="center"> \
-    								<a href="'+server+'/shopping?orderId='+orderId+'"> \
+    								<a href="'+server+'/shopping?type='+deliveryType+'&orderId='+orderId+'"> \
   										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
                       I miei Ordini</button> \
                     </a> \
 									</div> \
                   <div align="center">   <p> oppure </p>  </div> \
                   <div><p> copia il seguente link nella barra degli indirizzi del browser </p></div> \
-                  <div align="center">   <p> '+server+'/shopping?orderId='+orderId+' </p>  </div> \
+                  <div align="center">   <p> '+server+'/shopping?type='+deliveryType+'&orderId='+orderId+' </p>  </div> \
                   <div><p> e premi invio. </p></div> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
@@ -119,14 +119,14 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
                   <p> Il tuo ordine è già pronto! Ti chiedo la cortesia di ritirarlo entro '+date+'. <b>Verifica gli orari di apertura del Birrificio Viana<b>. </p> \
                   <p> Accedi ai tuoi ordini cliccando su </p> \
                   <div align="center"> \
-                    <a href="'+server+'/shopping?orderId='+orderId+'"> \
+                    <a href="'+server+'/shopping?type='+deliveryType+'&orderId='+orderId+'"> \
                       <button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
                       I miei Ordini</button> \
                     </a> \
                   </div> \
                   <div align="center">   <p> oppure </p>  </div> \
                   <div><p> copia il seguente link nella barra degli indirizzi del browser </p></div> \
-                  <div align="center">   <p> '+server+'/shopping?orderId='+orderId+' </p>  </div> \
+                  <div align="center">   <p> '+server+'/shopping?type='+deliveryType+'&orderId='+orderId+' </p>  </div> \
                   <div><p> e premi invio. </p></div> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \

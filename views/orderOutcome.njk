@@ -26,12 +26,14 @@
     </div>
   </div>
   <div>
-    <form role="form" action="/shopping" method="GET">
+    <form role="form" action="/shopping?type={{user.orders.deliveryType}}&orderId={{orderId}}" method="GET">
        <div style="margin-bottom: 40px;">
          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
            Riepilogo ordini
              </button>
         </div>
+        <input type="hidden" name="type" value="{{user.orders.deliveryType}}"/>
+        <input type="hidden" name="orderId" value="{{orderId}}" />
      </form>
   </div>
 {% else %}

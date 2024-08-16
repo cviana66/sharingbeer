@@ -270,9 +270,11 @@ const gestpayService = new GestpayService();
       req.session.cart = {};
       req.session.order = {};
       req.session.numProducts = 0;
+      //-------------------------------------
 
       res.render('orderOutcome.njk', {
             status        : decryptedString.TransactionResult,
+            orderId       : decryptedString.ShopTransactionID,
             deliveryDate  : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'),
             ritiroDate    : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Ritiro'),
             user          : req.user,

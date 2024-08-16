@@ -8,17 +8,23 @@
 <!-- Nav tabs -->
 
 <nav class="nav nav-pills nav-justified">
-  <a class="nav-item nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" style="font-size:0.9em;"><b>in consegna</b></a>
-  <a class="nav-item nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" style="font-size:0.9em;"><b>da ritirare</b></a>
+  <a class="nav-item nav-link {{attivaConsegna}}" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" style="font-size:0.9em;"><b>in consegna</b></a>
+  <a class="nav-item nav-link {{attivaRitiro}}" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" style="font-size:0.9em;"><b>da ritirare</b></a>
   <a class="nav-item nav-link" id="messages-tab" data-toggle="tab" href="#messages" role="tab" aria-controls="messages" aria-selected="false" style="font-size:0.9em;"><b>consegnati o ritirati</b></a>
 </nav>
 
 <!-- Tab panes -->
 <div class="tab-content">
   
-  <div class="tab-pane active text-white " id="home" role="tabpanel" aria-labelledby="home-tab" style="margin: 20px 0px 0px 0px;">
+  <div class="tab-pane {{attivaConsegna}} text-white " id="home" role="tabpanel" aria-labelledby="home-tab" style="margin: 20px 0px 0px 0px;">
     {% for purchase in ordiniInConsegna %}
-    <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 20px 0px;">
+    
+      {% if purchase.orders._id == orderId %}
+        <div class="card" style="background-color:#2A0009;border-color:#c67605;margin: 0px 0px 20px 0px;">
+      {% else %}
+        <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 20px 0px;">
+      {%endif%}
+
       <div class="flex-row" style="margin: 10px 0px 10px 0px;">
         <div class="text-white font-weight-light text-center">
           ORDINE <br> <span style="font-size:0.9em;">{{purchase.orders._id}}</span>
@@ -69,9 +75,13 @@
     {% endfor %}
   </div>
 
-  <div class="tab-pane text-white " id="profile" role="tabpanel" aria-labelledby="profile-tab" style="margin: 20px 0px 0px 0px;">
+  <div class="tab-pane {{attivaRitiro}} text-white " id="profile" role="tabpanel" aria-labelledby="profile-tab" style="margin: 20px 0px 0px 0px;">
     {% for purchase in ordiniInRitiro %}
-    <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 20px 0px;">
+      {% if purchase.orders._id == orderId %}
+        <div class="card" style="background-color:#2A0009;border-color:#c67605;margin: 0px 0px 20px 0px;">
+      {% else %}
+        <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 20px 0px;">
+      {%endif%}
       <div class="flex-row" style="margin: 10px 0px 10px 0px;">
         <div class="text-white font-weight-light text-center">
           ORDINE <br> <span style="font-size:0.9em;">{{purchase.orders._id}}</span>

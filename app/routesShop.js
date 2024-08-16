@@ -13,6 +13,16 @@ module.exports = function(app, moment, mongoose) {
 // =============================================================================
 //GET
 	app.get('/shopping', lib.isLoggedIn, async function (req,res) {
+    
+    if (req.query.type == "Ritiro") {
+      var attivaConsegna = ""
+      var attivaRitiro = "active"
+    } else {
+      var attivaConsegna = "active"
+      var attivaRitiro = ""
+    }
+    
+
 		//====================================
 		// ORDINI IN CONSEGNA
 		//====================================
@@ -89,13 +99,18 @@ module.exports = function(app, moment, mongoose) {
             ])
 	  //console.debug('INDIRIZZO RITIRO', JSON.stringify(addressRitiro,null,2))
 
+    console.debug('SHOPPIMG req.query.orderId',req.query.orderId)
+
 		res.render('shopping.njk', {
                   ordiniInConsegna 	: ordiniInConsegna,
                   ordiniInRitiro 		: ordiniInRitiro,
                   ordiniConsegnati 	: ordiniConsegnati,
                   numProducts 			: req.session.numProducts,
                   user 							: req.user,
-                  addressRitiro 		: addressRitiro[0].addresses
+                  addressRitiro 		: addressRitiro[0].addresses,
+                  attivaRitiro      : attivaRitiro,
+                  attivaConsegna    : attivaConsegna,
+                  orderId           : req.query.orderId
                })
 	})
 
