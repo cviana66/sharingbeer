@@ -415,7 +415,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
           
           //Test unicità del num. tel 
-          const countMobileNumber = await User.aggregate([{$match:{"local.mobileNumber":req.body.mobile}},{$count:"count"}])
+          const numMobil = req.body.mobile.replace(/\s/g,"")
+          const countMobileNumber = await User.aggregate([{$match:{"local.mobileNumber":numMobil}},{$count:"count"}])
           console.debug('REGISTER countMobileNumber:',countMobileNumber, 'LENGTH',countMobileNumber.length)
           if (countMobileNumber.length > 0) throw({code:11000})
 
@@ -425,7 +426,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           user.privacy.transfer              = req.body.checkPrivacyCessione;
           user.local.status                  = 'customer';
           user.local.mobilePrefix    = '+39';
-          user.local.mobileNumber    = req.body.mobile;
+          user.local.mobileNumber    = numMobil;
           console.debug('USER in REGISTER',user)
           console.debug('req.body.checkPrivacyOptional in REGISTER',req.body.checkPrivacyOptional)
           console.debug('req.body.checkPrivacyCessione in REGISTER',req.body.checkPrivacyCessione)
@@ -438,7 +439,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 'name.first'    : req.body.firstName,     
                 'name.last'     : req.body.lastName,
                 mobilePrefix    : '+39',
-                mobileNumber    : req.body.mobile,
+                mobileNumber    : numMobil,
                 city            : req.body.city, 
                 province        : req.body.provincia,
                 address         : req.body.street,
