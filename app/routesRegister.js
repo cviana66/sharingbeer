@@ -410,12 +410,12 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         };
           
         const user = await User.findById(req.user._id);
+        const numMobil = req.body.mobile.replace(/\s/g,"");
 
         if (user.local.status != 'customer') {
           console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
           
-          //Test unicità del num. tel 
-          const numMobil = req.body.mobile.replace(/\s/g,"")
+          //Test unicità del num. tel           
           const countMobileNumber = await User.aggregate([{$match:{"local.mobileNumber":numMobil}},{$count:"count"}])
           console.debug('REGISTER countMobileNumber:',countMobileNumber, 'LENGTH',countMobileNumber.length)
           if (countMobileNumber.length > 0) throw({code:11000})
@@ -537,7 +537,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         } else {
           let msg = 'Spiacente ma l\'applicazione ha riscontrato un errore inatteso. Riprova';      
           req.flash('error', msg);
-          console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /register" ID: {"email":"' + req.user.id + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+          console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /register" ID: {"id":"' + req.user.id + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
           return res.render('info.njk', {
               message: req.flash('error'),
               type: "danger"
