@@ -167,12 +167,7 @@ app.get('/logout', function(req, res, next) {
               req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
-            let server;
-            if (process.env.NODE_ENV == "development") {
-              server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-            } else {
-              server = req.protocol+'://'+req.hostname;
-            } 
+            const server = lib.getServer(req);
             try {
               await lib.sendmailToPerson('',user.local.email,'',token,'','','','reset',server);
               let msg = '!';
@@ -351,12 +346,7 @@ app.get('/logout', function(req, res, next) {
 
   //UTILITY
   app.get('/mailvalidatemail', function(req, res) {
-      let server;
-      if (process.env.NODE_ENV == "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      } 
+      var server = lib.getServer(req);      
       res.send(mailvalidatemail('Token', server))
     }); 
 

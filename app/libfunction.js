@@ -60,6 +60,20 @@ module.exports = {
                             return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
                           }
                          },
+  getServer: function getServer(req)
+                        {
+                          var server;
+                          if (process.env.NODE_ENV== "development") {
+                            if (req.hostname == "sb.sharingbeer.it") {
+                              server = req.protocol+'://'+req.hostname
+                            } else {
+                              server = req.protocol+'://'+req.hostname+':'+process.env.PORT
+                            }                           
+                          } else {
+                           server = req.protocol+'://'+req.hostname;
+                          }
+                          return server;
+                        },
   sendmailToPerson: async function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server, html) {
 
                       console.log('MAIL TYPE: ', typeOfMail);
@@ -83,7 +97,7 @@ module.exports = {
                         var mailOptions = {
                             from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
                             to: Email, //'cviana66@gmail.com', // list of receivers
-                            subject: 'Grazie dal Birrificio Viana', // Subject line
+                            subject: 'Invito - Birrificio Viana', // Subject line
                             html: mailinvite(Name, Email, Token, userName, server)
                         }
                       } else if  (typeOfMail == 'conferme') {
@@ -104,7 +118,7 @@ module.exports = {
                         var mailOptions = {
                             from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
                             to: Email, //'cviana66@gmail.com', // list of receivers
-                            subject: 'Conferma ordine - Birrificio Viana', // Subject line
+                            subject: 'Conferma d\'ordine - Birrificio Viana', // Subject line
                             html: html
                         }   
                       }

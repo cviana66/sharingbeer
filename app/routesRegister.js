@@ -194,7 +194,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             if (!user) {
                 let msg = 'Invito non più valido o scaduto'; //Invitation is invalid or has expired';
                 req.flash('warning', msg);
-                console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err);
+                console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: utente non trovato' + msg);
                 return res.render('info.njk', {
                                     message: req.flash('warning'),
                                     type: "warning"
@@ -226,7 +226,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   await session.commitTransaction();
 
                 } catch (e) {
-                  console.log("errore: ",e)
+                  console.debug("errore: ",e)
                   await session.abortTransaction();
                   req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
                   console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: '+e);
@@ -264,58 +264,55 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
                 req.flash('error', msg);
                 console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '"}  FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
-                console.log('POST VALIDATION ERROR: ', err);
+                console.debug('POST VALIDATION ERROR: ', err);
                 return res.render('info.njk', {
                     message: req.flash('error'),
                     type: "danger"
                 });
-
             } else {
                 const email = req.body.email.toLowerCase();
+                
                 //start email validation
                 if (!lib.emailValidation(email)) {
                     let msg = 'Indirizzo mail non valido'; //'Please provide a valid email';
                     req.flash('validateMessage', msg)
-                    console.info(moment().utc("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "POST /validation" OKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:'+ user._id + '"} FLASH: ' + msg);
+                    console.info(moment().utc("Europe/Rome").format() + ' [WARNING][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:'+ user._id + '"} FLASH: ' + msg);
                     return res.redirect("/validation?token=" + req.body.token);
                 }
                 //end email validation
                 
-                let server;
-                if (process.env.NODE_ENV== "development") {
-                  server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-                } else {
-                  server = req.protocol+'://'+req.hostname;
-                }
-
+                var server = lib.getServer(req)
+                
                 //START TRANSACTION
                 const session = await mongoose.startSession();
                 session.startTransaction();
+                                
+                const opts = { session };
 
-                const filter =  {'friends.token':req.body.token };
-                const update =  {'friends.$.status':'accepted',
+                try {         
+                  if (user.local.status == "new") {         
+                    const filter =  {'friends.token':req.body.token };
+                    const update =  {'friends.$.status':'accepted',
                                  'friends.$.email':email,
                                  'friends.$.name.first':lib.capitalizeFirstLetter(req.body.firstName),
                                  'friends.$.id': user._id.toString()
                                 }
-                
-                const newToken = lib.generateToken(20);
-                const opts = { session };
+                    const newToken = lib.generateToken(20);
+                    await User.findOneAndUpdate(filter,{'$set':update}).session(session);
+                    
+                    user.local.email = email;
+                    user.local.password = user.generateHash(req.body.password);
+                    user.local.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
+                    user.local.resetPasswordToken = newToken
 
-                try {
-                  await User.findOneAndUpdate(filter,{'$set':update}).session(session);
-                  
-                  user.local.email = email;
-                  user.local.password = user.generateHash(req.body.password);
-                  user.local.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
-                  user.local.resetPasswordToken = newToken
+                    user.local.status = "waiting"
+                    //throw("errore forzato in post validation")
+                    await user.save(opts);
 
-                  user.local.status = "waiting"
-                  await user.save(opts);
-
-                  await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme',server);
-                  let msg = 'Inviata email di verifica'; //'Validated and Logged';
-                  console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
+                    await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme',server);
+                    let msg = 'Inviata email di verifica'; //'Validated and Logged';
+                    console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
+                  }
 
                   await session.commitTransaction();
 
@@ -617,12 +614,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   flag = "true";
               }
 
-              let server;
-              if (process.env.NODE_ENV== "development") {
-                server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-              } else {
-                server = req.protocol+'://'+req.hostname;
-              }
+              var server = lib.getServer(req);
+              
               res.render('friend.njk', {
                   controlSates: controlSates,
                   flag: flag,
@@ -658,12 +651,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
               percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
           });
       }
-      let server;
-      if (process.env.NODE_ENV== "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      }
+
+      var server = lib.getServer(req);
+
       //START TRANSACTION
       const session = await mongoose.startSession();
       session.startTransaction();
@@ -782,54 +772,30 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 // =================================================================================================
 // visualizza in formato HTML la mail conferma
     app.get('/mailconferme', function(req, res) {
-      let server;
-      if (process.env.NODE_ENV == "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      } 
+      var server = lib.getServer(req);
       res.send(mailconferme('Name', 'Email', 'Token', 'userName', 'userSurname', server))
     })
 
     // visualizza in formato HTML la mail Friend
     app.get('/mailfriend', function(req, res) {
-      let server;
-      if (process.env.NODE_ENV== "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      }
+      var server = lib.getServer(req);
       res.send(mailfriend('Name', 'Email', 'Token', 'userName', 'userSurname', server))
 
     })
+
     // visualizza in formato HTML la mail User
     app.get('/mailparent', function(req, res) {
-      let server;
-      if (process.env.NODE_ENV== "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      }
+      var server = lib.getServer(req);
       res.send(mailparent('Name', 'Email', 'userName', 'userEmail', server))
     })
 
     app.get('/mailinvite', function(req, res) {
-      let server;
-      if (process.env.NODE_ENV== "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      }
+      var server = lib.getServer(req);      
       res.send(mailinvite('Name', 'Email', 'Token', 'userName', server))
     })   
 
     app.get('/mailorder', function(req, res) {
-      let server;
-      if (process.env.NODE_ENV== "development") {
-        server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-      } else {
-        server = req.protocol+'://'+req.hostname;
-      }
+      var server = lib.getServer(req);
       
       const html = mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'), server)
       lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)

@@ -193,6 +193,9 @@ color: #4e4e4e;
   user-select: none;
 }
 
+#pagina {
+ overflow: hidden; /* Blocca lo scrolling */
+}
 /*--------------------------------*/
 
 .bg-dark {
