@@ -285,29 +285,28 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 
                 //START TRANSACTION
                 const session = await mongoose.startSession();
-                session.startTransaction();
-                                
-                const opts = { session };
+                
 
                 try {         
+                  await session.startTransaction();
+                  const opts = { session };
                   if (user.local.status == "new") {         
-                    const filter =  {'friends.token':req.body.token };
-                    const update =  {'friends.$.status':'accepted',
-                                 'friends.$.email':email,
-                                 'friends.$.name.first':lib.capitalizeFirstLetter(req.body.firstName),
-                                 'friends.$.id': user._id.toString()
-                                }
-                    const newToken = lib.generateToken(20);
-                    await User.findOneAndUpdate(filter,{'$set':update}).session(session);
                     
+                    const newToken = lib.generateToken(20);
                     user.local.email = email;
                     user.local.password = user.generateHash(req.body.password);
                     user.local.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
                     user.local.resetPasswordToken = newToken
-
-                    user.local.status = "waiting"
-                    //throw("errore forzato in post validation")
+                    user.local.status = "waiting"                    
                     await user.save(opts);
+
+                    const filter =  {'friends.token':req.body.token };
+                    const update =  {'friends.$.status':'accepted',
+                                     'friends.$.email':email,
+                                     'friends.$.name.first':lib.capitalizeFirstLetter(req.body.firstName),
+                                     'friends.$.id': user._id.toString()
+                                    }                  
+                    await User.findOneAndUpdate(filter,{'$set':update}).session(session);
 
                     await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme',server);
                     let msg = 'Inviata email di verifica'; //'Validated and Logged';
