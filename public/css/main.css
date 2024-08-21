@@ -140,7 +140,7 @@ div.input-error {
 }
 
 /*-----------------------
-/* Design Cookie Consent
+/* Design Cookie Content
 /*-----------------------*/
 #cookiePopup {
   background: white;
@@ -189,13 +189,10 @@ color: #4e4e4e;
 
 .blur.active {
   filter: blur(2px);
-  pointer-events: none;
-  user-select: none;
+ /* pointer-events: none;
+  user-select: none;*/
 }
 
-#pagina {
- overflow: hidden; /* Blocca lo scrolling */
-}
 /*--------------------------------*/
 
 .bg-dark {
