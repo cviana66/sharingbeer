@@ -107,7 +107,7 @@
             {{ritiroDate}}
           </div>
           <div>
-            <a href="#" onclick="return openDocument('infoOrari.njk')">vedi orari di apertura</a>
+            <a href="#" onclick="return openDocument('infoOrari.html',)">vedi orari di apertura</a>
           </div>
         </td>
       </tr>
@@ -246,11 +246,13 @@
           location.reload();
         }
       });
-
+      // azione richiesta nel carico della pagina  
       document.addEventListener("DOMContentLoaded", function() {
+        //console.log('DOMContentLoaded in ORDERSUMMARY')
         document.getElementById("loading").style.display = 'none';
         document.getElementById("mybutton").removeAttribute("disabled")
       });
+
       function startAxerve() {
         document.getElementById("mybutton").setAttribute("disabled","disabled");        
         document.getElementById("loading").style.display = 'block';

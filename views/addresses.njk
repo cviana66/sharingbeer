@@ -65,19 +65,41 @@
           <span style="font-size:0.9em;">oppure scegli tra i tuoi preferiti</span>
         </div>
       {%for address in addresses %}
-        <form role="form" action="/orderSummary?addressID={{address.id}}&typeOfDelivery=consegna" method="get" id="selectedAddress">
+        
           <div class="card text-white" style="background-color:#2A0009;border-color:#903246;margin-bottom:10px;">
             <div class="card-body">
-              <p class="card-text text-center" style="font-size:1.0em;">{{address.name.first}} {{address.name.last}}, {{address.address}} {{address.houseNumber}}, {{address.city}} - {{address.postcode}} ({{address.province}})</p>
-              <p class="card-text text-center">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
-              <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
-                Seleziona e vai al riepilogo
-              </button>
-              <input type="hidden" name="addressID" value="{{address.id}}" />
-              <input type="hidden" name="typeOfDelivery" value="consegna" />
+              <table>
+                <tr>
+                  <td>
+                    <p class="card-text text-left">{{address.name.first}} {{address.name.last}}, {{address.address}} {{address.houseNumber}}, {{address.city}} - {{address.postcode}} ({{address.province}})</p>
+                  </td>
+                  <td align="right">
+                    {%if address.main != "yes"%}
+                    <form action="/removeAddress" method="POST">
+                      <button class="btn btn-link" type="submit">
+                        <img src="img/delete_24dp.svg">
+                      </button>
+                      <input type="hidden" name="addressID" value="{{address.id}}" />
+                    </form>
+                    {%endif%}
+
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <form role="form" action="/orderSummary?addressID={{address.id}}&typeOfDelivery=consegna" method="GET" id="selectedAddress">
+                      <p class="card-text text-left">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
+                      <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
+                        Seleziona e vai al riepilogo
+                      </button>
+                      <input type="hidden" name="addressID" value="{{address.id}}" />
+                      <input type="hidden" name="typeOfDelivery" value="consegna" />
+                    </form>
+                  </td>
+                </tr>
+              </table>
             </div>
-          </div>
-        </form>
+          </div>        
       {%endfor%}
       
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:15px;margin-top:20px;">
@@ -123,6 +145,7 @@
             <div class="w-100"></div>
 
             <div class="input-error" id="wrongStreet"></div>
+            <div class="text-white font-weight-light text-justify" style="font-size:0.7em;">Inserisci il nome della Via / Piazza anche parziale e selezionare l'indirizzo dalla lista proposta</div>
             <input type="text" class="form-control" id="inputStreet" value="" name="street" placeholder="Via / Piazza" required readonly autocomplete="off"
             oninput="selectStreet(this.value)">
             <div class="w-100"></div>
@@ -146,6 +169,20 @@
 
 <script type="text/javascript">
 
+  // Ricarico la pagina se l'utente clicca INDIETRO sul bottone del browser
+  window.addEventListener('pageshow', function(event) {
+    // Controlla se la pagina è stata effettivamente caricata dal server
+    if (event.persisted) {
+      // Ricarica la pagina
+      location.reload();
+    }
+  });
+  // azione richiesta nel carico della pagina
+  document.addEventListener("DOMContentLoaded", function() {
+    //console.log('DOMContentLoaded in ADDRESSES');
+    document.getElementById("loading").style.display = 'none';
+  });
+  
   function toggleFatturaDetails() {
 
     var fatturaDetailsDisplay = document.getElementById("fatturaDetails").style.display;
@@ -199,9 +236,7 @@
     checkFatturaDetails();
   });
 */
-  document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("loading").style.display = 'none';
-  });
+
 /*==================================================================*/
 /* GESTIONE della CITTA' con query MONGODB                          */
 /* Gestione delle VIE con query su OpenStreetMaps (Overpass)        */
@@ -217,8 +252,8 @@ async function controlInputAndValidateAddress() {
 */
   const ret = await fieldsRegisterControl()
   if (ret) {
-    console.debug('CITTA: ',document.getElementById("inputCity").value);
-    console.debug('VIA: ',document.getElementById("inputStreet").value);
+    //console.debug('CITTA: ',document.getElementById("inputCity").value);
+    //console.debug('VIA: ',document.getElementById("inputStreet").value);
 
     document.getElementById("loading").style.display = 'block';
     document.getElementById("wrongNumciv").innerHTML = ''
@@ -261,7 +296,7 @@ async function controlInputAndValidateAddress() {
             lat : res.lat,
             lon : res.lon
           }
-          console.debug('PARAM',JSON.stringify(postData,null,2));
+          console.debug('PARAM',JSON.stringify(postData,null,2));          
           post('/register',postData);
 
         } else {
@@ -272,7 +307,7 @@ async function controlInputAndValidateAddress() {
         }
       },
       error: function (e) {
-        console.log("OVERPASS_CAP", e);
+        //console.log("OVERPASS_CAP", e);
         //document.getElementById("loading").style.display = 'none';
         post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
       }
@@ -285,7 +320,7 @@ async function setValueStreet(via) {
   if (document.getElementById('myselectstreet') != null) {
     document.getElementById('myselectstreet').remove();
   };
-  console.log('SETVALUESTREET');
+  //console.log('SETVALUESTREET');
   document.getElementById("hiddenStreet").value = 'OK';
   document.getElementById("inputStreet").value = via;
   document.getElementById('inputNumciv').removeAttribute('readonly');
@@ -297,8 +332,8 @@ async function setValueStreet(via) {
 // DATA LA CITTA E IL CODICE ISTAT RECUPERA LE VIE DA OPENSTREETMAP
 //********************************************************************
 async function listOfStreets(citta,istat) {
-  console.log('CITTA: ',citta);
-  console.log('ISTAT: ',istat);
+  //console.log('CITTA: ',citta);
+  //console.log('ISTAT: ',istat);
   if (document.getElementById('myselectcity') != null) {
     document.getElementById('myselectcity').remove();
   };
@@ -315,10 +350,10 @@ async function listOfStreets(citta,istat) {
     data: data,
     success: function(res) {
       response = res;
-      console.log('STREET: ', JSON.stringify(res,null,2) )
+      //console.log('STREET: ', JSON.stringify(res,null,2) )
     },
     error: function (e) {
-      console.log("ErrorListOfStreets", e.responseText);
+      //console.log("ErrorListOfStreets", e.responseText);
       response = e;
     }
   });
@@ -351,9 +386,9 @@ async function selectStreet(v) {
 
 
 
-          console.log('via=',via);
-          console.log('street=', street);
-          console.log('size=',size);
+          //console.log('via=',via);
+          //console.log('street=', street);
+          //console.log('size=',size);
 
           //------------------------------------------------------------------------------
           if (size == 1 && via == street) {
@@ -384,7 +419,7 @@ async function selectStreet(v) {
           }
 
         } else {
-          console.log ("FINE SELECTSTREET")
+          //console.log ("FINE SELECTSTREET")
           document.getElementById("inputNumciv").setAttribute('readonly', true);
           document.getElementById('inputNumciv').value = null;
           document.getElementById("hiddenStreet").value = 'KO';
@@ -395,7 +430,7 @@ async function selectStreet(v) {
       },
 
       error: function (e) {
-        console.log("Error", e);
+        //console.log("Error", e);
       }
     });
   } else {
@@ -415,7 +450,7 @@ async function setValueCity(comune, provincia, istat) {
   if (document.getElementById('myselectcity') != null) {
     document.getElementById('myselectcity').remove();
   };
-  console.log('SETVALUE_CITY');
+  //console.log('SETVALUE_CITY');
   document.getElementById("hiddenStreet").value = 'OK';
   document.getElementById("hiddenIstat").value = istat;
   document.getElementById("inputCity").value = comune;
@@ -433,7 +468,7 @@ async function setValueCity(comune, provincia, istat) {
   } catch (e) {
     document.getElementById('inputNumciv').removeAttribute('readonly');
   }
-  console.log('RES: ',res);
+  //console.log('RES: ',res);
   document.getElementById("loading").style.display = 'none';
   //document.getElementById("inputStreet").focus();
   document.getElementById("inputCap").focus();
@@ -453,11 +488,11 @@ async function listOfCities(v) {
     url: '/cities',
     data: data,
     success: function(res) {
-      console.log('CITY: ', JSON.stringify(res) )
+      //console.log('CITY: ', JSON.stringify(res) )
       response = res;
     },
     error: function (e) {
-      console.log("ErrorListOfCities", JSON.stringify(e));
+      //console.log("ErrorListOfCities", JSON.stringify(e));
       response = e;
     }
   });
@@ -493,7 +528,7 @@ async function selectCity(v) {
         input.setAttribute("id","hiddenListOfCities");
         input.setAttribute("name", "hiddenListOfCities");
         input.setAttribute("value", "OK");
-        console.log('INPUT: ',input);
+        //console.log('INPUT: ',input);
         //append to form element that you want .
         document.getElementById("addresses").appendChild(input);
       }
@@ -514,7 +549,7 @@ async function selectCity(v) {
         input.setAttribute("id","hiddenListOfCities");
         input.setAttribute("name", "hiddenListOfCities");
         input.setAttribute("value", "KO");
-        console.log('INPUT: ',input);
+        //console.log('INPUT: ',input);
         //append to form element that you want .
         document.getElementById("addresses").appendChild(input);
       }
@@ -635,6 +670,11 @@ var inputCN = document.createElement("input");
     form.submit();
   }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 </script>
 
 {% endblock %}

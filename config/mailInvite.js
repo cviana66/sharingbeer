@@ -29,7 +29,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
 							</div> \
 							<div style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-align:left;color:#222541;margin-top:10px;background-color:#F5F5F5;border-radius:6px; padding:10px 5px 15px 20px"> \
 								<p>Ciao ' +friendName+ ', </p> \
-								<p> ti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana. </p> \
+								<p> ho appena assaggiato una nuova birra artigianale. <br>Ti mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.> \
 								<p> ' +server+ '/validation?token=' +token+ ' </p> \
 								<p> ' +parentName+ ' </p> \
 							</div> \

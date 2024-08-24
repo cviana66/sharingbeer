@@ -104,7 +104,7 @@
       ).then( async function(data) 
         {
           if (data.ok) {            
-            let textText = "Ciao "+data.friendName+",\n\nti mando il link con il codice invito per accedere in Sharingbeer dove potrai acquistare Birra Viana.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
+            let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale. \nTi mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
             //console.log('textText -->', textText)
             let shareData = {
               title: 'Birrificio Viana - Codice invito SharingBeer',
