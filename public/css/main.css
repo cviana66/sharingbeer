@@ -178,7 +178,7 @@ color: #4e4e4e;
   position: fixed;
   width: 80%;
   height: 70%;
-  z-index: 50;
+  z-index:1000;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -192,6 +192,32 @@ color: #4e4e4e;
  /* pointer-events: none;
   user-select: none;*/
 }
+
+/* Stili per la pagina sottostante */
+#pagina-sottostante {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.blocca-scroll {
+  overflow-y: hidden;
+  height: 100vh;
+}
+/*
+.popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+*/
 
 /*--------------------------------*/
 
