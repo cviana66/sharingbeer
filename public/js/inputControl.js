@@ -133,11 +133,11 @@ function fieldsValidationControl() {
   }
 
   if(!document.getElementById('checkAge').checked) {
-    document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella di controllo solo se hai più di 18 anni";
+    document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella solo se hai più di 18 anni";
     return false;
   }
   if(!document.getElementById('checkPrivacy').checked) {
-    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella di controllo per accettare le Condizioni generali di vendita e la Privacy";
+    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella per accettare le Condizioni generali di vendita e la Privacy";
     return false;
   }
   console.debug('FIELDS VALIDATION CONTROL')
@@ -300,7 +300,7 @@ async function fieldsRegisterControl() {
   }
   if (document.getElementById("wrongPrivacyNeed") != null) {
     if(!document.getElementById('checkPrivacyNeed').checked) {
-      document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella di controllo per poter proseguire";
+      document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella per poter proseguire";
       document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }  
