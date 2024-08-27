@@ -8,35 +8,14 @@
     height: auto; /* Altezza iniziale dell'immagine */
     display: flex;
     justify-content: center;
-    align-items: center;
-    transition: all 0.5s ease-in-out;
-}
+    align-items: center;  
+  }
 
-.image {
+  .image {
     max-width: 100%;
     height: auto;
-    transition: all 0.5s ease-in-out;
-}
-
-.scrolled .image-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100px; /* Dimensioni ridotte */
-    height: auto; /* Ricalcoliamo l'altezza in base alla nuova larghezza */
-    justify-content: flex-start;
-    align-items: flex-start;
-}
-
-.scrolled .image {
-    width: 100px; /* Dimensioni ridotte */
-    height: auto;
-}
-
-.content {
-    padding: 20px;
-    font-size: 1.3em;
-}
+    margin: 0px 0px 15px 0px;
+  }
 </style>
 
 <div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
@@ -194,16 +173,6 @@
             toggleConfirmPassword.classList.remove("bi-eye-slash");
             toggleConfirmPassword.classList.add("bi-eye");
           }
-        });
-        document.addEventListener('scroll', function() {
-            const imageContainer = document.querySelector('.image-container');
-            const scrollPosition = window.scrollY;
-
-            if (scrollPosition > 210) { // Puoi regolare il valore per cambiare quando avviene l'effetto
-                document.body.classList.add('scrolled');
-            } else {
-                document.body.classList.remove('scrolled');
-            }
         });
       </script>
 {% endblock %}

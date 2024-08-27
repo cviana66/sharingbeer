@@ -1,6 +1,6 @@
 {% extends "layouts/main.njk" %} 
 {% block body %}
-
+<!-- NON funziona lo scroll perchè nel main css ho #pagina-sottostante che usa height: 100vh; che inibisce lo scoll -->
 <style type="text/css">
   .image-container {
     position: relative;
@@ -9,12 +9,29 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+    transition: all 0.5s ease-in-out;
+}
 
-  .image {
+.image {
     max-width: 90%;
     height: auto;
-  }
+    transition: all 0.5s ease-in-out;
+}
+
+.scrolled .image-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100px; /* Dimensioni ridotte */
+    height: auto; /* Ricalcoliamo l'altezza in base alla nuova larghezza */
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.scrolled .image {
+    width: 100px; /* Dimensioni ridotte */
+    height: auto;
+}
 </style>
 
 <div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
@@ -88,5 +105,21 @@
     </div>
   </div>
 </div>
+
+
+<script type="text/javascript">
+document.addEventListener('scroll', function() {
+    const imageContainer = document.querySelector('.image-container');
+    const scrollPosition = window.scrollY;
+
+    console.log('SCROLLL')
+
+    if (scrollPosition > 10) { // Puoi regolare il valore per cambiare quando avviene l'effetto
+        document.body.classList.add('scrolled');
+    } else {
+        document.body.classList.remove('scrolled');
+    }
+});
+</script>
 
 {% endblock %}
