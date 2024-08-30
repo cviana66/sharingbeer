@@ -611,7 +611,7 @@ module.exports = function(app, moment, mongoose) {
 // Add a new product to the database.
 // =============================================================================
 
-    app.get('/admin/product',lib.isLoggedIn, function (req,res) {
+    app.get('/product',lib.isLoggedIn, (req,res) => {
 
       Product.find(function (err, prods) {
   			if (err) {
@@ -623,51 +623,21 @@ module.exports = function(app, moment, mongoose) {
         console.log(prods);
         var model = { products: prods	};
         console.log(model);
-        res.render('newProduct.dust', model);
+        res.render('newProduct.njk', model);
       });
     });
 
 
-	app.post('/admin/product', function (req, res) {
-		var name = req.body.name && req.body.name.trim();
-
-		//***** PLEASE READ THIS COMMENT ******\\\
-		/*
-		 Using floating point numbers to represent currency is a *BAD* idea \\
-
-		 You should be using arbitrary precision libraries like:
-		 https://github.com/justmoon/node-bignum instead.
-
-		 So why am I not using it here? At the time of this writing, bignum is tricky to install
-		 on Windows-based systems. I opted to make this example accessible to more people, instead
-		 of making it mathematically correct.
-
-		 I would strongly advise against using this code in production.
-		 You've been warned!
-		 */
-		var price = parseFloat(req.body.price, 10).toFixed(2);
-
-		//Some very lightweight input checking
-		if (name === '' || isNaN(price)) {
-			res.redirect('/admin/product#BadInput');
-			return;
-		}
-
-		var newProduct = new Product({name: name, price: price});
-
-		//Show it in console for educational purposes...
-		newProduct.whatAmI();
-
-		/* The call back recieves to more arguments ->product/s that is/are added to the database
-		 and number of rows that are affected because of save, which right now are ignored
-		 only errors object is consumed*/
-		newProduct.save(function(err) {
-			if(err) {
-				console.log('save error', err);
-			}
-
-			res.redirect('/admin/product');
-		});
+	app.post('/product', (req, res) => {
+		const product = new Product(req.body);
+    product.save((err, product) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send({ message: 'Errore durante la creazione del prodotto' });
+      } else {
+        res.send({ message: 'Prodotto creato con successo' });
+      }
+    });
 	});
 
   app.delete('/admin/product', function (req, res) {

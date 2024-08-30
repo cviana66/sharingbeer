@@ -5,36 +5,17 @@ var Schema = mongoose.Schema;
 // Define product schema
 var ProductSchema = new Schema({
 
-  name: { type: String, required: true },
-  price: { type: Number, required: true },
-  linkImage: {type: String, required: true},
-  description: {type: String},
-  quantity: { type: Number}
-
-/*
-  make: { type: String},
-  model: { type: String},
-  category: { type: String},
-  seo: { type: String},
-  sku: { type: String},
-  upc: { type: String},
-  featured: { type: Boolean},
-  date: { type: Date, default: Date.now },
-
-  pricing: {
-    retail: { type: Number, required: true },
-    sale: { type: Number},
-    cost: { type: Number},
-  },
-
-  details: {
-    description: { type: String},
-    attributes: [{ type: String}]
-  },
-
-  image: [{ type: String}]
-*/
-
+  name        : {type: String, required: true},
+  price       : {type: Number, required: true}, // per beerbox = 6 bottiglie
+  linkImage   : {type: String, required: true},
+  description : {type: String},
+  quantity    : {type: Number}, //stock di beerbox
+  colorEBC       : {type: String},
+  volAlcol    : {type: String},
+  gradoPlato  : {type: String},
+  tempServ    : {type: Number},
+  amaroIBU    : {type: String},
+  formatoCl   : {type: String} 
 });
 
 // methods =====================================================================
