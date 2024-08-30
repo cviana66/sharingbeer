@@ -840,10 +840,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
     app.get('/mailorder', function(req, res) {
       var server = lib.getServer(req);
-      
-      const html = mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'), server)
+      console.debug('SERVER MAILORDER',server)
+
+      const html = mailorder(req.user.local.name.first, '56787f4cb61693f94f5c17d4', lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'), 'Ritiro', server)
       lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', '', '', '', '', 'order',server, html)
-      res.send(mailorder(req.user.local.name.first, '6684224d12814800a635bcb5', lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM', 'Consegna'), server))
+      res.send(mailorder(req.user.local.name.first, '56787f4cb61693f94f5c17d4', lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM', 'Consegna'), 'Ritiro', server))
       return
 
     }) 

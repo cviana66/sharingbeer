@@ -26,15 +26,15 @@ module.exports = {
                     res.redirect('/login');
                   }
               },
-  isAdmin: function isLoggedAsAdmin(req, res, next) {
+  isAdmin: function isAdmin(req, res, next) {
 
                   // if user is authenticated in the session, carry on
-                  if (req.isAuthenticated() && req.user.local.status == 'admin')  {                    
-
-                      return next();
+                  if (req.isAuthenticated() && req.user.local.role == 'admin')  {                    
+                    return next();
+                  } else {
+                    //res.status(403).send('Accesso negato'); 
+                    res.render('info.njk',{ messaggio: 'Accesso negato'})
                   }
-                  // if they aren't redirect them to the home page
-                  res.redirect('/');
               },
   generateToken: function generateToken(n) {
                   var length = n,

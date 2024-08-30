@@ -611,7 +611,7 @@ module.exports = function(app, moment, mongoose) {
 // Add a new product to the database.
 // =============================================================================
 
-    app.get('/product',lib.isLoggedIn, (req,res) => {
+    app.get('/product',lib.isAdmin, (req,res) => {
 
       Product.find(function (err, prods) {
   			if (err) {

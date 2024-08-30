@@ -55,6 +55,12 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
                     <a href="mailto:friend@sharingbeer.com" style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686" target="_blank">  friend@sharingbeer.com </a> \
                   </span> \
                 </div> \
+                <div align="left"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/gavel_24dp.png" height="24" width="24"> \
+                  <span> \
+                    <a href="'+server+'/infoCondizioniVendita0424.html" style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686" target="_blank"> Condizioni di Vendita </a> \
+                  </span> \
+                </div> \
   						</td> \
   					</tr> \
   				</tbody> \
@@ -79,9 +85,9 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
     </tr> \
   	<tr> \
 		<td style="font-weight:300;font-size:10px;color:#88a1af;padding-left:24px;padding-right:24px" align="center"><br><br>  \
-			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.herokuapp.com" target="_blank">sharingbeer.it </a> - \
+			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.it" target="_blank">sharingbeer.it </a> - \
 			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.herokuapp.com" target="_blank"> sharingbeer.com </a> - \
-			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.herokuapp.com" target="_blank">sharingbeer.eu</a> \
+			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.herokuapp.eu" target="_blank">sharingbeer.eu</a> \
 		</td> \
 	</tr> \
  </tbody> \
@@ -140,6 +146,12 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
                   <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/mail-ru.png" height="24" width="24"> \
                   <span> \
                     <a href="mailto:friend@sharingbeer.com" style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686" target="_blank">  friend@sharingbeer.com </a> \
+                  </span> \
+                </div> \
+                <div align="left"> \
+                  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/gavel_24dp.png" height="24" width="24"> \
+                  <span> \
+                    <a href="'+server+'/infoCondizioniVendita0424.html" style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-decoration:none;color:#868686" target="_blank"> Condizioni di Vendita </a> \
                   </span> \
                 </div> \
               </td> \
