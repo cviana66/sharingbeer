@@ -4,9 +4,9 @@ module.exports = function(app, mongoose, moment) {
   const lib       = require('./libfunction');
 
   //const Order   = require('../app/models/order');
-  const Item    = require('../app/models/item');
+  
   const User    = require('../app/models/user');
-  const PayInfo = require('../app/models/payinfo');
+  
 
 // =====================================
 // PAYPAL ==============================

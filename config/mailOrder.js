@@ -122,7 +122,8 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
                   <p> Ciao '+name+'.</p> \
                   <p> Grazie per aver acquistato Birra Viana su Sharingbeer. </p> \
-                  <p> Il tuo ordine è già pronto! Ti chiedo la cortesia di ritirarlo entro '+date+'. <b>Verifica gli orari di apertura del Birrificio Viana<b>. </p> \
+                  <p> Il tuo ordine è già pronto! Ti chiedo la cortesia di ritirarlo entro '+date+'. </p> \
+                  <p><b>Verifica gli <a href="'+server+'/infoOrari.html" target="_blank">orari di apertura </a> del Birrificio Viana</b>. </p> \
                   <p> Accedi ai tuoi ordini cliccando su </p> \
                   <div align="center"> \
                     <a href="'+server+'/shopping?type='+deliveryType+'&orderId='+orderId+'"> \

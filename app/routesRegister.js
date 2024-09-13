@@ -5,11 +5,9 @@
 // load up the user model
 
 var User = require('../app/models/user');
-var Friend = require('../app/models/friend');
 var CityCap = require('../app/models/cityCap');
 var CityIstat = require('../app/models/cityIstat');
 var MultipleCap = require('../app/models/multipleCap');
-var Address = require('../app/models/address')
 var bcrypt = require('bcrypt-nodejs');
 //TODO da spostare in libfunction
 var lib = require('./libfunction');
