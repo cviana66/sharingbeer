@@ -89,7 +89,7 @@ const routesDelivery  = require('./app/routesDelivery');
 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
     global.debug = true;
 } else {
-    global.debug = false;
+    global.debug = true;
 }
 
 /*=======================================================================
@@ -244,7 +244,6 @@ var SharingBeer = function() {
                 //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                 store: MongoStore.create({
                     client: mongoose.connection.getClient(),
-                    dbName: "dbm1",
                     stringify: false,
                     autoRemove: 'interval',
                     autoRemoveInterval: 1 // removing expired sessions, using defined interval in minutes
@@ -265,8 +264,7 @@ var SharingBeer = function() {
                         }, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                   //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                   store: MongoStore.create({
-                    client: mongoose.connection.getClient(),
-                    dbName: "cluster0",
+                    client: mongoose.connection.getClient(),                    
                     stringify: false,
                     autoRemove: 'interval',
                     autoRemoveInterval: 1 // emoving expired sessions, using defined interval in minutes
