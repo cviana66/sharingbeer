@@ -89,7 +89,7 @@ const routesDelivery  = require('./app/routesDelivery');
 if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
     global.debug = true;
 } else {
-    global.debug = true;
+    global.debug = false;
 }
 
 /*=======================================================================
@@ -312,7 +312,3 @@ sb.start();
     | 1) E'ad invito quindi non è disponibile la funzionalità di SIGN-UP    |
 */
 
-/*  =========================================================================
-    |                               TODO                                    |
-    | 1) Funzionalità amministrativa di cancellazione di un user            |
-*/

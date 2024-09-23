@@ -119,7 +119,7 @@ const gestpayService = new GestpayService();
       res.status(200).send(data);  
 
     } catch (e) {
-        console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
+        console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
         await session.abortTransaction();
         res.status(400).send(e)
     } finally {
@@ -282,7 +282,7 @@ const gestpayService = new GestpayService();
       });
 
     }catch (e){
-      console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /response_positiva"  PARAMETRI RISPOSTA POSITIVA: '+req.query.toString()+' ERRORE:'+e);
+      console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /response_positiva"  PARAMETRI RISPOSTA POSITIVA: '+req.query.toString()+' ERRORE:'+e);
       let msg = 'Ci dispiace, si è verificato un errore inatteso. L\'esito del pagamento sarà verificato e ti manterremo informato. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
       req.flash('error', msg);
       return res.render('info.njk', {
@@ -326,7 +326,7 @@ const gestpayService = new GestpayService();
       });
 
     }catch (e){
-      console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "GET /response_negativa"  PARAMETRI RISPOSTA POSITIVA: '+req.query.toString()+' ERRORE:'+e);
+      console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /response_negativa"  PARAMETRI RISPOSTA POSITIVA: '+req.query.toString()+' ERRORE:'+e);
       let msg = 'Ci dispiace, si è verificato un errore inatteso. L\'esito del pagamento sarà verificato e ti manterremo informato. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
       req.flash('error', msg);
       return res.render('info.njk', {

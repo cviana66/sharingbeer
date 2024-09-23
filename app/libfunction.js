@@ -245,6 +245,14 @@ module.exports = {
                       console.debug('DATA-ORA formatTextDate',d)
                       return d;
               },
+  logDate: function logDate(timeZone) {
+                      var data = new Date();
+                      var a = moment.tz(data, timeZone);
+                      a.utc(timeZone).format();
+                      var now =  new Date(moment(a).format());
+                      var d = moment(now).utc().format('YYYY-MM-DD hh:mm');
+                      return d;
+  }, 
   getServer:  function getServer(req) {
                 if (process.env.NODE_ENV== "development") {
                   if (req.hostname == 'sb.sharingbeer.it') {                  

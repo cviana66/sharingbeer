@@ -13,6 +13,7 @@ var User = require('../app/models/user');
 
 // date and time utility
 const moment  = require("moment");
+const lib     = require('../app/libfunction');
 
 // expose this function to our app using module.exports
 module.exports = function(passport) {
@@ -105,26 +106,26 @@ module.exports = function(passport) {
                 if (err) {
                     let msg = 'Something bad happened! There are problems with the network connection. Please try again later';
                     req.flash('error', msg);
-                    console.error(moment().utc("Europe/Rome").format() + ' [ERROR][RECOVERY:NO] "POST /logn" email: {"email":"' + email + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+                    console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /logn" email: {"email":"' + email + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
                     return done(err);
                 }
 
                 // if no user is found, return the message
                 if (!user) {
-                    console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /logn" User Not Found"');
+                    console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /logn" User Not Found"');
                     // req.flash is the way to set flashdata using connect-flash
                     return done(null, false, req.flash('loginMessage', 'Utente sconosciuto'));
                 }
 
                 // if the user is found but the password is wrong, return the message
                 if (!user.validPassword(password)) {
-                    console.info(moment().utc("Europe/Rome").format() + ' [INFO][RECOVERY:NO] "POST /logn" Wrong Password');
+                    console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /logn" Wrong Password');
                     // create the loginMessage and save it to session as flashdata
                     return done(null, false, req.flash('loginMessage', 'La password è errata'));
                 }
 
                 // all is well, return successful user
-                console.info(moment().utc("Europe/Rome").format()+' [INFO] "/login" USERS_ID: {"_id":ObjectId("'+user._id+'")}');
+                console.info(lib.logDate("Europe/Rome")+' [INFO] "/login" USERS_ID: {"_id":ObjectId("'+user._id+'")}');
                 
                 return done(null, user)
             });

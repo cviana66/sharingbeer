@@ -20,12 +20,6 @@ module.exports = function(app, passport, moment) {
       if (process.env.NODE_ENV === 'development') {
         video = ""
       }
-      
-      //lib.formatTextDate(lib.nowDate('America/Los_Angeles'),'DD.MM.YYYY - HH:mm', 'Europe/Rome') 
-      //lib.deliveryDate('Europe/Rome','DATA')
-      //lib.deliveryDate('Europe/Rome','TXT','DD.MM.YYYY - HH:mm')
-
-
       res.render('index.njk', {
           user: req.user,
           numProducts : req.session.numProducts,
@@ -141,7 +135,7 @@ app.get('/logout', function(req, res, next) {
         // Handle error: best practicies
         if (err) {
           let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
-          console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+          console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
           req.flash('error', msg);
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 
@@ -149,7 +143,7 @@ app.get('/logout', function(req, res, next) {
 
         if (!user) {
           let msg = 'Nessun utente è registrato con l\'indirizzo email '+email;
-          console.info(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
+          console.info(lib.logDate("Europe/Rome")+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
           req.flash('info', msg);
           return res.render('forgot.njk', {message: req.flash('info'), type: "warning"});
         } else {
@@ -163,7 +157,7 @@ app.get('/logout', function(req, res, next) {
 
             if(err) {
               let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
-              console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: user.save: '+err+' FLASH: '+msg);
+              console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: user.save: '+err+' FLASH: '+msg);
               req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
@@ -171,12 +165,12 @@ app.get('/logout', function(req, res, next) {
             try {
               await lib.sendmailToPerson('',user.local.email,'',token,'','','','reset',server);
               let msg = '!';
-              console.info(moment().utc("Europe/Rome").format()+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
+              console.info(lib.logDate("Europe/Rome")+' [INFO][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: User.findOne: '+err+' FLASH: '+msg);
               req.flash('loginMessage', 'Il messaggio con le istruzioni per reimpostare la password è stato inviato a ' + user.local.email );
               res.redirect('/login');
             } catch (e) {
               let msg = 'Spiacente ma qualche cosa non ha funzionato nell\'invio dell\'email. Per cortesia riprova';
-              console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: transporter.sendMail: '+err+' FLASH: '+msg);
+              console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "POST /forgot" EMAIL: {"email":"'+email+'"} FUNCTION: transporter.sendMail: '+err+' FLASH: '+msg);
               req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
@@ -197,7 +191,7 @@ app.get('/logout', function(req, res, next) {
       if(err) {
         let msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
         req.flash('error', msg);
-        console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "GET /reset" TOKEN: {"resetPasswordToken":"'+req.query.token+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+        console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "GET /reset" TOKEN: {"resetPasswordToken":"'+req.query.token+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       }
 
@@ -269,7 +263,7 @@ app.get('/logout', function(req, res, next) {
       if(err) {
         let msg = 'Something bad happened! Please retry';
         req.flash('error', msg);
-        console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "GET /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+        console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "GET /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       }
       res.render('change.njk',{        
@@ -294,7 +288,7 @@ app.get('/logout', function(req, res, next) {
         if(err) {
           let msg = 'Something bad happened! Please retry';
           req.flash('error', msg);
-          console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
+          console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
         }
 
@@ -306,7 +300,7 @@ app.get('/logout', function(req, res, next) {
           if(err) {
             let msg = 'Something bad happened! Please retry';
             req.flash('error', msg);
-            console.error(moment().utc("Europe/Rome").format()+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.save: '+err+' FLASH: '+msg);
+            console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "POST /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.save: '+err+' FLASH: '+msg);
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
           }
 
