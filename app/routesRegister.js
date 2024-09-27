@@ -856,6 +856,25 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           res.render('testRegistrationV2.njk', {
           });
     });
+    
+    app.get('/delta', function(req, res) {
+
+// Esempio di utilizzo
+const groupA = [5, 5]; // 2 prodotti nel gruppo A
+const groupB = [20, 20, 20]; // 3 prodotti nel gruppo B
+const groupC = [30]; // 1 prodotto nel gruppo C
+const groupD = [50]; // 1 prodotto nel gruppo C
+
+const products = [...groupA, ...groupB, ...groupC, ...groupD];
+const T = 195;
+
+const result = lib.findClosestCombination(products, T);
+console.log(`Somma più vicina a ${T}: ${result.closestSum}`);
+console.log(`Combinazione: ${result.bestCombination}`);
+res.send("Somma più vicina a "+T+":" +result.closestSum+" | Combinazione:"+result.bestCombination)
+
+
+    });
 
     app.get('/share', function(req, res) {
           console.log("FISRT NAME: ",req.body.firstName);

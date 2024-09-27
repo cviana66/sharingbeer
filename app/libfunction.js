@@ -1,13 +1,13 @@
 //libfunction.js
 
 //email settings
-const transporter = require('../config/mailer');
-const mailfriend  = require('../config/mailFriend');
-const mailparent  = require('../config/mailParent');
-const mailinvite  = require('../config/mailInvite');
-const mailconferme  = require('../config/mailConferme');
-const mailvalidatemail  = require('../config/mailValidateMail');
-const moment        = require("moment-timezone"); 
+const transporter 			= require('../config/mailer');
+const mailfriend  				= require('../config/mailFriend');
+const mailparent  			= require('../config/mailParent');
+const mailinvite  				= require('../config/mailInvite');
+const mailconferme  		= require('../config/mailConferme');
+const mailvalidatemail 	= require('../config/mailValidateMail');
+const moment        			= require("moment-timezone"); 
 
 const User  = require('../app/models/user');
 
@@ -264,7 +264,30 @@ module.exports = {
                   server = req.protocol+'://'+req.hostname;
                 }
                 return server;
-              }
+              },
+
+findClosestCombination: function findClosestCombination(products, T) {
+															let closestSum = 0;
+															let bestCombination = [];
+
+															function backtrack(start, currentCombination, currentSum) {
+																// Se la somma corrente è inferiore a T e più vicina alla somma migliore trovata
+																if (currentSum <= T && currentSum >= closestSum) {
+																	closestSum = currentSum;
+																	bestCombination = [...currentCombination];
+																}
+
+																// Esplora le combinazioni
+																for (let i = start; i < products.length; i++) {
+																	currentCombination.push(products[i]);
+																	backtrack(i + 1, currentCombination, currentSum + products[i]);
+																	currentCombination.pop(); // Rimuovi l'ultimo prodotto per tornare indietro
+																}
+															}
+
+															backtrack(0, [], 0);
+															return { closestSum, bestCombination };
+														}
 }
 
 

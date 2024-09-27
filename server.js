@@ -105,8 +105,8 @@ global.priceCurier =  ['7.70','7.90','6.60','6.60','5.20','11.10','9.80','8.40',
     ======================================================================= */
 global.numBottigliePerBeerBox = 6
 global.invitiPerOgniAcquisto = 4;
-global.puntiPintaPerUnaBottiglia = 12;
-global.puntiPintaPerAcquisto = 1;
+//global.puntiPintaPerUnaBottiglia = 12;
+//global.puntiPintaPerAcquisto = 1;
 // equivalente in € di 1 Punto Pinta = PrezzoBirra / numBottigliePerBeerBox / puntiPintaPerUnaBottiglia
 global.mkt = 0.45;
 
@@ -311,4 +311,3 @@ sb.start();
     |                 NOTE DI FUNZIONAMENTO DI PROCESSO                     |
     | 1) E'ad invito quindi non è disponibile la funzionalità di SIGN-UP    |
 */
-
