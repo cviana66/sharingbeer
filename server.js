@@ -47,7 +47,7 @@ console.debug('GESTPAY =', process.env.SHOPLOGIN);
 
 //=================================================
 // Connect to our database
-const mongoose = require('./config/database.js');
+const mongoose = require('./config/database.js'); //TODO: per la PRO impostare parametro per connessione ambiente di produzione su fly.io
 //=================================================
 
 // set the form to post and then create a hidden field _method (DELETE, PUT)

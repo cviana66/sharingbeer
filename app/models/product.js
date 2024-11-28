@@ -4,18 +4,20 @@ var Schema = mongoose.Schema;
 
 // Define product schema
 var ProductSchema = new Schema({
-
-  name        : {type: String, required: true},
-  price       : {type: Number, required: true}, // per beerbox = 6 bottiglie
-  linkImage   : {type: String, required: true},
-  description : {type: String},
-  quantity    : {type: Number}, //stock di beerbox
-  colorEBC       : {type: String},
-  volAlcol    : {type: String},
-  gradoPlato  : {type: String},
-  tempServ    : {type: Number},
-  amaroIBU    : {type: String},
-  formatoCl   : {type: String} 
+  codProd			: {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required
+  name        		: {type: String, required: true},
+  price       		: {type: Number, required: true}, // per beerbox = 6 bottiglie
+  linkImage   	: {type: String, required: true},
+  description 	: {type: String},
+  quantity    		: {type: Number}, //stock di beerbox disponibili
+  colorEBC     	: {type: String},
+  volAlcol    		: {type: String},
+  gradoPlato  	: {type: String},
+  tempServ    	: {type: Number}, //temperatura di servizio consigliata
+  amaroIBU   	: {type: String},
+  formatoCl   	: {type: String}, //formato della bottiglia es: 50 cl
+  quantitaXtipo : {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:   [{"codProd_A": quantità},{"codProd_B": quantità},...]
+  prezzoXtipo 	: {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:  [{"codProd_A": prezzo},{"codProd_B": prezzo},...]
 });
 
 // methods =====================================================================

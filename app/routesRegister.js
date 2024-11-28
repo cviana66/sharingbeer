@@ -9,7 +9,7 @@ var CityCap = require('../app/models/cityCap');
 var CityIstat = require('../app/models/cityIstat');
 var MultipleCap = require('../app/models/multipleCap');
 var bcrypt = require('bcrypt-nodejs');
-//TODO da spostare in libfunction
+//TODO: da spostare in libfunction
 var lib = require('./libfunction');
 var {getAddressFromOSM} = require('../app/overpassQuery')
 
@@ -858,23 +858,46 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     });
     
     app.get('/delta', function(req, res) {
+			// Esempio di utilizzo
+			const groupA = [5, 5]; // 2 prodotti nel gruppo A
+			const groupB = [20, 20, 20]; // 3 prodotti nel gruppo B
+			const groupC = [30]; // 1 prodotto nel gruppo C
+			const groupD = [50]; // 1 prodotto nel gruppo D
 
-// Esempio di utilizzo
-const groupA = [5, 5]; // 2 prodotti nel gruppo A
-const groupB = [20, 20, 20]; // 3 prodotti nel gruppo B
-const groupC = [30]; // 1 prodotto nel gruppo C
-const groupD = [50]; // 1 prodotto nel gruppo C
+			const products = [...groupA, ...groupB, ...groupC, ...groupD];
+			const T = 195;
 
-const products = [...groupA, ...groupB, ...groupC, ...groupD];
-const T = 195;
-
-const result = lib.findClosestCombination(products, T);
-console.log(`Somma più vicina a ${T}: ${result.closestSum}`);
-console.log(`Combinazione: ${result.bestCombination}`);
-res.send("Somma più vicina a "+T+":" +result.closestSum+" | Combinazione:"+result.bestCombination)
-
-
+			const result = lib.findClosestCombination(products, T);
+			console.log(`Somma più vicina a ${T}: ${result.closestSum}`);
+			console.log(`Combinazione: ${result.bestCombination}`);
+			res.send("Somma più vicina a "+T+":" +result.closestSum+" | Combinazione:"+result.bestCombination)
     });
+    
+    app.get('/prezzo', function(req, res) { 
+		// Esempio di utilizzo
+		const prezzi = [
+			{ "A": 4.5 },
+			{ "B": 4.7 },
+			{ "C": 5.0 }
+		];
+
+		const quantita = [
+			{ "A": 4 },
+			{ "B": 2 },
+			{ "C": 3 },
+			{ "A": 2 }
+		];
+
+		const risultato = lib.generaArrayPrezzi(prezzi, quantita);
+
+		// Stampa i risultati
+		let txt=""
+		for (const tipo in risultato) {
+			console.log(`Array ${tipo}:`, risultato[tipo]);
+			txt=txt+ `Array ${tipo}:[`+risultato[tipo]+"]      "
+		}
+		res.send(txt);
+	});
 
     app.get('/share', function(req, res) {
           console.log("FISRT NAME: ",req.body.firstName);

@@ -287,7 +287,50 @@ findClosestCombination: function findClosestCombination(products, T) {
 
 															backtrack(0, [], 0);
 															return { closestSum, bestCombination };
-														}
+														},
+														
+generaArrayPrezzi: function generaArrayPrezzi(prezzi, quantita) {
+										/* esempio di utilizzo
+										 *	const prezzi = [{ "A": 4.5 },{ "B": 4.7 },{ "C": 5.0 }];
+										 *	const quantita = [{ "A": 4 },{ "B": 2 },{ "C": 3 },{ "A": 2 }];
+										 */
+										const risultati = {};
+										// sommo assieme le quantità dello stesso tipo
+										const somma = quantita.reduce((acc, curr) => {
+																		for (const key in curr) {
+																			if (acc[key]) {
+																				acc[key] += curr[key];
+																			} else {
+																				acc[key] = curr[key];
+																			}
+																		}
+																		return acc;
+																	}, {});
+										quantita = Object.keys(somma).map(key => ({ [key]: somma[key] }));
+
+										// Itera ttrverso l'array dei prezzi
+										prezzi.forEach(prezzo => {
+											const tipo = Object.keys(prezzo)[0]; // Ottieni il tipo (A, B, C, ecc.)
+											const valorePrezzo = prezzo[tipo]; // Ottieni il prezzo
+
+											// Trova la quantità corrispondente
+											const quantitaTipo = quantita.find(q => q[tipo] !== undefined);
+											const valoreQuantita = quantitaTipo ? quantitaTipo[tipo] : 0; // Ottieni la quantità
+
+											// Inizializza l'array per il tipo se non esiste già
+											if (!risultati[tipo]) {
+												risultati[tipo] = [];
+											}
+
+											// Aggiungi il prezzo ripetuto per la quantità all'array corrispondente
+											for (let i = 0; i < valoreQuantita; i++) {
+												risultati[tipo].push(valorePrezzo);
+											}
+										});
+
+										return risultati;
+									}
+														
 }
 
 
