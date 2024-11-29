@@ -135,8 +135,8 @@ const gestpayService = new GestpayService();
     //================================================
     // Chiamo Axerve per ottenere la stringa DENCRYPT
     //================================================
-    let shopLogin     = req.query.a;
-    let cryptedString = req.query.b;
+    var shopLogin     = req.query.a;
+    var cryptedString = req.query.b;
     
     const decryptedString = await gestpayService
       .decrypt({
@@ -182,7 +182,7 @@ const gestpayService = new GestpayService();
         if ( status == 'OK') {            
       
           //=====================================
-          // aggiungo possibilità di invito
+          // aggiungo inviti
           // aggiungo punto Pinta al cliente Padre
           // decurto punti pinta al Cliente
           //=====================================        

@@ -64,8 +64,8 @@ module.exports = {
 	  RiskResponseDescription: null
 	}*/
 
-		let filter = {_id: _userId};
-	  let update = 
+	let filter = {_id: _userId};
+	let update = 
 	      {
 	        'orders.$[el].status'            		: data.TransactionResult,
 	        'orders.$[el].payment.s2sStatus'		: data.TransactionResult,
@@ -98,8 +98,11 @@ module.exports = {
 			                      {_id: user._id},
 			                      {'$inc': {'local.eligibleFriends': invitiPerOgniAcquisto},'local.booze': booze}
 			                      ).session(session);
-			let booze4Parent = mkt * user.orders.totalQty;
-		  await User.findOneAndUpdate(
+			// calcolo dei Booze (€):
+			// (Prezzo Medio per bottiglia / numero di acquisti necessari per ottenere una bottiglia omaggio (costante =12) * n° beerbox acquistati
+			let booze4Parent = (((user.orders.totalPriceBeer / (user.orders.totalQty * numBottigliePerBeerBox)) / numAcquistiPerUnaBottigliaOmaggio) * user.orders.totalQty).toFixed(2); // definisce i booze da riconoscere al parent in €;  user.orders.totalQty=n° Berrbox acquistati   
+			console.debug("BOOZE FOR PARENT:",booze4Parent)
+			await User.findOneAndUpdate(
 		                        {'_id': mongoose.Types.ObjectId(user.local.idParent)},
 		                        {'$inc': {'local.booze':booze4Parent}}
 		                        ).session(session);

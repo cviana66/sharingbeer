@@ -134,18 +134,15 @@ module.exports = {
   retriveCart:  function retriveCart (req) {
                   //Retrieve the shopping cart from memory
                   var cart = req.session.cart,
-                      cartItems = {items: [], totalPrice: 0, totalQty: 0},
-                      totalPrice = 0,
-                      totalQty = 0
+						cartItems = {items: [], totalPrice: 0, totalQty: 0},
+						totalPrice = 0,
+						totalQty = 0
                   req.session.numProducts = 0;
                   req.session.numProductsPerId = [];
 
                   console.debug('CART: ', cart)
 
-                 // if (!cart) {
-                 //   req.session.numProducts = 0;
-                 // } else {
-                  if (cart) {
+                  if (cart) { //se ho rpodotti in carrello
                     for (var item in cart) {
                       if (cart[item].qty > 0) {
                         cartItems.items.push(cart[item]);
@@ -153,7 +150,7 @@ module.exports = {
                         totalQty += cart[item].qty;
                         req.session.numProducts += cart[item].qty;
                         let npXid = { "id":cart[item].id.toString(), "qty":cart[item].qty}
-                        req.session.numProductsPerId.push(npXid);  
+                        req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino 
                         console.debug('PRODOTTI NEL CARRELLO: ITEM =',item, ' PRODOTTO: ', cart[item])
                       }
                     }
@@ -161,6 +158,7 @@ module.exports = {
                     req.session.cartItems = cartItems;
                     req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
                     req.session.totalQty = cartItems.totalQty = totalQty;
+                    console.debug("TOTAL PRICE:", req.session.totalPrc,"TOTAL QTY BeeBox:",req.session.totalQty)
                   }
                 },
   emailValidation:  function emailValidation (email) {

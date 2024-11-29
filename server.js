@@ -105,10 +105,11 @@ global.priceCurier =  ['7.70','7.90','6.60','6.60','5.20','11.10','9.80','8.40',
     ======================================================================= */
 global.numBottigliePerBeerBox = 6
 global.invitiPerOgniAcquisto = 4;
-//global.puntiPintaPerUnaBottiglia = 12;
+global.numAcquistiPerUnaBottigliaOmaggio = 12;
+global.valoreUnPuntoPinta = 0.05 // euro 
 //global.puntiPintaPerAcquisto = 1;
 // equivalente in € di 1 Punto Pinta = PrezzoBirra / numBottigliePerBeerBox / puntiPintaPerUnaBottiglia
-global.mkt = 0.45;
+//global.mkt = 0.45;
 
 /*  =======================================================================
     Debug utility

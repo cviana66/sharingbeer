@@ -371,7 +371,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //GET
 //-------------------------------------------
     app.get('/register', lib.isLoggedIn, function(req, res) {
-
+        console.debug("USER STATUS =",req.user.local.status)
+        console.debug("NUM PRODOTTI IN CARRELLO", req.session.numProducts)
         if (req.user.local.status == "validated") {
             var model = { firstName: req.user.local.name.first,
                           lastName: req.user.local.name.last,
@@ -383,7 +384,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             res.render('registration.njk', model);
 
         } else if (req.user.local.status == 'customer' && req.session.numProducts > 0) {
-          res.redirect('/addresses');
+			res.redirect('/addresses');
+        } else if (req.user.local.status == 'customer' && (req.session.numProducts  == 0 || req.session.numProducts == undefined)) {
+			res.redirect('/shop');
         } else {
           var msg = "Devi validare la tua identità attraverso la mail che ti abbiamo inviato in fase di accettazione dell'invito";
           console.error(lib.logDate("Europe/Rome") + ' [WARNING][RECOVERY:NO] "GET /register" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FLASH:'+msg+'');
@@ -516,8 +519,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         // se i booze >= costo di una bottiglia allora faccio lo sconto
         // lo sconto massimo è del 50% su totale di acquisto  
         //==============================================================================
-        const c1b = req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox
-        console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
+        const c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
+        console.debug('COSTO DI 1 BOTTIGLIA!!: ', c1b)
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
           req.session.pointDiscount = req.user.local.booze.toFixed(2);  
         } else if (req.user.local.booze > req.session.totalPrc/2) {

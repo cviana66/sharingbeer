@@ -124,6 +124,7 @@ module.exports = function(app, moment, mongoose) {
   app.get('/orderSummary', lib.isLoggedIn, async function(req,res){
 
   	var address = [];
+  	var c1b;
 
   	var refFatturaPEC = req.body.refFatturaPEC;
   	var refFatturaSDI = req.body.refFatturaSDI;
@@ -140,6 +141,25 @@ module.exports = function(app, moment, mongoose) {
 
   	console.debug('refFatturaPEC', refFatturaPEC);
   	console.debug('refFatturaSDI', refFatturaSDI);
+  	
+  	//-------------------------------------------
+    // Verifica se è il primo ordine
+    //-------------------------------------------
+    var nOrders
+    const resNorder = await User.aggregate([
+          {$match:{"_id":req.user._id}}, 
+          {$unwind: "$orders"}, 
+          {$match :{ "orders.payment.s2sStatus":"OK"}},
+          {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
+          {$group:{_id:null,count:{$count:{ }}}}
+          ])
+    if (resNorder.length > 0) {
+		nOrders=resNorder[0].count
+	} else {
+		nOrders=0
+	}		
+    console.debug("N° ORDINI",nOrders)
+   //--------------------------------------------
 
     try{
 
@@ -159,7 +179,7 @@ module.exports = function(app, moment, mongoose) {
         // se i booze >= costo di una bottiglia allora faccio lo sconto
         // lo sconto massimo è del 50% su totale di acquisto  
         //==============================================================================
-        const c1b = req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox
+        c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
         	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
@@ -229,7 +249,7 @@ module.exports = function(app, moment, mongoose) {
         // se i booze >= costo di una bottiglia allora faccio lo sconto
         // lo sconto massimo è del 50% su totale di acquisto  
         //==============================================================================
-        const c1b = req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox
+        c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
         	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
@@ -253,7 +273,9 @@ module.exports = function(app, moment, mongoose) {
         user        : req.user,
         payType     : "axerve", //"paypal"  "axerve"
         fatturaPEC  : refFatturaPEC,
-        fatturaSDI  : refFatturaSDI
+        fatturaSDI  : refFatturaSDI,
+        nOrders : nOrders,
+        omaggio:  c1b
       })
     }
     catch (e) {
@@ -428,9 +450,27 @@ module.exports = function(app, moment, mongoose) {
 // CART ========================================================================
 // =============================================================================
 //GET
-	app.get('/cart', lib.isLoggedIn, function (req, res) {
+	app.get('/cart', lib.isLoggedIn, async function (req, res) {
+    //-------------------------------------------
+    // Verifica se è il primo ordine
+    //-------------------------------------------
+    var nOrders
+    const resNorder = await User.aggregate([
+          {$match:{"_id":req.user._id}}, 
+          {$unwind: "$orders"}, 
+          {$match :{ "orders.payment.s2sStatus":"OK"}},
+          {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
+          {$group:{_id:null,count:{$count:{ }}}}
+          ])
+    if (resNorder.length > 0) {
+		nOrders=resNorder[0].count
+	} else {
+		nOrders=0
+	}		
+    console.debug("N° ORDINI",nOrders)
+   //--------------------------------------------
     
-		Product.find(function (err, prods) {
+	Product.find(function (err, prods) {
       if (err) {
         let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
         console.error(lib.logDate("Europe/Rome")+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
@@ -447,13 +487,12 @@ module.exports = function(app, moment, mongoose) {
           var cart = req.session.cart
           console.debug('CART in CART', cart)
           var numProds = req.session.numProducts
-
+          // prods sono tutti i prodotti in catalaogo su DB products
           prods.forEach(function(prod) {
             prodId = prod._id.toString()
-            if (cart != undefined) {
-              
+            if (cart != undefined) { //verifico che il carrello non sia vuoto (ridondante ma non disturba)              
               if (cart[prodId] != undefined) {
-                // controlo che nel frattempo non abbiano acquistato beerbox
+                // controllo che nel frattempo non abbiano acquistato beerbox
                 // e nel caso aggiusto i quantitativi 
                 prod.quantity = prod.quantity - cart[prodId].qty                            
                 if (prod.quantity < 0 ) {                
@@ -471,12 +510,13 @@ module.exports = function(app, moment, mongoose) {
         }else{
           req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'\indirizzo email birrificioviana@gmail.com")
         }
-    		var model = { user       : req.user.local,
-      						    numProducts: req.session.numProducts,
-      						    cart       : req.session.cartItems,
-                      totalPrice : req.session.totalPrc,
-                      message    : req.flash('cartMessage'),
-      					    };
+    		var model = {	user       : req.user.local,
+									numProducts: req.session.numProducts,
+									cart       : req.session.cartItems,
+									totalPrice : req.session.totalPrc,
+									nOrders		: nOrders,
+									message    : req.flash('cartMessage'),
+								};
       	res.render('cart.njk', model);
       }
     });

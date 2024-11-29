@@ -1,6 +1,16 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 <h3 class="text-white text-center bg-dark">Il tuo Carrello</h3>
+
+{% if nOrders == 0 %}
+	 <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.1em;">
+      <!-- Shipping -->
+      <tr class="text-white">
+        <td width="100%"  padding-left: 15px;" valign="middle" align="center" >E' il tuo primo acquisto! <br> Una bottiglia omaggio per te</td>
+      </tr>
+    </table>
+{%endif%}
+
 <hr style="border-top: 1px solid #5375BD;">
 
 <table class="mx-auto" width="100%">

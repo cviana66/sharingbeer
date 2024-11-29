@@ -2,6 +2,16 @@
 {% block body %}
 	
   <h3 class="text-white text-center bg-dark"> Riepilogo ordine </h3>
+  
+  {% if nOrders == 0 %}
+	 <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.1em;">
+      <!-- Shipping -->
+      <tr class="text-white">
+        <td width="100%"  padding-left: 15px;" valign="middle" align="center" >E' il tuo primo acquisto! <br> Una bottiglia omaggio per te</td>
+      </tr>
+    </table>
+{%endif%}
+  
   <hr style="border-top: 1px solid #5375BD;">
       
     <table class="mx-auto" width="100%">
@@ -24,9 +34,10 @@
         </tr>
       {% endfor %}
     </table>
-
+     
+    {% if discount >0%} 
     <table class="mx-auto" width="100%" style="margin: 10px;">
-      <!-- Savings -->
+      <!-- Savings -->     
       <tr class="text-white">
         <td width="16%" rowspan="2" align="center"><img src="img/savings_36dp.svg"></td>
         <td width="64%" padding-left="15px" style="font-size:0.9em;">Vantaggio dai tuoi amici</td>
@@ -37,11 +48,26 @@
         <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;-{{shippingDiscount}}</td>
       </tr-->
     </table>
-
+    {% endif %}
+    
+    {% if nOrders == 0 %}
+	<table class="mx-auto" width="100%" style="margin: 10px;">
+      <!-- Savings -->     
+      <tr class="text-white">
+        <td width="16%" rowspan="2" align="center"><img src="img/savings_36dp.svg"></td>
+        <td width="64%" padding-left="15px">Omaggio primo acquisto</td>
+        <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;-{{omaggio}}</td>
+      </tr>
+      <!---tr class="text-white">
+        <td width="64%" padding-left="15px" style="font-size:0.9em;">Sconto su spedizione</td>
+        <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;-{{shippingDiscount}}</td>
+      </tr-->
+    </table>
+    {% endif %}
+    
     <table class="mx-auto" width="100%" style="margin: 10px;">
       <!-- Shipping -->
-      <tr class="text-white">
-        
+      <tr class="text-white">        
         {% if shipping != 0 %}
           <td width="16%" align="center"><img src="img/local_shipping_36dp.svg"></td>
           <td width="64%" padding-left="15px">Spese di spedizione</td>
@@ -50,9 +76,9 @@
           <!--td colspan="2" width="100%" padding-left="15px"> <font style="color: #FFBB35; font-size:1.3em;"><b>gratis</b></font></td-->
         {% else %}
           <td width="16%" align="center"><img src="img/local_shipping_36dp.svg"></td>
-          <td colspan="2" width="100%" padding-left="15px">La consegna è <font style="font-size:1.3em;"><b>gratis</b></font></td>
+          <td colspan="2" width="100%" padding-left="15px">La consegna è <font style="font-size:1.3em;">gratuita</font></td>
         {% endif %}
-      </tr>
+      </tr>	
     </table>
 
     <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.5em;">
@@ -278,12 +304,12 @@
     {% endif %}
 
   <script type="text/javascript">
-    function getTotal (subtotale,spedizione, scontoA) {
-      const tot = Number(subtotale)+Number(spedizione)-Number(scontoA)
+    function getTotal (subtotale,spedizione, scontoA, omaggio) {
+      const tot = Number(subtotale)+Number(spedizione)-Number(scontoA)-Number(omaggio)
       return tot.toFixed(2)
     }
 
-    let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{discount}})
+    let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{discount}},{{omaggio}})
     document.getElementById("total").innerHTML = `<b>&euro;${i}</b>`;
   
 
