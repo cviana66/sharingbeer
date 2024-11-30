@@ -18,6 +18,7 @@ var ProductSchema = new Schema({
   formatoCl   	: {type: String}, //formato della bottiglia es: 50 cl
   quantitaXtipo : {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:   [{"codProd_A": quantità},{"codProd_B": quantità},...]
   prezzoXtipo 	: {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:  [{"codProd_A": prezzo},{"codProd_B": prezzo},...]
+  promo			: {type: Boolean}
 });
 
 // methods =====================================================================

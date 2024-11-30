@@ -12,7 +12,9 @@
 				  <div class="containerShop">
 					<div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
 				   </div>
+					{% if prod.promo %} 
 				   <div class="corner-text">Promo</div>
+					{% endif %}
                 <table width="100%">
                   <tr>
                     <td width="75%"><div><h3 class="card-title text-white text-left">{{prod.name}}</h3></div></td>

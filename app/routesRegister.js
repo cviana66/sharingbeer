@@ -408,7 +408,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
       //const opts = { session };
       try {        
 
-        console.log('ID POST REGISTER: ',req.user.id);
+        console.debug('ID POST REGISTER: ',req.user.id);
 
         // Conta quanti indirizzi main=yes ci sono 
         const Nadr = await User.aggregate([
@@ -418,7 +418,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           {$project:{_id:0,friends:0,orders:0,local:0}},
           {$group:{_id:null,count:{$count:{ }}}}
           ])
-        //console.log('AGGREGATE: ',Nadr.length);
+        console.debug('AGGREGATE: ',Nadr.length);
         var main = 'yes';
         if (Nadr.length >= 1) {
           main = 'no';
@@ -433,7 +433,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         const numMobil = req.body.mobile.replace(/\s/g,"");
 
         if (user.local.status != 'customer') {
-          console.log('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
+          console.debug('FORM Register: ',user);     //TODO fare il controllo di inserimento se l'arreay è vuota
           
           //Test unicità del num. tel           
           const countMobileNumber = await User.aggregate([{$match:{"local.mobileNumber":numMobil}},{$count:"count"}])

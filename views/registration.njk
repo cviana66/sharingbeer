@@ -156,7 +156,7 @@ async function controlInputAndValidateAddress() {
             checkPrivacyOptional : document.getElementById('checkPrivacyOptional').checked,
             checkPrivacyCessione : document.getElementById('checkPrivacyCessione').checked
           }
-          console.log('PARAM',JSON.stringify(postData,null,2));
+          //console.log('PARAM',JSON.stringify(postData,null,2));
           post('/register',postData);
 
         } else {

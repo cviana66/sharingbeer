@@ -289,43 +289,27 @@ module.exports = function(app, moment, mongoose) {
 
   });
 
-// =============================================================================
+// ==========================================================================
 // ORDER OUTCOME ===============================================================
-// =============================================================================
-/*GET
-	app.get('/orderOutcome', lib.isLoggedIn, function(req, res) {
-	
-	//TODO da finire l'implemetazione ... solo abbozzata 
-
-    res.render('orderOutcome.njk', {
-      status  : 'OK',
-      user    : req.user,
-      deliveryDate: lib.deliveryDate(),
-      numProducts : req.session.numProducts
-    })
-
-  });
-*/
-  //POST
-	app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
+// ==========================================================================
+ //POST
+app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
    	const status = req.body.status;    
-    
     res.render('orderOutcome.njk', {
       status  : status,
       user    : req.user,
       deliveryDate: lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM',req.user.orders.deliveryType),
       numProducts : req.session.numProducts
     })
-  });
+ });
 
-
-// =============================================================================
-// SHOP ========================================================================
-// =============================================================================
+// ==========================================================================
+// SHOP ======================================================================
+// ==========================================================================
 //GET
-  app.get('/shop', lib.isLoggedIn, function (req,res) {
+ app.get('/shop', lib.isLoggedIn, function (req,res) {
 
-  	Product.find(function (err, prods) {
+	Product.find(function (err, prods) {
   		if (err) {
   			let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
   			console.error(lib.logDate("Europe/Rome")+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
@@ -337,49 +321,47 @@ module.exports = function(app, moment, mongoose) {
   		} else {
   			req.flash('info', req.query.msg);
 
-        //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
-        lib.retriveCart(req);
-        var cart = req.session.cart
-        console.debug('SHOP CART', cart)
-        var numProds = req.session.numProducts
+			//mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+			lib.retriveCart(req);
+			var cart = req.session.cart
+			console.debug('SHOP CART', cart)
+			var numProds = req.session.numProducts
 
-	  		prods.forEach(function(prod) {
-	  			prod.prettyPrice = prod.prettyPrice();
-	  			prod.price = prod.price.toFixed(2)
-          prodId = prod._id.toString()
-          if (cart != undefined) {
-
-            //tolgo dallo shop quanto ho in carrello            
-            if (cart[prodId] != undefined) {
-              prod.quantity = prod.quantity - cart[prodId].qty              
-              // controlo che nel frattempo non abbiano acquistato beerbox
-              // e nel caso aggiusto i quantitativi 
-              if (prod.quantity < 0 ) {                
-                cart[prodId].qty = cart[prodId].qty + prod.quantity
-                numProds = numProds + prod.quantity
-                prod.quantity = 0
-                req.flash('info','Mi dispiace, ma la quantità disponibile dei beerbox per la birra '+prod.name+' è inferiore alla richieste rivevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo '+cart[prodId].qty+' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.')
-              } 
-            }
-
-          }
-	  		});
-        req.session.cart = cart
-        //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
-        lib.retriveCart(req);
-	  		console.debug('CATALOGO PRODOTTI: ',prods)
-
-			  var model =  { products   : prods,                     //prodotti dello shop
-	  						       user       : req.user,                  //utente loggato
-	  						       numProducts: req.session.numProducts,   //numero di proodotti nel carrello	  						       
-	                     message    : req.flash('info'),
-	                     type       : "info"
-	  					       };
-	      
-	  		res.render('shop.njk', model);
+			prods.forEach(function(prod) {
+					prod.prettyPrice = prod.prettyPrice();
+					prod.price = prod.price.toFixed(2)
+					prodId = prod._id.toString()
+				if (cart != undefined) {
+					//tolgo dallo shop quanto ho in carrello            
+					if (cart[prodId] != undefined) {
+						prod.quantity = prod.quantity - cart[prodId].qty              
+						// controlo che nel frattempo non abbiano acquistato beerbox
+						// e nel caso aggiusto i quantitativi 
+						if (prod.quantity < 0 ) {                
+							cart[prodId].qty = cart[prodId].qty + prod.quantity
+							numProds = numProds + prod.quantity
+							prod.quantity = 0
+							req.flash('info','Mi dispiace, ma la quantità disponibile dei beerbox per la birra '+prod.name+' è inferiore alla richieste rivevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo '+cart[prodId].qty+' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.')
+						} 
+					}
+				}
+			});
+			req.session.cart = cart
+			//mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+			lib.retriveCart(req);
+			console.debug('CATALOGO PRODOTTI: ',prods)
+			//TODO: sistema gestione promo base -> evolvere con una modalità automatica che impostato la %sconto calcola il nuovo prezzo e lo visualizza nello shop	
+			 var model =  { 	products   : prods,       //prodotti dello shop
+										user       : req.user,      //utente loggato
+										numProducts: req.session.numProducts,   //numero di proodotti nel carrello	  						       
+										message    : req.flash('info'),
+										type       : "info"
+									};
+			  
+			res.render('shop.njk', model);
   		}
-  	});
-  });
+	});
+});
 
 //POST
 	app.post('/shop', lib.isLoggedIn ,async function (req, res) {

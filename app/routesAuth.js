@@ -3,6 +3,7 @@
 const transporter   = require('../config/mailer');
 
 const Users         = require('./models/user');
+
 const lib           = require('./libfunction');
 
 var mailvalidatemail = require('../config/mailValidateMail');
@@ -60,21 +61,18 @@ module.exports = function(app, passport, moment) {
 // PROFILE SECTION ========== 17-12-2021
 // =====================================
 //GET
-  // we will want this protected so you have to be logged in to visit
-  // we will use route middleware to verify this (the isLoggedIn function)
-  app.get('/profile', lib.isLoggedIn, async function(req, res) {
+// we will want this protected so you have to be logged in to visit
+// we will use route middleware to verify this (the isLoggedIn function)
+app.get('/profile', lib.isLoggedIn, async function(req, res) {
 
     try {
-
-      // Conta quanti amici invitati  
+      // Conta quanti amici hai mandato l'invito 
       const nF = await Users.aggregate([
         {$match:{"_id":req.user._id}}, 
         {$unwind: "$friends"}, 
-        //{$match :{ "friends.status":"accepted"}},
-        {$project:{_id:0,addresses:0,orders:0,local:0}}
-        //{$group:{_id:null,count:{$count:{ }}}}
+        {$project:{_id:0,addresses:0,orders:0,local:0}}        
         ]);
-      console.debug('AMICI', nF)
+      console.debug('INVITI MANDATI', nF)
       // Conta quanti amici invitati hanno accettato 
       const nFa = await Users.aggregate([
         {$match:{"_id":req.user._id}}, 
@@ -83,17 +81,22 @@ module.exports = function(app, passport, moment) {
         {$project:{_id:0,addresses:0,orders:0,local:0}}
         //{$group:{_id:null,count:{$count:{ }}}}
         ]);      
+      console.debug('INVITI ACCETTATI', nFa)
       
-      let msg = req.flash('success');
-      console.log('MESSAGGIO',msg );
+      var pinta = (req.user.local.booze / valoreUnPuntoPinta).toFixed(1)
+      
+      let msg = req.flash('infoProfile');
+      console.log('MESSAGGIO',msg, req.user.privacy );
+      
       res.render('profile.njk', {
-          user     : req.user.local, // get the user out of session and pass to template
-          booze    : req.user.local.booze.toFixed(2),
-          friends  : nFa,         
-          invites  : nF,
-          message  : msg,
-          type     : "info",
-          numProducts: req.session.numProducts, //numero di proodotti nel carrello
+          user     		: req.user.local, // get the user out of session and pass to template
+          privacy		: req.user.privacy,
+          pinta    		: pinta,
+          friends  		: nFa,         
+          invites  		: nF,
+          message  	: msg,
+          type     		: "info",
+          numProducts : req.session.numProducts, //numero di proodotti nel carrello
       });
 
     } catch (e) {
@@ -102,7 +105,30 @@ module.exports = function(app, passport, moment) {
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
     }
         
-    });
+});
+
+app.post('/profile', lib.isLoggedIn, async function(req, res) {
+	try {
+		const optional = (req.body.checkPrivacyOptional == undefined) ? false : true
+		const cessione = (req.body.checkPrivacyCessione == undefined) ? false : true
+		
+		const user = await Users.findById(req.user._id)
+		user.privacy.optional              = optional
+		user.privacy.transfer              = cessione
+		
+		console.debug('req.body.checkPrivacyOptional in PROFILE', optional)
+		console.debug('req.body.checkPrivacyCessione in PROFILE', cessione)
+		
+		await user.save();
+		req.flash('infoProfile','La scelta di consenso alla Privacy è stata aggionata');
+		res.redirect('/profile')
+		
+	} catch (e) {
+			req.flash('error','Qualche cosa non ha funzionato nella scelta privacy');
+          console.log('PROFILE PRIVACY:', e );
+          return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+	}
+})
 
 // =====================================
 // LOGOUT ==============================
@@ -304,7 +330,7 @@ app.get('/logout', function(req, res, next) {
             return res.render('info.njk', {message: req.flash('error'), type: "danger"});
           }
 
-          req.flash('success', 'Success! Your password has been changed.');
+          req.flash('infoProfile', 'Your password has been changed.');
           res.redirect('/profile')
         });
       });

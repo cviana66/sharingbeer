@@ -3,25 +3,103 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center" style="margin:6px 0px 0px 0px;">Profile</h3>
-      <hr style="border-top: 1px solid #5375BD;">
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Colore di sfondo della pagina */
+        }
+        table {
+            width: 100%; /* Larghezza della tabella */
+            margin: 10px auto; /* Centra la tabella n pagina */
+            border-collapse: collapse; /* Rimuove gli spazi tra i bordi delle celle */
+            background-color: #2A0009; /* Colore di sfondo della tabella */
+        }
+        th, td {
+            border: 1px solid #903246; /* Colore del bordo più chiaro */
+            padding: 10px; /* Interspaziatura interna */
+            color: white; /* Colore del testo */
+            text-align: left; /* Allineamento del testo */
+        }
+        th {
+            background-color: #3B1A1E; /* Colore di sfondo per l'intestazione */
+        }
+    </style>
 
-              {% if user %}
-            <ul class="list-group">
-              <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.name.first}} {{user.name.last}} </li>
-              <li class="list-group-item text-white" style="background-color:#2A0009"> {{user.email}} </li>
-              <li class="list-group-item text-white" style="background-color:#2A0009"> {{booze}} punti Pinta </li>
-          {% endif %}
-        
-              <li class="list-group-item text-white" style="background-color:#2A0009"> Inviti effettuati: {{invites.length}} </li> 
-              <li class="list-group-item text-white" style="background-color:#2A0009"> Amici che hanno accettato l'invito: {{friends.length}} </li> 
-             
-              {% for friend in friendsMap %}
-                <li class="list-group-item text-white" style="background-color:#2A0009"> {{friend.firstNameFriend}} : {{friend.emailFriend}} </li>
-              {% endfor %}
+<h3 class="text-white text-center  bg-dark" style="margin:6px 0px 0px 0px;">Profile</h3>
+<hr style="border-top: 1px solid #5375BD;">
+
+<table>
+        <tbody>
+            <tr>
+                <td>Nome e Cognome: </td>
+                <td>{{user.name.first}}  {{user.name.last}}</td>
+            </tr>
+            <tr>
+                <td>Mail:</td>
+                <td>{{user.email}}</td>
+            </tr>
+            <tr>
+                <td>Punti Pinta</td>
+                <td>{{pinta}}</td>
+            </tr>
+            <tr>
+                <td>Inviti effettuati</td>
+                <td>{{invites.length}}</td>
+            </tr>
+            <tr>
+                <td>Inviti accettati</td>
+                <td>{{friends.length}}</td>
+            </tr>             
+        </tbody>
+    </table>
+    
+	<div class="card text-white" style="background-color:#2A0009;border-color:#903246;padding: 10px; margin:0px 0px 10px 0px;"> 
+		<label class="form-check-label text-white font-weight-light text-center" for="checkPrivacyDefault"><a href="/change"> Cambio Password </a>
+    </div>  
+	<form role="form" action="/profile" method="post" id="profile">
+      <div class="card text-white" style="background-color:#2A0009;border-color:#903246;padding: 10px;">  
+       
+          <label class="form-check-label text-white font-weight-light text-center" for="checkPrivacyDefault">Consenso <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy </a> (<span style="font-size:0.7em">la tu a attuale scelta</span>)
           
-          </ul> 
-        <br>
-  
+          <div class="input-error" id="wrongPrivacyDefault"></div>
+          <div class="form-check" style="margin-top: 10px;" >
+            <input class="form-check-input" type="checkbox" value="" name="checkPrivacyDefault" checked onclick="return false;"/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">(Obbligatorio)
+              <span style="font-size:0.7em">Per adempiere a tutti gli obblighi legali, regolamentari, normativi e commerciali in materia fiscale/tributaria.</span>
+            </label>
+          </div>
+          
+          <div class="form-check" style="margin-top: 20px;" >
+            <div class="input-error" id="wrongPrivacyNeed"></div>
+            <input class="form-check-input" type="checkbox" value="" name="checkPrivacyNeed" checked onclick="return false;"/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyNeed">(Necessario) 
+              <span style="font-size:0.7em">Per invio di comunicazioni informative relativi a servizi offerti, a seguito dell'acquisto effettuato sul sito web, della richiesta di ritiro della merce o consegna a domicilio, inclusi aggiornamenti su disponibilità di prodotti in riassortimento o nuovi. Utilizzo dei dati per scopi accessori o correlati alle funzionalità principali del sito web, ma sempre all'interno delle sue attività.</span> 
+            </label>
+          </div>
+                    
+          <div class="form-check" style="margin: 20px 0px 0px 0px;" >
+            <div class="input-error" id="wrongPrivacyOptional"></div>
+            <input class="form-check-input" type="checkbox" value="" name="checkPrivacyOptional" name="checkPrivacyOptional" {%if privacy.optional%} checked {%endif%}/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyOptional">(Facoltativo)
+               <span style="font-size:0.7em">Per l’invio di informazioni ed offerte promozionali e commerciali e per attività di profilazione a fini di marketing;</span>
+            </label>
+          </div>
+
+          <div class="form-check" style="margin: 20px 0px 30px 0px;" >
+            <div class="input-error" id="wrongPrivacyCessione"></div>
+            <input class="form-check-input" type="checkbox" value="" name="checkPrivacyCessione" name="checkPrivacyCessione" {%if privacy.transfer%} checked {%endif%}/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyCessione">(Facoltativo)
+              <span style="font-size:0.7em">Per cessione dei Dati a società e/o soggetti terzi con cui il Titolare collabora o ha stipulato convenzioni </span>
+            </label>
+          </div>
+        <div>
+          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+            Salva i dati
+          </button>
+        </div>
+        </div>
+    </form>
+
+
 {% endblock %}
         
