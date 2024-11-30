@@ -264,7 +264,6 @@ color: #4e4e4e;
     background-color: rgba(255, 187, 53, 0.8); /* Sfondo semi-trasparente */
     padding: 5px; /* Padding attorno al testo */
     border-radius: 5px; /* Angoli arrotondati */
-    transform: skew(-10deg);
 }
 
 
