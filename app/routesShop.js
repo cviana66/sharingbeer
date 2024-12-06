@@ -118,10 +118,9 @@ module.exports = function(app, moment, mongoose) {
 // ORDER SUMMARY  
 // !!!ATTENZIONE!!! in routesRegiter c'è una parte di gestione del della consegna in /register (POST)
 // ==============================================================================================
-//-------------------------------------------
+
 //POST
-//-------------------------------------------
-  app.get('/orderSummary', lib.isLoggedIn, async function(req,res){
+  app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
 
   	var address = [];
   	var c1b;
@@ -142,31 +141,12 @@ module.exports = function(app, moment, mongoose) {
   	console.debug('refFatturaPEC', refFatturaPEC);
   	console.debug('refFatturaSDI', refFatturaSDI);
   	
-  	//-------------------------------------------
-    // Verifica se è il primo ordine
-    //-------------------------------------------
-    var nOrders
-    const resNorder = await User.aggregate([
-          {$match:{"_id":req.user._id}}, 
-          {$unwind: "$orders"}, 
-          {$match :{ "orders.payment.s2sStatus":"OK"}},
-          {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
-          {$group:{_id:null,count:{$count:{ }}}}
-          ])
-    if (resNorder.length > 0) {
-		nOrders=resNorder[0].count
-	} else {
-		nOrders=0
-	}		
-    console.debug("N° ORDINI",nOrders)
-   //--------------------------------------------
-
     try{
 
       //--------------------------------------
       // Caso di RITIRO presso Sede Birrificio
       //--------------------------------------
-      if (req.query.typeOfDelivery == 'ritiro' ) {
+      if (req.body.typeOfDelivery == 'ritiro' ) {
         req.session.deliveryType =  "Ritiro"; //session usata in Axerve
         console.debug('POINT DISCOUNT BOOZE DISPONIBILI: ', req.user.local.booze);
         
@@ -181,6 +161,26 @@ module.exports = function(app, moment, mongoose) {
         //==============================================================================
         c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
+        //-------------------------------------------
+		// Verifica se è il primo ordine
+		//-------------------------------------------
+		var nOrders
+		const resNorder = await User.aggregate([
+			  {$match:{"_id":req.user._id}}, 
+			  {$unwind: "$orders"}, 
+			  {$match :{ "orders.payment.s2sStatus":"OK"}},
+			  {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
+			  {$group:{_id:null,count:{$count:{ }}}}
+			  ])
+		if (resNorder.length > 0) {
+			nOrders=resNorder[0].count
+			req.session.omaggioPrimoAcquisto = 0
+		} else {
+			nOrders=0
+			req.session.omaggioPrimoAcquisto = c1b
+		}		
+		console.debug("N° ORDINI",nOrders)
+	   //--------------------------------------------
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
         	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
         } else if (req.user.local.booze > req.session.totalPrc/2) {
@@ -210,14 +210,14 @@ module.exports = function(app, moment, mongoose) {
         
       } else {
       //-------------------------------------------------------
-      // Caso di CONSEGNA presso all'indirizzo indirizzo 
+      // Caso di CONSEGNA presso all'indirizzo
       //-------------------------------------------------------
         req.session.deliveryType =  "Consegna"
-        
+        console.debug('INDIRIZZO',req.body.addressID)
         address = await User.aggregate([
             {$match:{"_id":req.user._id}}, 
             {$unwind: "$addresses"}, 
-            {$match :{ "addresses._id":mongoose.Types.ObjectId(req.query.addressID)}},
+            {$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
         req.session.shippingAddress = address[0].addresses;         
@@ -251,6 +251,26 @@ module.exports = function(app, moment, mongoose) {
         //==============================================================================
         c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
+        //-------------------------------------------
+		// Verifica se è il primo ordine
+		//-------------------------------------------
+		var nOrders
+		const resNorder = await User.aggregate([
+			  {$match:{"_id":req.user._id}}, 
+			  {$unwind: "$orders"}, 
+			  {$match :{ "orders.payment.s2sStatus":"OK"}},
+			  {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
+			  {$group:{_id:null,count:{$count:{ }}}}
+			  ])
+		if (resNorder.length > 0) {
+			nOrders=resNorder[0].count
+			req.session.omaggioPrimoAcquisto = 0
+		} else {
+			nOrders=0
+			req.session.omaggioPrimoAcquisto = c1b
+		}		
+		console.debug("N° ORDINI",nOrders)
+	   //--------------------------------------------
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
         	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
         } else if (req.user.local.booze > req.session.totalPrc/2) {
@@ -269,13 +289,13 @@ module.exports = function(app, moment, mongoose) {
         deliveryType      : req.session.deliveryType,
         deliveryDate      : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'),
         ritiroDate  			: lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Ritiro'),
-        discount    : req.session.pointDiscount,
+        friendsDiscount    : req.session.pointDiscount,
         user        : req.user,
         payType     : "axerve", //"paypal"  "axerve"
         fatturaPEC  : refFatturaPEC,
         fatturaSDI  : refFatturaSDI,
         nOrders : nOrders,
-        omaggio:  c1b
+        omaggio:  req.session.omaggioPrimoAcquisto
       })
     }
     catch (e) {

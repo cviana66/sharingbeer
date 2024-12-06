@@ -3,7 +3,7 @@
 	
   <h3 class="text-white text-center bg-dark"> Riepilogo ordine </h3>
   
-  {% if nOrders == 0 %}
+ {% if nOrders == 0 %}
 	 <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.1em;">
       <!-- Shipping -->
       <tr class="text-white">
@@ -35,13 +35,13 @@
       {% endfor %}
     </table>
      
-    {% if discount >0%} 
+    {% if friendsDiscount >0%} 
     <table class="mx-auto" width="100%" style="margin: 10px;">
       <!-- Savings -->     
       <tr class="text-white">
         <td width="16%" rowspan="2" align="center"><img src="img/savings_36dp.svg"></td>
         <td width="64%" padding-left="15px" style="font-size:0.9em;">Vantaggio dai tuoi amici</td>
-        <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;-{{discount}}</td>
+        <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;-{{friendsDiscount}}</td>
       </tr>
       <!---tr class="text-white">
         <td width="64%" padding-left="15px" style="font-size:0.9em;">Sconto su spedizione</td>
@@ -304,12 +304,20 @@
     {% endif %}
 
   <script type="text/javascript">
-    function getTotal (subtotale,spedizione, scontoA, omaggio) {
-      const tot = Number(subtotale)+Number(spedizione)-Number(scontoA)-Number(omaggio)
+	
+	//console.log('N°ordini=',{{nOrders}},'Prezzo Birra=',{{cartItems.totalPrice}},'Costo consegna=',{{shipping}},'Sconto Amici=',{{friendsDiscount}},'Omaggio primo acquisto=',{{omaggio}})	
+	
+    function getTotal (nOrders,subtotale,spedizione, scontoAmico, omaggio) {
+		var tot
+		if (nOrders==0) {
+			 tot = Number(subtotale)+Number(spedizione)-Number(scontoAmico)-Number(omaggio)
+		}else{ 
+			 tot = Number(subtotale)+Number(spedizione)-Number(scontoAmico)
+		}
       return tot.toFixed(2)
     }
 
-    let i = getTotal({{cartItems.totalPrice}},{{shipping}},{{discount}},{{omaggio}})
+    const i = getTotal({{nOrders}},{{cartItems.totalPrice}},{{shipping}},{{friendsDiscount}},{{omaggio}})
     document.getElementById("total").innerHTML = `<b>&euro;${i}</b>`;
   
 

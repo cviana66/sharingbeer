@@ -46,7 +46,7 @@
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:15px;">
         <span style="font-size:0.9em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
       </div>
-      <form role="form" action="/orderSummary?addressID={{address.id}}&typeOfDelivery=ritiro" method="get" id="selectedAddress">
+      <form role="form" action="/orderSummary" method="POST" id="selectedAddress">
         <div class="card text-white" style="background-color:#6B1628;border-color:#903246;margin-bottom:10px;">
           <div class="card-body">
             <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!</p>
@@ -87,7 +87,7 @@
                 </tr>
                 <tr>
                   <td colspan="2">
-                    <form role="form" action="/orderSummary?addressID={{address.id}}&typeOfDelivery=consegna" method="GET" id="selectedAddress">
+                    <form role="form" action="/orderSummary" method="POST" id="selectedAddress">
                       <p class="card-text text-left">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
                       <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
                         Seleziona e vai al riepilogo
@@ -106,7 +106,7 @@
         <span style="font-size:0.9em;">oppure indicaci tu dove preferisci riceverlo</span>
       </div>
       
-      <form role="form" action="/register" method="post" id="addresses">
+      <form role="form" action="/register" method="POST" id="addresses">
         <div class="card text-white" style="background-color:#2A0009;border-color:#903246;">
           <div class="form-group" style="margin: 10px 10px 10px 10px;">
             <div class="input-error" id="wrongFirstName"></div>

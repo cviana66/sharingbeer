@@ -447,6 +447,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           user.local.status                  = 'customer';
           user.local.mobilePrefix    = '+39';
           user.local.mobileNumber    = numMobil;
+          
           console.debug('USER in REGISTER',user)
           console.debug('req.body.checkPrivacyOptional in REGISTER',req.body.checkPrivacyOptional)
           console.debug('req.body.checkPrivacyCessione in REGISTER',req.body.checkPrivacyCessione)
@@ -500,7 +501,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         let birrificioCoordinate =  {'latitude': 45.5447643, 'longitude': 8.1130519};
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress, customerCoordinate, birrificioCoordinate));
 
-        console.log('DISTANZA = ', dist.distanceInMeters)
+        console.debug('DISTANZA = ', dist.distanceInMeters)
 
         if ( Number(dist.distanceInMeters) > 15000) {
           req.session.shippingCost = priceCurier[req.session.numProducts-1];
@@ -508,11 +509,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           if (req.session.numProducts > 5) {
             req.session.shippingCost = '0.00';
           } else {
-            console.debug('PRICE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
+            console.debug('COSTO SPEDIZIONE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
             req.session.shippingCost = priceLocal[req.session.numProducts-1]
           }
         }
-
+		
         //==============================================================================
         // Vantaggio dai tuoi amici 
         // Il prezzo totale di acquisto/numero di bottigli => costo di una bottiglia
@@ -520,6 +521,26 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         // lo sconto massimo è del 50% su totale di acquisto  
         //==============================================================================
         const c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
+        //-------------------------------------------
+		// Verifica se è il primo ordine
+		//-------------------------------------------
+		var nOrders
+		const resNorder = await User.aggregate([
+			  {$match:{"_id":req.user._id}}, 
+			  {$unwind: "$orders"}, 
+			  {$match :{ "orders.payment.s2sStatus":"OK"}},
+			  {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
+			  {$group:{_id:null,count:{$count:{ }}}}
+			  ])
+		if (resNorder.length > 0) {
+			nOrders=resNorder[0].count
+			req.session.omaggioPrimoAcquisto = 0
+		} else {
+			nOrders=0
+			req.session.omaggioPrimoAcquisto = c1b
+		}		
+		console.debug("N° ORDINI",nOrders)
+	   //--------------------------------------------
         console.debug('COSTO DI 1 BOTTIGLIA!!: ', c1b)
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
           req.session.pointDiscount = req.user.local.booze.toFixed(2);  
@@ -529,7 +550,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           req.session.pointDiscount = 0.00.toFixed(2); 
         }
         
-        console.debug('req.user.local.status = ',req.user.local.status);
+        console.debug('STATO UTENTE = ',req.user.local.status);
         if (req.user.local.status == 'validated') {
             req.user.local.status = 'customer'
             res.redirect('/addresses');
@@ -542,9 +563,11 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   shipping    : req.session.shippingCost,
                   deliveryType      : req.session.deliveryType,
                   deliveryDate      : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM',req.session.deliveryType),
-                  discount    : req.session.pointDiscount,
+                  friendsDiscount    : req.session.pointDiscount,
                   user        : req.user,
-                  payType     : "axerve" //"paypal"  "axerve"
+                  payType     : "axerve", //"paypal"  "axerve"
+                  nOrders : nOrders,
+                  omaggio:  req.session.omaggioPrimoAcquisto
                   
                 })
         }      

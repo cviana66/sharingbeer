@@ -55,12 +55,11 @@ const gestpayService = new GestpayService();
 
       const _orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
       const orderId  = _orderId.toString();
-      const amount   = req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2)
+      const amount   = req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.omaggioPrimoAcquisto)).toFixed(2)
       
       //================================================
       // Chiamo Axerve per ottenere la stringa ENCRYPT
       //================================================
-      console.debug('IMPORTO CALCOLATO', (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)).toFixed(2));
       console.debug('IMPORTO in SESSIONE', req.session.order.totalaAmount)
 
       const url = 'https://sandbox.gestpay.net/pagam/pagam.aspx'; 
