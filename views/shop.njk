@@ -61,12 +61,12 @@
         url: '/shop',
         data: data,
         success: function(res) { 
-          console.log(res.statusText)          
-          console.log(res.msg)       
+          //console.log(res.statusText)          
+          //console.log(res.msg)       
           if (res.statusText == 'ok') {
             var spanElement = document.getElementById('lblCartCount');
             var num = Number(document.getElementById('lblCartCount').textContent) + 1
-            console.log('NUMERO DI ITEM', num.toString())
+            //console.log('NUMERO DI ITEM', num.toString())
             spanElement.textContent = num.toString(); 
             
             document.querySelector('#carrello').classList.remove('animate-div'); //animazione

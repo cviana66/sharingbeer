@@ -41,8 +41,8 @@
       function validateData() {
         var pToken = document.getElementById("token").value;
         var pID = document.getElementById("ID").value;
-        console.log("token= ",pToken);
-        console.log("ID= ",pID);
+        //console.log("token= ",pToken);
+        //console.log("ID= ",pID);
 
         if (pToken != "" && pID != "") {
           axerve.lightBox.shop = "{{shopLogin}}";
@@ -52,7 +52,7 @@
       }
 
       function pCallback(response) {
-        console.log(response);
+        //console.log(response);
         
         let error = JSON.stringify(Object.values(response)[0]);
         let result = Object.values(response)[2];

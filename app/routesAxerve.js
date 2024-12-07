@@ -307,7 +307,7 @@ const gestpayService = new GestpayService();
         cryptedString
       })
       .then(result => {
-        console.log(result);
+        console.debug(result);
         return result        
       })
       .catch(err => {

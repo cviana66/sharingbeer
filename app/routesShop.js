@@ -231,7 +231,7 @@ module.exports = function(app, moment, mongoose) {
         let birrificioCoordinate = {'latitude': 45.5447643, 'longitude': 8.1130519} ;
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress, customerCoordinate, birrificioCoordinate));
 
-        console.log('DISTANZA = ', dist.distanceInMeters)
+        console.debug('DISTANZA = ', dist.distanceInMeters)
 
         if ( Number(dist.distanceInMeters) > 15000) {
           req.session.shippingCost = priceCurier[req.session.numProducts-1];
@@ -662,9 +662,9 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
         prods.forEach(function(prod) {
           prod.prettyPrice = prod.prettyPrice();
         });
-        console.log(prods);
+        console.debug(prods);
         var model = { products: prods	};
-        console.log(model);
+        console.debug(model);
         res.render('newProduct.njk', model);
       });
     });

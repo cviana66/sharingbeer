@@ -76,8 +76,8 @@ module.exports = {
                         },
   sendmailToPerson: async function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server, html) {
 
-                      console.log('MAIL TYPE: ', typeOfMail);
-                      console.log("SERVER:", server);
+                      console.debug('MAIL TYPE: ', typeOfMail);
+                      console.debug("SERVER:", server);
 
                       if (typeOfMail == 'friend') {
                         var mailOptions = {

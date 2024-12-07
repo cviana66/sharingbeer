@@ -205,7 +205,7 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 		result = 'Aggiornamento eseguito';
 
 	} catch (e) {
-		//console.log("errore: ",e)
+		console.log("errore: ",e)
 		await session.abortTransaction();
 		result = 'Aggiornamento in errore. ' + e;
 

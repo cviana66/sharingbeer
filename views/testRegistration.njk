@@ -18,12 +18,12 @@
 /*==================================================================*/
 
 $('body').on('click','#myselect li a',function(){
-      console.log('COMUNE di ',$(this).text());
+      //console.log('COMUNE di ',$(this).text());
       selectCaps(this.text);
 });
 
 $('body').on('click','#myselectcaps li a',function(){
-      console.log('CAP: ',$(this).text());
+      //console.log('CAP: ',$(this).text());
       //selectCap(this);
       $("#myselectcaps").hide();
       $('#myselect').hide();
@@ -31,7 +31,7 @@ $('body').on('click','#myselectcaps li a',function(){
 });
 
 function selectCaps(selectCity) {
-  console.log('CITTA: ',selectCity);
+  //console.log('CITTA: ',selectCity);
   $('#myselect').hide();
   document.getElementById("inputCity").value = selectCity;
   document.getElementById("inputCap").focus();
@@ -101,8 +101,8 @@ function selectCity (v) {
           let select = document.createElement('ul');
           let size = res.length;
           let citta = document.getElementById("inputCity").value.toLowerCase();
-          console.log('citta=',citta);
-          console.log('Comune',res[0].Comune.toLowerCase());
+          //console.log('citta=',citta);
+          //console.log('Comune',res[0].Comune.toLowerCase());
 
           if (size == 1 && citta == res[0].Comune.toLowerCase()) selectCaps(res[0].Comune);
           //this.text=res[0].Comune;

@@ -20,7 +20,7 @@ module.exports = function(app, qr, moment) {
 //GET
   // read  Qrcode
   app.get('/webcam', function(req, res, next) {
-  console.log("webcam-easy")
+  console.debug("webcam-easy")
    res.render('webcam.njk', {user : req.user});
   });
 
@@ -34,7 +34,7 @@ module.exports = function(app, qr, moment) {
 //GET
   // show Qrcode information
   app.get('/qrcodeOrder', function(req, res, next) {
-    console.log('qrcodeOrder-> ',req.session.qrcodeInfo);
+    console.debug('qrcodeOrder-> ',req.session.qrcodeInfo);
     res.render('qrcodeOrder.njk', {QrcodeData : req.session.qrcodeInfo});
   });
 

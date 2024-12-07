@@ -4,11 +4,11 @@ const translate = require('@iamtraction/google-translate');
 
 // Funzione per la traduzione del messaggio
 async function transMsg(inputMessage, langCode) {
-    console.log('TRADUCO:', inputMessage);
+    console.debug('TRADUCO:', inputMessage);
 
     try {
         const { text } = await translate(inputMessage, { to: langCode });
-        console.log('RISULTATO TRADUZIONE', text);
+        console.debug('RISULTATO TRADUZIONE', text);
         return text;
     } catch (err) {
         console.error(err);

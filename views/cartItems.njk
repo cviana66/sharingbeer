@@ -110,12 +110,12 @@
           paypal.Buttons({
             // Order is created on the server and the order id is returned
             createOrder: (data, actions) => {
-                console.log('!!! createOrder !!!')
+                //console.log('!!! createOrder !!!')
                 return fetch('/create-paypal-transaction', {
                     method: 'post'
                 })
                 .then(function(res) {
-                    console.log('createOrder.res->',res);
+                    //console.log('createOrder.res->',res);
                     if (res.ok===false) {
                       return window.location.href = ("/");
                     } else {
@@ -123,7 +123,7 @@
                     }
                 })
                 .then(function(orderData) {
-                    console.log('orderData.orderID-> ',orderData.orderID)
+                    //console.log('orderData.orderID-> ',orderData.orderID)
                     return orderData.orderID;
                 })
                 /*.catch(function(error){
@@ -134,7 +134,7 @@
 
             // Call your server to finalize the transaction
             onApprove: function(data) {
-              console.log('!!! onApprove !!!')
+              //console.log('!!! onApprove !!!')
               return fetch('/authorize-paypal-transaction', {
                 headers: {
                   'content-type': 'application/json'
@@ -144,7 +144,7 @@
                   orderID: data.orderID
                 })
               }).then(function(res) {
-                  console.log('onApprove.res->',res);
+                  //console.log('onApprove.res->',res);
                   return res.json();
                 }).then(function(orderData) {
                   // Three cases to handle:

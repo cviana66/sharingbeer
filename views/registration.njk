@@ -113,8 +113,8 @@ async function controlInputAndValidateAddress() {
   const ret = await fieldsRegisterControl()
   if (ret) {
     
-    console.log('CITTA: ',document.getElementById("inputCity").value);
-    console.log('VIA: ',document.getElementById("inputStreet").value);
+    //console.log('CITTA: ',document.getElementById("inputCity").value);
+    //console.log('VIA: ',document.getElementById("inputStreet").value);
 
     document.getElementById("loading").style.display = 'block';
     document.getElementById("wrongNumciv").innerHTML = ''
@@ -134,11 +134,11 @@ async function controlInputAndValidateAddress() {
       data: data,
       success: function(res) {        
         if (res.status != 'ko') {          
-          console.log('CAP: ',res.cap)
+          //console.log('CAP: ',res.cap)
           document.getElementById("hiddenCAP").value = res.cap
 
           document.getElementById("hiddenAddressIsValid").value = res.status
-          console.log('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
+          //console.log('HIDDEN ADDRESS 2: ', document.getElementById("hiddenAddressIsValid").value)
 
           postData = {
             firstName : document.getElementById("inputFirstName").value,
@@ -167,7 +167,7 @@ async function controlInputAndValidateAddress() {
         }
       },
       error: function (e) {
-        console.log("OVERPASS_CAP", e);
+        //console.log("OVERPASS_CAP", e);
         //document.getElementById("loading").style.display = 'none';
         post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
       }
@@ -181,7 +181,7 @@ async function setValueStreet(via) {
   if (document.getElementById('myselectstreet') != null) {
     document.getElementById('myselectstreet').remove();
   };
-  console.log('SETVALUESTREET');
+  //console.log('SETVALUESTREET');
   document.getElementById("hiddenStreet").value = 'OK';
   document.getElementById("inputStreet").value = via;
   document.getElementById('inputNumciv').removeAttribute('readonly');
@@ -193,8 +193,8 @@ async function setValueStreet(via) {
 // DATA LA CITTA E IL CODICE ISTAT RECUPERA LE VIE DA OPENSTREETMAP
 //********************************************************************
 async function listOfStreets(citta,istat) {
-  console.log('CITTA: ',citta);
-  console.log('ISTAT: ',istat);
+  //console.log('CITTA: ',citta);
+  //console.log('ISTAT: ',istat);
   if (document.getElementById('myselectcity') != null) {
     document.getElementById('myselectcity').remove();
   };
@@ -211,7 +211,7 @@ async function listOfStreets(citta,istat) {
     data: data,
     success: function(res) {
       response = res;
-      console.log('STREET: ', JSON.stringify(res,null,2) )
+      //console.log('STREET: ', JSON.stringify(res,null,2) )
     },
     error: function (e) {
       console.log("ErrorListOfStreets", e.responseText);
@@ -247,9 +247,9 @@ async function selectStreet(v) {
 
 
 
-          console.log('via=',via);
-          console.log('street=', street);
-          console.log('size=',size);
+          //console.log('via=',via);
+          //console.log('street=', street);
+          //console.log('size=',size);
 
           //------------------------------------------------------------------------------
           if (size == 1 && via == street) {
@@ -280,7 +280,7 @@ async function selectStreet(v) {
           }
 
         } else {
-          console.log ("FINE SELECTSTREET")
+          //console.log ("FINE SELECTSTREET")
           document.getElementById("inputNumciv").setAttribute('readonly', true);
           document.getElementById('inputNumciv').value = null;
           document.getElementById("hiddenStreet").value = 'KO';
@@ -311,7 +311,7 @@ async function setValueCity(comune, provincia, istat) {
   if (document.getElementById('myselectcity') != null) {
     document.getElementById('myselectcity').remove();
   };
-  console.log('SETVALUE_CITY');
+  //console.log('SETVALUE_CITY');
   document.getElementById("hiddenStreet").value = 'OK';
   document.getElementById("hiddenIstat").value = istat;
   document.getElementById("inputCity").value = comune;
@@ -329,7 +329,7 @@ async function setValueCity(comune, provincia, istat) {
   } catch (e) {
     document.getElementById('inputNumciv').removeAttribute('readonly');
   }
-  console.log('RES: ',res);
+  //console.log('RES: ',res);
   document.getElementById("loading").style.display = 'none';
   //document.getElementById("inputStreet").focus();
   document.getElementById("inputCap").focus();
@@ -349,7 +349,7 @@ async function listOfCities(v) {
     url: '/cities',
     data: data,
     success: function(res) {
-      console.log('CITY: ', JSON.stringify(res) )
+      //console.log('CITY: ', JSON.stringify(res) )
       response = res;
     },
     error: function (e) {
@@ -389,7 +389,7 @@ async function selectCity(v) {
         input.setAttribute("id","hiddenListOfCities");
         input.setAttribute("name", "hiddenListOfCities");
         input.setAttribute("value", "OK");
-        console.log('INPUT: ',input);
+        //console.log('INPUT: ',input);
         //append to form element that you want .
         document.getElementById("addresses").appendChild(input);
       }
@@ -410,7 +410,7 @@ async function selectCity(v) {
         input.setAttribute("id","hiddenListOfCities");
         input.setAttribute("name", "hiddenListOfCities");
         input.setAttribute("value", "KO");
-        console.log('INPUT: ',input);
+        //console.log('INPUT: ',input);
         //append to form element that you want .
         document.getElementById("addresses").appendChild(input);
       }

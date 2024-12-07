@@ -86,7 +86,7 @@ app.get('/profile', lib.isLoggedIn, async function(req, res) {
       var pinta = (req.user.local.booze / valoreUnPuntoPinta).toFixed(1)
       
       let msg = req.flash('infoProfile');
-      console.log('MESSAGGIO',msg, req.user.privacy );
+      console.debug('MESSAGGIO',msg, req.user.privacy );
       
       res.render('profile.njk', {
           user     		: req.user.local, // get the user out of session and pass to template
@@ -177,7 +177,7 @@ app.get('/logout', function(req, res, next) {
           user.local.resetPasswordToken = token;
           user.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-          console.log('POST FORGOT USER: ',user)
+          console.debug('POST FORGOT USER: ',user)
 
           user.save(async function(err) {
 

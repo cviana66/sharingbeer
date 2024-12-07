@@ -136,7 +136,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 // UTILITY per importare i Comuni Italiani
 //==================================================================================================
     app.get('/importCityIstat/:csvname', (req,res) => {
-      console.log('PARAM: ',req.params.csvname);
+      console.debug('PARAM: ',req.params.csvname);
       let stream = fs.createReadStream('./data/'+ req.params.csvname +'.csv');
       let csvData = [];
       let csvStream = fastcsv
@@ -894,8 +894,8 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 			const T = 195;
 
 			const result = lib.findClosestCombination(products, T);
-			console.log(`Somma più vicina a ${T}: ${result.closestSum}`);
-			console.log(`Combinazione: ${result.bestCombination}`);
+			console.debug(`Somma più vicina a ${T}: ${result.closestSum}`);
+			console.debug(`Combinazione: ${result.bestCombination}`);
 			res.send("Somma più vicina a "+T+":" +result.closestSum+" | Combinazione:"+result.bestCombination)
     });
     
@@ -919,14 +919,14 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 		// Stampa i risultati
 		let txt=""
 		for (const tipo in risultato) {
-			console.log(`Array ${tipo}:`, risultato[tipo]);
+			console.debug(`Array ${tipo}:`, risultato[tipo]);
 			txt=txt+ `Array ${tipo}:[`+risultato[tipo]+"]      "
 		}
 		res.send(txt);
 	});
 
     app.get('/share', function(req, res) {
-          console.log("FISRT NAME: ",req.body.firstName);
+          console.debug("FISRT NAME: ",req.body.firstName);
           res.render('share.njk', {
                 firstName : req.body.firstName // encodeURIComponent("Ciao \n come stai")
           });
