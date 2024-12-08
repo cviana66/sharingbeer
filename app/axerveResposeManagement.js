@@ -89,6 +89,7 @@ module.exports = {
 
 	updateInviteAndPoint: async function updateInviteAndPoint(user, session, mongoose) {
 		try {
+			//decrementa i booze utilizzati nell'acquisto'
 			if (user.local.booze <= user.orders.pointsDiscount) {
 				booze = 0
 			} else {
