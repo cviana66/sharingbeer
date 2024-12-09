@@ -63,7 +63,7 @@ const gestpayService = new GestpayService();
       console.debug('IMPORTO in SESSIONE', req.session.order.totalaAmount)
 
       const url = 'https://sandbox.gestpay.net/pagam/pagam.aspx'; 
-      if (process.env.MODE_ENV == 'Production') {
+      if (process.env.MODE_ENV == 'production') {
             const url = 'https://ecomm.sella.it/pagam/pagam.aspx';
       } 
 
