@@ -42,9 +42,6 @@ console.debug("Date Europe/Rome =",new Date(moment(c).format()))
 
 console.debug(moment().utc("Europe/Rome").format('dddd'))
 
-console.debug('GESTPAY =', process.env.SHOPLOGIN);
-
-
 //=================================================
 // Connect to our database
 const mongoose = require('./config/database.js'); //TODO: per la PRO impostare parametro per connessione ambiente di produzione su fly.io
@@ -86,13 +83,19 @@ const {geoMap}        = require('./app/routesGeoMap');
 // percorso consegne ===========================================================
 const routesDelivery  = require('./app/routesDelivery');
 
-var debug = true
-
-//if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'pre-production') {
+// ================================
+// Gestione Debug
+// ================================
+global.debug = true
 if (process.env.NODE_DEBUG === false) {
     global.debug = false;
 }
-console.log("DEBUG SETTING=", debug);
+console.log("DEBUG SETTING=", global.debug);
+// ================================
+
+console.log('NODE ENVIRONMENT =', process.env.NODE_ENV);
+console.log('GESTPAY =', process.env.SHOPLOGIN);
+
 
 /*=======================================================================
     Delivery price

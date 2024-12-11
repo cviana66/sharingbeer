@@ -62,11 +62,11 @@ const gestpayService = new GestpayService();
       //================================================
       console.debug('IMPORTO in SESSIONE', req.session.order.totalaAmount)
 
-      const url = 'https://sandbox.gestpay.net/pagam/pagam.aspx'; 
-      if (process.env.MODE_ENV == 'production') {
-            const url = 'https://ecomm.sella.it/pagam/pagam.aspx';
-      } 
-
+      var url = 'https://sandbox.gestpay.net/pagam/pagam.aspx'; 
+      if (process.env.NODE_ENV == 'production') {
+            url = 'https://ecomm.sella.it/pagam/pagam.aspx';
+      }
+	  console.debug("URL ECOMMERCE=",url)
       const cryptedString = await gestpayService.encrypt({
           amount,
           orderId

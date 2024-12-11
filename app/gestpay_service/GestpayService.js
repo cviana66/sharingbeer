@@ -7,7 +7,7 @@ const WsCryptDecrypt = require('../wscryptdecrypt/wscryptdecrypt');
 class GestpayService {
   constructor() {
     let isTest = true;
-    if (process.env.MODE_ENV == 'production') {
+    if (process.env.NODE_ENV == 'production') {
       isTest = false;
     }
     this.wsCryptDecrypt = new WsCryptDecrypt(isTest);

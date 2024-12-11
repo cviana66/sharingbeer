@@ -13,6 +13,7 @@ class WsCryptDecrypt {
     if (isTest) {
       this.url = testUrl;
     }
+    console.debug("URL ECOMMERCE=",this.url)
   }
 
   /**
