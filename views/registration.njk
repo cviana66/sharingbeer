@@ -46,6 +46,7 @@
           <div class="w-100"></div>
 
           <div class="input-error" id="wrongStreet"></div>
+          <div class="text-white font-weight-light text-justify" style="font-size:0.7em;">Inserisci il nome della Via / Piazza anche parziale e selezionare l'indirizzo dalla lista proposta</div>
           <input type="text" class="form-control" id="inputStreet" value="" name="street" placeholder="Via / Piazza" required readonly autocomplete="off" oninput="selectStreet(this.value)">
           <div class="w-100"></div>
           <div id="streets"></div>
@@ -55,7 +56,7 @@
         </div>
         
         <div class="form-group"style="margin: 10px 10px 10px 10px;">
-          <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">Consenso Privacy (<span style="font-size:0.7em">per dettagli vedere</span> <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy) </a>
+          <!--label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">Consenso Privacy (<span style="font-size:0.7em">per dettagli vedere</span> <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy) </a>
           
           <div class="input-error" id="wrongPrivacyDefault"></div>
           <div class="form-check" style="margin-top: 10px;" >
@@ -87,7 +88,7 @@
             <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyCessione">(Facoltativo)
               <span style="font-size:0.7em">Per cessione dei Dati a società e/o soggetti terzi con cui il Titolare collabora o ha stipulato convenzioni </span>
             </label>
-          </div>
+          </div-->
         <div>
           <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return controlInputAndValidateAddress()">
             Salva i dati
@@ -152,9 +153,9 @@ async function controlInputAndValidateAddress() {
             hiddenAddressIsValid : res.status,
             descValidAddress : res.desStatus,
             lat : res.lat,
-            lon : res.lon,
-            checkPrivacyOptional : document.getElementById('checkPrivacyOptional').checked,
-            checkPrivacyCessione : document.getElementById('checkPrivacyCessione').checked
+            lon : res.lon
+            //checkPrivacyOptional : document.getElementById('checkPrivacyOptional').checked,
+            //checkPrivacyCessione : document.getElementById('checkPrivacyCessione').checked
           }
           //console.log('PARAM',JSON.stringify(postData,null,2));
           post('/register',postData);

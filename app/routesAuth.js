@@ -8,23 +8,38 @@ const lib           = require('./libfunction');
 
 var mailvalidatemail = require('../config/mailValidateMail');
 
-module.exports = function(app, passport, moment) {
+module.exports = function(app, passport, moment, mongoose) {
 
 // =====================================
 // HOME PAGE (with login links) ========
 // =====================================
 //GET
-  app.get('/', function(req, res) {
+  app.get('/', async function(req, res) {
       //var video = "video/BiarraViannaColor_Final_Logo_ligth_24.mp4";
       var video = "video/BirraViannaColor_Final_Logo_38.mp4";
       //console.debug(req.session)
       if (process.env.NODE_ENV === 'development') {
         video = ""
       }
+      var amiciDaInvitare = false
+      if (req.isAuthenticated())  {
+		 // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
+		  const user =  await Users.findOne({'_id': mongoose.Types.ObjectId(req.user.id)})
+		  console.debug("INVITI DISPONIBILI=",parseInt(user.local.eligibleFriends, 10))
+		  console.debug("AMICI INVITATI= ", parseInt(user.friends.length, 10))
+		  // controllo che ci siano ancora inviti diposnibili
+		  if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
+			  console.debug ("HAI AMICI DA INVITARE !!!!!!!!!!!!!!!");
+			  amiciDaInvitare = true
+		  }
+		//----------------
+	}
+
       res.render('index.njk', {
           user: req.user,
           numProducts : req.session.numProducts,
-          video : video
+          video : video,
+          amiciDaInvitare : amiciDaInvitare
       }); // load the index.ejs file
   });
 
@@ -49,7 +64,7 @@ module.exports = function(app, passport, moment) {
   // https://stackoverflow.com/questions/41475626/passport-authenticate-successredirect-condition
   app.post('/login',  passport.authenticate('local-login', {
                         failureRedirect : '/login', // redirect back to the signup page if there is an error
-                        failureFlash : true 
+                        failureFlash : true
                       }),
                       function (req, res) {
                         console.debug('LOGIN RETURN TO :',req.body.returnTo)
@@ -66,33 +81,33 @@ module.exports = function(app, passport, moment) {
 app.get('/profile', lib.isLoggedIn, async function(req, res) {
 
     try {
-      // Conta quanti amici hai mandato l'invito 
+      // Conta quanti amici hai mandato l'invito
       const nF = await Users.aggregate([
-        {$match:{"_id":req.user._id}}, 
-        {$unwind: "$friends"}, 
-        {$project:{_id:0,addresses:0,orders:0,local:0}}        
+        {$match:{"_id":req.user._id}},
+        {$unwind: "$friends"},
+        {$project:{_id:0,addresses:0,orders:0,local:0}}
         ]);
       console.debug('INVITI MANDATI', nF)
-      // Conta quanti amici invitati hanno accettato 
+      // Conta quanti amici invitati hanno accettato
       const nFa = await Users.aggregate([
-        {$match:{"_id":req.user._id}}, 
-        {$unwind: "$friends"}, 
+        {$match:{"_id":req.user._id}},
+        {$unwind: "$friends"},
         {$match :{ "friends.status":"accepted"}},
         {$project:{_id:0,addresses:0,orders:0,local:0}}
         //{$group:{_id:null,count:{$count:{ }}}}
-        ]);      
+        ]);
       console.debug('INVITI ACCETTATI', nFa)
-      
+
       var pinta = (req.user.local.booze / valoreUnPuntoPinta).toFixed(1)
-      
+
       let msg = req.flash('infoProfile');
       console.debug('MESSAGGIO',msg, req.user.privacy );
-      
+
       res.render('profile.njk', {
           user     		: req.user.local, // get the user out of session and pass to template
           privacy		: req.user.privacy,
           pinta    		: pinta,
-          friends  		: nFa,         
+          friends  		: nFa,
           invites  		: nF,
           message  	: msg,
           type     		: "info",
@@ -104,25 +119,25 @@ app.get('/profile', lib.isLoggedIn, async function(req, res) {
           console.log('ERROR PROFILE FIND FRIENDS:', e );
           return res.render('info.njk', {message: req.flash('error'), type: "danger"});
     }
-        
+
 });
 
 app.post('/profile', lib.isLoggedIn, async function(req, res) {
 	try {
 		const optional = (req.body.checkPrivacyOptional == undefined) ? false : true
 		const cessione = (req.body.checkPrivacyCessione == undefined) ? false : true
-		
+
 		const user = await Users.findById(req.user._id)
 		user.privacy.optional              = optional
 		user.privacy.transfer              = cessione
-		
+
 		console.debug('req.body.checkPrivacyOptional in PROFILE', optional)
 		console.debug('req.body.checkPrivacyCessione in PROFILE', cessione)
-		
+
 		await user.save();
 		req.flash('infoProfile','La scelta di consenso alla Privacy è stata aggionata');
 		res.redirect('/profile')
-		
+
 	} catch (e) {
 			req.flash('error','Qualche cosa non ha funzionato nella scelta privacy');
           console.log('PROFILE PRIVACY:', e );
@@ -200,7 +215,7 @@ app.get('/logout', function(req, res, next) {
               req.flash('error',msg);
               return res.render('info.njk', {message: req.flash('error'), type: "danger"});
             }
-            
+
           });
         };
       });
@@ -231,7 +246,7 @@ app.get('/logout', function(req, res, next) {
       };
     });
   });
-//POST 
+//POST
   app.post('/reset', function(req, res) {
 
     if (req.body.password != req.body.confirmPassword) {
@@ -292,7 +307,7 @@ app.get('/logout', function(req, res, next) {
         console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "GET /change" email: {"email":"'+req.user.local.email+'"} FUNCTION: Users.findOne: '+err+' FLASH: '+msg);
         return res.render('info.njk', {message: req.flash('error'), type: "danger"});
       }
-      res.render('change.njk',{        
+      res.render('change.njk',{
         user        : req.user,
         numProducts : req.session.numProducts
       });
@@ -366,9 +381,9 @@ app.get('/logout', function(req, res, next) {
 
   //UTILITY
   app.get('/mailvalidatemail', function(req, res) {
-      var server = lib.getServer(req);      
+      var server = lib.getServer(req);
       res.send(mailvalidatemail('Token', server))
-    }); 
+    });
 
   app.get('/infoCookie', (req,res) => {
     res.render('infoCookie.njk')

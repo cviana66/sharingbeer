@@ -8,7 +8,7 @@
     height: auto; /* Altezza iniziale dell'immagine */
     display: flex;
     justify-content: center;
-    align-items: center;  
+    align-items: center;
   }
 
   .image {
@@ -18,9 +18,13 @@
   }
 </style>
 
+      <div id="loading">
+        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
+      </div>
+
 <div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
 
-<div class="font-weight-light text-center" style="margin:5px 0px 0px 0px; font-size:0.8em; color:#FF9139;"> 
+<div class="font-weight-light text-center" style="margin:5px 0px 0px 0px; font-size:0.8em; color:#FF9139;">
   Condividi il gusto, moltiplica il risparmio
 </div>
 
@@ -28,21 +32,21 @@
   <video class="embed-responsive-item" src={{video}} controls autoplay="true" muted></video>
 </div>
 
-<div class="text-white font-weight-light text-center" style="margin:10px 0px 10px 0px; font-size:1.2em"> 
+<div class="text-white font-weight-light text-center" style="margin:10px 0px 10px 0px; font-size:1.2em">
   Unisciti alla nostra community di amanti della birra!
 </div>
 
-  
+
       <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;" id="section2">
         <div class="card-body">
-          <!-- <h3 class="card-title text-white font-weight-light text-center"> Invito </h3> -->          
+          <!-- <h3 class="card-title text-white font-weight-light text-center"> Invito </h3> -->
           <div class="flex-row">
-            <div class="align-self-center font-weight-light text-white">              
-              <p class="text-justify" style="font-size:1.1em">se non hai ancora un 
+            <div class="align-self-center font-weight-light text-white">
+              <p class="text-justify" style="font-size:1.1em">se non hai ancora un
                 <span style="font-size:1.2em;"> bicchiere di birra </span> davanti a te allora sei nel posto giusto!</p>
-              <p class="text-center"> 
+              <p class="text-center">
                 <span style="font-size:1.5em">Prova </span>
-                <span class="text-center sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span>  
+                <span class="text-center sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span>
               </p>
             </div>
             <div class="image-container">
@@ -74,7 +78,7 @@
                 <div class="input-error" id="wrongMail"></div>
                 <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="Indirizzo email" required>
                 <div class="input-error" id="wrongControlMail"></div>
-                <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value="" 
+                <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value=""
                 placeholder="Conferma Indirizzo email" required>
               </div>
               <div class="form-group" style="margin-top: 30px;">
@@ -90,23 +94,58 @@
                 </div>
               </div>
 
-              
+
               <div class="form-check" style="margin-top: 30px;" >
                 <div class="input-error" id="wrongAge"></div>
                 <input class="form-check-input" type="checkbox" value="" id="checkAge" />
                 <label class="form-check-label text-white font-weight-light text-justify" for="checkAge">Dichiaro di essere maggiorenne</label>
               </div>
-              
+
               <div class="form-check">
                 <div class="input-error" id="wrongPrivacy"></div>
                 <input class="form-check-input" type="checkbox" value="" id="checkPrivacy" />
-                <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacy">Accetto le 
-                  <a href="#" onclick="return openDocument('infoCondizioniVendita0424.html')"> Condizioni generali di vendita </a> e l'informativa sulla 
-                  <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy </a> di Sharing Beer </label>
+                <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacy">Accetto le
+                  <a href="#" onclick="return openDocument('infoCondizioniVendita0424.html')"> Condizioni generali di vendita </a>
               </div>
 
+         <div class="form-group"style="margin: 20px 0px 10px 0px;">
+          <label class="form-check-label text-white font-weight-normal text-center" for="checkPrivacyDefault">Consenso Privacy (<span style="font-size:0.7em">per dettagli vedere</span> <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy) </a>
+
+          <div class="input-error" id="wrongPrivacyDefault"></div>
+          <div class="form-check" style="margin-top: 10px;" >
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyDefault" checked onclick="return false;"/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">(Obbligatorio)
+              <span style="font-size:0.7em">Per adempiere a tutti gli obblighi legali, regolamentari, normativi e commerciali in materia fiscale/tributaria.</span>
+            </label>
+          </div>
+
+          <div class="form-check" style="margin-top: 20px;" >
+            <div class="input-error" id="wrongPrivacyNeed"></div>
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyNeed"/>
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyNeed">(Necessario)
+              <span style="font-size:0.7em">Per invio di comunicazioni informative relativi a servizi offerti, a seguito dell'acquisto effettuato sul sito web, della richiesta di ritiro della merce o consegna a domicilio, inclusi aggiornamenti su disponibilità di prodotti in riassortimento o nuovi. Utilizzo dei dati per scopi accessori o correlati alle funzionalità principali del sito web, ma sempre all'interno delle sue attività.</span>
+            </label>
+          </div>
+
+          <div class="form-check" style="margin: 20px 0px 0px 0px;" >
+            <div class="input-error" id="wrongPrivacyOptional"></div>
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyOptional" name="checkPrivacyOptional" />
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyOptional">(Facoltativo)
+               <span style="font-size:0.7em">Per l’invio di informazioni ed offerte promozionali e commerciali e per attività di profilazione a fini di marketing;</span>
+            </label>
+          </div>
+
+          <div class="form-check" style="margin: 20px 0px 30px 0px;" >
+            <div class="input-error" id="wrongPrivacyCessione"></div>
+            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyCessione" name="checkPrivacyCessione" />
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyCessione">(Facoltativo)
+              <span style="font-size:0.7em">Per cessione dei Dati a società e/o soggetti terzi con cui il Titolare collabora o ha stipulato convenzioni </span>
+            </label>
+          </div>
+        <div>
+
               <div style="margin-top:10px;margin-bottom:10px">
-                <button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsValidationControl()">
+                <button type="submit" class="btn btn-my btn-lg btn-block" id="validationButton" onclick="return accettaInvito()">
                   Accetto l'invito
                 </button>
                 <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
@@ -146,6 +185,19 @@
       </div-->
 
       <script type="text/javascript">
+		  document.addEventListener("DOMContentLoaded", function() {
+			document.getElementById("loading").style.display = 'none';
+		  });
+
+		function  accettaInvito() {
+				if (fieldsValidationControl()) {
+					document.getElementById("loading").style.display = 'block';
+					return true
+				} else {
+					return false
+				}
+		}
+
         const passwordField = document.getElementById("inputPassword");
         const togglePassword = document.querySelector(".password-toggle-icon i");
         const confirmPasswordField = document.getElementById("confirmPassword");

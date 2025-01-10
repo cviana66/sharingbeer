@@ -1,4 +1,4 @@
-{% extends "layouts/main.njk" %} 
+{% extends "layouts/main.njk" %}
 {% block body %}
 
 <style type="text/css">
@@ -19,7 +19,7 @@
 
 <div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
 
-<div class="font-weight-light text-center" style="margin:5px 0px 0px 0px; font-size:0.8em; color:#FF9139;"> 
+<div class="font-weight-light text-center" style="margin:5px 0px 0px 0px; font-size:0.8em; color:#FF9139;">
   Condividi il gusto, moltiplica il risparmio
 </div>
 
@@ -27,7 +27,7 @@
   <video class="embed-responsive-item" src={{video}} controls autoplay="true" muted></video>
 </div>
 
-<div class="text-white font-weight-light text-center" style="margin:10px 0px 10px 0px; font-size:1.2em"> 
+<div class="text-white font-weight-light text-center" style="margin:10px 0px 10px 0px; font-size:1.2em">
   Unisciti alla nostra community di amanti della birra!
 </div>
 
@@ -35,35 +35,45 @@
   <img src="img/logoBirraViana.png" alt="Immagine" class="image" id="image">
 </div>
 
-<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;"> 
+<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;">
   <div class="card-body">
     <div class="flex-row">
       <div class="align-self-center">
         <p class="text-white font-weight-light text-justify">
-          <span style="font-size:1.4em;">Come? </span> <br>          
-            <p class="text-white font-weight-light"><b>Con invito</b>: hai un amico all'interno della community? Fatti invitare! Avrete entrambi vantaggi. Per te una birra <span style="color:#FF9139;"> omaggio </span> al primo acquisto.</b></p>
-            <p class="text-white font-weight-light"><b>Con QR Code</b>: scansiona il QR Code sul nostro sito o sulla bottiglia e unisciti a noi</p>
+           <span style="font-size:1.4em;">Come? </span>
         </p>
+        <p class="text-white font-weight-light text-justify"><span class="font-weight-light" style="font-size:1.4em">Con invito </span>: hai un amico all'interno della community? <span style="font-size:1.2em"> Fatti invitare! </span> Avrete entrambi vantaggi. Per te una birra <span style="color:#FF9139;"> omaggio </span> al primo acquisto.</p>
       </div>
+      <!--div class="text-white font-weight-light text-center"><p> oppure </p></div>
+      <div class="text-white font-weight-light text-justify"><p> se non conosci nessun iscritto allora richiedilo cliccando sul simbolo <a href="mailto:birrificioviana@gmail.com?subject=Richiesta%20 invito alla community di sharingbeer&Body=Ciao,%0D%0A%20richiedo l'invito per iscrivermi alla community di sharingbeer di Birrificio Viana"><img src="img/outgoing_mail.svg"></a> </p></div-->
+
+       <!--div>
+				<button type="button" class="btn btn-my btn-lg btn-block" id="emailButton">
+					Richiedo l'invito
+				</button>
+	   </div-->
+        </p>
+
     </div>
   </div>
 </div>
 
-<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;"> 
+<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;">
   <div class="card-body">
     <div class="flex-row">
       <div class="align-self-center">
         <p class="text-white font-weight-light text-justify">
           <span style="font-size:1.4em;">Invita i tuoi Amici</span> <br>
+          <p class="text-white font-weight-light"> Ad ogni acquisto puoi invitare i tuoi <span style="font-size:1.2em">amici</span> </p>
           <p class="text-white font-weight-light"> Per ogni amico che acquista un BeerBox ricevi <span style="color:#FF9139;">sconti</span> fino al 50% sui tuoi prossimi acquisti</p>
-        
+
         </p>
       </div>
     </div>
   </div>
 </div>
 
-<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;"> 
+<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;">
   <div class="card-body">
     <div class="flex-row">
       <div class="align-self-center">
@@ -76,7 +86,7 @@
   </div>
 </div>
 
-<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;z-index:100;"> 
+<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 10px 0px 10px 0px;z-index:100;">
   <div class="card-body">
     <div class="flex-row">
       <div class="align-self-center">
@@ -88,5 +98,13 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+if ({{amiciDaInvitare}}==true) {
+		console.log('TRUE')
+		document.querySelector('#invita').classList.add('invita_div'); // colora a intermittenza
+		document.querySelector('#imgInvita').classList.add('pulsa');  //anima l'immagine"
+	}
+</script>
 
 {% endblock %}

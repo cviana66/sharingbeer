@@ -1,11 +1,12 @@
 const User          = require('./models/user');
 const {geoMapCore}	= require('./routesGeoMap');
-const {getAddressFromCoordinates} = require('./geoCoordHandler'); 
+const {getAddressFromCoordinates} = require('./geoCoordHandler');
 const lib           = require('./libfunction');
 
 async function loadDeliveryData(moment) {
 	var consegneAddress = [];
 	var ritiroOrders = [];
+	var spedizioneOrders=[];
 
 	var birrificioAddress = {'puntoMappa': {'tipoPunto': 'Birrificio', 'orderSeq':0, 'indirizzo':'via molignati 10 candelo biella', 'planningSelection':'M', 'affidability': 'valido'}};
 
@@ -15,99 +16,117 @@ async function loadDeliveryData(moment) {
 	const aggregationResultRitiro = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { $and: [{'orders.status': 'OK'}, 
-	    				   {'orders.payment.s2sStatus': 'OK'}, 
-	    				   {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
-	    { $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
+	    { $match: {$and: [{'orders.status': 'OK'},
+	    				 {'orders.payment.s2sStatus': 'OK'},
+	    				 {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
+						 { $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
 	  ]
 	);
 
 	const aggregationResultConsegna = await User.aggregate([
 	    { $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { $and: [{'orders.status': 'OK'}, 
-	    				   {'orders.payment.s2sStatus': 'OK'}, 
-	    				   {'orders.deliveryType': 'Consegna'}] } }
+	    { $match: { $and: [	{'orders.status': 'OK'},
+										{'orders.payment.s2sStatus': 'OK'},
+										{'orders.deliveryType': 'Consegna'},
+										{'orders.address.distance':  {$lte: 15000}}] } },
+		{$project:{_id:0,friends:0, addresses:0,privacy:0,local:0}}
 	  ]
 	);
 
+	const aggregationResultSpedizione = await User.aggregate([
+	    { $unwind: { path: '$orders' } },
+	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
+	    { $match: { $and: [	{'orders.status': 'OK'},
+										{'orders.payment.s2sStatus': 'OK'},
+										{'orders.deliveryType': 'Consegna'},
+										{'orders.address.distance':  {$gt: 15000}}] } },
+		{$project:{_id:0,friends:0, addresses:0,privacy:0,local:0}}
+	  ]
+	);
+
+	/* --------------------------
+	 * RITIRO
+	 * -------------------------*/
 	for (i=0; i<aggregationResultRitiro.length; i++) {
 		var orders = aggregationResultRitiro[i].orders;
-		
+
 		var deliveryType = orders.deliveryType;
 
 		if (!deliveryType) {
 			deliveryType = 'Ritiro';
 		}
-		
+
 		var orderID = orders._id.toString();
 
 		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
 		var customerMobile = orders.address.mobileNumber;
-		var customerAddress = orders.address.address + ' ' + 
+		var customerAddress = orders.address.address + ' ' +
 							  orders.address.houseNumber + ' ' +
 							  orders.address.city +  ' ' +
 							  orders.address.province;
 
 		var orderItems = orders.items;
-		
+
 		var insertDate = moment(orders.dateInsert);
 		var todayDate  = moment(new Date()); //new Date();
 
 		var dayDiff = todayDate.startOf('day').diff(insertDate.startOf('day'), 'days');
-		
+
 		var isHighPriority = 'N';
 		if (dayDiff >= 3) {isHighPriority = 'Y';}
-		
-		//Imposto indirizzo di consegna 
+
+		//Imposto indirizzo di ritiro
 		if (deliveryType == 'Ritiro') {
 			ritiroOrders.push(orders);
 		}
 	}
-
+	/* --------------------------
+	 * CONSEGNA
+	 * -------------------------*/
 	for (i=0; i<aggregationResultConsegna.length; i++) {
 		var orders = aggregationResultConsegna[i].orders;
-		
+
 		var deliveryType = orders.deliveryType;
 
 		if (!deliveryType) {
 			deliveryType = 'Ritiro';
 		}
-		
+
 		var orderID = orders._id.toString();
 
 		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
 		var customerMobile = orders.address.mobileNumber;
-		var customerAddress = orders.address.address + ' ' + 
+		var customerAddress = orders.address.address + ' ' +
 							  orders.address.houseNumber + ' ' +
 							  orders.address.city +  ' ' +
 							  orders.address.province;
 		var customerAddressCoordinate = orders.address.coordinateGPS;
 		var customerAddressAffidability = orders.address.affidability;
-		
+
 		var orderItems = orders.items;
-		
+
 		var insertDate = moment(orders.dateInsert);
 		var todayDate  = moment(new Date()); //new Date();
 
 		var dayDiff = todayDate.startOf('day').diff(insertDate.startOf('day'), 'days');
-		
+
 		var isHighPriority = 'N';
 		if (dayDiff >= 3) {isHighPriority = 'Y';}
-		
-		//Imposto indirizzo di consegna 
+
+		//Imposto indirizzo di consegna
 		if (deliveryType == 'Consegna') {
-			var puntoMappa = {'puntoMappa': 
-								{'tipoPunto': deliveryType, 
-								 'orderID': orderID, 
-								 'orderSeq': i+1, 
-								 'cliente': customerAnag, 
-								 'mobile': customerMobile, 
-								 'indirizzo': customerAddress, 
+			var puntoMappa = {'puntoMappa':
+								{'tipoPunto': deliveryType,
+								 'orderID': orderID,
+								 'orderSeq': i+1,
+								 'cliente': customerAnag,
+								 'mobile': customerMobile,
+								 'indirizzo': customerAddress,
 								 'coordinateGPS': customerAddressCoordinate,
 								 'affidability': customerAddressAffidability,
-								 'planningSelection': 'Y', 
-								 'isHighPriority': isHighPriority, 
+								 'planningSelection': 'Y',
+								 'isHighPriority': isHighPriority,
 								 orderItems
 								}
 							 };
@@ -119,6 +138,41 @@ async function loadDeliveryData(moment) {
 		}
 	}
 	consegneAddress.push(birrificioAddress);
+	/* --------------------------
+	 * SPEDIZIONE
+	 * -------------------------*/
+	for (i=0; i<aggregationResultSpedizione.length; i++) {
+		var orders = aggregationResultSpedizione[i].orders;
+		console.debug("ORDERS -> ", orders)
+		var deliveryType = orders.deliveryType;
+
+		if (!deliveryType) {
+			deliveryType = 'Ritiro';
+		}
+
+		var orderID = orders._id.toString();
+
+		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
+		var customerMobile = orders.address.mobileNumber;
+		var customerAddress = orders.address.address + ' ' +
+							  orders.address.houseNumber + ' ' +
+							  orders.address.city +  ' ' +
+							  orders.address.province;
+		var customerAddressCoordinate = orders.address.coordinateGPS;
+		var customerAddressAffidability = orders.address.affidability;
+
+		var orderItems = orders.items;
+
+		var insertDate = moment(orders.dateInsert);
+		var todayDate  = moment(new Date()); //new Date();
+
+		var dayDiff = todayDate.startOf('day').diff(insertDate.startOf('day'), 'days');
+
+		var isHighPriority = 'N';
+		if (dayDiff >= 3) {isHighPriority = 'Y';}
+	}
+	spedizioneOrders.push(orders);
+
 
 	var mapResult;
 	if (consegneAddress.length > 2) {
@@ -127,7 +181,7 @@ async function loadDeliveryData(moment) {
 		mapResult = await geoMapCore(consegneAddress, null /*departure date_time*/);
 	}
 
-	var result = [ritiroOrders, mapResult];
+	var result = [ritiroOrders, mapResult, spedizioneOrders];
 
 	return result;
 }
@@ -140,7 +194,7 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 	actionStatus['NOK02'] = {status: 'NON CONSEGNATO', statusDesc: 'Ordine respinto/rifiutato'};
 	actionStatus['NOK03'] = {status: 'NON CONSEGNATO', statusDesc: 'Ordine non conforme'};
 
-	//console.log('actionCode', actionCode);
+	console.debug('actionCode', actionCode);
 
 	var orderID = mongoose.Types.ObjectId(orderIDPar);
 
@@ -156,25 +210,25 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 										{ $match: { 'orders._id': orderID } }
 										]);
 
-		//console.debug('aggregationResult', aggregationResult);
+		console.debug('aggregationResult', aggregationResult);
 
 		for (i=0; i < aggregationResult.length; i++) {
 			var order = aggregationResult[i].orders;
-			//console.log('order', order);
+			//console.debug('order', order);
 
 			var deliveryStatus = actionStatus[actionCode].status;
 			var deliveryStatusDesc = actionStatus[actionCode].statusDesc;
 
 			if (actionCode.toString().substring(0, 3) == 'DEL') {
 				await User.updateOne(
-					{ "orders._id": order._id }, 
+					{ "orders._id": order._id },
 					{ $set: { "orders.$.status": actionStatus[actionCode].status } }
 				);
 			}
-			
+
 			if (actionCode.toString() == 'NOK01') {
 				await User.updateOne(
-					{ "orders._id": order._id }, 
+					{ "orders._id": order._id },
 					{ $set: { "orders.$.deliveryType": 'Ritiro' } }
 				);
 			}
@@ -188,10 +242,10 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 			//order['delivery'] = deliveryDocUpd;
 
 			await User.updateOne(
-					{ "orders._id": order._id }, 
+					{ "orders._id": order._id },
 					{ $push: { "orders.$.delivery": deliveryDocUpd } }
 				);
-		}		
+		}
 
 		const aggregationResultDone = await User.aggregate([
 											{ $unwind: { path: '$orders' } },
@@ -232,7 +286,7 @@ module.exports = function(app, mongoose, moment) {
 
 			if (!mapResult) {
 				req.flash('info', 'Non ci sono consegne da effettuare al momento');
-	        
+
 	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
 			} else {
 				return res.render('consegneMap.njk', mapResult);
@@ -241,7 +295,7 @@ module.exports = function(app, mongoose, moment) {
 			console.debug(error);
 
 	        req.flash('error', error);
-	        
+
 	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 	});
@@ -281,7 +335,7 @@ module.exports = function(app, mongoose, moment) {
 		} else {
 			updConsegneAddress[0] = updConsegneAddress[updConsegneAddress.length -1];
 		}
-		
+
 		//console.debug('POST updConsegneAddress', updConsegneAddress);
 
 		try {
@@ -293,7 +347,7 @@ module.exports = function(app, mongoose, moment) {
 			console.debug(error);
 
 			req.flash('error', "Errore durante l'aggiornamento della consegna.");
-        
+
         	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 
@@ -306,7 +360,7 @@ module.exports = function(app, mongoose, moment) {
 			console.debug(error);
 
 			req.flash('error', "Errore nella gestione interna dell'ottimizzazione di percorso");
-        
+
         	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 	});
@@ -328,7 +382,7 @@ module.exports = function(app, mongoose, moment) {
 			console.debug(error);
 
 			req.flash('error', "Errore durante l'aggiornamento della consegna.");
-        
+
         	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 
@@ -343,7 +397,7 @@ module.exports = function(app, mongoose, moment) {
 
 			if (!ordersInHouse) {
 				req.flash('info', 'Non ci sono consegne previste al momento');
-	        
+
 	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
 			} else {
 				return res.render('consegneInHouse.njk', {ordersInHouseString: JSON.stringify(ordersInHouse)});
@@ -352,7 +406,52 @@ module.exports = function(app, mongoose, moment) {
 			console.debug(error);
 
 	        req.flash('error', error);
-	        
+
+	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+		}
+	});
+
+	app.all('/deliveryToShip', async function(req, res) {
+
+		var actionCode = req.body.actionCode;
+		var orderID = req.body.orderID;
+
+		try {
+			// Come prima cosa aggiorno il database se occorre. Se va in errore salta il resto
+			if (actionCode) {
+				await updateDeliveryData(mongoose, orderID, actionCode);
+			}
+
+		} catch (error) {
+			console.debug(error);
+
+			req.flash('error', "Errore durante l'aggiornamento della consegna.");
+
+        	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+		}
+
+
+		try {
+			// Carico la lista degli ordini da spedire
+
+			const result = await loadDeliveryData(moment);
+			const ordersInHouse = result[2];
+
+			//console.debug('ordersInHouse', ordersInHouse);
+
+			if (!ordersInHouse) {
+				req.flash('info', 'Non ci sono consegne previste al momento');
+
+	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
+			} else {
+				console.debug('SHIPPING -> ', JSON.stringify(ordersInHouse))
+				return res.render('consegneToShip.njk', {ordersInHouseString: JSON.stringify(ordersInHouse)});
+			}
+    	} catch (error) {
+			console.debug(error);
+
+	        req.flash('error', error);
+
 	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 	});

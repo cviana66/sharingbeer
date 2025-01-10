@@ -1,0 +1,176 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+      <!--h3 class="text-white text-center bg-dark"> Invita amici </h3>
+      <hr style="border-top: 1px solid #903246;"-->
+
+
+      <table widht="100%" style="margin:20px 0px 0px 0px">
+        <tr>
+          <td width="50%">
+            <p class="text-left text-white"><span style="font-size:1.2em;">{{friendsInvited}}</span> Amici invitati</p>
+          </td>
+          <td width="50%" align="right">
+            <p class="text-right text-white"><span style="font-size:1.2em;">{{invitationAvailable}}</span> inviti disponibili</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="100%" colspan="2">
+            <div class="progress" style="margin-bottom:20px;">
+              <div class="progress-bar  progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{friendsInvited}}" aria-valuemin="0" aria-valuemax="{{invitationAvailable}}" style="width:{{percentage}}%; background-color:#ffc85d">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td width="100%" colspan="2">
+            <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
+              <div class="card-body">
+                <div class="flex-row">
+                  <div class="align-self-center">
+                    <p class="text-white font-weight-light text-justify">
+                      <span style="font-size:1.2em;">Invita i tuoi amici </span>
+                      a bere
+                      <span class="sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span>
+                      e ottieni ad ogni loro acquisto punti
+                      <span  style="font-size:1.2em;"> Pinta </span>
+                      per
+                      <span  style="font-size:1.5em;"> sconti fino al 50%!</span>
+                      <span style="float:right;">
+                        <a href="#" onclick="return openDocument('infoFriend.html')">
+                          <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="30px" viewBox="0 0 24 24" width="30px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>
+                        </a>
+                      </span>
+                    </p>
+                  </div>
+                  <div><img class="mx-auto d-block" src="img/cincin.png" style="height:100%;width:100%;margin-bottom:10px"></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="inputUsernameEmail" class="text-white text-center">Inserisci il Nome del tuo amico</label>
+              <div class="input-error" id="wrongFirstName"></div>
+              <input type="text" class="form-control" id="inputFirstName" value=""
+              name="firstName" placeholder="Nome" required {{controlSates}} >
+            </div>
+            <div style="margin-bottom: 40px; margin-top: 40px;">
+              <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
+                Crea l'invito e condividilo
+              </button>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <div id="loading" style="display:none">
+        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
+      </div>
+
+<script  type="text/javascript">
+
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("loading").style.display = 'none';
+  });
+
+  async function share(token,parentName,server) {
+
+    if (document.getElementById("inputFirstName").value == "") {
+      let text = "Inserire il Nome";
+      document.getElementById("wrongFirstName").innerHTML = text;
+      document.getElementById("inputFirstName").focus();
+    } else {
+      //--------------------------------------------
+      // Disabilito il pulsante e abilito il loading
+      //--------------------------------------------
+      document.getElementById("mybutton").disabled = 'true';
+      document.getElementById("loading").style.display = 'block';
+
+      let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
+
+      fetch('/recomm',
+        {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            "firstName": firstName,
+          })
+        }
+      ).then(function(result)
+        {
+          return result.json();
+        }
+      ).then( async function(data)
+        {
+          if (data.ok) {
+            let textText = "Ciao "+data.friendName+",\n\nBirrificio Viana è entusiasta di invitarti a scoprire la nostra birra artigianale. \nAbbiamo incluso un link personale con il codice invito per accedere in Sharingbeer dove potrai visionare i nostri prodotti e fare i tuoi acquisti in tutta comodità.\n\n"+data.server+"/validation?token="+data.token+"\n\nNon vediamo l'ora che tu entri a far parte della community Sharingbeer\n\n"+data.parentName;
+            //console.log('textText -->', textText)
+            let shareData = {
+              title: 'Birrificio Viana - Codice invito SharingBeer',
+              text: textText
+              //url: server+"/validation?token="+token
+            }
+            if (navigator.canShare) {
+              try {
+                //console.log("Prima del navigator")
+                //document.getElementById("loading").style.display = 'block';
+                await navigator.share(shareData);
+                //document.getElementById("loading").style.display = 'none';
+                //console.log("Dopo il navigator")
+                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+              } catch (e) {
+                console.log("nel catch: ", e)
+                //document.getElementById("loading").style.display = 'none';
+                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+              }
+            } else {
+              //console.log("nell'else del if navigator")
+              let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
+              //console.log("MAILTO ", a)
+              post('/infoShare',{firstName:data.friendName,flag:data.flag});
+            }
+          } else {
+              post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito", type:"warning", err:data.err});
+          }
+        }
+
+      ).catch(console.error)
+      .finally(()=> {document.getElementById("loading").style.display = 'none';});
+    }
+  }
+
+  function capitalizeFirstLetter(string) {
+    if (typeof(string) != "undefined") {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+  }
+  /**
+  * sends a request to the specified url from a form. this will change the window location.
+  * @param {string} path the path to send the post request to
+  * @param {object} params the parameters to add to the url
+  * @param {string} [method=post] the method to use on the form
+  */
+  function post(path, params, method='post') {
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less verbose if you use one.
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = path;
+
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        const hiddenField = document.createElement('input');
+        hiddenField.type = 'hidden';
+        hiddenField.name = key;
+        hiddenField.value = params[key];
+        form.appendChild(hiddenField);
+      }
+    }
+    document.body.appendChild(form);
+    form.submit();
+  }
+</script>
+
+{% endblock %}

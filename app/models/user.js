@@ -12,7 +12,7 @@ const userSchema = new Schema({
               status          : {type: String, required: true},
               mobilePrefix : {type: String},
               mobileNumber : {type: String},
-              fiscalCode      : {type: String},  
+              fiscalCode      : {type: String},
               eligibleFriends : {type: Number, default: 0},
               idParent        : {type: String, required: true, unique: true}, //id della persona che ha fatto l'invito
               booze           : {type: Number, default: 0},
@@ -40,16 +40,16 @@ const userSchema = new Schema({
                   main        : {type: String}, // inserito all'atto della registrazine
                   preferred   : {type: String}, // preferito nelle spedizioni
                   postcode    : {type: String},
-                  affidability: {type: String}, 
+                  affidability: {type: String},
                   desAffidability : {type: String},
                   coordinateGPS : {
                     latitude      : {type: Number},
-                    longitude     : {type: Number},  
+                    longitude     : {type: Number},
                   }
               }],
   friends : [{  id    : {type: String, unique: true },
-                name  : { first: {type: String, required: true, unique: false},
-                          last: {type: String},
+                name  : { first: {type: String},
+								last: {type: String},
                         },
                 status      : {type: String},
                 token       : {type: String, required: true, unique: true},
@@ -66,17 +66,17 @@ const userSchema = new Schema({
               shippingCost        : { type: Number},
               deliveryType        : { type: String},
               deliveryDate        : { type: Date},
-              totalPriceBeer      : { type: Number}, // 
+              totalPriceBeer      : { type: Number}, //
               totalPriceTotal     : { type: Number}, //
               totalQty            : { type: Number},
-              items : [{ 
+              items : [{
                   id        : {type: String},
                   name      : {type: String},
                   price     : {type: Number},
                   qty       : {type: Number},
                   linkImage : {type: String},
               }],
-              address :{  
+              address :{
                   addressId: {type: String},
                   name: { first: {type: String},
                           last : {type: String},
@@ -88,29 +88,30 @@ const userSchema = new Schema({
                   address     : {type: String},
                   houseNumber : {type: String},
                   postcode    : {type: String},
-                  affidability: {type: String}, 
+                  affidability: {type: String},
                   desAffidability : {type: String},
                   coordinateGPS : {
                     latitude  : {type: Number},
                     longitude : {type: Number},
-                  }  
+                  },
+                  distance :  {type: Number}
               },
               payment : {
-                  paymentType       : { type: String}, 
-                  shopLogin         : { type: String}, 
-                  orderId           : { type: String}, 
-                  bankTransactionId : { type: String}, 
+                  paymentType       : { type: String},
+                  shopLogin         : { type: String},
+                  orderId           : { type: String},
+                  bankTransactionId : { type: String},
                   authorizationCode : { type: String},
                   errorCode         : { type: String},
                   errorDescription  : { type: String},
-                  createTime        : { type: Date}, 
+                  createTime        : { type: Date},
                   updateTime        : { type: Date},
-                  totalAmount       : { type: Number}, 
+                  totalAmount       : { type: Number},
                   country           : { type: String},
-                  currencyAmount    : { type: String},                   
+                  currencyAmount    : { type: String},
                   s2sStatus         : { type: String},
               },
-              delivery : [{ 
+              delivery : [{
                   id        : {type: String},
                   status    : {type: String},
                   note      : {type: String},

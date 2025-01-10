@@ -21,23 +21,14 @@ const moment        = require("moment-timezone");            // Formattazione de
 
 moment.locale('it');
 
-
-/*
-moment.tz.setDefault("America/Los_Angeles"); 
-d = moment().utc("America/Los_Angeles").format()
-console.debug(d)
-giornoLavorativo = new Date(moment(d).format())
-console.debug(giornoLavorativo)
-*/
-
 data = new Date()
-console.log('New Date',data) 
+console.log('New Date',data)
 
 var c = moment.tz(data, "Europe/Rome");
 c.utc("Europe/Rome").format()
 
-console.debug('TZ Europe/Rome =' ,c.format()); 
-console.debug('UTC Europe/Rome =' ,c.utc("Europe/Rome").format()); 
+console.debug('TZ Europe/Rome =' ,c.format());
+console.debug('UTC Europe/Rome =' ,c.utc("Europe/Rome").format());
 console.debug("Date Europe/Rome =",new Date(moment(c).format()))
 
 console.debug(moment().utc("Europe/Rome").format('dddd'))
@@ -111,7 +102,7 @@ global.priceCurier =  ['7.70','7.90','6.60','6.60','5.20','11.10','9.80','8.40',
 global.numBottigliePerBeerBox = 6
 global.invitiPerOgniAcquisto = 4;
 global.numAcquistiPerUnaBottigliaOmaggio = 12;
-global.valoreUnPuntoPinta = 0.05 // euro 
+global.valoreUnPuntoPinta = 0.05 // euro
 //global.puntiPintaPerAcquisto = 1;
 // equivalente in € di 1 Punto Pinta = PrezzoBirra / numBottigliePerBeerBox / puntiPintaPerUnaBottiglia
 //global.mkt = 0.45;
@@ -187,7 +178,7 @@ var SharingBeer = function() {
      *  Create the routing table entries + handlers for the application.
      */
     self.createRoutes = function() {
-        routesAuth(self.app, passport, moment);
+        routesAuth(self.app, passport, moment, mongoose);
         routesShop(self.app, moment, mongoose);
         routesRegister(self.app, moment, mongoose, fastcsv, fs, util);
         routesQrcode(self.app, qr, moment);
@@ -270,7 +261,7 @@ var SharingBeer = function() {
                         }, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                   //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
                   store: MongoStore.create({
-                    client: mongoose.connection.getClient(),                    
+                    client: mongoose.connection.getClient(),
                     stringify: false,
                     autoRemove: 'interval',
                     autoRemoveInterval: 1 // emoving expired sessions, using defined interval in minutes

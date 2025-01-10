@@ -1,6 +1,11 @@
 {
   "short_name": "SharingBeer",
   "name": "Birra Viana by SharigBeer",
+  "start_url": "/",
+   "display": "standalone",
+  "display_override":["standalone","minimal-ui","browser"],
+  "background_color": "#2A0009",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "img/favicon192.png",
@@ -22,7 +27,5 @@
       "sizes": "180x180",
       "type": "image/png"
     }
-  ],
-  "display_override":["minimal-ui","browser"],
-  "display":"browser"
+  ]
 }

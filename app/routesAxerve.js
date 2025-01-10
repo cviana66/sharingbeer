@@ -19,50 +19,50 @@ const gestpayService = new GestpayService();
 //POST
 //-------------------------------------------
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
-    
+
     var cart = req.session.cart;
     const currency='EUR';
     const shopLogin=process.env.SHOPLOGIN;
 
     req.session.order = {};
- 
+
     //==========================================
     // Inizializzo la Transazione
     //==========================================
     const session = await mongoose.startSession();
     session.startTransaction();
     const opts = { session };
-    
+
     try {
 
       //=============================================
-      // Decurto i prodotti dalla disponibilità 
+      // Decurto i prodotti dalla disponibilità
       // per ciacun prodotto in acquisto
       //=============================================
       for (var index = 0; index < req.session.numProductsPerId.length; index++) {
-        
+
         const filter = {_id:req.session.numProductsPerId[index].id};
         console.debug("FILTER: ",filter)
-        
+
         let doc = await Product.findOne(filter)
         console.debug('QUANTITY UPDATE PRIMA DELLA DECURTAZIONE: ',doc.quantity)
-        
+
         const update = { quantity: (Number(doc.quantity) - Number(req.session.numProductsPerId[index].qty))};
         let doc1 = await Product.findOneAndUpdate(filter,update, {new:true}).session(session);
         console.debug('QUANTITY UPDATE DOPO LA DECURTAZIONE: ',doc1.quantity)
       }
       //=============================================
 
-      const _orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve 
+      const _orderId = new mongoose.Types.ObjectId()   // genero _id usato poi nell'ordine e in Axerve
       const orderId  = _orderId.toString();
       const amount   = req.session.order.totalaAmount = (Number(req.session.totalPrc)+Number(req.session.shippingCost)-Number(req.session.pointDiscount)-Number(req.session.omaggioPrimoAcquisto)).toFixed(2)
-      
+
       //================================================
       // Chiamo Axerve per ottenere la stringa ENCRYPT
       //================================================
       console.debug('IMPORTO in SESSIONE', req.session.order.totalaAmount)
 
-      var url = 'https://sandbox.gestpay.net/pagam/pagam.aspx'; 
+      var url = 'https://sandbox.gestpay.net/pagam/pagam.aspx';
       if (process.env.NODE_ENV == 'production') {
             url = 'https://ecomm.sella.it/pagam/pagam.aspx';
       }
@@ -71,13 +71,13 @@ const gestpayService = new GestpayService();
           amount,
           orderId
         })
-        .then(cryptedString => {          
-          return cryptedString;        
+        .then(cryptedString => {
+          return cryptedString;
         })
         .catch(err => {
           console.log('ERRORE in encrypt', err)
           throw new Error("Encrypt fallita")
-        });  
+        });
 
       //==========================================
       // Inserimento dati in MongoDB
@@ -98,15 +98,16 @@ const gestpayService = new GestpayService();
         totalPriceBeer  : Number(req.session.totalPrc).toFixed(2),
         totalPriceTotal : Number(req.session.order.totalaAmount).toFixed(2),
         items     : req.session.cartItems.items,
-        totalQty  : req.session.totalQty,        
+        totalQty  : req.session.totalQty,
         address   : req.session.shippingAddress,
         'payment.shopLogin'        : shopLogin,
         'payment.createTime'       : lib.nowDate("Europe/Rome"),
         'payment.orderId'          : orderId,
         'payment.currencyAmount'   : currency,
         'payment.totalAmount'      : Number(req.session.order.totalaAmount).toFixed(2),
-        'payment.paymentType'      : 'Banca Sella'        
-      });          
+        'payment.paymentType'      : 'Banca Sella',
+        'address.distance'	: req.session.distance
+      });
       let saveOrder = await user.save(opts);
       await session.commitTransaction();
 
@@ -115,7 +116,7 @@ const gestpayService = new GestpayService();
       data.cryptedString = cryptedString,
       data.url = url;
       console.debug('DATA', JSON.stringify(data,null,2))
-      res.status(200).send(data);  
+      res.status(200).send(data);
 
     } catch (e) {
         console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /axerve_create" USER: {_id:bjectId("' + req.user._id + '"} FUNCTION: User.save: ' + e);
@@ -130,13 +131,13 @@ const gestpayService = new GestpayService();
 // Chiamata usata da Axerve per allineamento Server TO Server
 //=============================================================
   app.get('/response', async function(req, res) {
-    
+
     //================================================
     // Chiamo Axerve per ottenere la stringa DENCRYPT
     //================================================
     var shopLogin     = req.query.a;
     var cryptedString = req.query.b;
-    
+
     const decryptedString = await gestpayService
       .decrypt({
         shopLogin,
@@ -156,9 +157,9 @@ const gestpayService = new GestpayService();
     //==========================================
     const session = await mongoose.startSession();
     session.startTransaction();
-    
-    try {  
-    
+
+    try {
+
       const status  = decryptedString.TransactionResult;
       const orderId = decryptedString.ShopTransactionID;
       const user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin, orderId);
@@ -174,19 +175,19 @@ const gestpayService = new GestpayService();
         const userEmail = user.local.email;
 
         //==========================================
-        // UPDATE Esito del pagamento 
+        // UPDATE Esito del pagamento
         //==========================================
-        let doc = await axerveResMgm.updateResponsePayment(_userId, decryptedString, session, mongoose);               
-        
-        if ( status == 'OK') {            
-      
+        let doc = await axerveResMgm.updateResponsePayment(_userId, decryptedString, session, mongoose);
+
+        if ( status == 'OK') {
+
           //=====================================
           // aggiungo inviti
           // aggiungo punto Pinta al cliente Padre
           // decurto punti pinta al Cliente
-          //=====================================        
+          //=====================================
           await axerveResMgm.updateInviteAndPoint(user, session, mongoose)
-          
+
           //========================================
           // INVIO EMAIL al CLIENTE
           //========================================
@@ -196,39 +197,39 @@ const gestpayService = new GestpayService();
           console.debug('MAIL',name, userEmail, orderId, data, user.orders.deliveryType, server);
 
           const html = mailorder(name, orderId, data, user.orders.deliveryType, server)
-          await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html);      
+          await lib.sendmailToPerson(name, userEmail, '', '', '', '', '', 'order',server, html);
 
         } else {
           //==============================================
-          // Ri-aggiungo i prodotti nella disponibilità 
+          // Ri-aggiungo i prodotti nella disponibilità
           // per prodotto per acquisto non effettuato
           //==============================================
           axerveResMgm.addItemsInProductsByOrderId(orderId,shopLogin);
         }
         await session.commitTransaction();
       }
-    
+
     } catch(e) {
       console.error('ERRORE IN RESPONSE:',e);
       await session.abortTransaction();
-      
+
       //==============================================
-      //RECOVERY in documento per recupero transazione    
+      //RECOVERY in documento per recupero transazione
       //==============================================
       console.debug('URL = ',lib.getServer(req)+'/response?a='+req.query.a+'&b='+req.query.b);
-      
+
       const recoveryUrl = lib.getServer(req)+'/response?a='+req.query.a+'&b='+req.query.b;
       const recoveryOrder = new Recovery({dateInsert: lib.nowDate("Europe/Rome"),
-                                          orderId:decryptedString.ShopTransactionID, 
+                                          orderId:decryptedString.ShopTransactionID,
                                           url:recoveryUrl});
-      
+
       recoveryOrder.save()
       .then(function (doc) {
         console.debug("RECOVERY ID",doc._id.toString());
       }).catch(function (error) {
         console.error(error);
       });
-    
+
     } finally {
       await session.endSession();
       setTimeout(() => res.send('Fatto!'), 500);
@@ -238,8 +239,8 @@ const gestpayService = new GestpayService();
 //====================================================
 // RESPONSE POSITIVA
 //====================================================
-  app.get('/response_positiva',lib.isLoggedIn, async function(req,res) {  
-    
+  app.get('/response_positiva',lib.isLoggedIn, async function(req,res) {
+
     //================================================
     // Chiamo Axerve per ottenere la stringa DENCRYPT
     //================================================
@@ -260,9 +261,9 @@ const gestpayService = new GestpayService();
       });
 
     try {
-            
+
       req.user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin,decryptedString.ShopTransactionID);
-          
+
       //=====================================
       // Svuoto il carrello
       //=====================================
@@ -288,7 +289,7 @@ const gestpayService = new GestpayService();
                                       message: req.flash('error'),
                                       type: "danger"
                                     });
-    }    
+    }
   });
 
   app.get('/response_negativa', lib.isLoggedIn, async function(req,res) {
@@ -308,7 +309,7 @@ const gestpayService = new GestpayService();
       })
       .then(result => {
         console.debug(result);
-        return result        
+        return result
       })
       .catch(err => {
         console.log('ERRORE in encrypt', err)
@@ -316,12 +317,12 @@ const gestpayService = new GestpayService();
       });
 
     try {
-            
-      req.user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin,decryptedString.ShopTransactionID);    
+
+      req.user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin,decryptedString.ShopTransactionID);
       res.render('orderOutcome.njk', {
               status  : 'KO',
               user    : req.user,
-              numProducts : req.session.numProducts 
+              numProducts : req.session.numProducts
       });
 
     }catch (e){

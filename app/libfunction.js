@@ -7,7 +7,7 @@ const mailparent  			= require('../config/mailParent');
 const mailinvite  				= require('../config/mailInvite');
 const mailconferme  		= require('../config/mailConferme');
 const mailvalidatemail 	= require('../config/mailValidateMail');
-const moment        			= require("moment-timezone"); 
+const moment        			= require("moment-timezone");
 
 const User  = require('../app/models/user');
 
@@ -17,7 +17,7 @@ module.exports = {
   isLoggedIn: function isLoggedIn(req, res, next) {
 
                   // if user is authenticated in the session, carry on
-                  if (req.isAuthenticated())  {                    
+                  if (req.isAuthenticated())  {
                       return next();
                   } else {
                     // if they aren't redirect them to the Login page
@@ -29,10 +29,10 @@ module.exports = {
   isAdmin: function isAdmin(req, res, next) {
 
                   // if user is authenticated in the session, carry on
-                  if (req.isAuthenticated() && req.user.local.role == 'admin')  {                    
+                  if (req.isAuthenticated() && req.user.local.role == 'admin')  {
                     return next();
                   } else {
-                    //res.status(403).send('Accesso negato'); 
+                    //res.status(403).send('Accesso negato');
                     res.render('info.njk',{ messaggio: 'Accesso negato'})
                   }
               },
@@ -68,7 +68,7 @@ module.exports = {
                               server = req.protocol+'://'+req.hostname
                             } else {
                               server = req.protocol+'://'+req.hostname+':'+process.env.PORT
-                            }                           
+                            }
                           } else {
                            server = req.protocol+'://'+req.hostname;
                           }
@@ -113,14 +113,14 @@ module.exports = {
                             to: Email, //'cviana66@gmail.com', // list of receivers
                             subject: 'Imposta nuova password - Birrificio Viana', // Subject line
                             html: mailvalidatemail(Token, server)
-                        } 
+                        }
                       } else if  (typeOfMail == 'order') {
                         var mailOptions = {
                             from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
                             to: Email, //'cviana66@gmail.com', // list of receivers
                             subject: 'Conferma d\'ordine - Birrificio Viana', // Subject line
                             html: html
-                        }   
+                        }
                       }
                       // effettua l'invio della mail
                       try {
@@ -150,7 +150,7 @@ module.exports = {
                         totalQty += cart[item].qty;
                         req.session.numProducts += cart[item].qty;
                         let npXid = { "id":cart[item].id.toString(), "qty":cart[item].qty}
-                        req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino 
+                        req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino
                         console.debug('PRODOTTI NEL CARRELLO: ITEM =',item, ' PRODOTTO: ', cart[item])
                       }
                     }
@@ -169,17 +169,17 @@ module.exports = {
                         return true;
                       }
                     },
-  deliveryDate: function deliveryDate(timeZone, dataType, format, deliveryType) {    
-                    moment.locale('it');                    
+  deliveryDate: function deliveryDate(timeZone, dataType, format, deliveryType) {
+                    moment.locale('it');
                     var d = moment(data).utc(timeZone).format('dddd');
-                    var data = new Date();                    
+                    var data = new Date();
 
                     Date.prototype.addDays = function(days) {
                       var date = new Date(this.valueOf());
                       date.setDate(date.getDate() + days);
                       return date;
                     }
-                    
+
                     if (deliveryType == 'Consegna') {
                       var daysToAdd = 0
                       if (d == "sabato") {
@@ -213,7 +213,7 @@ module.exports = {
                       } else if (d == "venerdì") {
                         daysToAdd = 11
                       }
-                    }                    
+                    }
 
                     var dataDelivery = data.addDays(daysToAdd)
 
@@ -228,7 +228,7 @@ module.exports = {
                       giornoLavorativo = moment(now).utc().format(format)
                     }
                     console.debug('DATA-ORA deliveryDate',dataType, giornoLavorativo)
-                    return giornoLavorativo  
+                    return giornoLavorativo
                 },
   nowDate: function nowDate(timeZone) {
                       var data = new Date();
@@ -250,10 +250,10 @@ module.exports = {
                       var now =  new Date(moment(a).format());
                       var d = moment(now).utc().format('YYYY-MM-DD hh:mm');
                       return d;
-  }, 
+  },
   getServer:  function getServer(req) {
                 if (process.env.NODE_ENV== "development") {
-                  if (req.hostname == 'sb.sharingbeer.it') {                  
+                  if (req.hostname == 'sb.sharingbeer.it') {
                     server = req.protocol+'://'+req.hostname
                   }else{
                     server = req.protocol+'://'+req.hostname+':'+process.env.PORT
@@ -286,7 +286,7 @@ findClosestCombination: function findClosestCombination(products, T) {
 															backtrack(0, [], 0);
 															return { closestSum, bestCombination };
 														},
-														
+
 generaArrayPrezzi: function generaArrayPrezzi(prezzi, quantita) {
 										/* esempio di utilizzo
 										 *	const prezzi = [{ "A": 4.5 },{ "B": 4.7 },{ "C": 5.0 }];
@@ -328,7 +328,7 @@ generaArrayPrezzi: function generaArrayPrezzi(prezzi, quantita) {
 
 										return risultati;
 									}
-														
+
 }
 
 

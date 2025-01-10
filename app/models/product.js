@@ -9,16 +9,18 @@ var ProductSchema = new Schema({
   price       		: {type: Number, required: true}, // per beerbox = 6 bottiglie
   linkImage   	: {type: String, required: true},
   description 	: {type: String},
+  caratteristiche 	: {type: String},
   quantity    		: {type: Number}, //stock di beerbox disponibili
   colorEBC     	: {type: String},
   volAlcol    		: {type: String},
   gradoPlato  	: {type: String},
-  tempServ    	: {type: Number}, //temperatura di servizio consigliata
+  tempServ    	: {type: String}, //temperatura di servizio consigliata
   amaroIBU   	: {type: String},
   formatoCl   	: {type: String}, //formato della bottiglia es: 50 cl
   quantitaXtipo : {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:   [{"codProd_A": quantità},{"codProd_B": quantità},...]
   prezzoXtipo 	: {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:  [{"codProd_A": prezzo},{"codProd_B": prezzo},...]
-  promo			: {type: Boolean}
+  promo			: {type: Boolean},
+  allergeni		: {type: String}
 });
 
 // methods =====================================================================

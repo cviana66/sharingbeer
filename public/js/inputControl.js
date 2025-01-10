@@ -23,9 +23,9 @@ function fieldsFatturaControl() {
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var fatturaPEC = document.getElementById("inFatturaPEC").value;
   var fatturaSDI = document.getElementById("inFatturaSDI").value;
-  
+
   if (document.getElementById("isFatturaRequired").checked == true) {
-    if(fatturaPEC =="" || !re.test(String(fatturaPEC))) {    
+    if(fatturaPEC =="" || !re.test(String(fatturaPEC))) {
       document.getElementById("wrongPEC").innerHTML = iwar+"Inserisci una PEC valida";
       document.getElementById("inFatturaPEC").focus();
       return false;
@@ -33,7 +33,7 @@ function fieldsFatturaControl() {
 
     re = /^[a-zA-Z0-9]+$/i;
     if(fatturaSDI.length > 0) {
-      if (fatturaSDI.length != 7 || !re.test(String(fatturaSDI))) {    
+      if (fatturaSDI.length != 7 || !re.test(String(fatturaSDI))) {
         document.getElementById("wrongSDI").innerHTML = iwar+"Inserisci un codice SDI valido";
         document.getElementById("inFatturaSDI").focus();
         return false;
@@ -45,18 +45,19 @@ function fieldsFatturaControl() {
 }
 
 function fieldsValidationControl() {
-  document.getElementById("wrongMail").innerHTML = "";
-  document.getElementById("wrongPwd").innerHTML = "";
-  document.getElementById("wrongPrivacy").innerHTML = "";
-  document.getElementById("wrongAge").innerHTML = "";
-  document.getElementById("wrongControlMail").innerHTML = "";
-  document.getElementById("wrongConfirmPwd").innerHTML = "";
+  if (document.getElementById("wrongMail") != null) document.getElementById("wrongMail").innerHTML = "";
+  if (document.getElementById("wrongPwd") != null) document.getElementById("wrongPwd").innerHTML = "";
+  if (document.getElementById("wrongPrivacy") != null) document.getElementById("wrongPrivacy").innerHTML = "";
+  if (document.getElementById("wrongAge") != null) document.getElementById("wrongAge").innerHTML = "";
+  if (document.getElementById("wrongControlMail") != null) document.getElementById("wrongControlMail").innerHTML = "";
+  if (document.getElementById("wrongConfirmPwd") != null) document.getElementById("wrongConfirmPwd").innerHTML = "";
+  if (document.getElementById("wrongPrivacyNeed") != null) document.getElementById("wrongPrivacyNeed").innerHTML = "";
 
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  var email = document.getElementById("inputUsernameEmail").value;
-  var controlEmail = document.getElementById("inputControlUsernameEmail").value;
-  
-  if(email =="" || !re.test(String(email))) {    
+  var email = document.getElementById("inputUsernameEmail").value.trim();
+  var controlEmail = document.getElementById("inputControlUsernameEmail").value.trim();
+
+  if(email =="" || !re.test(String(email))) {
     document.getElementById("wrongMail").innerHTML = iwar+"Inserisci una Email valida";
     document.getElementById("inputUsernameEmail").focus();
     return false;
@@ -66,7 +67,6 @@ function fieldsValidationControl() {
     document.getElementById("inputControlUsernameEmail").focus();
     return false;
   }
-
 
   let pwd1 = "";
   let pwd2 = "";
@@ -134,11 +134,20 @@ function fieldsValidationControl() {
 
   if(!document.getElementById('checkAge').checked) {
     document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella solo se hai più di 18 anni";
+    document.getElementById("wrongAge").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
   if(!document.getElementById('checkPrivacy').checked) {
-    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella per accettare le Condizioni generali di vendita e la Privacy";
+    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella per accettare le Condizioni generali di vendita";
+    document.getElementById("wrongPrivacy").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
+  }
+  if (document.getElementById("wrongPrivacyNeed") != null) {
+    if(!document.getElementById('checkPrivacyNeed').checked) {
+      document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella per poter proseguire";
+      document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
   }
   console.debug('FIELDS VALIDATION CONTROL')
   return true;
@@ -230,18 +239,18 @@ async function fieldsRegisterControl() {
     document.getElementById("inputFirstName").focus();
     document.getElementById("wrongFirstName").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
-  } else {    
+  } else {
     document.getElementById("inputFirstName").value = nome.charAt(0).toUpperCase() + nome.slice(1);
-  } 
+  }
   if (cognome == "") {
     text = iwar+"Inserire il Cognome";
     document.getElementById("wrongLastName").innerHTML = text;
     document.getElementById("inputLastName").focus();
     document.getElementById("wrongLastName").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
-  } else {    
+  } else {
     document.getElementById("inputLastName").value = cognome.charAt(0).toUpperCase() + cognome.slice(1);
-  } 
+  }
   if (phone == "" || !phone.match(phoneno)) {
     text = iwar+"Inserire un numero di telefono cellulare valido";
     document.getElementById("wrongPhone").innerHTML = text;
@@ -252,7 +261,7 @@ async function fieldsRegisterControl() {
   // se la lista di città risultante dalla selezione fatta nella pagina registration.njk o addresses.njk
   // javascript async function selectCity(v) è diversa da NULL e la città è blank allora
   // non si è digitato correttamente il nome della città o selezionata la città dalla lista
-  // proposta 
+  // proposta
   if (city == "" || document.getElementById('myselectcity') != null || document.getElementById("hiddenListOfCities") === null || document.getElementById("hiddenListOfCities") === undefined) {
     text = iwar+"Inserire o selezionare la Città";
     document.getElementById("wrongCity").innerHTML = text;
@@ -283,16 +292,16 @@ async function fieldsRegisterControl() {
     document.getElementById("inputCap").focus();
     document.getElementById("wrongCap").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
-  }  
+  }
   if (address == "" || document.getElementById("myselectstreet") !=null || document.getElementById("hiddenStreet").value != 'OK') {
     text = iwar+"Inserire il nome della via anche parziale e selezionare l'indirizzo dalla lista proposta."
     document.getElementById("wrongStreet").innerHTML = text;
     document.getElementById("inputStreet").focus();
     document.getElementById("wrongStreet").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
-  }  
+  }
   if (numciv == "") {
-    text = iwar+"Inserire il Numero Civico";  
+    text = iwar+"Inserire il Numero Civico";
     document.getElementById("wrongNumciv").innerHTML = text;
     document.getElementById("inputNumciv").focus();
     document.getElementById("wrongNumciv").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -303,10 +312,10 @@ async function fieldsRegisterControl() {
       document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella per poter proseguire";
       document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
-    }  
+    }
   }
-  
+
 
   return true;
-   
+
 };

@@ -13,7 +13,7 @@ module.exports = function(app, moment, mongoose) {
 // =============================================================================
 //GET
 	app.get('/shopping', lib.isLoggedIn, async function (req,res) {
-    
+
     if (req.query.type == "Ritiro") {
       var attivaConsegna = ""
       var attivaRitiro = "active"
@@ -21,7 +21,7 @@ module.exports = function(app, moment, mongoose) {
       var attivaConsegna = "active"
       var attivaRitiro = ""
     }
-    
+
 
 		//====================================
 		// ORDINI IN CONSEGNA
@@ -34,14 +34,14 @@ module.exports = function(app, moment, mongoose) {
 								{$sort:{'orders.dateInsert': -1}}
 				]);
 	 	console.debug('ORDINI IN CONSEGNA', JSON.stringify(ordiniInConsegna,null,2))
-		for ( var i in  ordiniInConsegna) {	
+		for ( var i in  ordiniInConsegna) {
 		  console.debug('DB DELIVERY DATE',ordiniInConsegna[i].orders.deliveryDate);
 			ordiniInConsegna[i].orders.dateInsert = lib.formatTextDate(ordiniInConsegna[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm');
 			ordiniInConsegna[i].orders.deliveryDate = lib.formatTextDate(ordiniInConsegna[i].orders.deliveryDate, 'dddd DD MMMM');
 			ordiniInConsegna[i].orders.shippingCost = ordiniInConsegna[i].orders.shippingCost.toFixed(2)
 			ordiniInConsegna[i].orders.totalPriceBeer = ordiniInConsegna[i].orders.totalPriceBeer.toFixed(2)
 			ordiniInConsegna[i].orders.totalPriceTotal = ordiniInConsegna[i].orders.totalPriceTotal.toFixed(2)
-			ordiniInConsegna[i].orders.items.forEach(function(prod) {	  			
+			ordiniInConsegna[i].orders.items.forEach(function(prod) {
   			prod.price = prod.price.toFixed(2)
   		});
 		}
@@ -55,13 +55,13 @@ module.exports = function(app, moment, mongoose) {
 								{$project:{_id:0,addresses:0,friends:0,local:0,'orders.payment':0}},
 								{$sort:{'orders.dateInsert': -1}}
 				])
-		for ( var i in  ordiniInRitiro) {			
+		for ( var i in  ordiniInRitiro) {
 			ordiniInRitiro[i].orders.dateInsert = lib.formatTextDate(ordiniInRitiro[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm')
 			ordiniInRitiro[i].orders.deliveryDate = lib.formatTextDate(ordiniInRitiro[i].orders.deliveryDate, 'dddd DD MMMM');
 			ordiniInRitiro[i].orders.shippingCost = ordiniInRitiro[i].orders.shippingCost.toFixed(2)
 			ordiniInRitiro[i].orders.totalPriceBeer = ordiniInRitiro[i].orders.totalPriceBeer.toFixed(2)
 			ordiniInRitiro[i].orders.totalPriceTotal = ordiniInRitiro[i].orders.totalPriceTotal.toFixed(2)
-			ordiniInRitiro[i].orders.items.forEach(function(prod) {	  			
+			ordiniInRitiro[i].orders.items.forEach(function(prod) {
   			prod.price = prod.price.toFixed(2)
   		});
 		}
@@ -76,24 +76,24 @@ module.exports = function(app, moment, mongoose) {
 								{$sort:{'orders.delivery.date_ref': -1}}
 								]);
 		console.debug('ORDINI CONSEGNATI', JSON.stringify(ordiniConsegnati,null,2))
-		for ( var i in  ordiniConsegnati) {			
+		for ( var i in  ordiniConsegnati) {
 			ordiniConsegnati[i].orders.dateInsert = lib.formatTextDate(ordiniConsegnati[i].orders.dateInsert, 'DD.MM.YYYY - HH:mm');
 			ordiniConsegnati[i].orders.delivery.date_ref = lib.formatTextDate(ordiniConsegnati[i].orders.delivery[0].date_ref, 'DD.MM.YYYY - HH:mm')
 			ordiniConsegnati[i].orders.shippingCost = ordiniConsegnati[i].orders.shippingCost.toFixed(2)
 			ordiniConsegnati[i].orders.totalPriceBeer = ordiniConsegnati[i].orders.totalPriceBeer.toFixed(2)
 			ordiniConsegnati[i].orders.totalPriceTotal = ordiniConsegnati[i].orders.totalPriceTotal.toFixed(2)
-			ordiniConsegnati[i].orders.items.forEach(function(prod) {	  			
+			ordiniConsegnati[i].orders.items.forEach(function(prod) {
   			prod.price = prod.price.toFixed(2)
   		});
 		}
-		
-    
+
+
 		//---------------------
 		// INDIRIZZO DI RITIRO
 		//---------------------
 		var addressRitiro = await User.aggregate([
-            {$match:{"local.email": "birrificioviana@gmail.com"}}, 
-            {$unwind: "$addresses"}, 
+            {$match:{"local.email": "birrificioviana@gmail.com"}},
+            {$unwind: "$addresses"},
             //{$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
@@ -114,10 +114,14 @@ module.exports = function(app, moment, mongoose) {
                })
 	})
 
-// =================================================================================================
-// ORDER SUMMARY  
+// ==============================================================================================
+// ORDER SUMMARY
 // !!!ATTENZIONE!!! in routesRegiter c'è una parte di gestione del della consegna in /register (POST)
 // ==============================================================================================
+//GET
+	app.get('/orderSummary', lib.isLoggedIn, (req,res) => {
+			res.redirect('shop')
+		})
 
 //POST
   app.post('/orderSummary', lib.isLoggedIn, async function(req,res){
@@ -140,7 +144,7 @@ module.exports = function(app, moment, mongoose) {
 
   	console.debug('refFatturaPEC', refFatturaPEC);
   	console.debug('refFatturaSDI', refFatturaSDI);
-  	
+
     try{
 
       //--------------------------------------
@@ -149,15 +153,15 @@ module.exports = function(app, moment, mongoose) {
       if (req.body.typeOfDelivery == 'ritiro' ) {
         req.session.deliveryType =  "Ritiro"; //session usata in Axerve
         console.debug('POINT DISCOUNT BOOZE DISPONIBILI: ', req.user.local.booze);
-        
+
         // Costo spedizione
         req.session.shippingCost = 0.00.toFixed(2); //session usata in Axerve
 
         //==============================================================================
-        // Vantaggio dai tuoi amici 
+        // Vantaggio dai tuoi amici
         // Il prezzo totale di acquisto/numero di bottigli => costo di una bottiglia
         // se i booze >= costo di una bottiglia allora faccio lo sconto
-        // lo sconto massimo è del 50% su totale di acquisto  
+        // lo sconto massimo è del 50% su totale di acquisto
         //==============================================================================
         c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
@@ -166,8 +170,8 @@ module.exports = function(app, moment, mongoose) {
 		//-------------------------------------------
 		var nOrders
 		const resNorder = await User.aggregate([
-			  {$match:{"_id":req.user._id}}, 
-			  {$unwind: "$orders"}, 
+			  {$match:{"_id":req.user._id}},
+			  {$unwind: "$orders"},
 			  {$match :{ "orders.payment.s2sStatus":"OK"}},
 			  {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
 			  {$group:{_id:null,count:{$count:{ }}}}
@@ -178,36 +182,36 @@ module.exports = function(app, moment, mongoose) {
 		} else {
 			nOrders=0
 			req.session.omaggioPrimoAcquisto = c1b
-		}		
+		}
 		console.debug("N° ORDINI",nOrders)
 	   //--------------------------------------------
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
-        	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
+        	req.session.pointDiscount = req.user.local.booze.toFixed(2);
         } else if (req.user.local.booze > req.session.totalPrc/2) {
         	req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
         } else {
-        	 req.session.pointDiscount = 0.00.toFixed(2); 
+        	 req.session.pointDiscount = 0.00.toFixed(2);
         }
-        
+
         var addressRitiro = await User.aggregate([
-            {$match:{"local.email": "birrificioviana@gmail.com"}}, 
-            {$unwind: "$addresses"}, 
+            {$match:{"local.email": "birrificioviana@gmail.com"}},
+            {$unwind: "$addresses"},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
         address = addressRitiro
 
         var addressCliente = await User.aggregate([
-            {$match:{"_id":req.user._id}}, 
-            {$unwind: "$addresses"}, 
+            {$match:{"_id":req.user._id}},
+            {$unwind: "$addresses"},
             {$match :{ "addresses.main":"yes"}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
 
-        req.session.shippingAddress = addressCliente[0].addresses;  
+        req.session.shippingAddress = addressCliente[0].addresses;
 
-        console.debug('ADDRESS CLIENTE: ',addressCliente[0].addresses)       
-        console.debug('ADDRESS RITIRO: ', addressRitiro[0].addresses)       
-        
+        console.debug('ADDRESS CLIENTE: ',addressCliente[0].addresses)
+        console.debug('ADDRESS RITIRO: ', addressRitiro[0].addresses)
+
       } else {
       //-------------------------------------------------------
       // Caso di CONSEGNA presso all'indirizzo
@@ -215,14 +219,17 @@ module.exports = function(app, moment, mongoose) {
         req.session.deliveryType =  "Consegna"
         console.debug('INDIRIZZO',req.body.addressID)
         address = await User.aggregate([
-            {$match:{"_id":req.user._id}}, 
-            {$unwind: "$addresses"}, 
+            {$match:{"_id":req.user._id}},
+            {$unwind: "$addresses"},
             {$match :{ "addresses._id":mongoose.Types.ObjectId(req.body.addressID)}},
             {$project:{_id:0,friends:0,orders:0,local:0}}
             ])
-        req.session.shippingAddress = address[0].addresses;         
+        req.session.shippingAddress = address[0].addresses;
 
-        let customerAddress = address[0].addresses.address + ' ' + 
+		/*-----------------------------------------------------
+		 * Calcolo della distanza
+		 * ----------------------------------------------------*/
+        let customerAddress = address[0].addresses.address + ' ' +
                           address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
                           address[0].addresses.province;
@@ -232,6 +239,7 @@ module.exports = function(app, moment, mongoose) {
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress, customerCoordinate, birrificioCoordinate));
 
         console.debug('DISTANZA = ', dist.distanceInMeters)
+        req.session.distance = Number(dist.distanceInMeters)
 
         if ( Number(dist.distanceInMeters) > 15000) {
           req.session.shippingCost = priceCurier[req.session.numProducts-1];
@@ -239,15 +247,15 @@ module.exports = function(app, moment, mongoose) {
           if (req.session.numProducts > 5) {
             req.session.shippingCost = '0.00';
           } else {
-            console.debug('PRICE: ',req.session.numProducts,  priceLocal[req.session.numProducts-1])
+            console.debug('PRICE -> n° prdotti=',req.session.numProducts, 'costo=',priceLocal[req.session.numProducts-1])
             req.session.shippingCost = priceLocal[req.session.numProducts-1] // array Global definita in server.js con i prezzi di trasporto
           }
         }
         //==============================================================================
-        // Vantaggio dai tuoi amici 
+        // Vantaggio dai tuoi amici
         // Il prezzo totale di acquisto/numero di bottigli => costo di una bottiglia
         // se i booze >= costo di una bottiglia allora faccio lo sconto
-        // lo sconto massimo è del 50% su totale di acquisto  
+        // lo sconto massimo è del 50% su totale di acquisto
         //==============================================================================
         c1b = (req.session.totalPrc/req.session.numProducts/numBottigliePerBeerBox).toFixed(2)
         console.debug('COSTO DI 1 BOTTIGLIA: ', c1b)
@@ -256,8 +264,8 @@ module.exports = function(app, moment, mongoose) {
 		//-------------------------------------------
 		var nOrders
 		const resNorder = await User.aggregate([
-			  {$match:{"_id":req.user._id}}, 
-			  {$unwind: "$orders"}, 
+			  {$match:{"_id":req.user._id}},
+			  {$unwind: "$orders"},
 			  {$match :{ "orders.payment.s2sStatus":"OK"}},
 			  {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
 			  {$group:{_id:null,count:{$count:{ }}}}
@@ -268,18 +276,18 @@ module.exports = function(app, moment, mongoose) {
 		} else {
 			nOrders=0
 			req.session.omaggioPrimoAcquisto = c1b
-		}		
+		}
 		console.debug("N° ORDINI",nOrders)
 	   //--------------------------------------------
         if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc/2 ) {
-        	req.session.pointDiscount = req.user.local.booze.toFixed(2);	
+        	req.session.pointDiscount = req.user.local.booze.toFixed(2);
         } else if (req.user.local.booze > req.session.totalPrc/2) {
         	req.session.pointDiscount = (req.session.totalPrc/2).toFixed(2)
         } else {
-        	req.session.pointDiscount = 0.00.toFixed(2); 
+        	req.session.pointDiscount = 0.00.toFixed(2);
         }
       }
-      
+
       res.render('orderSummary.njk', {
         cartItems   : req.session.cartItems,
         address     : address[0].addresses,
@@ -300,7 +308,7 @@ module.exports = function(app, moment, mongoose) {
     }
     catch (e) {
       console.log ('ERROR ',e)
-      req.flash('error', 'Si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com') 
+      req.flash('error', 'Si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com')
       res.render('info.njk', {
           message: req.flash('error'),
           type: "danger"
@@ -314,7 +322,7 @@ module.exports = function(app, moment, mongoose) {
 // ==========================================================================
  //POST
 app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
-   	const status = req.body.status;    
+   	const status = req.body.status;
     res.render('orderOutcome.njk', {
       status  : status,
       user    : req.user,
@@ -329,15 +337,15 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 //GET
  app.get('/shop', lib.isLoggedIn, function (req,res) {
 
-	Product.find(function (err, prods) {
+	Product.find(async function (err, prods) {
   		if (err) {
   			let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
   			console.error(lib.logDate("Europe/Rome")+' [WARNING][RECOVERY:NO] "POST /shop" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERROR: '+err+' FLASH: '+msg);
-        req.flash('message', msg);
-        return res.render('info.njk', {
-            message: req.flash('message'),
-            type: "warning"
-        })
+			req.flash('message', msg);
+			return res.render('info.njk', {
+				message: req.flash('message'),
+				type: "warning"
+			})
   		} else {
   			req.flash('info', req.query.msg);
 
@@ -346,38 +354,50 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 			var cart = req.session.cart
 			console.debug('SHOP CART', cart)
 			var numProds = req.session.numProducts
-
+			// GESTIONE della concorrenza nella fase di acquisto
 			prods.forEach(function(prod) {
 					prod.prettyPrice = prod.prettyPrice();
 					prod.price = prod.price.toFixed(2)
 					prodId = prod._id.toString()
 				if (cart != undefined) {
-					//tolgo dallo shop quanto ho in carrello            
 					if (cart[prodId] != undefined) {
-						prod.quantity = prod.quantity - cart[prodId].qty              
+						prod.quantity = prod.quantity - cart[prodId].qty  //tolgo dallo shop quanto ho in carrello
 						// controlo che nel frattempo non abbiano acquistato beerbox
-						// e nel caso aggiusto i quantitativi 
-						if (prod.quantity < 0 ) {                
+						// e nel caso aggiusto i quantitativi
+						if (prod.quantity < 0 ) {
 							cart[prodId].qty = cart[prodId].qty + prod.quantity
 							numProds = numProds + prod.quantity
 							prod.quantity = 0
 							req.flash('info','Mi dispiace, ma la quantità disponibile dei beerbox per la birra '+prod.name+' è inferiore alla richieste rivevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo '+cart[prodId].qty+' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.')
-						} 
+						}
 					}
 				}
 			});
+			// Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
+			  var amiciDaInvitare = false
+			  const user =  await User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)})
+              console.debug("INVITI DISPONIBILI=",parseInt(user.local.eligibleFriends, 10))
+              console.debug("AMICI INVITATI= ", parseInt(user.friends.length, 10))
+              // controllo che ci siano ancora inviti diposnibili
+              if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
+                  console.debug ("HAI AMICI DA INVITARE !!!!!!!!!!!!!!!");
+                  amiciDaInvitare = true
+              }
+            //----------------
+
 			req.session.cart = cart
-			//mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
+			//RI-mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
 			lib.retriveCart(req);
 			console.debug('CATALOGO PRODOTTI: ',prods)
-			//TODO: sistema gestione promo base -> evolvere con una modalità automatica che impostato la %sconto calcola il nuovo prezzo e lo visualizza nello shop	
+			//TODO: sistema gestione promo base -> evolvere con una modalità automatica che impostato la %sconto calcola il nuovo prezzo e lo visualizza nello shop
 			 var model =  { 	products   : prods,       //prodotti dello shop
 										user       : req.user,      //utente loggato
-										numProducts: req.session.numProducts,   //numero di proodotti nel carrello	  						       
+										numProducts: req.session.numProducts,   //numero di proodotti nel carrello
 										message    : req.flash('info'),
-										type       : "info"
+										type       : "info",
+										amiciDaInvitare : amiciDaInvitare
 									};
-			  
+
 			res.render('shop.njk', model);
   		}
 	});
@@ -407,7 +427,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 				/*------------------------------------------------------------------------------
 				/ Verifico se il prodotto selezioanto è disponibile.
 				/ La verifica è parziale a causa della possibilità di concorrenza nell'acquisto
-				/ da più users. 
+				/ da più users.
 				/ La verifica finale è fatta in orderSummary.
 				/------------------------------------------------------------------------------*/
 				var q =  (!cart[id]) ? 0 : cart[id].qty; //se il carrello è vuoto
@@ -416,7 +436,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 
 				if (req.session.numProducts < priceCurier.length) { // verifico il numero massimo di beerbox spedibili
           if ((Number(prod.quantity) - Number(q)) > 0) {
-  					
+
   					//Increase quantity or add the product in the shopping cart.
   					if (cart[id]) {
   						cart[id].qty++;
@@ -440,7 +460,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
   					const msg = 'Hai aggiunto l\'ultimo beerBox disponibile. La birra '+prod.name+' è ora esaurita. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.'
             res.status(200).send('{"statusText":"ko", "msg":"'+msg+'"}');
   				}
-        } else { 
+        } else {
           const msg = "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'\indirizzo email birrificioviana@gmail.com"
           res.status(200).send('{"statusText":"ko", "msg":"'+msg+'"}');
         }
@@ -458,8 +478,8 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
     //-------------------------------------------
     var nOrders
     const resNorder = await User.aggregate([
-          {$match:{"_id":req.user._id}}, 
-          {$unwind: "$orders"}, 
+          {$match:{"_id":req.user._id}},
+          {$unwind: "$orders"},
           {$match :{ "orders.payment.s2sStatus":"OK"}},
           {$project:{_id:0,friends:0,addresses:0,local:0,privacy:0}},
           {$group:{_id:null,count:{$count:{ }}}}
@@ -468,10 +488,10 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 		nOrders=resNorder[0].count
 	} else {
 		nOrders=0
-	}		
+	}
     console.debug("N° ORDINI",nOrders)
    //--------------------------------------------
-    
+
 	Product.find(function (err, prods) {
       if (err) {
         let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
@@ -485,24 +505,24 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
         //mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
         lib.retriveCart(req);
         if (req.session.numProducts <= priceCurier.length) { // verifico il numero massimo di beerbox spedibili
-          
+
           var cart = req.session.cart
           console.debug('CART in CART', cart)
           var numProds = req.session.numProducts
           // prods sono tutti i prodotti in catalaogo su DB products
           prods.forEach(function(prod) {
             prodId = prod._id.toString()
-            if (cart != undefined) { //verifico che il carrello non sia vuoto (ridondante ma non disturba)              
+            if (cart != undefined) { //verifico che il carrello non sia vuoto (ridondante ma non disturba)
               if (cart[prodId] != undefined) {
                 // controllo che nel frattempo non abbiano acquistato beerbox
-                // e nel caso aggiusto i quantitativi 
-                prod.quantity = prod.quantity - cart[prodId].qty                            
-                if (prod.quantity < 0 ) {                
+                // e nel caso aggiusto i quantitativi
+                prod.quantity = prod.quantity - cart[prodId].qty
+                if (prod.quantity < 0 ) {
                   cart[prodId].qty = cart[prodId].qty + prod.quantity
                   numProds = numProds + prod.quantity
                   prod.quantity = 0
                   req.flash('cartMessage','Mi dispiace, ma la quantità disponibile dei beerbox per la birra '+prod.name+' è inferiore alla richieste rivevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo '+cart[prodId].qty+' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.')
-                } 
+                }
               }
             }
           });

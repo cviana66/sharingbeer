@@ -15,10 +15,10 @@
 
 <!-- Tab panes -->
 <div class="tab-content">
-  
+
   <div class="tab-pane {{attivaConsegna}} text-white " id="home" role="tabpanel" aria-labelledby="home-tab" style="margin: 20px 0px 0px 0px;">
     {% for purchase in ordiniInConsegna %}
-    
+
       {% if purchase.orders._id == orderId %}
         <div class="card" style="background-color:#2A0009;border-color:#c67605;margin: 0px 0px 20px 0px;">
       {% else %}
@@ -30,20 +30,20 @@
           ORDINE <br> <span style="font-size:0.9em;">{{purchase.orders._id}}</span>
         </div>
         <div class="text-white font-weight-light text-center">
-           del <span style="font-size:0.9em;"> {{purchase.orders.dateInsert}} </span>            
+           del <span style="font-size:0.9em;"> {{purchase.orders.dateInsert}} </span>
         </div>
       </div>
-      
+
       <div class="text-white font-weight-light text-center" style="margin: 5px 5px 20px 5px;">
-        <div><span style="font-size:0.9em">Consegna entro </span> {{purchase.orders.deliveryDate}}</div>     
+        <div><span style="font-size:0.9em">Consegna entro </span> {{purchase.orders.deliveryDate}}</div>
       </div>
 
       {% for prod in purchase.orders.items %}
       <table style="margin: 0px 5px 10px 5px;">
         <tr>
-          <td width="16%" rowspan="3" style="padding: 5px;"> 
+          <td width="16%" rowspan="3" style="padding: 5px;">
             <div>
-              <img src="{{prod.linkImage}}" width="100%" height="100%"> 
+              <img src="{{prod.linkImage}}" width="100%" height="100%">
             </div>
           </td>
           <td class="text-white font-weight-light">
@@ -55,22 +55,22 @@
         </tr>
         <tr>
           <td class="text-white font-weight-light">Prezzo per BeerBox: €{{prod.price}}</td>
-        </tr>      
-      </table>      
+        </tr>
+      </table>
       {% endfor %}
       <div class="text-center" style="margin: 0px 5px 5px 5px;">
-        <span style="font-size:1.0em;font-weight: bold;">Totale</span> 
-        <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span> 
+        <span style="font-size:1.0em;font-weight: bold;">Totale</span>
+        <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span>
         <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
       </div>
       <div class="text-center" style="margin: 5px 5px 10px 5px;">
         <div style="font-size:1.1em;font-weight: bold;">Indirizzo di consegna <br></div>
         <div class="text-white font-weight-light" style="font-size:0.9em;">
-          {{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}} <br> 
-          {{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}} <br> 
+          {{purchase.orders.address.name.first}} {{purchase.orders.address.name.last}} <br>
+          {{purchase.orders.address.address}} {{purchase.orders.address.houseNumber}} <br>
           {{purchase.orders.address.postcode}} - {{purchase.orders.address.city}} ({{purchase.orders.address.province}})
         </div>
-      </div>      
+      </div>
     </div>
     {% endfor %}
   </div>
@@ -87,20 +87,20 @@
           ORDINE <br> <span style="font-size:0.9em;">{{purchase.orders._id}}</span>
         </div>
         <div class="text-white font-weight-light text-center">
-           del <span style="font-size:0.9em;"> {{purchase.orders.dateInsert}} </span>            
+           del <span style="font-size:0.9em;"> {{purchase.orders.dateInsert}} </span>
         </div>
       </div>
 
        <div class="text-white font-weight-light text-center" style="margin: 5px 5px 20px 5px;">
-        <div><span style="font-size:0.9em">Ritiro entro </span> {{purchase.orders.deliveryDate}}</div>     
+        <div><span style="font-size:0.9em">Ritiro entro </span> {{purchase.orders.deliveryDate}}</div>
       </div>
 
       {% for prod in purchase.orders.items %}
       <table style="margin: 0px 5px 10px 5px;">
         <tr>
-          <td width="16%" rowspan="3" style="padding: 5px;"> 
+          <td width="16%" rowspan="3" style="padding: 5px;">
             <div>
-              <img src="{{prod.linkImage}}" width="100%" height="100%"> 
+              <img src="{{prod.linkImage}}" width="100%" height="100%">
             </div>
           </td>
           <td class="text-white font-weight-light">
@@ -112,20 +112,21 @@
         </tr>
         <tr>
           <td class="text-white font-weight-light">Prezzo per BeerBox: €{{prod.price}}</td>
-        </tr>   
-      </table>           
+        </tr>
+      </table>
       {% endfor %}
       <div class="text-center" style="margin: 5px 5px 5px 5px;">
-        <span style="font-size:1.0em;font-weight: bold;">Totale</span> 
-        <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span> 
+        <span style="font-size:1.0em;font-weight: bold;">Totale</span>
+        <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span>
         <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
       </div>
       <div class="text-center" style="margin: 5px 5px 10px 5px;">
         <div style="font-size:1.1em;font-weight: bold;"> Indirizzo di ritiro <br></div>
-        <div class="text-white font-weight-light" style="font-size:1em;"> 
-          {{addressRitiro.name.first}} {{addressRitiro.name.last}} <br> 
-          {{addressRitiro.address}} {{addressRitiro.houseNumber}} <br> 
-          {{addressRitiro.postcode}} - {{addressRitiro.city}} ({{addressRitiro.province}})
+        <div class="text-white font-weight-light" style="font-size:1em;">
+          {{addressRitiro.name.first}} {{addressRitiro.name.last}} <br>
+          {{addressRitiro.address}} {{addressRitiro.houseNumber}} <br>
+          {{addressRitiro.postcode}} - {{addressRitiro.city}} ({{addressRitiro.province}}) <br>
+          <a style="color:#009B95" href="#" onclick="return openDocument('infoOrari.html')">Orari di apertura</a>
         </div>
       </div>
     </div>
@@ -140,15 +141,15 @@
           ORDINE <br> <span style="font-size:0.9em;">{{purchase.orders._id}}</span>
         </div>
         <div class="text-white font-weight-light text-center">
-           del <span style="font-size:0.9em;"> {{purchase.orders.dateInsert}} </span>            
+           del <span style="font-size:0.9em;"> {{purchase.orders.dateInsert}} </span>
         </div>
-      
+
         {% for prod in purchase.orders.items %}
         <table style="margin: 0px 5px 15px 5px;">
           <tr>
             <td width="16%" rowspan="3" style="padding: 5px;">
               <div>
-                <img src="{{prod.linkImage}}" width="100%" height="100%"> 
+                <img src="{{prod.linkImage}}" width="100%" height="100%">
               </div>
             </td>
             <td class="text-white font-weight-light">{{prod.name}}</td>
@@ -158,12 +159,12 @@
           </tr>
           <tr>
             <td class="text-white font-weight-light">Prezzo per BeerBox: €{{prod.price}}</td>
-          </tr>      
-        </table>      
+          </tr>
+        </table>
         {% endfor %}
         <div class="text-center" style="margin: 5px 5px 5px 5px;">
-          <span style="font-size:1.1em;font-weight: bold;">Totale</span> 
-          <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span> 
+          <span style="font-size:1.1em;font-weight: bold;">Totale</span>
+          <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span>
           <span style="font-size:1.1em;font-weight: bold;">€{{purchase.orders.totalPriceTotal}}</span>
         </div>
         <div class="text-center" style="margin: 10px 5px 0px 5px;">
@@ -175,7 +176,7 @@
         {%else%}
           <div class="text-white font-weight-light"><span style="font-size:1.1em;font-weight: bold;">Ritirato </span> il {{purchase.orders.delivery.date_ref}} <br> in <br> </div>
           <div class="text-white font-weight-light">
-            {{addressRitiro.address}} {{addressRitiro.houseNumber}} <br> 
+            {{addressRitiro.address}} {{addressRitiro.houseNumber}} <br>
             {{addressRitiro.postcode}} - {{addressRitiro.city}} ({{addressRitiro.province}})</div>
         {%endif%}
         </div>
