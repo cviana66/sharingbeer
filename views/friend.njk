@@ -4,7 +4,7 @@
       <!--h3 class="text-white text-center bg-dark"> Invita amici </h3>
       <hr style="border-top: 1px solid #903246;"-->
 
-      
+
       <table widht="100%" style="margin:20px 0px 0px 0px">
         <tr>
           <td width="50%">
@@ -29,12 +29,12 @@
                 <div class="flex-row">
                   <div class="align-self-center">
                     <p class="text-white font-weight-light text-justify">
-                      <span style="font-size:1.2em;">Invita i tuoi amici </span> 
-                      a bere 
-                      <span class="sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span> 
-                      e ottieni ad ogni loro acquisto punti 
-                      <span  style="font-size:1.2em;"> Pinta </span> 
-                      per 
+                      <span style="font-size:1.2em;">Invita i tuoi amici </span>
+                      a bere
+                      <span class="sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span>
+                      e ottieni ad ogni loro acquisto punti
+                      <span  style="font-size:1.2em;"> Pinta </span>
+                      per
                       <span  style="font-size:1.5em;"> sconti fino al 50%!</span>
                       <span style="float:right;">
                         <a href="#" onclick="return openDocument('infoFriend.html')">
@@ -71,7 +71,7 @@
   document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("loading").style.display = 'none';
   });
-  
+
   async function share(token,parentName,server) {
 
     if (document.getElementById("inputFirstName").value == "") {
@@ -84,26 +84,26 @@
       //--------------------------------------------
       document.getElementById("mybutton").disabled = 'true';
       document.getElementById("loading").style.display = 'block';
-      
+
       let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
-      
+
       fetch('/recomm',
         {
           method: 'POST',
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({  
+          body: JSON.stringify({
             "firstName": firstName,
           })
         }
-      ).then(function(result) 
+      ).then(function(result)
         {
           return result.json();
         }
-      ).then( async function(data) 
+      ).then( async function(data)
         {
-          if (data.ok) {            
+          if (data.ok) {
             let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale. \nTi mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
             //console.log('textText -->', textText)
             let shareData = {
@@ -112,10 +112,10 @@
               //url: server+"/validation?token="+token
             }
             if (navigator.canShare) {
-              try {  
+              try {
                 //console.log("Prima del navigator")
                 //document.getElementById("loading").style.display = 'block';
-                await navigator.share(shareData);
+                /*await*/ navigator.share(shareData);
                 //document.getElementById("loading").style.display = 'none';
                 //console.log("Dopo il navigator")
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
@@ -124,8 +124,8 @@
                 //document.getElementById("loading").style.display = 'none';
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});
               }
-            } else {                  
-              //console.log("nell'else del if navigator")                           
+            } else {
+              //console.log("nell'else del if navigator")
               let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
               //console.log("MAILTO ", a)
               post('/infoShare',{firstName:data.friendName,flag:data.flag});
@@ -135,9 +135,12 @@
           }
         }
 
-      ).catch(console.error)
-      .finally(()=> {document.getElementById("loading").style.display = 'none';});
-    } 
+      ).catch((error)=> {
+		  document.getElementById("loading").style.display = 'none';
+		  post('/infoShare',{firstName:data.friendName,flag:data.flag});
+		  }
+      ).finally(()=> {document.getElementById("loading").style.display = 'none';});
+    }
   }
 
   function capitalizeFirstLetter(string) {
