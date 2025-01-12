@@ -498,10 +498,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         req.session.shippingAddress = address[0].addresses;
         //console.debug('ADDRESS[0]: ',address[0].addresses)
 
-/*
- -----------------------------------------------------------------------------------------------------------------------
- NON SERVE: il calcolo vineie fatto in orderSummary, prima della conferma di ordine
-------------------------------------------------------------------------------------------------------------------------
+		/*-----------------------------------------------------
+		 * Calcolo della distanza
+		 * ----------------------------------------------------*/
         let customerAddress = address[0].addresses.address + ' ' +
                           address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
@@ -512,6 +511,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
         let dist = JSON.parse( await getDistance(customerAddress, birrificioAddress, customerCoordinate, birrificioCoordinate));
 
         console.debug('DISTANZA = ', dist.distanceInMeters)
+        req.session.distance = Number(dist.distanceInMeters)
 
         if ( Number(dist.distanceInMeters) > 15000) {
           req.session.shippingCost = priceCurier[req.session.numProducts-1];
@@ -523,7 +523,6 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             req.session.shippingCost = priceLocal[req.session.numProducts-1]
           }
         }
-*/
         //==============================================================================
         // Vantaggio dai tuoi amici
         // Il prezzo totale di acquisto/numero di bottigli => costo di una bottiglia
