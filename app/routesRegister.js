@@ -885,6 +885,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   });
 
   app.get('/inviteQrcode', lib.isAdmin, (req, res) => {
+				console.debug('NODE_ENV =', process.env.NODE_ENV)
 			res.render('qrcode4Invite.njk',{
 								user    : req.user,
 								nodeEnv : process.env.NODE_ENV
