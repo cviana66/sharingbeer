@@ -142,28 +142,28 @@ async function loadDeliveryData(moment) {
 	 * SPEDIZIONE
 	 * -------------------------*/
 	for (i=0; i<aggregationResultSpedizione.length; i++) {
-		var orders = aggregationResultSpedizione[i].orders;
-		console.debug("ORDERS -> ", orders)
-		var deliveryType = orders.deliveryType;
+		var sOrders = aggregationResultSpedizione[i].orders;
+		console.debug("ORDERS -> ", sOrders)
+		var deliveryType = sOrders.deliveryType;
 
 		if (!deliveryType) {
 			deliveryType = 'Ritiro';
 		}
 
-		var orderID = orders._id.toString();
+		var orderID = sOrders._id.toString();
 
-		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
-		var customerMobile = orders.address.mobileNumber;
-		var customerAddress = orders.address.address + ' ' +
-							  orders.address.houseNumber + ' ' +
-							  orders.address.city +  ' ' +
-							  orders.address.province;
-		var customerAddressCoordinate = orders.address.coordinateGPS;
-		var customerAddressAffidability = orders.address.affidability;
+		var customerAnag = sOrders.address.name.last + ' ' + sOrders.address.name.first;
+		var customerMobile = sOrders.address.mobileNumber;
+		var customerAddress = sOrders.address.address + ' ' +
+							  sOrders.address.houseNumber + ' ' +
+							  sOrders.address.city +  ' ' +
+							  sOrders.address.province;
+		var customerAddressCoordinate = sOrders.address.coordinateGPS;
+		var customerAddressAffidability = sOrders.address.affidability;
 
-		var orderItems = orders.items;
+		var orderItems = sOrders.items;
 
-		var insertDate = moment(orders.dateInsert);
+		var insertDate = moment(sOrders.dateInsert);
 		var todayDate  = moment(new Date()); //new Date();
 
 		var dayDiff = todayDate.startOf('day').diff(insertDate.startOf('day'), 'days');
@@ -171,7 +171,7 @@ async function loadDeliveryData(moment) {
 		var isHighPriority = 'N';
 		if (dayDiff >= 3) {isHighPriority = 'Y';}
 	}
-	spedizioneOrders.push(orders);
+	spedizioneOrders.push(sOrders);
 
 
 	var mapResult;
@@ -435,17 +435,17 @@ module.exports = function(app, mongoose, moment) {
 			// Carico la lista degli ordini da spedire
 
 			const result = await loadDeliveryData(moment);
-			const ordersInHouse = result[2];
+			const ordersToShip = result[2];
 
-			//console.debug('ordersInHouse', ordersInHouse);
+			console.debug('ordersToShip', ordersToShip);
 
-			if (!ordersInHouse) {
+			if (!ordersToShip) {
 				req.flash('info', 'Non ci sono consegne previste al momento');
 
 	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
 			} else {
-				console.debug('SHIPPING -> ', JSON.stringify(ordersInHouse))
-				return res.render('consegneToShip.njk', {ordersInHouseString: JSON.stringify(ordersInHouse)});
+				console.debug('SHIPPING -> ', JSON.stringify(ordersToShip))
+				return res.render('consegneToShip.njk', {ordersInHouseString: JSON.stringify(ordersToShip)});
 			}
     	} catch (error) {
 			console.debug(error);
