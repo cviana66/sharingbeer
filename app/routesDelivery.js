@@ -41,7 +41,7 @@ async function loadDeliveryData(moment) {
 										{'orders.payment.s2sStatus': 'OK'},
 										{'orders.deliveryType': 'Consegna'},
 										{'orders.address.distance':  {$gt: 15000}}] } },
-		{$project:{_id:0,friends:0, addresses:0,privacy:0,local:0}}
+		{$project:{_id:0,friends:0, addresses:0,privacy:0}}
 	  ]
 	);
 
@@ -52,11 +52,11 @@ async function loadDeliveryData(moment) {
 		var orders = aggregationResultRitiro[i].orders;
 
 		var deliveryType = orders.deliveryType;
-
+/*
 		if (!deliveryType) {
 			deliveryType = 'Ritiro';
 		}
-
+*/
 		var orderID = orders._id.toString();
 
 		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
@@ -143,7 +143,7 @@ async function loadDeliveryData(moment) {
 	 * -------------------------*/
 	for (i=0; i<aggregationResultSpedizione.length; i++) {
 		var sOrders = aggregationResultSpedizione[i].orders;
-		console.debug("ORDERS -> ", sOrders)
+		//console.debug("ORDERS -> ", sOrders)
 		var deliveryType = sOrders.deliveryType;
 
 		if (!deliveryType) {
@@ -170,8 +170,10 @@ async function loadDeliveryData(moment) {
 
 		var isHighPriority = 'N';
 		if (dayDiff >= 3) {isHighPriority = 'Y';}
+
+		spedizioneOrders.push(sOrders);
 	}
-	spedizioneOrders.push(sOrders);
+
 
 
 	var mapResult;
@@ -444,7 +446,7 @@ module.exports = function(app, mongoose, moment) {
 
 	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
 			} else {
-				console.debug('SHIPPING -> ', JSON.stringify(ordersToShip))
+				//console.debug('SHIPPING -> ', JSON.stringify(ordersToShip))
 				return res.render('consegneToShip.njk', {ordersInHouseString: JSON.stringify(ordersToShip)});
 			}
     	} catch (error) {
