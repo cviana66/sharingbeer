@@ -1,0 +1,46 @@
+<!-- last modify 17-12-2021 -->
+
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0; /* Colore di sfondo della pagina */
+        }
+        table {
+            width: 100%; /* Larghezza della tabella */
+            margin: 10px auto; /* Centra la tabella n pagina */
+            border-collapse: collapse; /* Rimuove gli spazi tra i bordi delle celle */
+            background-color: #2A0009; /* Colore di sfondo della tabella */
+        }
+        th, td {
+            border: 1px solid #903246; /* Colore del bordo più chiaro */
+            padding: 10px; /* Interspaziatura interna */
+            color: white; /* Colore del testo */
+            text-align: left; /* Allineamento del testo */
+        }
+        th {
+            background-color: #3B1A1E; /* Colore di sfondo per l'intestazione */
+        }
+    </style>
+
+<h3 class="text-white text-center  bg-dark" style="margin:6px 0px 0px 0px;">Dashboard</h3>
+<hr style="border-top: 1px solid #5375BD;">
+
+<table>
+        <tbody>
+            <tr>
+                <td><a href="/delivery"> Consegna nei 15Km</a></td>
+            </tr>
+            <tr>
+                <td><a href="/deliveryToShip"> Spedizione con Corriere</a></td>
+            </tr>
+            <tr>
+                <td><a href="/deliveryInHouse"> Ritiro in Sede</a></td>
+            </tr>
+        </tbody>
+</table>
+
+{% endblock %}
+

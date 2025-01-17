@@ -457,4 +457,8 @@ module.exports = function(app, mongoose, moment) {
 	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 	});
+
+	app.all('/dashboard', lib.isAdmin, (req, res) => {
+		res.render('dashboard.njk')
+	});
 }
