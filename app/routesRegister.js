@@ -689,7 +689,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
               // controllo che ci siano ancora inviti diposnibili
               if (req.session.friendsInvited >= req.session.invitationAvailable) {
-                  req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per avere nuovi inviti");
+                  req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per averne di nuovi");
                   controlSates = "disabled";
                   flag = "true";
               }
@@ -738,7 +738,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 
       // controllo che ci siano ancora inviti diposnibili
       if (req.session.friendsInvited >= req.session.invitationAvailable) {
-          req.flash('info', "Non hai inviti disponibili! Acquista un BoxNbeer per avere un nuovo invito");
+          req.flash('info', "Non hai inviti disponibili! Acquista un BoxNbeer per averne di nuovi");
           return res.render('friend.njk', {
               message: req.flash('info'),
               type: "info",
@@ -1029,6 +1029,10 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           res.render('share.njk', {
                 firstName : req.body.firstName // encodeURIComponent("Ciao \n come stai")
           });
+    });
+
+    app.get('/testval', function(req, res) {
+          res.render('validation.njk');
     });
 
     app.get('/qrq', function(req, res) {

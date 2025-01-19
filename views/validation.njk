@@ -18,9 +18,9 @@
   }
 </style>
 
-      <div id="loading">
-        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
-      </div>
+<div id="loading">
+	<img  src="img/ajax-loader-1.gif" alt="Loading..." />
+</div>
 
 <div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
 
@@ -36,11 +36,9 @@
   Unisciti alla nostra community di amanti della birra!
 </div>
 
-
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;" id="section2">
-        <div class="card-body">
-          <!-- <h3 class="card-title text-white font-weight-light text-center"> Invito </h3> -->
-          <div class="flex-row">
+	<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;" id="section2">
+		<div class="card-body">
+			<div class="flex-row">
             <div class="align-self-center font-weight-light text-white">
               <p class="text-justify" style="font-size:1.1em">se non hai ancora un
                 <span style="font-size:1.2em;"> bicchiere di birra </span> davanti a te allora sei nel posto giusto!</p>
@@ -61,27 +59,24 @@
                 </span>
               </p>
             </div>
-          </div>
-        </div>
-      </div>
+			</div>
+		</div>
+	</div>
 
-      <div class="row">
-        <div class="col-12" >
-          <form role="form" action="/validation" method="post" id="addresses">
-            <fieldset>
+<div class="row">
+	<div class="col-12">
+		<form role="form" action="/validation" method="post" id="addresses">
+			<fieldset>
               <div class="form-group" style="margin-top: 10px;">
-                <!-- <label class="text-white col-form-label-lg" for="inputUserName">Nome</label-->
-                <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}"
-                 name="firstName" placeholder="Nome" required>
+                <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}" name="firstName" placeholder="Nome" required>
               </div>
               <div class="form-group" style="margin-top: 30px;">
                 <div class="input-error" id="wrongMail"></div>
-                <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="Indirizzo email" required>
+					 <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="" placeholder="Indirizzo email" required>
                 <div class="input-error" id="wrongControlMail"></div>
-                <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value=""
-                placeholder="Conferma Indirizzo email" required>
+                <input type="text" class="form-control" id="inputControlUsernameEmail" name="controlEmail" value="" placeholder="Conferma Indirizzo email" required>
               </div>
-              <div class="form-group" style="margin-top: 30px;">
+				<div class="form-group" style="margin-top: 30px;">
                 <div class="input-error" id="wrongPwd"></div>
                 <p class="text-white font-weight-light text-justify" style="font-size:0.7em;">La password deve essere di almeno 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p>
                 <div class="contenitore">
@@ -92,99 +87,72 @@
                 <div class="contenitore">
                   <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Conferma Password" required><a class="passwordConfirm-toggle-icon"><i class="bi bi-eye" id="toggleConfirmPassword"></i></a>
                 </div>
-              </div>
+				</div>
 
 
-              <div class="form-check" style="margin-top: 30px;" >
+				<div class="form-check" style="margin-top: 30px;" >
                 <div class="input-error" id="wrongAge"></div>
                 <input class="form-check-input" type="checkbox" value="" id="checkAge" />
                 <label class="form-check-label text-white font-weight-light text-justify" for="checkAge">Dichiaro di essere maggiorenne</label>
-              </div>
+				</div>
 
-              <div class="form-check">
+				<div class="form-check">
                 <div class="input-error" id="wrongPrivacy"></div>
                 <input class="form-check-input" type="checkbox" value="" id="checkPrivacy" />
                 <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacy">Accetto le
                   <a href="#" onclick="return openDocument('infoCondizioniVendita0424.html')"> Condizioni generali di vendita </a>
-              </div>
+				</div>
 
-         <div class="form-group"style="margin: 20px 0px 10px 0px;">
-          <label class="form-check-label text-white font-weight-normal text-center" for="checkPrivacyDefault">Consenso Privacy (<span style="font-size:0.7em">per dettagli vedere</span> <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy) </a>
+				<div class="form-group"style="margin: 20px 0px 10px 0px;">
+					 <label class="form-check-label text-white font-weight-normal text-center" for="checkPrivacyDefault">Consenso Privacy (<span style="font-size:0.7em">per dettagli vedere</span> <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy) </a>
+					 <div class="input-error" id="wrongPrivacyDefault"></div>
+					 <div class="form-check" style="margin-top: 10px;" >
+						<input class="form-check-input" type="checkbox" value="" id="checkPrivacyDefault" checked onclick="return false;"/>
+						<label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">(Obbligatorio)
+						  <span style="font-size:0.7em">Per adempiere a tutti gli obblighi legali, regolamentari, normativi e commerciali in materia fiscale/tributaria.</span>
+						</label>
+					 </div>
 
-          <div class="input-error" id="wrongPrivacyDefault"></div>
-          <div class="form-check" style="margin-top: 10px;" >
-            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyDefault" checked onclick="return false;"/>
-            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">(Obbligatorio)
-              <span style="font-size:0.7em">Per adempiere a tutti gli obblighi legali, regolamentari, normativi e commerciali in materia fiscale/tributaria.</span>
-            </label>
-          </div>
+					<div class="input-error" id="wrongPrivacyNeed"></div>
+					<div class="form-check" style="margin-top: 10px;" >
+						<input class="form-check-input" type="checkbox" value="" id="checkPrivacyNeed"/>
+						<label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyNeed">(Necessario)
+							<span style="font-size:0.7em">Per invio di comunicazioni informative relativi a servizi offerti, a seguito dell'acquisto effettuato sul sito web, della richiesta di ritiro della merce o consegna a domicilio, inclusi aggiornamenti su disponibilità di prodotti in riassortimento o nuovi. Utilizzo dei dati per scopi accessori o correlati alle funzionalità principali del sito web, ma sempre all'interno delle sue attività.</span>
+						</label>
+					</div>
 
-          <div class="form-check" style="margin-top: 20px;" >
-            <div class="input-error" id="wrongPrivacyNeed"></div>
-            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyNeed"/>
-            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyNeed">(Necessario)
-              <span style="font-size:0.7em">Per invio di comunicazioni informative relativi a servizi offerti, a seguito dell'acquisto effettuato sul sito web, della richiesta di ritiro della merce o consegna a domicilio, inclusi aggiornamenti su disponibilità di prodotti in riassortimento o nuovi. Utilizzo dei dati per scopi accessori o correlati alle funzionalità principali del sito web, ma sempre all'interno delle sue attività.</span>
-            </label>
-          </div>
+					<div class="input-error" id="wrongPrivacyOptional"></div>
+					<div class="form-check" style="margin-top: 10px;" >
+						<input class="form-check-input" type="checkbox" value="" id="checkPrivacyOptional" name="checkPrivacyOptional" />
+							<label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyOptional">(Facoltativo)
+								<span style="font-size:0.7em">Per l’invio di informazioni ed offerte promozionali e commerciali e per attività di profilazione a fini di marketing;</span>
+							</label>
+					</div>
 
-          <div class="form-check" style="margin: 20px 0px 0px 0px;" >
-            <div class="input-error" id="wrongPrivacyOptional"></div>
-            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyOptional" name="checkPrivacyOptional" />
-            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyOptional">(Facoltativo)
-               <span style="font-size:0.7em">Per l’invio di informazioni ed offerte promozionali e commerciali e per attività di profilazione a fini di marketing;</span>
-            </label>
-          </div>
+					<div class="input-error" id="wrongPrivacyCessione"></div>
+					<div class="form-check" style="margin-top: 10px;" >
+						<input class="form-check-input" type="checkbox" value="" id="checkPrivacyCessione" name="checkPrivacyCessione" />
+							<label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyCessione">(Facoltativo)
+								<span style="font-size:0.7em">Per cessione dei Dati a società e/o soggetti terzi con cui il Titolare collabora o ha stipulato convenzioni </span>
+							</label>
+					</div>
+				</div>
+				<div style="margin-top:10px;margin-bottom:10px">
+					<button type="submit" class="btn btn-my btn-lg btn-block" id="validationButton" onclick="return accettaInvito()">
+						Accetto l'invito
+					</button>
+					<input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
+				</div>
+				<div class="form-group">
+						<p class="text-white font-weight-light text-center" style="font-size:0.6em;">L'accettazione NON ha vincoli ne obblighi di acquisto</p>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</div>
 
-          <div class="form-check" style="margin: 20px 0px 30px 0px;" >
-            <div class="input-error" id="wrongPrivacyCessione"></div>
-            <input class="form-check-input" type="checkbox" value="" id="checkPrivacyCessione" name="checkPrivacyCessione" />
-            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyCessione">(Facoltativo)
-              <span style="font-size:0.7em">Per cessione dei Dati a società e/o soggetti terzi con cui il Titolare collabora o ha stipulato convenzioni </span>
-            </label>
-          </div>
-        <div>
 
-              <div style="margin-top:10px;margin-bottom:10px">
-                <button type="submit" class="btn btn-my btn-lg btn-block" id="validationButton" onclick="return accettaInvito()">
-                  Accetto l'invito
-                </button>
-                <input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
-              </div>
-              <div class="form-group">
-               <p class="text-white font-weight-light text-center" style="font-size:0.6em;">L'accettazione NON ha vincoli ne obblighi di acquisto</p>
-              </div>
-            </fieldset>
-          </form>
-          <br>
-        </div>
-      </div>
-
-      <!--div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
-        <div class="card-body">
-          <h3 class="card-title text-white font-weight-light"> Una birra offerta </h3>
-          <p class="card-text text-white font-weight-light">accettando questo invito hai 1 birra gratis sull'acquisto di un packaging da 4</p>
-        </div>
-      </div>
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
-        <div class="card-body">
-          <h3 class="card-title text-white font-weight-light">Invita i tuoi amici</h3>
-          <p class="card-text text-white font-weight-light">invita i tuoi amici e dagli la possibilità di bere la nostra birra e tu potrai accumalare Booze per bere gratis </p>
-        </div>
-      </div>
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
-        <div class="card-body">
-          <h3 class="card-title text-white font-weight-light">Prodotto per me</h3>
-          <p class="card-text text-white font-weight-light">scegli o proponi una ricetta e potrai dare il tuo nome all'etichetta del lotto di birra</p>
-        </div>
-      </div>
-      <div class="card" style="background-color:#2A0009;border-color:#903246;margin-bottom: 10px;">
-        <div class="card-body">
-          <h3 class="card-title text-white font-weight-light">Fare la birra</h3>
-          <p class="card-text text-white font-weight-light">partecipa alla produzione di una cotta imparado l'arte della birrificazione</p>
-        </div>
-      </div-->
-
-      <script type="text/javascript">
+<script type="text/javascript">
 		  document.addEventListener("DOMContentLoaded", function() {
 			document.getElementById("loading").style.display = 'none';
 		  });
@@ -226,5 +194,5 @@
             toggleConfirmPassword.classList.add("bi-eye");
           }
         });
-      </script>
+</script>
 {% endblock %}

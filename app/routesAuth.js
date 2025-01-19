@@ -1,12 +1,9 @@
 // app/routes.js
 
-const transporter   = require('../config/mailer');
-
-const Users         = require('./models/user');
-
-const lib           = require('./libfunction');
-
-var mailvalidatemail = require('../config/mailValidateMail');
+const transporter   			= require('../config/mailer');
+const Users         			= require('./models/user');
+const lib           				= require('./libfunction');
+const mailvalidatemail 	= require('../config/mailValidateMail');
 
 module.exports = function(app, passport, moment, mongoose) {
 
@@ -14,44 +11,53 @@ module.exports = function(app, passport, moment, mongoose) {
 // HOME PAGE (with login links) ========
 // =====================================
 //GET
-  app.get('/', async function(req, res) {
-      //var video = "video/BiarraViannaColor_Final_Logo_ligth_24.mp4";
-      var video = "video/BirraViannaColor_Final_Logo_38.mp4";
-      //console.debug(req.session)
-      if (process.env.NODE_ENV === 'development') {
-        video = ""
-      }
-      var amiciDaInvitare = false
-      if (req.isAuthenticated())  {
-		 // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
-		  const user =  await Users.findOne({'_id': mongoose.Types.ObjectId(req.user.id)})
-		  console.debug("INVITI DISPONIBILI=",parseInt(user.local.eligibleFriends, 10))
-		  console.debug("AMICI INVITATI= ", parseInt(user.friends.length, 10))
-		  // controllo che ci siano ancora inviti diposnibili
-		  if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
-			  console.debug ("HAI AMICI DA INVITARE !!!!!!!!!!!!!!!");
-			  amiciDaInvitare = true
-		  }
-		//----------------
+app.get('/', async function(req, res) {
+	//var video = "video/BiarraViannaColor_Final_Logo_ligth_24.mp4";
+	var video = "video/BirraViannaColor_Final_Logo_38.mp4";
+	//console.debug(req.session)
+	if (process.env.NODE_ENV === 'development') {
+		video = ""
 	}
 
-      res.render('index.njk', {
+	if (req.isAuthenticated())  {
+		 // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
+		const user =  await Users.findOne({'_id': req.user._id})
+		// controllo che ci siano ancora inviti diposnibili
+		if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
+			req.session.amiciDaInvitare = true
+			console.debug("INVITI DISPONIBILI=",parseInt(user.local.eligibleFriends, 10)-parseInt(user.friends.length, 10))
+		}
+	}
+	res.render('index.njk', {
           user: req.user,
           numProducts : req.session.numProducts,
           video : video,
-          amiciDaInvitare : amiciDaInvitare
-      }); // load the index.ejs file
-  });
+          amiciDaInvitare : req.session.amiciDaInvitare
+    });
+});
 
 // =====================================
 // LOGIN ===============================
 // =====================================
 //GET
   // show the login form
-  app.get('/login', function(req, res) {
+  app.get('/login', async function(req, res) {
       console.debug('IN LOGIN req.session.returnTo',req.session.returnTo)
+      if (req.isAuthenticated())  {
+		 // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
+		const user =  await Users.findOne({'_id': req.user._id})
+		// controllo che ci siano ancora inviti diposnibili
+		if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
+			req.session.amiciDaInvitare = true
+			console.debug("INVITI DISPONIBILI=",parseInt(user.local.eligibleFriends, 10)-parseInt(user.friends.length, 10))
+		}
+	  }
       // render the page and pass in any flash data if it exists
-      res.render('login.njk', { message: req.flash('loginMessage'), returnTo: req.session.returnTo });
+      res.render('login.njk', {
+		  message: req.flash('loginMessage'),
+		  returnTo: req.session.returnTo,
+		  amiciDaInvitare : req.session.amiciDaInvitare
+	  });
   });
 
   app.get('/login/:user', function(req, res) {
@@ -87,7 +93,7 @@ app.get('/profile', lib.isLoggedIn, async function(req, res) {
         {$unwind: "$friends"},
         {$project:{_id:0,addresses:0,orders:0,local:0}}
         ]);
-      console.debug('INVITI MANDATI', nF)
+      //console.debug('INVITI MANDATI', nF)
       // Conta quanti amici invitati hanno accettato
       const nFa = await Users.aggregate([
         {$match:{"_id":req.user._id}},
@@ -96,13 +102,13 @@ app.get('/profile', lib.isLoggedIn, async function(req, res) {
         {$project:{_id:0,addresses:0,orders:0,local:0}}
         //{$group:{_id:null,count:{$count:{ }}}}
         ]);
-      console.debug('INVITI ACCETTATI', nFa)
+      //console.debug('INVITI ACCETTATI', nFa)
 
       var pinta = (req.user.local.booze / valoreUnPuntoPinta).toFixed(1)
 
       let msg = req.flash('infoProfile');
       console.debug('MESSAGGIO',msg, req.user.privacy );
-
+	  console.debug('INVITI DISPONIBULI?',req.session.amiciDaInvitare );
       res.render('profile.njk', {
           user     		: req.user.local, // get the user out of session and pass to template
           privacy		: req.user.privacy,
@@ -112,6 +118,7 @@ app.get('/profile', lib.isLoggedIn, async function(req, res) {
           message  	: msg,
           type     		: "info",
           numProducts : req.session.numProducts, //numero di proodotti nel carrello
+          amiciDaInvitare : req.session.amiciDaInvitare
       });
 
     } catch (e) {

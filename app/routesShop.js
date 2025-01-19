@@ -110,7 +110,8 @@ module.exports = function(app, moment, mongoose) {
                   addressRitiro 		: addressRitiro[0].addresses,
                   attivaRitiro      : attivaRitiro,
                   attivaConsegna    : attivaConsegna,
-                  orderId           : req.query.orderId
+                  orderId           : req.query.orderId,
+                  amiciDaInvitare : req.session.amiciDaInvitare
                })
 	})
 
@@ -373,7 +374,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 					}
 				}
 			});
-			// Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
+			/* Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
 			  var amiciDaInvitare = false
 			  const user =  await User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)})
               console.debug("INVITI DISPONIBILI=",parseInt(user.local.eligibleFriends, 10))
@@ -383,7 +384,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
                   console.debug ("HAI AMICI DA INVITARE !!!!!!!!!!!!!!!");
                   amiciDaInvitare = true
               }
-            //----------------
+            */
 
 			req.session.cart = cart
 			//RI-mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
@@ -395,7 +396,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 										numProducts: req.session.numProducts,   //numero di proodotti nel carrello
 										message    : req.flash('info'),
 										type       : "info",
-										amiciDaInvitare : amiciDaInvitare
+										amiciDaInvitare :  req.session.amiciDaInvitare //amiciDaInvitare
 									};
 
 			res.render('shop.njk', model);
@@ -538,6 +539,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 									totalPrice : req.session.totalPrc,
 									nOrders		: nOrders,
 									message    : req.flash('cartMessage'),
+									amiciDaInvitare : req.session.amiciDaInvitare
 								};
       	res.render('cart.njk', model);
       }

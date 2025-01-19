@@ -25,7 +25,7 @@ data = new Date()
 console.log('New Date',data)
 
 var c = moment.tz(data, "Europe/Rome");
-c.utc("Europe/Rome").format()
+//c.utc("Europe/Rome").format()
 
 console.debug('TZ Europe/Rome =' ,c.format());
 console.debug('UTC Europe/Rome =' ,c.utc("Europe/Rome").format());

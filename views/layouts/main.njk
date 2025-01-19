@@ -283,7 +283,12 @@
 
 					</div>
 					<div class="text-center" style="margin: 20px 0px 10px 0px; font-size:0.6em; color:#009B95">
-						Birrificio Viana Srl (capitale sociale €10.000) <br> Sede legale in Via Molignati 12, 13878 - Candelo (BI)<br> P.IVA n° 02792790020 - n° REA BI – 314117 <br> Cod. accisa IT00BIA00026R <br> email: birrificioviana@gmail.com <br> PEC: birrificioviana@pec.poste.it
+						Birrificio Viana Srl (capitale sociale €10.000)<br>
+						Sede legale in Via Molignati 12, 13878 - Candelo (BI)<br>
+						P.IVA n° 02792790020 - n° REA BI – 314117 <br>
+						Cod. accisa IT00BIA00026R <br>
+						email: birrificioviana@sharingbeer.it <br>
+						PEC: birrificioviana@pec.poste.it
 
 					</div>
 				</div>
@@ -292,11 +297,19 @@
 			</div>
 		</div>
 	</div>
-  <!-- PopUp normalmente nascosta -->
-  <div class="infoPopup" id="popup"></div>
-  <script type="text/javascript" src="/js/popups.js"></script>
+	<!-- PopUp normalmente nascosta -->
+	<div class="infoPopup" id="popup"></div>
+	<script type="text/javascript" src="/js/popups.js"></script>
 
 	<script type="text/javascript" src="/js/plusMinus.js"></script>
+
+	<script type="text/javascript">
+	if ({{amiciDaInvitare}}==true) {
+		console.log('TRUE')
+		document.querySelector('#invita').classList.add('invita_div'); // colora a intermittenza
+		document.querySelector('#imgInvita').classList.add('pulsa');  //anima l'immagine"
+	}
+	</script>
 
 </body>
 </html>

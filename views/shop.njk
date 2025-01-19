@@ -1,55 +1,53 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-    <h3 class="text-white text-center bg-dark">Shop</h3>
-      <div class="align-self-center">
-		  <p class="text-white text-justify" style="font-size:1em;">Birra artigianale ad alta fermentazione, non filtrata, non pastorizzata e rifermentata in bottiglia per una naturale frizzantezza.</p>
-		</div>
-	<hr style="border-top: 1px solid #5375BD;">
+<h3 class="text-white text-center bg-dark">Shop</h3>
+<div class="align-self-center">
+	<p class="text-white text-justify" style="font-size:0.9em;">Birra artigianale ad alta fermentazione, non filtrata, non pastorizzata e rifermentata in bottiglia per una naturale frizzantezza.</p>
+</div>
+<hr style="border-top: 1px solid #5375BD;">
 
-      {% for prod in products %}
-        <form id="shop" method="POST" action="/shop">
-          <input type="hidden" id="item_id" name="item_id" value="{{prod.id}}">
-            <div class="card h-100 border-1" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
-              <div class=" card-body">
-				  <div class="containerShop">
-					<div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
-				   </div>
-					{% if prod.promo %}
-				   <div class="corner-text">Promo</div>
-					{% endif %}
-                <table width="100%">
-                  <tr>
-                    <td width="70%"><div class="card-title text-left" style="color:#FFBB35; font-size:1.5em;font-weight:bold">{{prod.name}} </div></td>
-                    <td width="30%"><div class="card-title text-white text-right" style="font-size:1.5em;font-weight:bold">{{prod.prettyPrice}}</div></td>
-                  </tr>
-                  <tr>
+{% for prod in products %}
+ <form id="shop" method="POST" action="/shop">
+	<input type="hidden" id="item_id" name="item_id" value="{{prod.id}}">
+	<div class="card h-100 border-1" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;">
+		<div class=" card-body">
+			<div class="containerShop">
+				<div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
+			</div>
+		{% if prod.promo %}
+			<div class="corner-text">Promo</div>
+		{% endif %}
+			<table width="100%">
+				<tr>
+					<td width="70%"><div class="card-title text-left" style="color:#FFBB35; font-size:1.5em;font-weight:bold">{{prod.name}} </div></td>
+					<td width="30%"><div class="card-title text-white text-right" style="font-size:1.5em;font-weight:bold">{{prod.prettyPrice}}</div></td>
+				</tr>
+				<tr>
 					<td><div class="text-white text-left" style="font-size:1.2em;"> BeeBox da 6 bottiglie da {{prod.formatoCl}} </div></td>
 					<td><div class="text-white text-right" style="font-size:1.2em;font-weight:bold;">€4,90 cad.</div></td>
-                  </tr>
-                </table>
-                {% if prod.quantity > 0 %}
-                  <div style="margin: 10px 0px 10px 0px;">
-                    <button type="Button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}')">
-                      <div>Aggiungi al Carrello</div>
-                    </button>
-                  </div>
-                {% endif %}
-                {% if prod.quantity > 20 %}
-                  <!--h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili {{prod.quantity}}</h5-->
-                {% elif prod.quantity < 20 and prod.quantity > 0 %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento</h5>
-                {% else %}
-                  <h5 class="text-emphasis font-weight-normal text-center">BeerBox finiti e in riassortimento</h5>
-                {% endif %}
-                <div class="align-self-center">
-                  <p class="text-white text-justify" style="font-size:1em;">{{prod.caratteristiche}}
-						<br> Servire alla temperatura di {{prod.tempServ}} °C
-                  </p>
-                  <table width="100%">
+				</tr>
+			</table>
+		{% if prod.quantity > 0 %}
+			<div style="margin: 10px 0px 10px 0px;">
+				<button type="Button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}')">
+					<div>Aggiungi al Carrello</div>
+				</button>
+			</div>
+		{% endif %}
+		{% if prod.quantity >= 20 %}
+<!--h5 class="text-emphasis font-weight-normal text-center">BeerBox disponibili {{prod.quantity}}</h5-->
+		{% elif prod.quantity < 20 and prod.quantity > 0 %}
+			<h5 class="text-emphasis font-weight-normal text-center">BeerBox in esaurimento</h5>
+		{% else %}
+			<h5 class="text-emphasis font-weight-normal text-center">BeerBox finiti e in riassortimento</h5>
+		{% endif %}
+			<div class="align-self-center">
+				<p class="text-white text-justify" style="font-size:1em;">{{prod.caratteristiche}} <br> Servire alla temperatura di {{prod.tempServ}} °C </p>
+				<table width="100%">
 					<tr>
 						<td width="100'%"><div class="text-white  text-left" style="font-size:1em;font-weight:normal"> Allergeni: <span  style="color:#FFBB35;font-size:1em;font-weight:bold"> {{prod.allergeni}}</span> </div></td>
-                    </tr>
+					</tr>
 					<tr>
 						<td ><div class="text-white  text-left" style="font-size:1em;font-weight:normal">Grado Alcolico {{prod.volAlcol}} Vol%</div></td>
 					</tr>
@@ -59,22 +57,17 @@
 					<tr>
 						<td ><div class="text-white text-left" style="font-size:1em;font-weight:normal">Amaro: {{prod.amaroIBU}}</div></td>
 					</tr>
-                </table>
-                </div>
+				</table>
 			</div>
 		</div>
-	</form>
+	</div>
+</form>
 
-      {% else %}
-        <p>Non ci sono prodotti :(<br> <a href="/products">Aggiungi</a></p>
-      {% endfor %}
+{% else %}
+<p>Non ci sono prodotti :(<br> <a href="/products">Aggiungi</a></p>
+{% endfor %}
 
 <script type="text/javascript">
-	if ({{amiciDaInvitare}}==true) {
-		console.log('TRUE')
-		document.querySelector('#invita').classList.add('invita_div'); // colora a intermittenza
-		document.querySelector('#imgInvita').classList.add('pulsa');  //anima l'immagine"
-	}
 
   async function animateDiv(item_id) {
     document.querySelector('#carrello').classList.add('animate-div'); //animazione

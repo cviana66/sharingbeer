@@ -2,22 +2,34 @@
 
 //email settings
 const transporter 			= require('../config/mailer');
-const mailfriend  				= require('../config/mailFriend');
+const mailfriend  			= require('../config/mailFriend');
 const mailparent  			= require('../config/mailParent');
-const mailinvite  				= require('../config/mailInvite');
+const mailinvite  			= require('../config/mailInvite');
 const mailconferme  		= require('../config/mailConferme');
 const mailvalidatemail 	= require('../config/mailValidateMail');
-const moment        			= require("moment-timezone");
+const moment        		= require("moment-timezone");
 
-const User  = require('../app/models/user');
+const Users  = require('../app/models/user');
+
+//=================================================
+// Connect to our database
+const mongoose = require('../config/database.js'); //TODO: per la PRO impostare parametro per connessione ambiente di produzione su fly.io
+//=================================================
 
 module.exports = {
 
   // route middleware to make sure a user is logged in ===========================
-  isLoggedIn: function isLoggedIn(req, res, next) {
-
+  isLoggedIn: async function isLoggedIn(req, res, next) {
+				  req.session.amiciDaInvitare = false
                   // if user is authenticated in the session, carry on
                   if (req.isAuthenticated())  {
+					  // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
+					  const user =  await Users.findOne({'_id': req.user._id})
+					  // controllo che ci siano ancora inviti diposnibili
+					  if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
+						  req.session.amiciDaInvitare = true
+						  console.debug("INVITI DISPONIBILI=",parseInt(user.local.eligibleFriends, 10)-parseInt(user.friends.length, 10))
+					  }
                       return next();
                   } else {
                     // if they aren't redirect them to the Login page
