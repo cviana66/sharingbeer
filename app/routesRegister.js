@@ -212,13 +212,17 @@ app.get('/validation', async function(req, res) {
             }
         } else {
             if (user.local.status === 'new') {
-                const video = process.env.NODE_ENV === 'development' ? "" : "video/BirraViannaColor_Final_Logo_38.mp4";
-                res.render('validation.njk', {
-                    prospect: user.local,
-                    message: req.flash('validateMessage'),
-                    type: "danger",
-                    video: video
-                });
+					const video = process.env.NODE_ENV === 'development' ? "" : "video/BirraViannaColor_Final_Logo_38.mp4";
+					//inserire invitoVisitato = true
+					console.debug('INVITO VISITATO = TRUE')
+					user.local.invitoVisitato = true;
+					await user.save()
+               res.render('validation.njk', {
+						prospect: user.local,
+						message: req.flash('validateMessage'),
+						type: "danger",
+						video: video
+					});
             } else if (user.local.status === 'waiting') {
                 const session = await mongoose.startSession();
                 session.startTransaction();
@@ -267,111 +271,7 @@ app.get('/validation', async function(req, res) {
     }
 });
 
-/* GET con callback
-    app.get('/validation', function(req, res) {
-
-        User.findOne({
-            'local.resetPasswordToken': req.query.token,
-            'local.resetPasswordExpires': { $gt: Date.now() }
-        }, async function(err, user) {
-            if (err) {
-                let msg = 'Token non più valido o scaduto';
-                req.flash('error', msg);
-                console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
-                return res.render('info.njk', {
-                                message: req.flash('error'),
-                                type: "warning"
-                        });
-            }
-
-            if (!user) {
-              User.findOne({
-                    'local.token': req.query.token
-              }, (err, user) => {
-                    if (err) {
-                        let msg = 'Token non più valido o scaduto';
-                        req.flash('error', msg);
-                        console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
-                        return res.render('info.njk', {
-                                        message: req.flash('error'),
-                                        type: "warning"
-                                });
-                    }
-                    if (user) {
-                      if (user.local.status == 'validated') {
-                        let msg = 'L\'invito è già stato accettato e la mail validata. Puoi accedere con le credenziali con cui ti sei registrato';
-                        req.flash('loginMessage', msg);
-                        console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {"resetPasswordToken":"' + user.id + '"} FLASH' + msg);
-                        return res.redirect('/login');
-                      }
-                    } else {
-                      let msg = 'Invito non più valido o scaduto';
-                      req.flash('warning', msg);
-                      console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: utente non trovato' + msg);
-                      return res.render('info.njk', {
-                                          message: req.flash('warning'),
-                                          type: "warning"
-                                        });
-                    }
-              })
-
-            } else {
-              if (user.local.status == 'new') {
-                var video = "video/BirraViannaColor_Final_Logo_38.mp4";
-                //console.debug(req.session)
-                if (process.env.NODE_ENV === 'development') {
-                  video = "";
-                }
-                res.render('validation.njk', {
-                  prospect: user.local,
-                  message : req.flash('validateMessage'),
-                  type    : "danger",
-                  video   : video
-                });
-              } else if (user.local.status == 'waiting') {
-                //START TRANSACTION.local
-                const session = await mongoose.startSession();
-                session.startTransaction();
-                const opts = { session };
-                try {
-                  user.local.status = 'validated';
-                  user.local.token = req.query.token
-                  user.local.resetPasswordToken = undefined;
-                  user.local.resetPasswordExpires = undefined;
-                  await user.save(opts);
-
-                  await session.commitTransaction();
-
-                } catch (e) {
-                 console.debug("errore: ",e)
-                  await session.abortTransaction();
-                  req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                  console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: '+e);
-                  return res.render('info.njk', {message: req.flash('error'), type: "danger"});
-
-                } finally {
-                  await session.endSession();
-                }
-                req.logIn(user, function(err) {
-                  if (err) {
-                      req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                      console.info(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" FUNCTION: req.logIn ERROR: ' +err);
-                      res.render('info.njk', {message: req.flash('error'), type: "danger"});
-                  } else {
-                      // Email Verificata - Utente validato e autenticato'
-                      console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {_id:bjectId("' + req.user._id + '"}');
-                      res.render('conferme.njk', {
-                        user: req.user,
-                        numProducts : req.session.numProducts
-                      });
-                  }
-                });
-              }
-            };
-        });
-    });
-    */
-    app.post('/validation', async function(req, res) {
+app.post('/validation', async function(req, res) {
     try {
         const user = await User.findOne({
             'local.resetPasswordToken': req.body.token,
@@ -461,101 +361,6 @@ app.get('/validation', async function(req, res) {
         });
     }
 });
-
-/* POST con callback
-    app.post('/validation', function(req, res) {
-
-        User.findOne({
-          'local.resetPasswordToken': req.body.token,
-          'local.resetPasswordExpires': {$gt: Date.now()}
-        }, async function(err, user) {
-            if (err || user == null) {
-                let msg = 'Token non più valido o scaduto'; //'Token is invalid or has expired';
-                req.flash('error', msg);
-                console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '"}  FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
-                console.debug('POST VALIDATION ERROR: ', err);
-                return res.render('info.njk', {
-                    message: req.flash('error'),
-                    type: "danger"
-                });
-            } else {
-                const email = req.body.email.toLowerCase().trim();
-
-                //start email validation
-                if (!lib.emailValidation(email)) {
-                    let msg = 'Indirizzo mail non valido'; //'Please provide a valid email';
-                    req.flash('validateMessage', msg)
-                    console.info(lib.logDate("Europe/Rome") + ' [WARNING][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:'+ user._id + '"} FLASH: ' + msg);
-                    return res.redirect("/validation?token=" + req.body.token);
-                }
-                //end email validation
-
-                var server = lib.getServer(req)
-
-                //START TRANSACTION
-                //const session = await mongoose.startSession();
-                try {
-                  //await session.startTransaction();
-                  //const opts = { session };
-                  if (user.local.status == "new") {
-
-					const optional = (req.body.checkPrivacyOptional == undefined) ? false : true
-					const cessione = (req.body.checkPrivacyCessione == undefined) ? false : true
-					console.debug('req.body.checkPrivacyOptional in REGISTER',optional)
-					console.debug('req.body.checkPrivacyCessione in REGISTER',cessione)
-
-                    const newToken = lib.generateToken(20);
-                    user.local.email = email;
-                    user.local.password = user.generateHash(req.body.password);
-                    user.local.name.first =  lib.capitalizeFirstLetter(req.body.firstName);
-                    user.local.resetPasswordToken = newToken
-                    user.privacy.optional              = optional;
-					user.privacy.transfer              = cessione;
-                    user.local.status = "waiting"
-                    //await user.save(opts);
-                    await user.save();
-
-                    const filter =  {'friends.token':req.body.token };
-                    const update =  {'friends.$.status':'accepted',
-                                     'friends.$.email':email,
-                                     'friends.$.name.first':lib.capitalizeFirstLetter(req.body.firstName),
-                                     'friends.$.id': user._id.toString()
-                                    }
-                    await User.findOneAndUpdate(filter,{'$set':update})//.session(session);
-
-                    await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme',server);
-                    let msg = 'Inviata email di verifica'; //'Validated and Logged';
-                    console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
-                  }
-
-                  //await session.commitTransaction();
-
-                  res.render('emailValidation.njk', { email: email});
-
-                } catch (e) {
-                  //await session.abortTransaction();
-                  if (e.code === 11000) {
-                    let msg = 'Indirizzo e-mail già registrato';
-                    req.flash('validateMessage', msg);
-                    console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e +' FLASH: ' + msg);
-                    res.redirect("/validation?token=" + req.body.token);
-                  } else {
-                    let msg = 'Spiacente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';
-                    req.flash('error', msg);
-                    console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + 'e.code'+e.code+' FLASH: ' + msg);
-                    return res.render('info.njk', {
-                        message: req.flash('error'),
-                        type: "danger"
-                    })
-                  }
-
-                } finally {
-                  //await session.endSession();
-                }
-            }
-          });
-      });
-      */
 
 //==================================================================================================
 // REGISTRAZIONE CLIENTE

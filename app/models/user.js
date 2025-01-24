@@ -21,7 +21,8 @@ const userSchema = new Schema({
               endDate               : {type: Date},
               resetPasswordToken    : {type: String},
               resetPasswordExpires  : {type: Date},
-              role                  : {type: String}
+              role                  	: {type: String},
+              invitoVisitato		: {type: Boolean, default: false}
             },
   privacy : {
               needs     : {type: Boolean, default: true},
