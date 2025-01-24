@@ -15,14 +15,14 @@
 
 <table class="mx-auto" width="100%">
 {% for prod in cart.items %}
-  <tr> 
+  <tr>
     <td width="40%" rowspan="3">
       <div>
         <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%">
       </div>
     </td>
     <td width="60%">
-      <div class="col"> <h5 class="card-title text-white text-left font-weight-bold"><p style="font-size:1.3em;color:#FFBB35;"><u>{{prod.name}}</u></p></h5> </div>
+      <div class="col"> <h5 class="card-title text-white text-left font-weight-bold"><p style="font-size:1.3em;color:#FFBB35;">{{prod.name}}</p></h5> </div>
       <div class="col text-white text-left" style="font-size:1.0em">Beerbox: 6 birre da 50cl</div>
     </td>
   </tr>
@@ -31,7 +31,7 @@
       <span style="font-size:1.6em;">{{prod.prettyPrice}}</span>
     </td>
   </tr>
-  <tr> 
+  <tr>
     <td width="60%">
       <table width="100%" valign="middle">
         <tr>
@@ -41,7 +41,7 @@
               <input type="hidden" name="_csrf" value="{{_csrf}}">
               <button class="btn btn-link" type="submit">
                 <span>
-                    <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path fill="#ffffff" 
+                    <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path fill="#ffffff"
                     d="M360-640v-80h240v80H360ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/></svg>
                     <title>Togli</title>
                 </span>
@@ -78,7 +78,7 @@
       <hr style="border-top: 1px solid #5375BD;">
     </td>
   </tr>
-  
+
   {% endfor %}
 </table>
 
@@ -100,7 +100,7 @@
         </button>
       </div>
       </form>
-     
+
   {% else %}
 
     <div class="col">

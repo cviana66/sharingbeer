@@ -221,7 +221,8 @@ app.get('/validation', async function(req, res) {
 						prospect: user.local,
 						message: req.flash('validateMessage'),
 						type: "danger",
-						video: video
+						video: video,
+						amiciDaInvitare: false
 					});
             } else if (user.local.status === 'waiting') {
                 const session = await mongoose.startSession();
@@ -1087,6 +1088,10 @@ app.post('/validation', async function(req, res) {
 
     app.get('/testval', function(req, res) {
           res.render('validation.njk');
+    });
+
+      app.get('/testreg', function(req, res) {
+          res.render('registration.njk');
     });
 
     app.get('/qrq', function(req, res) {

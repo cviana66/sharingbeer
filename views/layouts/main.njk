@@ -309,11 +309,12 @@
 	<script type="text/javascript" src="/js/plusMinus.js"></script>
 
 	<script type="text/javascript">
-	if ({{amiciDaInvitare}}==true) {
-		console.log('TRUE')
+	if ({{amiciDaInvitare}}) {
+		console.log('HAI AMICI DA INVITARE')
 		document.querySelector('#invita').classList.add('invita_div'); // colora a intermittenza
 		document.querySelector('#imgInvita').classList.add('pulsa');  //anima l'immagine"
-	}
+	} else {
+		console.log('NON HAI AMICI DA INVITARE')}
 	</script>
 
 </body>

@@ -43,6 +43,7 @@ app.get('/', async function(req, res) {
   // show the login form
   app.get('/login', async function(req, res) {
 		console.debug('IN LOGIN req.session.returnTo',req.session.returnTo)
+		req.session.amiciDaInvitare = false
       if (req.isAuthenticated())  {
 			// Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
 			const user =  await Users.findOne({'_id': req.user._id})

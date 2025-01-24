@@ -3,24 +3,24 @@
 
     <h3 class="text-white text-center bg-dark">Dati Registrazione</h3>
     <hr style="border-top: 1px solid #5375BD;">
-    
+
     <div id="loading">
       <img  src="img/ajax-loader-1.gif" alt="Loading..." />
     </div>
 
     <div class="card-body text-white font-weight-light text-justify">
-      <span style="font-size:1.1em;">Completa con i tuoi dati personali </span> 
+      <span style="font-size:1.1em;">Completa con i tuoi dati personali </span>
     </div>
 
     <form role="form" action="/register" method="post" id="addresses">
-      <div class="card text-white" style="background-color:#2A0009;border-color:#903246;">  
-        <div class="form-group" style="margin: 10px 10px 10px 10px;">          
+      <div class="card text-white" style="background-color:#2A0009;border-color:#903246;">
+        <div class="form-group" style="margin: 10px 10px 10px 10px;">
           <div class="input-error" id="wrongFirstName"></div>
           <input type="text" class="form-control" id="inputFirstName" value="{{firstName}}" name="firstName" placeholder="Nome" >
           <div class="input-error" id="wrongLastName"></div>
           <input type="text" class="form-control" id="inputLastName" value="{{lastName}}" name="lastName" placeholder="Cognome" autofocus required>
         </div>
-        
+
         <div class="form-group" style="margin: 10px 10px 10px 10px;">
           <div class="input-error" id="wrongPhone"></div>
           <div class="input-group mb-2">
@@ -29,7 +29,7 @@
           </div>
         </div>
 
-        <div class="form-group" style="margin: 10px 10px 10px 10px;">          
+        <div class="form-group" style="margin: 10px 10px 10px 10px;">
           <div class="input-error" id="wrongCity"></div>
           <input type="text" class="form-control" id="inputCity" value="{{city}}"
            name="city" placeholder="Città" required autocomplete="off" oninput="selectCity(this.value)"/>
@@ -52,12 +52,18 @@
           <div id="streets"></div>
 
           <div class="input-error" id="wrongNumciv"></div>
-          <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly>        
+          <input type="text" class="form-control" id="inputNumciv" value="" name="numberciv" placeholder="Numero" required readonly>
         </div>
-        
+
         <div class="form-group"style="margin: 10px 10px 10px 10px;">
+				<div class="form-check"  style="margin: 0px 0px 20px 0px;" >
+                <div class="input-error" id="wrongPrivacy"></div>
+                <input class="form-check-input" type="checkbox" value="" id="checkPrivacy" />
+                <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacy">Accetto le
+                  <a href="#" onclick="return openDocument('infoCondizioniVendita0424.html')"> Condizioni generali di vendita </a>
+				</div>
           <!--label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyDefault">Consenso Privacy (<span style="font-size:0.7em">per dettagli vedere</span> <a href="#" onclick="return openDocument('infoPrivacy.html')"> Privacy) </a>
-          
+
           <div class="input-error" id="wrongPrivacyDefault"></div>
           <div class="form-check" style="margin-top: 10px;" >
             <input class="form-check-input" type="checkbox" value="" id="checkPrivacyDefault" checked onclick="return false;"/>
@@ -65,15 +71,15 @@
               <span style="font-size:0.7em">Per adempiere a tutti gli obblighi legali, regolamentari, normativi e commerciali in materia fiscale/tributaria.</span>
             </label>
           </div>
-          
+
           <div class="form-check" style="margin-top: 20px;" >
             <div class="input-error" id="wrongPrivacyNeed"></div>
             <input class="form-check-input" type="checkbox" value="" id="checkPrivacyNeed"/>
-            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyNeed">(Necessario) 
-              <span style="font-size:0.7em">Per invio di comunicazioni informative relativi a servizi offerti, a seguito dell'acquisto effettuato sul sito web, della richiesta di ritiro della merce o consegna a domicilio, inclusi aggiornamenti su disponibilità di prodotti in riassortimento o nuovi. Utilizzo dei dati per scopi accessori o correlati alle funzionalità principali del sito web, ma sempre all'interno delle sue attività.</span> 
+            <label class="form-check-label text-white font-weight-light text-justify" for="checkPrivacyNeed">(Necessario)
+              <span style="font-size:0.7em">Per invio di comunicazioni informative relativi a servizi offerti, a seguito dell'acquisto effettuato sul sito web, della richiesta di ritiro della merce o consegna a domicilio, inclusi aggiornamenti su disponibilità di prodotti in riassortimento o nuovi. Utilizzo dei dati per scopi accessori o correlati alle funzionalità principali del sito web, ma sempre all'interno delle sue attività.</span>
             </label>
           </div>
-                    
+
           <div class="form-check" style="margin: 20px 0px 0px 0px;" >
             <div class="input-error" id="wrongPrivacyOptional"></div>
             <input class="form-check-input" type="checkbox" value="" id="checkPrivacyOptional" name="checkPrivacyOptional" />
@@ -113,13 +119,13 @@
 async function controlInputAndValidateAddress() {
   const ret = await fieldsRegisterControl()
   if (ret) {
-    
+
     //console.log('CITTA: ',document.getElementById("inputCity").value);
     //console.log('VIA: ',document.getElementById("inputStreet").value);
 
     document.getElementById("loading").style.display = 'block';
     document.getElementById("wrongNumciv").innerHTML = ''
-    
+
     let data = {};
     let response;
     data.comune = document.getElementById("inputCity").value;
@@ -127,14 +133,14 @@ async function controlInputAndValidateAddress() {
     data.istat = document.getElementById("hiddenIstat").value;
     data.numero = document.getElementById("inputNumciv").value;
     data.cap = document.getElementById("inputCap").value;
-    
+
     await $.ajax({
       type: 'POST',
       dataType: 'json',
       url: '/overpass/cap',
       data: data,
-      success: function(res) {        
-        if (res.status != 'ko') {          
+      success: function(res) {
+        if (res.status != 'ko') {
           //console.log('CAP: ',res.cap)
           document.getElementById("hiddenCAP").value = res.cap
 
@@ -174,7 +180,7 @@ async function controlInputAndValidateAddress() {
       }
     });
   }
-  
+
 };
 
 //----------------------------TREET---------------------------------
@@ -187,7 +193,7 @@ async function setValueStreet(via) {
   document.getElementById("inputStreet").value = via;
   document.getElementById('inputNumciv').removeAttribute('readonly');
   document.getElementById("inputNumciv").focus();
-  document.getElementById("wrongStreet").innerHTML = ""; 
+  document.getElementById("wrongStreet").innerHTML = "";
 }
 
 //********************************************************************
@@ -236,7 +242,7 @@ async function selectStreet(v) {
       url: '/streets',
       data: data,
       success: function(res) {
-        
+
         if (typeof res !== undefined && res.length > 0 &&  document.getElementById("inputStreet").value.length > 1) {
           /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
           document.getElementById("inputNumciv").setAttribute('readonly', true);
@@ -256,7 +262,7 @@ async function selectStreet(v) {
           if (size == 1 && via == street) {
             document.getElementById("inputStreet").value = res[0];
             document.getElementById("hiddenStreet").value = 'OK';
-            
+
             if (document.getElementById('myselectstreet') != null) {
               document.getElementById('myselectstreet').remove();
             }
@@ -363,7 +369,7 @@ async function listOfCities(v) {
 //*******************************************************
 // GESTIONE FORM DI INSERIMENTO E RICERCA DELLA CITTA'
 //*******************************************************
-async function selectCity(v) {  
+async function selectCity(v) {
   document.getElementById('inputProvincia').value = null;
   document.getElementById('inputCap').setAttribute('readonly', true);
   document.getElementById('inputCap').value = null;
@@ -372,7 +378,7 @@ async function selectCity(v) {
   document.getElementById("inputNumciv").setAttribute('readonly', true);
   document.getElementById('inputNumciv').value = null;
   document.getElementById("wrongCity").innerHTML = "";
-  
+
   if (v.length > 2 || v =='lu' || v =='ne' || v =='re' || v =='ro') {
     //*******************************************************
     // RICERCA LE CITTA' A PARTIRE DALLA STRINGA INSERITA
@@ -417,7 +423,7 @@ async function selectCity(v) {
       }
       return;
     }
-     
+
     //*******************************************************
     if (typeof res !== undefined && res.length > 0 && document.getElementById("inputCity").value.length > 1) {
       /* Creo la lista <ul> <il> con elenco delle città in modo dinamico */
@@ -465,12 +471,12 @@ async function selectCity(v) {
       }
       if (document.getElementById('myselectstreet') !=null) {
         document.getElementById('myselectstreet').remove();
-      }      
+      }
     }
   } else {
     if (document.getElementById('myselectcity') != null) {
       document.getElementById("myselectcity").remove();
-    };    
+    };
     if (document.getElementById('myselectstreet') !=null) {
       document.getElementById('myselectstreet').remove();
     };

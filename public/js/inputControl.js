@@ -137,14 +137,10 @@ function fieldsValidationControl() {
     document.getElementById("wrongAge").scrollIntoView({ behavior: "smooth", block: "center" });
     return false;
   }
-  if(!document.getElementById('checkPrivacy').checked) {
-    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella per accettare le Condizioni generali di vendita";
-    document.getElementById("wrongPrivacy").scrollIntoView({ behavior: "smooth", block: "center" });
-    return false;
-  }
+
   if (document.getElementById("wrongPrivacyNeed") != null) {
     if(!document.getElementById('checkPrivacyNeed').checked) {
-      document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella per poter proseguire";
+      document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella (Necessario) per poter proseguire";
       document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
@@ -313,6 +309,11 @@ async function fieldsRegisterControl() {
       document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
+  }
+   if(!document.getElementById('checkPrivacy').checked) {
+    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella per accettare le Condizioni generali di vendita";
+    document.getElementById("wrongPrivacy").scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
   }
 
 
