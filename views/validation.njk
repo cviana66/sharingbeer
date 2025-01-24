@@ -31,41 +31,47 @@
 <div class="embed-responsive embed-responsive-16by9" style="margin:10px 0px 0px 0px; border-radius:5px 5px 5px 5px">
   <video class="embed-responsive-item" src={{video}} controls autoplay="true" muted></video>
 </div>
-
-<div class="text-white font-weight-light text-center" style="margin:10px 0px 10px 0px; font-size:1.2em">
-  Unisciti alla nostra community di amanti della birra!
-</div>
-
+<form role="form" action="/validation" method="post" id="addresses">
+	<div class="text-white font-weight-light text-center" style="margin:10px 0px 10px 0px; font-size:1em">
+		<p class="text-center" style="font-size:1.1em">Se non hai ancora un <span style="font-size:1.2em;"> bicchiere di birra </span> davanti a te </br>allora sei nel posto giusto! </br>
+					Unisciti alla nostra community di amanti della birra!</p>
+		</p>
+	</div>
+	<div style="margin-top:10px;margin-bottom:10px">
+		<button type="submit" class="btn btn-my btn-lg btn-block" id="validationButton" onclick="return accettaInvito()">
+			Accetto l'invito
+		</button>
+		<input type="hidden" id="tokenID" name="token" value={{prospect.resetPasswordToken}}>
+	</div>
+	<div class="form-group">
+			<p class="text-white font-weight-light text-center" style="font-size:0.6em;">L'accettazione NON ha vincoli ne obblighi di acquisto</p>
+	</div>
 	<div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 10px 0px;" id="section2">
 		<div class="card-body">
 			<div class="flex-row">
-            <div class="align-self-center font-weight-light text-white">
-              <p class="text-justify" style="font-size:1.1em">se non hai ancora un
-                <span style="font-size:1.2em;"> bicchiere di birra </span> davanti a te allora sei nel posto giusto!</p>
-              <p class="text-center">
-                <span style="font-size:1.5em">Prova </span>
-                <span class="text-center sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span>
-              </p>
-            </div>
-            <div class="image-container">
-              <img src="img/logoBirraViana.png" alt="Immagine" class="image" id="image">
-            </div>
-            <div class="align-self-center" id="infoInfo">
-              <p style="font-size:1.1em;" class="card-text text-white font-weight-light text-justify">accettando questo invito hai una birra <span style="color:#FF9139;font-size:1.2em;"> omaggio </span>  al primo acquisto
-                <span style="float:right;">
-                  <a href="#" onclick="openDocument('infoValidation.html')">
-                    <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="30px" viewBox="0 0 24 24" width="30px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>
-                  </a>
-                </span>
-              </p>
-            </div>
+				<div class="align-self-center font-weight-light text-white">
+				  <p class="text-center">
+					 <span style="font-size:1.5em">Prova </span><span class="text-center sb-font" style="font-size:1.8em;color:#FF9139;">birra Viana</span>
+				  </p>
+				</div>
+				<div class="image-container">
+				  <img src="img/logoBirraViana.png" alt="Immagine" class="image" id="image">
+				</div>
+				<div class="align-self-center" id="infoInfo">
+				  <p style="font-size:1.1em;" class="card-text text-white font-weight-light text-justify">accettando questo invito hai una birra <span style="color:#FF9139;font-size:1.2em;"> omaggio </span>  al primo acquisto
+					 <span style="float:right;">
+						<a href="#" onclick="openDocument('infoValidation.html')">
+						  <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="30px" viewBox="0 0 24 24" width="30px" fill="#5375BD"><g><path d="M0,0h24v24H0V0z" fill="none"/><path d="M11,7h2v2h-2V7z M11,11h2v6h-2V11z M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M12,20 c-4.41,0-8-3.59-8-8s3.59-8,8-8s8,3.59,8,8S16.41,20,12,20z"/></g></svg>
+						</a>
+					 </span>
+				  </p>
+				</div>
 			</div>
 		</div>
 	</div>
 
-<div class="row">
-	<div class="col-12">
-		<form role="form" action="/validation" method="post" id="addresses">
+	<div class="row">
+		<div class="col-12">
 			<fieldset>
               <div class="form-group" style="margin-top: 10px;">
                 <input type="text" class="form-control" id="inputFirsName" value="{{prospect.name.first}}" name="firstName" placeholder="Nome" required>
@@ -147,10 +153,9 @@
 						<p class="text-white font-weight-light text-center" style="font-size:0.6em;">L'accettazione NON ha vincoli ne obblighi di acquisto</p>
 				</div>
 			</fieldset>
-		</form>
+		</div>
 	</div>
-</div>
-
+</form>
 
 <script type="text/javascript">
 		  document.addEventListener("DOMContentLoaded", function() {
