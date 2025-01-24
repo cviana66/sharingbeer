@@ -198,7 +198,7 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 
 	console.debug('actionCode', actionCode);
 
-	var orderID = mongoose.Types.ObjectId(orderIDPar);
+	var orderID = new mongoose.Types.ObjectId(orderIDPar);
 
 	var result = null;
 

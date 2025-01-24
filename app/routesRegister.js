@@ -106,18 +106,27 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   });
 
 
-  app.post('/cities', function(req, res) {
-      req.session.elements = [];
-      //throw('Genera ERRORE');
-      //console.log("city : ", req.body.city);
-      CityIstat.find({'Comune': new RegExp('^' + req.body.city,"i")},
-                   null,
-                   {sort: {Comune: 1}},
-                   function(err, city) {
-                     //console.log("Got city : ", city);
-                     res.send(city)
-                   })
-  });
+ app.post('/cities', lib.isLoggedIn, async function(req, res) {
+  try {
+    req.session.elements = [];
+    // throw('Genera ERRORE');
+    // console.log("city : ", req.body.city);
+
+    const cities = await CityIstat.find(
+      { 'Comune': new RegExp('^' + req.body.city, "i") },
+      null,
+      { sort: { Comune: 1 } }
+    );
+
+    // console.log("Got city : ", cities);
+    return res.send(cities);
+
+  } catch (err) {
+    console.error('Error fetching cities:', err);
+    return res.status(500).send('An error occurred while fetching cities.');
+  }
+});
+
 
   app.post('/streets', function(req, res) {
       var rates = req.session.elements;
@@ -172,7 +181,93 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
 //==================================================================================================
 // TOKEN VALIDATION ========= 05-01-2022
 //==================================================================================================
-//GET
+
+app.get('/validation', async function(req, res) {
+    try {
+        const user = await User.findOne({
+            'local.resetPasswordToken': req.query.token,
+            'local.resetPasswordExpires': { $gt: Date.now() }
+        });
+
+        if (!user) {
+            const userByToken = await User.findOne({
+                'local.token': req.query.token
+            });
+
+            if (!userByToken) {
+                let msg = 'Invito non più valido o scaduto';
+                req.flash('warning', msg);
+                console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: utente non trovato' + msg);
+                return res.render('info.njk', {
+                    message: req.flash('warning'),
+                    type: "warning"
+                });
+            }
+
+            if (userByToken.local.status === 'validated') {
+                let msg = 'L\'invito è già stato accettato e la mail validata. Puoi accedere con le credenziali con cui ti sei registrato';
+                req.flash('loginMessage', msg);
+                console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {"resetPasswordToken":"' + userByToken.id + '"} FLASH' + msg);
+                return res.redirect('/login');
+            }
+        } else {
+            if (user.local.status === 'new') {
+                const video = process.env.NODE_ENV === 'development' ? "" : "video/BirraViannaColor_Final_Logo_38.mp4";
+                res.render('validation.njk', {
+                    prospect: user.local,
+                    message: req.flash('validateMessage'),
+                    type: "danger",
+                    video: video
+                });
+            } else if (user.local.status === 'waiting') {
+                const session = await mongoose.startSession();
+                session.startTransaction();
+                const opts = { session };
+
+                try {
+                    user.local.status = 'validated';
+                    user.local.token = req.query.token;
+                    user.local.resetPasswordToken = undefined;
+                    user.local.resetPasswordExpires = undefined;
+                    await user.save(opts);
+                    await session.commitTransaction();
+                } catch (e) {
+                    console.debug("errore: ", e);
+                    await session.abortTransaction();
+                    req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
+                    console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: ' + e);
+                    return res.render('info.njk', { message: req.flash('error'), type: "danger" });
+                } finally {
+                    await session.endSession();
+                }
+
+                req.logIn(user, function(err) {
+                    if (err) {
+                        req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
+                        console.info(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" FUNCTION: req.logIn ERROR: ' + err);
+                        return res.render('info.njk', { message: req.flash('error'), type: "danger" });
+                    } else {
+                        console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {_id:ObjectId("' + req.user._id + '")}');
+                        return res.render('conferme.njk', {
+                            user: req.user,
+                            numProducts: req.session.numProducts
+                        });
+                    }
+                });
+            }
+        }
+    } catch (err) {
+        let msg = 'Token non più valido o scaduto';
+        req.flash('error', msg);
+        console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+        return res.render('info.njk', {
+            message: req.flash('error'),
+            type: "warning"
+        });
+    }
+});
+
+/* GET con callback
     app.get('/validation', function(req, res) {
 
         User.findOne({
@@ -248,7 +343,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                   await session.commitTransaction();
 
                 } catch (e) {
-                  console.debug("errore: ",e)
+                 console.debug("errore: ",e)
                   await session.abortTransaction();
                   req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
                   console.error(lib.logDate("Europe/Rome")+' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: '+e);
@@ -275,7 +370,99 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             };
         });
     });
-    //POST
+    */
+    app.post('/validation', async function(req, res) {
+    try {
+        const user = await User.findOne({
+            'local.resetPasswordToken': req.body.token,
+            'local.resetPasswordExpires': { $gt: Date.now() }
+        });
+
+        if (!user) {
+            let msg = 'Token non più valido o scaduto';
+            req.flash('error', msg);
+            console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '"} FUNCTION: User.findOne: utente non trovato' + msg);
+            return res.render('info.njk', {
+                message: req.flash('error'),
+                type: "danger"
+            });
+        }
+
+        const email = req.body.email.toLowerCase().trim();
+
+        // Validazione dell'email
+        if (!lib.emailValidation(email)) {
+            let msg = 'Indirizzo mail non valido';
+            req.flash('validateMessage', msg);
+            console.info(lib.logDate("Europe/Rome") + ' [WARNING][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:' + user._id + '"} FLASH: ' + msg);
+            return res.redirect("/validation?token=" + req.body.token);
+        }
+
+        var server = lib.getServer(req);
+
+        // Inizio della transazione
+        try {
+            if (user.local.status === "new") {
+                const optional = req.body.checkPrivacyOptional !== undefined;
+                const cessione = req.body.checkPrivacyCessione !== undefined;
+                console.debug('req.body.checkPrivacyOptional in REGISTER', optional);
+                console.debug('req.body.checkPrivacyCessione in REGISTER', cessione);
+
+                const newToken = lib.generateToken(20);
+                user.local.email = email;
+                user.local.password = user.generateHash(req.body.password);
+                user.local.name.first = lib.capitalizeFirstLetter(req.body.firstName);
+                user.local.resetPasswordToken = newToken;
+                user.privacy.optional = optional;
+                user.privacy.transfer = cessione;
+                user.local.status = "waiting";
+
+                await user.save();
+
+                const filter = { 'friends.token': req.body.token };
+                const update = {
+                    'friends.$.status': 'accepted',
+                    'friends.$.email': email,
+                    'friends.$.name.first': lib.capitalizeFirstLetter(req.body.firstName),
+                    'friends.$.id': user._id.toString()
+                };
+                await User.findOneAndUpdate(filter, { '$set': update });
+
+                await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme', server);
+                let msg = 'Inviata email di verifica';
+                console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
+            }
+
+            res.render('emailValidation.njk', { email: email });
+
+        } catch (e) {
+            if (e.code === 11000) {
+                let msg = 'Indirizzo e-mail già registrato';
+                req.flash('validateMessage', msg);
+                console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+                return res.redirect("/validation?token=" + req.body.token);
+            } else {
+                let msg = 'Spiacente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';
+                req.flash('error', msg);
+                console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' e.code: ' + e.code + ' FLASH: ' + msg);
+                return res.render('info.njk', {
+                    message: req.flash('error'),
+                    type: "danger"
+                });
+            }
+        }
+    } catch (err) {
+        let msg = 'Si è verificato un errore durante la validazione.';
+        req.flash('error', msg);
+        console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
+        return res.render('info.njk', {
+            message: req.flash('error'),
+            type: "danger"
+        });
+    }
+});
+
+/* POST con callback
     app.post('/validation', function(req, res) {
 
         User.findOne({
@@ -368,6 +555,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
             }
           });
       });
+      */
 
 //==================================================================================================
 // REGISTRAZIONE CLIENTE
@@ -630,9 +818,9 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
     try {
       console.debug('ADDRESSID in removeAddress',req.body.addressID)
 
-      const user = await User.findOne({ _id: mongoose.Types.ObjectId(req.user.id) });
+      const user = await User.findOne({ _id: new mongoose.Types.ObjectId(req.user.id) });
       //console.debug('USER',user)
-      user.addresses.pull({_id : mongoose.Types.ObjectId(req.body.addressID)})
+      user.addresses.pull({_id : new mongoose.Types.ObjectId(req.body.addressID)})
       await user.save()
 
       res.redirect('/addresses');
@@ -655,7 +843,68 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
   // 24-11-2022 uso della Trasaction
   // ===============================================================================================
   //GET
-  app.get('/recomm', lib.isLoggedIn, function(req, res) {
+  app.get('/recomm', lib.isLoggedIn, async function(req, res) {
+  try {
+    // Conto quanti amici ha già lo User
+    const user = await User.findOne({ '_id':  req.user._id });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); // Numero di inviti disponibili = amici ammissibili
+    req.session.friendsInvited = parseInt(user.friends.length, 10);             // Numero di amici già invitati
+
+    console.debug("INVITI DISPONIBILI=", req.session.invitationAvailable);
+    console.debug("AMICI INVITATI= ", req.session.friendsInvited);
+
+    let controlSates = "";
+    let flag = "false";
+
+    // Controllo che ci siano ancora inviti disponibili
+    if (req.session.friendsInvited >= req.session.invitationAvailable) {
+      req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per averne di nuovi");
+      controlSates = "disabled";
+      flag = "true";
+    }
+
+    const server = lib.getServer(req);
+
+    console.debug('MAIL PARENT', req.user.local.email.toLowerCase());
+    const isBirrificioEmail = req.user.local.email.toLowerCase() === 'birrificioviana@gmail.com';
+
+    const model = {
+      controlSates: controlSates,
+      flag: flag,
+      message: req.flash('info'),
+      type: "info",
+      numProducts: req.session.numProducts, // Numero di prodotti nel carrello
+      user: req.user.local,
+      invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
+      friendsInvited: req.session.friendsInvited,
+      percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), // Percentuale di amici invitati
+      parentName: req.user.local.name.first,
+      parentEmail: req.user.local.email,
+      server: server
+    };
+
+    if (isBirrificioEmail) {
+      res.render('birrificioToFriend.njk', model);
+    } else {
+      res.render('friend.njk', model);
+    }
+
+  } catch (err) {
+    console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} ERROR: ' + err);
+    req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
+    return res.render('info.njk', {
+      message: req.flash('error'),
+      type: "danger"
+    });
+  }
+});
+
+/*  app.get('/recomm', lib.isLoggedIn, function(req, res) {
 
       // conto quanti amici ha già lo User
       User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)}, async function(err, user) {
@@ -676,7 +925,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
                 {$group:{_id:null,count:{$count:{ }}}}
                 ])
               console.log('AGGREGATE: ',u)
-            */
+
               req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); //numero di inviti disponibili = amici ammissibili
               req.session.friendsInvited = parseInt(user.friends.length, 10);             //numero di amici già invitati
 
@@ -733,7 +982,7 @@ module.exports = function(app, moment, mongoose, fastcsv, fs, util) {
           };
       });
   });
-
+*/
     app.post('/recomm', lib.isLoggedIn, async (req, res) => {
 
       // controllo che ci siano ancora inviti diposnibili

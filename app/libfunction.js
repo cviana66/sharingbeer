@@ -145,14 +145,14 @@ module.exports = {
                   },
   retriveCart:  function retriveCart (req) {
                   //Retrieve the shopping cart from memory
-                  var cart = req.session.cart,
+                  var cart = req.session.cart || null
 						cartItems = {items: [], totalPrice: 0, totalQty: 0},
 						totalPrice = 0,
 						totalQty = 0
                   req.session.numProducts = 0;
                   req.session.numProductsPerId = [];
 
-                  console.debug('CART: ', cart)
+                  console.debug('CART IN LIB: ', cart)
 
                   if (cart) { //se ho rpodotti in carrello
                     for (var item in cart) {
@@ -172,6 +172,7 @@ module.exports = {
                     req.session.totalQty = cartItems.totalQty = totalQty;
                     console.debug("TOTAL PRICE:", req.session.totalPrc,"TOTAL QTY BeeBox:",req.session.totalQty)
                   }
+                  req.session.cart = cart
                 },
   emailValidation:  function emailValidation (email) {
                       var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

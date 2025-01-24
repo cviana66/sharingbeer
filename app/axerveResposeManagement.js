@@ -1,12 +1,12 @@
 const fetch 	= require("node-fetch");
 const User  	= require('../app/models/user');
 const Product 	= require('./models/product.js');
-const moment 	= require("moment-timezone"); 
+const moment 	= require("moment-timezone");
 const lib		= require('./libfunction');
 
 module.exports = {
 
-	getUserByPaymentIdAndShopLoginAndToken: async function getUserByPaymentIdAndShopLoginAndToken(paymentID,shopLogin,token) {		
+	getUserByPaymentIdAndShopLoginAndToken: async function getUserByPaymentIdAndShopLoginAndToken(paymentID,shopLogin,token) {
 		var user = await User.aggregate([ {$unwind:"$orders"},
 																{$match:{$and:[	{'orders.payment.transactionId':paymentID},
 															  								{'orders.payment.shopLogin':shopLogin},
@@ -15,8 +15,8 @@ module.exports = {
 															  {$project:{addresses:0,friends:0,'orders.items':0}}]);
 		return user[0];
 	},
-  
-	getUserByShopLoginAndOrderId: async function getUserByShopLoginAndOrderId(shopLogin,orderId) {		
+
+	getUserByShopLoginAndOrderId: async function getUserByShopLoginAndOrderId(shopLogin,orderId) {
 		var user = await User.aggregate([ {$unwind:"$orders"},
 																{$match:{$and:[	{'orders.payment.orderId':orderId},
 															  								{'orders.payment.shopLogin':shopLogin}
@@ -26,7 +26,7 @@ module.exports = {
 		return user[0];
 	},
 
-	getUserByPaymentIdAndShopLogin: async function getUserByPaymentIdAndShopLogin(paymentID,shopLogin) {	
+	getUserByPaymentIdAndShopLogin: async function getUserByPaymentIdAndShopLogin(paymentID,shopLogin) {
 		var user = await User.aggregate([ {$unwind:"$orders"},
 																{$match:{$and:[	{'orders.payment.transactionId':paymentID},
 															  								{'orders.payment.shopLogin':shopLogin}
@@ -37,8 +37,8 @@ module.exports = {
 
 	updateResponsePayment: async function updateResponsePayment(_userId, data, session, mongoose) {
 
-	/*RISPOSTA DECRIPTATA		
-	{ 
+	/*RISPOSTA DECRIPTATA
+	{
 	  TransactionType: 'DECRYPT',
 	  TransactionResult: 'OK',
 	  ShopTransactionID: '668425ca12814800a635bd62',
@@ -65,7 +65,7 @@ module.exports = {
 	}*/
 
 	let filter = {_id: _userId};
-	let update = 
+	let update =
 	      {
 	        'orders.$[el].status'            		: data.TransactionResult,
 	        'orders.$[el].payment.s2sStatus'		: data.TransactionResult,
@@ -73,15 +73,15 @@ module.exports = {
 	        'orders.$[el].payment.bankTransactionId': data.BankTransactionID,
 	        'orders.$[el].payment.authorizationCode': data.AuthorizationCode,
  	        'orders.$[el].payment.errorCode' 		: data.ErrorCode,
-	        'orders.$[el].payment.errorDescription' : data.ErrorDescription,	       
+	        'orders.$[el].payment.errorDescription' : data.ErrorDescription,
 	        'orders.$[el].payment.country' 			: data.Country
 	      }
-	  try {    
+	  try {
 		  let doc = await User.findOneAndUpdate(
 		                filter,
 		                {'$set':update},
-		                {arrayFilters: [{"el._id": mongoose.Types.ObjectId(data.ShopTransactionID)}]}).session(session);
-		}catch (e){ 
+		                {arrayFilters: [{"el._id": new mongoose.Types.ObjectId(data.ShopTransactionID)}]}).session(session);
+		}catch (e){
 			console.error('Errore in function updateResponsePayment ->',e);
 			throw new Error("updateStatusPayment fallito")
 		}
@@ -101,10 +101,10 @@ module.exports = {
 			                      ).session(session);
 			// calcolo dei Booze (€):
 			// (Prezzo Medio per bottiglia / numero di acquisti necessari per ottenere una bottiglia omaggio (costante =12) * n° beerbox acquistati
-			let booze4Parent = (((user.orders.totalPriceBeer / (user.orders.totalQty * numBottigliePerBeerBox)) / numAcquistiPerUnaBottigliaOmaggio) * user.orders.totalQty).toFixed(2); // definisce i booze da riconoscere al parent in €;  user.orders.totalQty=n° Berrbox acquistati   
+			let booze4Parent = (((user.orders.totalPriceBeer / (user.orders.totalQty * numBottigliePerBeerBox)) / numAcquistiPerUnaBottigliaOmaggio) * user.orders.totalQty).toFixed(2); // definisce i booze da riconoscere al parent in €;  user.orders.totalQty=n° Berrbox acquistati
 			console.debug("BOOZE FOR PARENT:",booze4Parent)
 			await User.findOneAndUpdate(
-		                        {'_id': mongoose.Types.ObjectId(user.local.idParent)},
+		                        {'_id': new mongoose.Types.ObjectId(user.local.idParent)},
 		                        {'$inc': {'local.booze':booze4Parent}}
 		                        ).session(session);
 		}catch(e){
@@ -120,10 +120,10 @@ module.exports = {
 																		{$project:{_id:0,local:0,addresses:0,friends:0,delivery:0,payment:0}}]);
 		console.debug('ITEMS TO ADD', orderUser[0].orders.items);
 		var items = orderUser[0].orders.items
-		
+
 		for (var index = 0; index < items.length; index++) {
 	    console.debug('ID PRODOTTO: ',items[index].id)
-	    
+
 	    const filter = {_id: items[index].id};
 	    console.debug("FILTER: ",filter)
 	    let doc = await Product.findOne(filter)
@@ -142,10 +142,10 @@ module.exports = {
 																		{$project:{_id:0,local:0,addresses:0,friends:0,delivery:0,payment:0}}]);
 		console.debug('ITEMS TO ADD', orderUser[0].orders.items);
 		var items = orderUser[0].orders.items
-		
+
 		for (var index = 0; index < items.length; index++) {
 	    console.debug('ID PRODOTTO: ',items[index].id)
-	    
+
 	    const filter = {_id: items[index].id};
 	    console.debug("FILTER: ",filter)
 	    let doc = await Product.findOne(filter)
