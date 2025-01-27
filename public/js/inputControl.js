@@ -310,11 +310,13 @@ async function fieldsRegisterControl() {
       return false;
     }
   }
-   if(!document.getElementById('checkPrivacy').checked) {
-    document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella per accettare le Condizioni generali di vendita";
-    document.getElementById("wrongPrivacy").scrollIntoView({ behavior: "smooth", block: "center" });
-    return false;
-  }
+	if (document.getElementById("wrongPrivacy") != null) {
+		if(!document.getElementById('checkPrivacy').checked) {
+			document.getElementById("wrongPrivacy").innerHTML = iwar+"Spunta la casella per accettare le Condizioni generali di vendita";
+			document.getElementById("wrongPrivacy").scrollIntoView({ behavior: "smooth", block: "center" });
+			return false;
+		}
+	}
 
 
   return true;

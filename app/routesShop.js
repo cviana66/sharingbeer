@@ -304,7 +304,8 @@ module.exports = function(app, moment, mongoose) {
         fatturaPEC  : refFatturaPEC,
         fatturaSDI  : refFatturaSDI,
         nOrders : nOrders,
-        omaggio:  req.session.omaggioPrimoAcquisto
+        omaggio:  req.session.omaggioPrimoAcquisto,
+        amiciDaInvitare: req.session.amiciDaInvitare
       })
     }
     catch (e) {

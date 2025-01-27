@@ -278,7 +278,8 @@ const gestpayService = new GestpayService();
             deliveryDate  : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'),
             ritiroDate    : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Ritiro'),
             user          : req.user,
-            numProducts   : 0
+            numProducts   : 0,
+            amiciDaInvitare: true
       });
 
     }catch (e){
