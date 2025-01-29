@@ -17,13 +17,13 @@
     td {
         border: 1px solid #903246;
         /* Colore del bordo più chiaro */
-        padding: 10px;
+        padding: 2px;
         /* Interspaziatura interna */
         color: white;
         /* Colore del testo */
         text-align: left;
         /* Allineamento del testo */
-        font-size:0.8em
+        font-size: 0.8em
     }
 
     th {
@@ -32,53 +32,57 @@
     }
 </style>
 {% for user in users %}
-  <table>
+<table>
     <thead>
         <th colspan="4" style="font-size:1.2em">{{ user.local.name.first }} {{ user.local.name.last }}</th>
     </thead>
     <tr>
-    
-    <td colspan="2">{{ user.local.email }}</td>
-    <td colspan="2">{{ user.local.mobilePrefix }} {{ user.local.mobileNumber }}</td>
-    
+
+        <td colspan="2">{{ user.local.email }}</td>
+        <td colspan="2">{{ user.local.mobilePrefix }} {{ user.local.mobileNumber }}</td>
+
     </tr>
-    
+
     <tr>
         <thead>
-            <th colspan ="4"> Indirizzi </th>
+            <th colspan="4"> Indirizzi </th>
         </thead>
     </tr>
     <tbody>
         {% for address in user.addresses %}
-          <tr>
+        <tr>
             <td>{{ address.name.first }} {{ address.name.last }}</td>
             <td>{{ address.mobilePrefix }} {{ address.mobileNumber }}</td>
-            <td>{{ address.address }}, {{ address.houseNumber }}, {{ address.city }}, {{ address.province }}, {{ address.postcode }}</td>
-            <td>main: {{ address.main }}</td>
-          </tr>
+            {% if address.main == "yes" %}
+            <td colspan="2" style="background-color:yellow; color:#2A0009">
+            {%else%}
+            <td colspan="2">
+                {%endif%}
+                {{ address.address }}, {{ address.houseNumber }}, {{ address.city }}, {{ address.province }}, {{
+                address.postcode }}
+            </td>
+        </tr>
         {% endfor %}
         {% if (user.friends | length) > 0 %}
         <thead>
-            <th colspan ="4"> Amici </th>
+            <th colspan="4"> Amici </th>
         </thead>
         {% endif %}
         {% for friend in user.friends %}
-          <tr>
-            <td 
-                {% if friend.status == "accepted" %} 
-                    style="background-color: green">
+        <tr>
+            {% if friend.status == "accepted" %}
+            <td colspan="3" style="background-color: green">
                 {% else %}
-                    style="background-color: red">
+            <td colspan="3" style="background-color: red">
                 {%endif%}
-            {{ friend.name.first }} {{ friend.name.last }}</td>
-            <td>{{ friend.email }}</td>
-            <td colspan="2">{{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}</td>
-            
-          </tr>
+                {{ friend.name.first }} {{ friend.name.last }}
+            </td>
+            <td colspan="1">{{ friend.email }} <br> {{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit',
+                month: '2-digit', year: 'numeric' }) }}</td>
+        </tr>
         {% endfor %}
     </tbody>
-  </table>
-  {% endfor %}
+</table>
+{% endfor %}
 
 {% endblock %}
-
