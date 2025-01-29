@@ -74,6 +74,9 @@ const { geoMap } = require('./app/routesGeoMap');
 // percorso consegne ===========================================================
 const routesDelivery = require('./app/routesDelivery');
 
+// dashboard clienti ===========================================================
+const routesDashboard = require('./app/routesDashboard');
+
 // ================================
 // Gestione Debug
 // ================================
@@ -185,6 +188,7 @@ var SharingBeer = function () {
         getDistancePost(self.app);
         geoMap(self.app, moment);
         routesDelivery(self.app, mongoose, moment);
+        routesDashboard(self.app, mongoose, moment);
     };
 
     /**

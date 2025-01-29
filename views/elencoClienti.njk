@@ -1,0 +1,78 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<style>
+    table {
+        width: 100%;
+        /* Larghezza della tabella */
+        margin: 10px auto;
+        /* Centra la tabella n pagina */
+        border-collapse: collapse;
+        /* Rimuove gli spazi tra i bordi delle celle */
+        background-color: #2A0009;
+        /* Colore di sfondo della tabella */
+    }
+
+    th,
+    td {
+        border: 1px solid #903246;
+        /* Colore del bordo più chiaro */
+        padding: 10px;
+        /* Interspaziatura interna */
+        color: white;
+        /* Colore del testo */
+        text-align: left;
+        /* Allineamento del testo */
+        font-size:0.8em
+    }
+
+    th {
+        background-color: #3B1A1E;
+        /* Colore di sfondo per l'intestazione */
+    }
+</style>
+{% for user in users %}
+  <table>
+    <thead>
+        <th colspan="4" style="font-size:1.2em">{{ user.local.name.first }} {{ user.local.name.last }}</th>
+    </thead>
+    <tr>
+    
+    <td colspan="2">{{ user.local.email }}</td>
+    <td colspan="2">{{ user.local.mobilePrefix }} {{ user.local.mobileNumber }}</td>
+    
+    </tr>
+    
+    <tr>
+        <thead>
+            <th colspan ="4"> Indirizzi </th>
+        </thead>
+    </tr>
+    <tbody>
+        {% for address in user.addresses %}
+          <tr>
+            <td>{{ address.name.first }} {{ address.name.last }}</td>
+            <td>{{ address.mobilePrefix }} {{ address.mobileNumber }}</td>
+            <td>{{ address.address }}, {{ address.houseNumber }}, {{ address.city }}, {{ address.province }}, {{ address.postcode }}</td>
+            <td>main: {{ address.main }}</td>
+          </tr>
+        {% endfor %}
+        {% if (user.friends | length) > 0 %}
+        <thead>
+            <th colspan ="4"> Amici </th>
+        </thead>
+        {% endif %}
+        {% for friend in user.friends %}
+          <tr>
+            <td>{{ friend.name.first }} {{ friend.name.last }}</td>
+            <td>{{ friend.email }}</td>
+            <td>{{ friend.insertDate }}</td>
+            <td>{{ friend.status }}</td>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+  {% endfor %}
+
+{% endblock %}
+
