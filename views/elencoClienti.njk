@@ -66,7 +66,7 @@
           <tr>
             <td>{{ friend.name.first }} {{ friend.name.last }}</td>
             <td>{{ friend.email }}</td>
-            <td>{{ friend.insertDate }}</td>
+            <td>{{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}</td>
             <td>{{ friend.status }}</td>
           </tr>
         {% endfor %}
