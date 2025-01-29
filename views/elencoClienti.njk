@@ -64,10 +64,16 @@
         {% endif %}
         {% for friend in user.friends %}
           <tr>
-            <td>{{ friend.name.first }} {{ friend.name.last }}</td>
+            <td 
+                {% if friend.status == "accepted" %} 
+                    style="background-color: green">
+                {% else %}
+                    style="background-color: red">
+                {%endif%}
+            {{ friend.name.first }} {{ friend.name.last }}</td>
             <td>{{ friend.email }}</td>
-            <td>{{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}</td>
-            <td>{{ friend.status }}</td>
+            <td colspan="2">{{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}</td>
+            
           </tr>
         {% endfor %}
     </tbody>
