@@ -10,7 +10,7 @@ module.exports = (app, moment, mongoose) => {
     app.get('/listOfCustomer', lib.isAdmin, async (req, res) => {
         console.debug('LISTA DEI CLIENTI');
         try {
-            const users = await User.find({ 'local.status': 'customer' }).sort({"local.initDate": 1});
+            const users = await User.find( {$or: [ { 'local.status': 'customer'}, {'local.status':'validated' }]}).sort({"local.initDate": 1});
             res.render('elencoClienti.njk', {
                 users: users,
                 user: req.user
