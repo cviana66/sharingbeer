@@ -71,13 +71,13 @@
         {% for friend in user.friends %}
         <tr>
             {% if friend.status == "accepted" %}
-            <td colspan="3" style="background-color: green">
+            <td colspan="1" style="background-color: green">
                 {% else %}
-            <td colspan="3" style="background-color: red">
+            <td colspan="1" style="background-color: red">
                 {%endif%}
                 {{ friend.name.first }} {{ friend.name.last }}
             </td>
-            <td colspan="1">{{ friend.email }} <br> {{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit',
+            <td colspan="3">{{ friend.email }} <br> {{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit',
                 month: '2-digit', year: 'numeric' }) }}</td>
         </tr>
         {% endfor %}
