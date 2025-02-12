@@ -15,6 +15,7 @@ var { getAddressFromOSM } = require('../app/overpassQuery')
 
 var mailfriend = require('../config/mailFriend');
 var mailparent = require('../config/mailParent');
+var mailfriendstatus = require('../config/mailFriendStatus');
 var mailinvite = require('../config/mailInvite');
 var mailconferme = require('../config/mailConferme');
 var mailorder = require('../config/mailOrder');
@@ -222,7 +223,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
             message: req.flash('validateMessage'),
             type: "danger",
             video: video,
-            amiciDaInvitare: false
+            amiciDaInvitare: req.session.amiciDaInvitare
           });
         } else if (user.local.status === 'waiting') {
           const session = await mongoose.startSession();
@@ -660,8 +661,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         throw new Error('User not found');
       }
 
+      const inviti = await lib.getInviteAvailable(req) 
+        
       req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); // Numero di inviti disponibili = amici ammissibili
-      req.session.friendsInvited = parseInt(user.friends.length, 10);             // Numero di amici già invitati
+      req.session.friendsInvited = parseInt(inviti.numFriendsInvited, 10);             // Numero di amici già invitati
 
       console.debug("INVITI DISPONIBILI=", req.session.invitationAvailable);
       console.debug("AMICI INVITATI= ", req.session.friendsInvited);
@@ -670,7 +673,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       let flag = "false";
 
       // Controllo che ci siano ancora inviti disponibili
-      if (req.session.friendsInvited >= req.session.invitationAvailable) {
+      if (!inviti.isInviteAvialable) {
         req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per averne di nuovi");
         controlSates = "disabled";
         flag = "true";
@@ -713,85 +716,6 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     }
   });
 
-  /*  app.get('/recomm', lib.isLoggedIn, function(req, res) {
-  
-        // conto quanti amici ha già lo User
-        User.findOne({'_id': mongoose.Types.ObjectId(req.user.id)}, async function(err, user) {
-            if (err) {
-                console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /recomm" USERS_ID: {"_id":ObjectId("' + req.user.id + '")} FUNCTION: Friend.countDocuments: ' + err);
-                req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
-                return res.render('info.njk', {
-                    message: req.flash('error'),
-                    type: "danger"
-                });
-            } else {
-              /* Conta quanti amici ssono "new" ---> al momento non usato ma funzionante
-                const u = await User.aggregate([
-                  {$match:{"_id":mongoose.Types.ObjectId("656af6eca93c31dc18501d06")}},
-                  {$unwind: "$friends"},
-                  {$match :{ "friends.status":"new"}},
-                  {$project:{_id:0,addresses:0,orders:0,local:0}},
-                  {$group:{_id:null,count:{$count:{ }}}}
-                  ])
-                console.log('AGGREGATE: ',u)
-  
-                req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); //numero di inviti disponibili = amici ammissibili
-                req.session.friendsInvited = parseInt(user.friends.length, 10);             //numero di amici già invitati
-  
-                console.debug("INVITI DISPONIBILI=",req.session.invitationAvailable)
-                console.debug("AMICI INVITATI= ", req.session.friendsInvited)
-  
-                let error = "";
-                let controlSates = "";
-                let flag = "false";
-  
-                // controllo che ci siano ancora inviti diposnibili
-                if (req.session.friendsInvited >= req.session.invitationAvailable) {
-                    req.flash('info', "Non hai inviti disponibili! Acquista un beerBox per averne di nuovi");
-                    controlSates = "disabled";
-                    flag = "true";
-                }
-  
-                var server = lib.getServer(req);
-  
-                console.debug('MAIL PARENT', req.user.local.email.toLowerCase());
-          if (req.user.local.email.toLowerCase() != 'birrificioviana@gmail.com') {
-            res.render('friend.njk', {
-              controlSates: controlSates,
-              flag: flag,
-              message: req.flash('info'),
-              type: "info",
-              numProducts: req.session.numProducts, //numero di proodotti nel carrello
-              user: req.user.local,
-              invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-              friendsInvited: req.session.friendsInvited,
-              percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
-              //token: lib.generateToken(20),
-              parentName: req.user.local.name.first,
-              parentEmail: req.user.local.email,
-              server: server
-            });
-        } else {
-          res.render('birrificioToFriend.njk', {
-              controlSates: controlSates,
-              flag: flag,
-              message: req.flash('info'),
-              type: "info",
-              numProducts: req.session.numProducts, //numero di proodotti nel carrello
-              user: req.user.local,
-              invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
-              friendsInvited: req.session.friendsInvited,
-              percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), //numProducts : req.session.numProducts
-              //token: lib.generateToken(20),
-              parentName: req.user.local.name.first,
-              parentEmail: req.user.local.email,
-              server: server
-            });
-        }
-            };
-        });
-    });
-  */
   app.post('/recomm', lib.isLoggedIn, async (req, res) => {
 
     // controllo che ci siano ancora inviti diposnibili
@@ -832,7 +756,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       newUser.local.email = token + "@sb.sb";
       newUser.local.token = token;
       newUser.local.resetPasswordToken = token;
-      newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
+      //newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
+      newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settimane
       await newUser.save(opts);
 
       //-------------------------------------------------
@@ -909,7 +834,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       newUser.local.email = token + "@sb.sb";
       newUser.local.token = token;
       newUser.local.resetPasswordToken = token;
-      newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
+      //newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
+      newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settiamana
       await newUser.save(opts);
 
       //-------------------------------------------------
@@ -986,7 +912,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       firstName: req.body.firstName,
       flag: req.body.flag,
       user: req.user,
-      numProducts: req.session.numProducts
+      numProducts: req.session.numProducts,
+      amiciDaInvitare: req.session.amiciDaInvitare
     });
   });
 
@@ -998,30 +925,36 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
   // UTILITY
   // =================================================================================================
   // visualizza in formato HTML la mail conferma
-  app.get('/mailconferme', function (req, res) {
+  app.get('/mailconferme', lib.isAdmin, function (req, res) {
     var server = lib.getServer(req);
     res.send(mailconferme('Name', 'Email', 'Token', 'userName', 'userSurname', server))
   })
 
   // visualizza in formato HTML la mail Friend
-  app.get('/mailfriend', function (req, res) {
+  app.get('/mailfriend', lib.isAdmin, function (req, res) {
     var server = lib.getServer(req);
     res.send(mailfriend('Name', 'Email', 'Token', 'userName', 'userSurname', server))
 
   })
 
   // visualizza in formato HTML la mail User
-  app.get('/mailparent', function (req, res) {
+  app.get('/mailparent', lib.isAdmin, function (req, res) {
     var server = lib.getServer(req);
     res.send(mailparent('Name', 'Email', 'userName', 'userEmail', server))
   })
 
-  app.get('/mailinvite', function (req, res) {
+  // visualizza in formato HTML la mail User
+  app.get('/mailfriendstatus', lib.isAdmin, function (req, res) {
+    var server = lib.getServer(req);
+    res.send(mailfriendstatus('Name', 'Email', 'userName', 'userEmail', server))
+  })
+
+  app.get('/mailinvite', lib.isAdmin, function (req, res) {
     var server = lib.getServer(req);
     res.send(mailinvite('Name', 'Email', 'Token', 'userName', server))
   })
 
-  app.get('/mailorder', function (req, res) {
+  app.get('/mailorder', lib.isAdmin, function (req, res) {
     var server = lib.getServer(req);
     console.debug('SERVER MAILORDER', server)
 
@@ -1036,13 +969,13 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
   // =================================================================================================
   // TESTING
   // =================================================================================================
-  app.get('/test', function (req, res) {
+  app.get('/test', lib.isAdmin, function (req, res) {
     req.session.elements = [];
     res.render('testRegistrationV2.njk', {
     });
   });
 
-  app.get('/delta', function (req, res) {
+  app.get('/delta', lib.isAdmin, function (req, res) {
     // Esempio di utilizzo
     const groupA = [5, 5]; // 2 prodotti nel gruppo A
     const groupB = [20, 20, 20]; // 3 prodotti nel gruppo B
@@ -1058,7 +991,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     res.send("Somma più vicina a " + T + ":" + result.closestSum + " | Combinazione:" + result.bestCombination)
   });
 
-  app.get('/prezzo', function (req, res) {
+  app.get('/prezzo', lib.isAdmin, function (req, res) {
     // Esempio di utilizzo
     const prezzi = [
       { "A": 4.5 },
@@ -1084,43 +1017,43 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     res.send(txt);
   });
 
-  app.get('/share', function (req, res) {
+  app.get('/share', lib.isAdmin, function (req, res) {
     console.debug("FISRT NAME: ", req.body.firstName);
     res.render('share.njk', {
       firstName: req.body.firstName // encodeURIComponent("Ciao \n come stai")
     });
   });
 
-  app.get('/testval', function (req, res) {
+  app.get('/testval', lib.isAdmin, function (req, res) {
     res.render('validation.njk');
   });
 
-  app.get('/testreg', function (req, res) {
+  app.get('/testreg', lib.isAdmin, function (req, res) {
     res.render('registration.njk');
   });
 
-  app.get('/qrq', function (req, res) {
+  app.get('/qrq', lib.isAdmin, function (req, res) {
     res.render('square.njk', {
     });
   });
 
-  app.get('/redirect', function (req, res) {
+  app.get('/redirect', lib.isAdmin, function (req, res) {
     req.flash('info', 'SHOP');
     res.redirect('/shop');
   });
-  app.get('/redirectType', function (req, res) {
+  app.get('/redirectType', lib.isAdmin, function (req, res) {
     req.flash('info', 'SHOP');
     res.redirect('/shop/warning');
   });
 
-  app.get('/testflash', function (req, res) {
+  app.get('/testflash', lib.isAdmin, function (req, res) {
     let msg = 'Email Verificata. Utente validato e autenticato';
     req.flash('info', msg);
     console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" EMAIL:  FLASH: ' + msg);
     res.redirect('/shop');
   });
 
-  app.get('/emailvalidation', function (req, res) {
+  app.get('/emailvalidation', lib.isAdmin, function (req, res) {
     res.render('emailValidation.njk', { email: 'indirizzo@email.mio' });
   });
 

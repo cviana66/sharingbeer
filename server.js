@@ -230,6 +230,7 @@ var SharingBeer = function () {
                 cookie: {
                     secure: false,
                     expires: 3600000,
+                    //maxAge: 3600000,
                     sameSite: 'Lax'
                 }, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                 //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
@@ -252,6 +253,7 @@ var SharingBeer = function () {
                 cookie: {
                     secure: true, // serve secure cookies
                     expires: 3600000,
+                    //maxAge: 3600000,
                     sameSite: 'Lax'
                 }, //Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
                 //store: MongoStore.create({mongoUrl: process.env.MONGODB_URL})
@@ -270,9 +272,8 @@ var SharingBeer = function () {
 
         // Initialize session variable
         self.app.use((req, res, next) => {
-            if (!req.session.amiciDaInvitare) {
-                req.session.amiciDaInvitare = false;
-            }
+            if (!req.session.amiciDaInvitare) req.session.amiciDaInvitare = false;
+            if (!req.session.returnTo) req.session.returnTo = '/'
             next();
         });
     };

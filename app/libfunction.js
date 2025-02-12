@@ -19,48 +19,48 @@ const mongoose = require('../config/database.js'); //TODO: per la PRO impostare 
 module.exports = {
 
   // route middleware to make sure a user is logged in ===========================
-  isLoggedIn: async function isLoggedIn(req, res, next) {
-    req.session.amiciDaInvitare = false
-    // if user is authenticated in the session, carry on
+  isLoggedIn: async (req, res, next) => {
     if (req.isAuthenticated()) {
       // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
-      const user = await Users.findOne({ '_id': req.user._id })
-      // controllo che ci siano ancora inviti diposnibili
-      if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
-        req.session.amiciDaInvitare = true
-        console.debug("INVITI DISPONIBILI=", parseInt(user.local.eligibleFriends, 10) - parseInt(user.friends.length, 10))
+      const invitiDisponibili = await getFriendsInfo(req)
+      console.debug('isLoggedIn -> AMICI DA INVITARE?:',invitiDisponibili.isInviteAvialable)
+      if (invitiDisponibili.isInviteAvialable) {
+        req.session.amiciDaInvitare = true;
+      } else {
+        req.session.amiciDaInvitare = false;
       }
       return next();
     } else {
-      // if they aren't redirect them to the Login page
+      req.session.amiciDaInvitare = false;
       console.debug('INDIRIZZO DA DOVE ARRIVO: ', req.originalUrl);
       req.session.returnTo = req.originalUrl;
       res.redirect('/login');
     }
   },
-  isAdmin: function isAdmin(req, res, next) {
-    // if user is authenticated in the session, carry on
+  isAdmin: (req, res, next) => {
     if (req.isAuthenticated() && req.user.local.role == 'admin') {
       return next();
     } else {
-      //res.status(403).send('Accesso negato');
       res.render('info.njk', { messaggio: 'Accesso negato' })
     }
   },
+  getInviteAvailable: (req) => {
+    return getFriendsInfo(req)
+  },
   generateToken: function generateToken(n) {
     var length = n,
-      charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-      retVal = "";
+    charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    retVal = "";
     for (var i = 0, n = charset.length; i < length; ++i) {
       retVal += charset.charAt(Math.floor(Math.random() * n));
     }
     return retVal;
   },
   // route middleware to make sure a user is logged in
-  generatePassword: function generatePassword(n) {
+  generatePassword: (n) => {
     var length = n,
-      charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-      retVal = "";
+    charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+    retVal = "";
     for (var i = 0, n = charset.length; i < length; ++i) {
       retVal += charset.charAt(Math.floor(Math.random() * n));
     }
@@ -71,7 +71,7 @@ module.exports = {
       return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
   },
-  getServer: function getServer(req) {
+  getServer: (req) => {
     var server;
     if (process.env.NODE_ENV == "development") {
       if (req.hostname == "sb.sharingbeer.it") {
@@ -84,8 +84,7 @@ module.exports = {
     }
     return server;
   },
-  sendmailToPerson: async function sendmailToPerson(Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server, html) {
-
+  sendmailToPerson: async (Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server, html) => {
     console.debug('MAIL TYPE: ', typeOfMail);
     console.debug("SERVER:", server);
 
@@ -141,12 +140,12 @@ module.exports = {
       throw new Error('SENDMAIL' + e);
     }
   },
-  retriveCart: function retriveCart(req) {
+  retriveCart: (req) => {
     //Retrieve the shopping cart from memory
     var cart = req.session.cart || null
     cartItems = { items: [], totalPrice: 0, totalQty: 0 },
-      totalPrice = 0,
-      totalQty = 0
+    totalPrice = 0,
+    totalQty = 0
     req.session.numProducts = 0;
     req.session.numProductsPerId = [];
 
@@ -172,7 +171,7 @@ module.exports = {
     }
     req.session.cart = cart
   },
-  emailValidation: function emailValidation(email) {
+  emailValidation: (email) => {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (email == "" || !re.test(String(email))) {
       return false;
@@ -180,7 +179,7 @@ module.exports = {
       return true;
     }
   },
-  deliveryDate: function deliveryDate(timeZone, dataType, format, deliveryType) {
+  deliveryDate: (timeZone, dataType, format, deliveryType) => {
     moment.locale('it');
     var d = moment(data).utc(timeZone).format('dddd');
     var data = new Date();
@@ -241,7 +240,7 @@ module.exports = {
     console.debug('DATA-ORA deliveryDate', dataType, giornoLavorativo)
     return giornoLavorativo
   },
-  nowDate: function nowDate(timeZone) {
+  nowDate: (timeZone) => {
     var data = new Date();
     var a = moment.tz(data, timeZone);
     a.utc(timeZone).format();
@@ -249,12 +248,12 @@ module.exports = {
     console.debug('DATA-ORA', timeZone, now);
     return now;
   },
-  formatTextDate: function formatTextDate(data, format) {
+  formatTextDate: (data, format) => {
     var d = moment(data).utc().format(format)
     console.debug('DATA-ORA formatTextDate', d)
     return d;
   },
-  logDate: function logDate(timeZone) {
+  logDate: (timeZone) => {
     var data = new Date();
     var a = moment.tz(data, timeZone);
     a.utc(timeZone).format();
@@ -262,7 +261,7 @@ module.exports = {
     var d = moment(now).utc().format('YYYY-MM-DD hh:mm');
     return d;
   },
-  getServer: function getServer(req) {
+  getServer: (req) => {
     if (process.env.NODE_ENV == "development") {
       if (req.hostname == 'sb.sharingbeer.it') {
         server = req.protocol + '://' + req.hostname
@@ -275,7 +274,7 @@ module.exports = {
     return server;
   },
 
-  findClosestCombination: function findClosestCombination(products, T) {
+  findClosestCombination: (products, T) => {
     let closestSum = 0;
     let bestCombination = [];
 
@@ -298,7 +297,7 @@ module.exports = {
     return { closestSum, bestCombination };
   },
 
-  generaArrayPrezzi: function generaArrayPrezzi(prezzi, quantita) {
+  generaArrayPrezzi: (prezzi, quantita) => {
     /* esempio di utilizzo
      *	const prezzi = [{ "A": 4.5 },{ "B": 4.7 },{ "C": 5.0 }];
      *	const quantita = [{ "A": 4 },{ "B": 2 },{ "C": 3 },{ "A": 2 }];
@@ -339,7 +338,26 @@ module.exports = {
 
     return risultati;
   }
-
 }
-
-
+//================================ LOCAL FUNCTION ===============================
+// Funzione per trovare gli utenti accepted (documento frinds dell'utente)
+async function getFriendsInfo(req) {
+  //conteggio dei friends dello user raggruppato per staus
+  const users = await Users.aggregate([
+    { $match: { '_id': req.user._id } },
+    { $unwind: "$friends" },
+    {
+      $group: {
+        _id: "$_id",
+        accepted: { $sum: { $cond: [{ $eq: ["$friends.status", "accepted"] }, 1, 0] } },
+        new: { $sum: { $cond: [{ $eq: ["$friends.status", "new"] }, 1, 0] } },
+        expired: { $sum: { $cond: [{ $eq: ["$friends.status", "expired"] }, 1, 0] } }
+      }
+    }
+  ]);
+  users[0].numInviteAvialable = req.user.local.eligibleFriends - users[0].new - users[0].accepted
+  users[0].numFriendsInvited = users[0].new + users[0].accepted
+  users[0].isInviteAvialable = (users[0].numInviteAvialable == 0) ? false : true;
+  console.debug('getFriendsInfo -> SITUAZIONE INVITI:',users)
+  return users[0];
+}

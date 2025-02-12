@@ -14,19 +14,11 @@ module.exports = function (app, passport, moment, mongoose) {
   app.get('/', async function (req, res) {
     //var video = "video/BiarraViannaColor_Final_Logo_ligth_24.mp4";
     var video = "video/BirraViannaColor_Final_Logo_38.mp4";
-    //console.debug(req.session)
+    
     if (process.env.NODE_ENV === 'development') {
       video = ""
     }
-    if (req.isAuthenticated()) {
-      // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
-      const user = await Users.findOne({ '_id': req.user._id })
-      // controllo che ci siano ancora inviti diposnibili
-      if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
-        req.session.amiciDaInvitare = true
-        console.debug("INVITI DISPONIBILI=", parseInt(user.local.eligibleFriends, 10) - parseInt(user.friends.length, 10))
-      }
-    }
+
     res.render('index.njk', {
       user: req.user,
       numProducts: req.session.numProducts,
@@ -42,17 +34,6 @@ module.exports = function (app, passport, moment, mongoose) {
   // show the login form
   app.get('/login', async function (req, res) {
     console.debug('IN LOGIN req.session.returnTo', req.session.returnTo)
-    req.session.amiciDaInvitare = false
-    if (req.isAuthenticated()) {
-      // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottome +Invita
-      const user = await Users.findOne({ '_id': req.user._id })
-      // controllo che ci siano ancora inviti diposnibili
-      if (parseInt(user.friends.length, 10) < parseInt(user.local.eligibleFriends, 10)) {
-        req.session.amiciDaInvitare = true
-        console.debug("INVITI DISPONIBILI=", parseInt(user.local.eligibleFriends, 10) - parseInt(user.friends.length, 10))
-      }
-    }
-    // render the page and pass in any flash data if it exists
     res.render('login.njk', {
       message: req.flash('loginMessage'),
       returnTo: req.session.returnTo,
@@ -67,9 +48,28 @@ module.exports = function (app, passport, moment, mongoose) {
     failureRedirect: '/login', // redirect back to the signup page if there is an error
     failureFlash: true
   }),
-    function (req, res) {
+    async (req, res, next) => {
       console.debug('LOGIN RETURN TO :', req.body.returnTo)
-      res.redirect(req.body.returnTo || '/shop');
+      if (req.isAuthenticated()) {
+        console.debug('STATUS IN LOGIN', req.user.local.status)
+        if (req.user.local.status == 'waiting') {          
+          req.logout(function (err) {
+          if (err) { return next(err); }
+            //req.session.destroy();
+            //req.session = null;
+            req.flash('loginMessage', 'Devi validare la tua identità attraverso la mail che ti abbiamo inviato in fase di accettazione dell\'invito');
+            res.redirect('/login');
+          });
+        } else {
+          const invitiDisponibili = await lib.getInviteAvailable(req) 
+          if (invitiDisponibili.isInviteAvialable) {
+            req.session.amiciDaInvitare = true;
+            console.debug("INVITI DISPONIBILI=",invitiDisponibili.numInviteAvialable)
+            res.redirect(req.body.returnTo || '/shop');
+          }
+        }
+      }
+      
     }
   );
 
@@ -158,16 +158,13 @@ module.exports = function (app, passport, moment, mongoose) {
   // LOGOUT ==============================
   // =====================================
   //GET
-  app.get('/logout', function (req, res, next) {
+  app.post('/logout', function (req, res, next) {
 
     req.logout(function (err) {
       if (err) { return next(err); }
       req.session.destroy();
       req.session = null;
       res.redirect('/');
-      //req.session.destroy();
-      //req.logout();
-      //res.redirect('/');
     });
   });
 

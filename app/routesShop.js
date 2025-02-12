@@ -337,7 +337,7 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 // SHOP ======================================================================
 // ==========================================================================
 //GET
- app.get('/shop', lib.isLoggedIn, async function (req, res) {
+app.get('/shop', lib.isLoggedIn, async function (req, res) {
   try {
     const prods = await Product.find();
 
@@ -357,33 +357,26 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
       //if (cart !== undefined && cart[prodId] !== undefined) {
       //if (cart !== null && cart[prodId] !== null) {
       if (cart !== undefined && cart !== null ) {
-			console.debug('SHOP CART PROD ID', cart[prodId]);
-			if (cart[prodId]) {
+        console.debug('SHOP CART PROD ID', cart[prodId]);
+        if (cart[prodId]) {
 				  prod.quantity -= cart[prodId].qty; // Tolgo dallo shop quanto ho in carrello
 				  // Controllo che nel frattempo non abbiano acquistato beerbox
 				  // e nel caso aggiusto i quantitativi
 				  if (prod.quantity < 0) {
-					 cart[prodId].qty += prod.quantity;
-					 numProds += prod.quantity;
-					 prod.quantity = 0;
-					 req.flash('info', 'Mi dispiace, ma la quantità disponibile dei beerbox per la birra ' + prod.name + ' è inferiore alla richieste ricevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo ' + cart[prodId].qty + ' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
-				  }
-			}
+            cart[prodId].qty += prod.quantity;
+            numProds += prod.quantity;
+            prod.quantity = 0;
+            req.flash('info', 'Mi dispiace, ma la quantità disponibile dei beerbox per la birra ' + prod.name + ' è inferiore alla richieste ricevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo ' + cart[prodId].qty + ' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
+          }
+        }
       }
     });
-
-    // Controllo se ho amici da invitare per attivare nel menu il lampeggio del bottone +Invita
-    /*
-    const user = await User.findOne({ '_id': mongoose.Types.ObjectId(req.user.id) });
-    const amiciDaInvitare = parseInt(user.local.eligibleFriends, 10) > user.friends.length;
-    console.debug("AMICI DA INVITARE=", amiciDaInvitare);
-    */
 
     req.session.cart = cart;
 
     // Rimetto in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
     lib.retriveCart(req);
-    console.debug('CATALOGO PRODOTTI: ', prods);
+    //console.debug('CATALOGO PRODOTTI: ', prods);
 
     const model = {
       products: prods, // Prodotti dello shop

@@ -4,118 +4,118 @@
 
 {% if nOrders == 0 %}
 	 <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.1em;">
-      <!-- Shipping -->
-      <tr class="text-white">
-        <td width="100%"  padding-left: 15px;" valign="middle" align="center" >E' il tuo primo acquisto! <br> Una bottiglia omaggio per te</td>
-      </tr>
-    </table>
+			<!-- Shipping -->
+			<tr class="text-white">
+				<td width="100%"  padding-left: 15px;" valign="middle" align="center" >E' il tuo primo acquisto! <br> Una bottiglia omaggio per te</td>
+			</tr>
+		</table>
 {%endif%}
 
 <hr style="border-top: 1px solid #5375BD;">
 
 <table class="mx-auto" width="100%">
 {% for prod in cart.items %}
-  <tr>
-    <td width="40%" rowspan="3">
-      <div>
-        <img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%">
-      </div>
-    </td>
-    <td width="60%">
-      <div class="col"> <h5 class="card-title text-white text-left font-weight-bold"><p style="font-size:1.3em;color:#FFBB35;">{{prod.name}}</p></h5> </div>
-      <div class="col text-white text-left" style="font-size:1.0em">Beerbox: 6 birre da 50cl</div>
-    </td>
-  </tr>
-  <tr>
-    <td width="60%" class="text-white" valign="middle" align="right">
-      <span style="font-size:1.6em;">{{prod.prettyPrice}}</span>
-    </td>
-  </tr>
-  <tr>
-    <td width="60%">
-      <table width="100%" valign="middle">
-        <tr>
-          <td width="15%" valign="middle">
-            <form method="POST" action="cart/minus">
-              <input type="hidden" name="item_id" value="{{prod.id}}">
-              <input type="hidden" name="_csrf" value="{{_csrf}}">
-              <button class="btn btn-link" type="submit">
-                <span>
-                    <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path fill="#ffffff"
-                    d="M360-640v-80h240v80H360ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/></svg>
-                    <title>Togli</title>
-                </span>
-              </button>
-            </form>
-          </td>
-          <td width="20%" class="text-white text-center"><span style="font-size:1.3em;">{{prod.qty}}</span></td>
-          <td width="15%" valign="middle">
-            <form method="POST" action="cart/plus">
-              <input type="hidden" name="item_id" value="{{prod.id}}">
-              <input type="hidden" name="_csrf" value="{{_csrf}}">
-              <button class="btn btn-link" type="submit">
-                <span>
-                  <svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path fill="#ffffff"
-                  d="M440-600v-120H320v-80h120v-120h80v120h120v80H520v120h-80ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/></svg>
-                  <title>Aggiungi</title>
-                </span>
-              </button>
-            </form>
-          </td>
-          <td width="50%" class="text-white" valign="middle" align="right">
-            <form method="POST" action="cart/delete">
-              <input type="hidden" name="item_id" value="{{prod.id}}">
-              <input type="hidden" name="_csrf" value="{_csrf}">
-              <button class="btn btn-link" type="submit"><span style="font-size:16px; font-color:gray;">Rimuovi</span></button>
-            </form>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <hr style="border-top: 1px solid #5375BD;">
-    </td>
-  </tr>
+	<tr>
+		<td width="40%" rowspan="3">
+			<div>
+				<img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%">
+			</div>
+		</td>
+		<td width="60%">
+			<div class="col"> <h5 class="card-title text-white text-left font-weight-bold"><p style="font-size:1.3em;color:#FFBB35;">{{prod.name}}</p></h5> </div>
+			<div class="col text-white text-left" style="font-size:1.0em">Beerbox: 6 birre da 50cl</div>
+		</td>
+	</tr>
+	<tr>
+		<td width="60%" class="text-white" valign="middle" align="right">
+			<span style="font-size:1.6em;">{{prod.prettyPrice}}</span>
+		</td>
+	</tr>
+	<tr>
+		<td width="60%">
+			<table width="100%" valign="middle">
+				<tr>
+					<td width="15%" valign="middle">
+						<form method="POST" action="cart/minus">
+							<input type="hidden" name="item_id" value="{{prod.id}}">
+							<input type="hidden" name="_csrf" value="{{_csrf}}">
+							<button class="btn btn-link" type="submit">
+								<span>
+										<svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path fill="#ffffff"
+										d="M360-640v-80h240v80H360ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/></svg>
+										<title>Togli</title>
+								</span>
+							</button>
+						</form>
+					</td>
+					<td width="20%" class="text-white text-center"><span style="font-size:1.3em;">{{prod.qty}}</span></td>
+					<td width="15%" valign="middle">
+						<form method="POST" action="cart/plus">
+							<input type="hidden" name="item_id" value="{{prod.id}}">
+							<input type="hidden" name="_csrf" value="{{_csrf}}">
+							<button class="btn btn-link" type="submit">
+								<span>
+									<svg xmlns="http://www.w3.org/2000/svg" height="32" viewBox="0 -960 960 960" width="32"><path fill="#ffffff"
+									d="M440-600v-120H320v-80h120v-120h80v120h120v80H520v120h-80ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z"/></svg>
+									<title>Aggiungi</title>
+								</span>
+							</button>
+						</form>
+					</td>
+					<td width="50%" class="text-white" valign="middle" align="right">
+						<form method="POST" action="cart/delete">
+							<input type="hidden" name="item_id" value="{{prod.id}}">
+							<input type="hidden" name="_csrf" value="{_csrf}">
+							<button class="btn btn-link" type="submit"><span style="font-size:16px; font-color:gray;">Rimuovi</span></button>
+						</form>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<hr style="border-top: 1px solid #5375BD;">
+		</td>
+	</tr>
 
-  {% endfor %}
+	{% endfor %}
 </table>
 
  <table width="100%">
-    <tr>
-      <td>
+		<tr>
+			<td>
 
-  {% if numProducts != 0 %}
+	{% if numProducts != 0 %}
 
-      <div>
-        <div>
-          <h4 class="text-white text-center">Totale ordine: <strong>€{{totalPrice}}</strong></h4>
-        </div>
-      </div>
-      <form role="form" action="/register" method="GET">
-      <div style="margin-bottom: 40px;">
-        <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-          Procedi con l'acquisto
-        </button>
-      </div>
-      </form>
+			<div>
+				<div>
+					<h4 class="text-white text-center">Totale ordine: <strong>€{{totalPrice}}</strong></h4>
+				</div>
+			</div>
+			<form role="form" action="/register" method="GET">
+			<div style="margin-bottom: 40px;">
+				<button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+					Procedi con l'acquisto
+				</button>
+			</div>
+			</form>
 
-  {% else %}
+	{% else %}
 
-    <div class="col">
-        <h4><p class="text-white text-center">Il carrello è vuoto...</p></h4>
-    </div>
-    <div class="col">
-      <form method="GET" action="/shop">
-        <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-          <h4>Shop</h4>
-        </button>
-        <br>
-     </form>
-    </div>
-  {% endif %}
-    </td>
-  </tr>
+		<div class="col">
+				<h4><p class="text-white text-center">Il carrello è vuoto...</p></h4>
+		</div>
+		<div class="col">
+			<form method="GET" action="/shop">
+				<button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+					<h4>Shop</h4>
+				</button>
+				<br>
+		 </form>
+		</div>
+	{% endif %}
+		</td>
+	</tr>
 </table>
 {% endblock %}

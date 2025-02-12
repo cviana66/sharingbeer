@@ -1,0 +1,203 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<style>
+    table {
+        width: 100%; /* Larghezza della tabella */
+        margin: 10px auto; /* Centra la tabella n pagina */
+        border-spacing: 0; /* Rimuove lo spazio tra le celle */
+        border-collapse: separate; /* Permette di avere bordi separati */
+        background-color: #2A0009; /* Colore di sfondo della tabella */
+        border-radius: 10px; /* Arrotonda gli angoli della tabella */
+        overflow: hidden; /* Nasconde gli angoli arrotondati */
+        border: 1px solid #903246; /* Bordo della tabella */
+    }
+
+    th,
+    td {
+        border: 1px solid #903246;
+        /* Colore del bordo più chiaro */
+        padding: 5px;
+        /* Interspaziatura interna */
+        color: white;
+        /* Colore del testo */
+        text-align: left;
+        /* Allineamento del testo */
+        font-size: 0.8em
+    }
+
+    th {
+        background-color: #3B1A1E;
+        /* Colore di sfondo per l'intestazione */
+    }
+</style>
+
+<h3 class="text-white text-center"> Inviti in scadenza </h3>
+{% for friend in friendsNonValidated %}
+{% if friend.local.residualTime > 0 %}
+<table>
+    <thead >
+        <th colspan="2"> 
+            <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
+        </th>
+    </thead>
+    <tr >
+        <td width="40%"> 
+            Invito effettuato il <span style="font-size:1.3em; font-weight: bold;" >{{ friend.local.initDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })}} </span>
+        </td>
+        <td rowspan="2">
+            <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
+                Avvisa <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
+            </button>
+        </td> 
+    </tr>
+    <tr>
+        <td> 
+            Scade tra <span style="font-size:1.3em; font-weight: bold;"> {{ friend.local.residualTime }} </span> giorni 
+        </td>        
+    </tr>
+</table>
+{% endif %}
+{% endfor %}
+<h3 class="text-white text-center"> Inviti scaduti </h3>
+{% for friend in friendsNonValidated %}
+{% if friend.local.residualTime <= 0 %}
+<table>
+    <thead >
+        <th colspan="2"> 
+            <span style="font-size:1.5em">{{ friend.local.name.first }} </span>
+        </th>
+    </thead>
+    <!--tr>
+        <td width="50%"> Invito scaduto</td>
+        <td>{{ friend.local.token }}</td>
+    </tr-->
+</table>
+{% endif %}
+{% endfor %}
+<h3 class="text-white text-center"> Inviti accettati </h3>
+{% for friend in friendsValidated %}
+<table>
+    <thead>
+        <th colspan="4" style="font-size:1.2em">{{ friend.friends.name.first }}</th>
+    </thead>
+    <tr>
+
+        <td colspan="2"></td>
+        <td colspan="2"></td>
+    </tr>
+</table>
+{% endfor %}
+
+<script  type="text/javascript">
+
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("loading").style.display = 'none';
+  });
+
+  async function share(token,parentName,server) {
+
+    if (document.getElementById("inputFirstName").value == "") {
+      let text = "Inserire il Nome";
+      document.getElementById("wrongFirstName").innerHTML = text;
+      document.getElementById("inputFirstName").focus();
+    } else {
+      //--------------------------------------------
+      // Disabilito il pulsante e abilito il loading
+      //--------------------------------------------
+      document.getElementById("mybutton").disabled = 'true';
+      document.getElementById("loading").style.display = 'block';
+
+      let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
+
+      fetch('/recomm',
+        {
+          method: 'POST',
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            "firstName": firstName,
+          })
+        }
+      ).then(function(result)
+        {
+          return result.json();
+        }
+      ).then( async function(data)
+        {
+          if (data.ok) {
+            let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale. \nTi mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
+            //console.log('textText -->', textText)
+            let shareData = {
+              title: 'Birrificio Viana - Codice invito SharingBeer',
+              text: textText
+              //url: server+"/validation?token="+token
+            }
+            if (navigator.canShare) {
+              try {
+                //console.log("Prima del navigator")
+                //document.getElementById("loading").style.display = 'block';
+                /*await*/ navigator.share(shareData);
+                //document.getElementById("loading").style.display = 'none';
+                //console.log("Dopo il navigator")
+                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+              } catch (e) {
+                console.log("nel catch: ", e)
+                //document.getElementById("loading").style.display = 'none';
+                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+              }
+            } else {
+              //console.log("nell'else del if navigator")
+              let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
+              //console.log("MAILTO ", a)
+              post('/infoShare',{firstName:data.friendName,flag:data.flag});
+            }
+          } else {
+              post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito", type:"warning", err:data.err});
+          }
+        }
+
+      ).catch((error)=> {
+          document.getElementById("loading").style.display = 'none';
+          post('/infoShare',{firstName:data.friendName,flag:data.flag});
+          }
+      ).finally(()=> {document.getElementById("loading").style.display = 'none';});
+    }
+  }
+
+  function capitalizeFirstLetter(string) {
+    if (typeof(string) != "undefined") {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    }
+  }
+  /**
+  * sends a request to the specified url from a form. this will change the window location.
+  * @param {string} path the path to send the post request to
+  * @param {object} params the parameters to add to the url
+  * @param {string} [method=post] the method to use on the form
+  */
+  function post(path, params, method='post') {
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less verbose if you use one.
+    const form = document.createElement('form');
+    form.method = method;
+    form.action = path;
+
+    for (const key in params) {
+      if (params.hasOwnProperty(key)) {
+        const hiddenField = document.createElement('input');
+        hiddenField.type = 'hidden';
+        hiddenField.name = key;
+        hiddenField.value = params[key];
+        form.appendChild(hiddenField);
+      }
+    }
+    document.body.appendChild(form);
+    form.submit();
+  }
+</script>
+
+
+{% endblock %}
