@@ -2,87 +2,262 @@
 {% block body %}
 
 <style>
-    table {
-        width: 100%;
-        /* Larghezza della tabella */
-        margin: 10px auto;
-        /* Centra la tabella n pagina */
-        border-collapse: collapse;
-        /* Rimuove gli spazi tra i bordi delle celle */
-        background-color: #2A0009;
-        /* Colore di sfondo della tabella */
-    }
-
-    th,
-    td {
-        border: 1px solid #903246;
-        /* Colore del bordo più chiaro */
-        padding: 2px;
-        /* Interspaziatura interna */
-        color: white;
-        /* Colore del testo */
-        text-align: left;
-        /* Allineamento del testo */
-        font-size: 0.8em
-    }
-
-    th {
-        background-color: #3B1A1E;
-        /* Colore di sfondo per l'intestazione */
-    }
+  table {
+    width: 100%;
+    /* Larghezza della tabella */
+    margin: 10px auto;
+    /* Centra la tabella n pagina */
+    border-collapse: collapse;
+    /* Rimuove gli spazi tra i bordi delle celle */
+    background-color: #2A0009;
+    /* Colore di sfondo della tabella */
+  }
+  th, td {
+    border: 1px solid #903246;
+    /* Colore del bordo più chiaro */
+    padding: 2px;
+    /* Interspaziatura interna */
+    color: white;
+    /* Colore del testo */
+    text-align: left;
+    /* Allineamento del testo */
+    font-size: 0.8em
+  }
+  th {
+    background-color: #3B1A1E;
+    /* Colore di sfondo per l'intestazione */
+  }
+  .toggle-button {
+            cursor: pointer;
+            color: #FFBB35;
+            text-decoration: none;            
+        }
 </style>
-{% for user in users %}
-<table>
-    <thead>
-        <th colspan="4" style="font-size:1.2em">{{ user.local.name.first }} {{ user.local.name.last }}</th>
+
+<h3 class="text-white text-center bg-dark"> Clienti con Ordini </h3>
+<h4 class="text-white text-center bg-dark"> <input type="checkbox" id="selezionaTuttiConOrdini" /> Seleziona Tutti </h4>
+<form action="/sendNotifyMail" method="POST">
+  <input type="hidden" name="tipoCliente" value="conOrdini" />
+  {% for user in usersWithOrders %}
+  <table>
+      <thead>
+      <th colspan="4" style="font-size:1.2em">    
+        <input type="checkbox" name="customers" value="{{ user.id }}" class="clienteConOrdini"> 
+        {{ user.local.name.first }} {{ user.local.name.last }}
+      </th>
     </thead>
     <tr>
-
-        <td colspan="2">{{ user.local.email }}</td>
-        <td colspan="2">{{ user.local.mobilePrefix }} {{ user.local.mobileNumber }}</td>
-
+      <td colspan="2">{{ user.local.email }}</td>
+      <td colspan="2">{{ user.local.mobilePrefix }} {{ user.local.mobileNumber }}</td>
     </tr>
-
     <tr>
-        <thead>
-            <th colspan="4"> Indirizzi </th>
-        </thead>
+      <thead>
+        <th colspan="4"> Indirizzi </th>
+      </thead>
     </tr>
     <tbody>
-        {% for address in user.addresses %}
-        <tr>
-            <td>{{ address.name.first }} {{ address.name.last }}</td>
-            <td>{{ address.mobilePrefix }} {{ address.mobileNumber }}</td>
-            {% if address.main == "yes" %}
-            <td colspan="2" style="background-color:yellow; color:#2A0009">
-            {%else%}
-            <td colspan="2">
-                {%endif%}
-                {{ address.address }}, {{ address.houseNumber }}, {{ address.city }}, {{ address.province }}, {{
-                address.postcode }}
-            </td>
-        </tr>
-        {% endfor %}
-        {% if (user.friends | length) > 0 %}
-        <thead>
-            <th colspan="4"> Amici </th>
-        </thead>
-        {% endif %}
-        {% for friend in user.friends %}
-        <tr>
-            {% if friend.status == "accepted" %}
-            <td colspan="1" style="background-color: green">
+      {% for address in user.addresses %}
+      <tr>
+        <td width="33%">{{ address.name.first }} {{ address.name.last }}</td>
+        <td width="33%">{{ address.mobilePrefix }} {{ address.mobileNumber }}</td>
+        {% if address.main == "yes" %}
+        <td colspan="2" style="background-color:yellow; color:#2A0009">
+        {%else%}
+        <td colspan="2">
+        {%endif%}
+        {{ address.address }}, {{ address.houseNumber }}, {{ address.city }}, {{address.postcode }} ({{ address.province }}) 
+        </td>
+      </tr>
+      {% endfor %}
+      {% if (user.friends | length) > 0 %}
+      <tr>
+        <td colspan="4" style="font-size:1.1em">
+          <span class="toggle-button" onclick="toggleFriends('{{user.id}}')">[+] </span> Amici
+        </td>
+      </tr>
+      {% endif %}
+      
+      <tr id="friends-list-{{user.id}}" style="display: none;">
+        <td colspan="4">
+          <table>
+            <tbody>
+              {% for friend in user.friends %}
+              <tr>
+                {% if friend.status == "accepted" %}
+                <td colspan="1" style="background-color: green">
                 {% else %}
-            <td colspan="1" style="background-color: red">
-                {%endif%}
-                {{ friend.name.first }} {{ friend.name.last }}
-            </td>
-            <td colspan="3">{{ friend.email }} <br> {{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit',
-                month: '2-digit', year: 'numeric' }) }}</td>
-        </tr>
-        {% endfor %}
+                <td colspan="1" style="background-color: red">
+                {% endif %}
+                  {{ friend.name.first }} {{ friend.name.last }}
+                </td>
+                <td colspan="3">
+                  {{ friend.email }} <br> {{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </td>        
+      </tr>
     </tbody>
-</table>
-{% endfor %}
+  </table>
+  <script>
+    function toggleFriends(userId) {
+      const friendsList = document.getElementById('friends-list-'+userId);
+      const toggleButton = document.querySelector('.toggle-button');
+
+      if (friendsList.style.display === 'none') {
+        friendsList.style.display = 'table-row'; // Mostra la lista degli amici
+        toggleButton.textContent = '[-]'; // Cambia il testo del pulsante
+      } else {
+        friendsList.style.display = 'none'; // Nascondi la lista degli amici
+        toggleButton.textContent = '[+]'; // Cambia il testo del pulsante
+      }
+    }
+  </script>
+  {% endfor %}
+  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+     Invia e-mail di notifica <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
+  </button>
+</form>
+
+<!------------------------------------------------------------------------------------------------------------>
+
+<h3 class="text-white text-center bg-dark"> Clienti senza Ordini </h3>
+<h4 class="text-white text-center bg-dark"> <input type="checkbox" id="selezionaTuttiSenzaOrdini" /> Seleziona Tutti </h4>
+<form action="/sendNotifyMail" method="POST">
+  <input type="hidden" name="tipoCliente" value="senzaOrdini" />
+  {% for user in usersWithoutOrders %}
+  <table>
+    <thead>
+      <th colspan="4" style="font-size:1.2em">    
+        <input type="checkbox" name="customers" value="{{ user.id }}" class="clienteSenzaOrdini"> 
+        {{ user.local.name.first }} {{ user.local.name.last }}
+      </th>
+    </thead>
+    <tr>
+      <td colspan="2">{{ user.local.email }}</td>
+      <td colspan="2">{{ user.local.mobilePrefix }} {{ user.local.mobileNumber }}</td>
+    </tr>
+    <tr>
+      <thead>
+        <th colspan="4"> Indirizzi </th>
+      </thead>
+    </tr>
+    <tbody>
+      {% for address in user.addresses %}
+      <tr>
+        <td width="33%">{{ address.name.first }} {{ address.name.last }}</td>
+        <td width="33%">{{ address.mobilePrefix }} {{ address.mobileNumber }}</td>
+        {% if address.main == "yes" %}
+        <td colspan="2" style="background-color:yellow; color:#2A0009">
+        {%else%}
+        <td colspan="2">
+        {%endif%}
+        {{ address.address }}, {{ address.houseNumber }}, {{ address.city }}, {{address.postcode }} ({{ address.province }}) 
+        </td>
+      </tr>
+      {% endfor %}
+      {% if (user.friends | length) > 0 %}
+      <tr>
+        <td colspan="4" style="font-size:1.1em">
+          <span class="toggle-button" onclick="toggleFriends('{{user.id}}')">[+] </span> Amici
+        </td>
+      </tr>
+      {% endif %}
+      
+      <tr id="friends-list-{{user.id}}" style="display: none;">
+        <td colspan="4">
+          <table>
+            <tbody>
+              {% for friend in user.friends %}
+              <tr>
+                {% if friend.status == "accepted" %}
+                <td colspan="1" style="background-color: green">
+                {% else %}
+                <td colspan="1" style="background-color: red">
+                {% endif %}
+                  {{ friend.name.first }} {{ friend.name.last }}
+                </td>
+                <td colspan="3">
+                  {{ friend.email }} <br> {{ friend.insertDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </td>        
+      </tr>
+    </tbody>
+  </table>
+  <script>
+    function toggleFriends(userId) {
+      const friendsList = document.getElementById('friends-list-'+userId);
+      const toggleButton = document.querySelector('.toggle-button');
+
+      if (friendsList.style.display === 'none') {
+        friendsList.style.display = 'table-row'; // Mostra la lista degli amici
+        toggleButton.textContent = '[-]'; // Cambia il testo del pulsante
+      } else {
+        friendsList.style.display = 'none'; // Nascondi la lista degli amici
+        toggleButton.textContent = '[+]'; // Cambia il testo del pulsante
+      }
+    }
+  </script>
+  {% endfor %}
+  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+     Invia e-mail di notifica <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
+  </button>
+</form>
+
+<script>
+  const selezionaTuttiCon = document.getElementById('selezionaTuttiConOrdini');
+  const clientiCon = document.querySelectorAll('.clienteConOrdini');
+
+  selezionaTuttiCon.addEventListener('change', () => {
+    if (selezionaTuttiCon.checked) {
+      clientiCon.forEach(cliente => {
+        cliente.checked = true;
+      });
+    } else {
+      clientiCon.forEach(cliente => {
+        cliente.checked = false;
+      });
+    }
+  });
+
+  clientiCon.forEach(cliente => {
+    cliente.addEventListener('change', () => {
+      if (!cliente.checked) {
+        selezionaTuttiCon.checked = false;
+      }
+    });
+  });
+
+  //-------------------------------------------------
+
+  const selezionaTuttiSenza = document.getElementById('selezionaTuttiSenzaOrdini');
+  const clientiSenza = document.querySelectorAll('.clienteSenzaOrdini');
+
+  selezionaTuttiSenza.addEventListener('change', () => {
+    if (selezionaTuttiSenza.checked) {
+      clientiSenza.forEach(cliente => {
+        cliente.checked = true;
+      });
+    } else {
+      clientiSenza.forEach(cliente => {
+        cliente.checked = false;
+      });
+    }
+  });
+
+  clientiSenza.forEach(cliente => {
+    cliente.addEventListener('change', () => {
+      if (!cliente.checked) {
+        selezionaTuttiSenza.checked = false;
+      }
+    });
+  });
+</script>
 
 {% endblock %}

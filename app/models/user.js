@@ -50,12 +50,13 @@ const userSchema = new Schema({
               }],
   friends : [{  id    : {type: String, unique: true },
                 name  : { first: {type: String},
-								last: {type: String},
+								          last: {type: String},
                         },
                 status      : {type: String},
                 token       : {type: String, required: true, unique: true},
                 email       : {type: String, unique: true},
-                insertDate  : {type: Date, default: Date.now}
+                insertDate  : {type: Date, default: Date.now},
+                numOfNotify : {type: Number, default: 0},
             }],
   orders: [{
               email       : { type: String, required: true },

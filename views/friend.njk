@@ -54,7 +54,7 @@
               name="firstName" placeholder="Nome" required {{controlSates}} >
             </div>
             <div style="margin-bottom: 40px; margin-top: 40px;">
-              <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
+              <button type="button" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
                 Crea l'invito e condividilo
               </button>
             </div>
@@ -134,7 +134,6 @@
               post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito", type:"warning", err:data.err});
           }
         }
-
       ).catch((error)=> {
 		  document.getElementById("loading").style.display = 'none';
 		  post('/infoShare',{firstName:data.friendName,flag:data.flag});

@@ -62,11 +62,15 @@ module.exports = function (app, passport, moment, mongoose) {
           });
         } else {
           const invitiDisponibili = await lib.getInviteAvailable(req) 
+          console.debug('INVITIDISPONIBILE', invitiDisponibili)
           if (invitiDisponibili.isInviteAvialable) {
             req.session.amiciDaInvitare = true;
+            console.debug("INVITI DISPONIBILI=",invitiDisponibili.numInviteAvialable)            
+          } else {
+            req.session.amiciDaInvitare = false;
             console.debug("INVITI DISPONIBILI=",invitiDisponibili.numInviteAvialable)
-            res.redirect(req.body.returnTo || '/shop');
           }
+          res.redirect(req.body.returnTo || '/shop');
         }
       }
       
@@ -276,9 +280,12 @@ module.exports = function (app, passport, moment, mongoose) {
 
       await user.save();
 
-      await req.logIn(user);
-      req.flash('success', 'Perfetto! La tua password è stata cambianta.');
-      return res.redirect('profile');
+      //await req.logIn(user);
+      req.logIn(user, (err) => {
+        if (err) { return next(err); }
+        req.flash('success', 'Perfetto! La tua password è stata cambianta.');
+        return res.redirect('profile');
+      });
 
     } catch (err) {
       req.flash('error', 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova');

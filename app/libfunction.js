@@ -130,6 +130,20 @@ module.exports = {
         subject: 'Conferma d\'ordine - Birrificio Viana', // Subject line
         html: html
       }
+    } else if (typeOfMail == 'notificaClienteConOrdiniFatti') {
+      var mailOptions = {
+        from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
+        to: Email, //'cviana66@gmail.com', // list of receivers
+        subject: 'Avviso - Birrificio Viana', // Subject line
+        html: html
+      }
+    } else if (typeOfMail == 'notificaClienteSenzaOrdiniFatti') {
+      var mailOptions = {
+        from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
+        to: Email, //'cviana66@gmail.com', // list of receivers
+        subject: 'Avviso - Birrificio Viana', // Subject line
+        html: html
+      }
     }
     // effettua l'invio della mail
     try {
@@ -355,9 +369,20 @@ async function getFriendsInfo(req) {
       }
     }
   ]);
-  users[0].numInviteAvialable = req.user.local.eligibleFriends - users[0].new - users[0].accepted
-  users[0].numFriendsInvited = users[0].new + users[0].accepted
-  users[0].isInviteAvialable = (users[0].numInviteAvialable == 0) ? false : true;
-  console.debug('getFriendsInfo -> SITUAZIONE INVITI:',users)
-  return users[0];
+  
+  if (users.length > 0) {
+    users[0].numInviteAvialable = req.user.local.eligibleFriends - users[0].new - users[0].accepted
+    users[0].numFriendsInvited = users[0].new + users[0].accepted
+    users[0].isInviteAvialable = (users[0].numInviteAvialable == 0) ? false : true;
+    console.debug('getFriendsInfo -> SITUAZIONE INVITI:',users)
+    return users[0];
+  } else {
+    let users = []
+    users[0] = {  numInviteAvialable : 0,
+                  numFriendsInvited : 0,
+                  isInviteAvialable : false }
+
+    console.debug('getFriendsInfo -> SITUAZIONE INVITI:',users)
+    return users[0];
+  }
 }

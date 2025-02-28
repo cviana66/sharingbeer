@@ -32,103 +32,128 @@
     }
 </style>
 
-<h3 class="text-white text-center"> Inviti in scadenza </h3>
-{% for friend in friendsNonValidated %}
-{% if friend.local.residualTime > 0 %}
-<table>
-    <thead >
-        <th colspan="2"> 
-            <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
-        </th>
-    </thead>
-    <tr >
-        <td width="40%"> 
-            Invito effettuato il <span style="font-size:1.3em; font-weight: bold;" >{{ friend.local.initDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })}} </span>
-        </td>
-        <td rowspan="2">
-            <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
-                Avvisa <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
-            </button>
-        </td> 
-    </tr>
-    <tr>
-        <td> 
-            Scade tra <span style="font-size:1.3em; font-weight: bold;"> {{ friend.local.residualTime }} </span> giorni 
-        </td>        
-    </tr>
-</table>
+<h3 class="text-white text-center bg-dark"> Inviti in scadenza </h3>
+{% set c = "0" %}
+  {% for friend in friendsNew %}
+    {% if friend.local.residualTime > 0 %}
+    {% set c = "1" %}
+    <table>
+        <thead >
+            <th colspan="2"> 
+                <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
+            </th>
+        </thead>
+        <tr >
+            <td width="40%"> 
+                Invito effettuato il <span style="font-size:1.3em; font-weight: bold;" >{{ friend.local.initDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })}} </span>
+            </td>
+            <td rowspan="2">
+                <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" 
+                  onclick="return share('{{friend.local.name.first}}','{{friend.local.token}}','{{user.local.name.first}}','{{server}}','{{friend.local.residualTime}}')">
+                    Avvisa <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
+                </button>
+            </td> 
+        </tr>
+        <tr>
+            <td> 
+                Scade tra <span style="font-size:1.3em; font-weight: bold;"> {{ friend.local.residualTime }} </span> giorni 
+            </td>        
+        </tr>
+    </table>
+    {% endif %}
+  {% endfor %}
+{% if c == "0" %}
+<p class="text-white text-center bg-dark"> Nessun invito in scadenza </p>
 {% endif %}
-{% endfor %}
-<h3 class="text-white text-center"> Inviti scaduti </h3>
-{% for friend in friendsNonValidated %}
-{% if friend.local.residualTime <= 0 %}
-<table>
-    <thead >
-        <th colspan="2"> 
-            <span style="font-size:1.5em">{{ friend.local.name.first }} </span>
-        </th>
-    </thead>
-    <!--tr>
-        <td width="50%"> Invito scaduto</td>
-        <td>{{ friend.local.token }}</td>
-    </tr-->
-</table>
+
+<h3 class="text-white text-center bg-dark"> Inviti scaduti </h3>
+{% if isScaduti %}
+  {% for friend in friendsNew %}
+    {% if friend.local.residualTime <= 0 %}
+    <table>
+        <thead >
+            <th colspan="2"> 
+                <span style="font-size:1.5em">{{ friend.local.name.first }} {{ friend.local.residualTime }}</span>
+            </th>
+        </thead>
+        <!--tr>
+            <td width="50%"> Invito scaduto</td>
+            <td>{{ friend.local.token }}</td>
+        </tr-->
+    </table>                                                                                                                                                                        
+    {% endif %}
+  {% endfor %}
+{% else %}
+  <p class="text-white text-center"> Nessun invito scaduto </p>
 {% endif %}
-{% endfor %}
-<h3 class="text-white text-center"> Inviti accettati </h3>
+
+<h3 class="text-white text-center bg-dark"> Inviti accettati </h3>
+{% set a = "0" %}
 {% for friend in friendsValidated %}
+{% set a = "1" %}
 <table>
     <thead>
-        <th colspan="4" style="font-size:1.2em">{{ friend.friends.name.first }}</th>
+        <th style="font-size:1.2em">{{ friend.local.name.first }} {{ friend.local.name.last }}</th>
     </thead>
-    <tr>
-
-        <td colspan="2"></td>
-        <td colspan="2"></td>
-    </tr>
+    <!--tr>
+        <td colspan="2">{{ friend.local.name.first }}</td>
+        <td colspan="2">{{ friend.local.name.last }}</td>
+    </tr-->
 </table>
 {% endfor %}
+{% for friend in friendsCustomer %}
+{% set a = "1" %}
+<table>
+    <thead>
+        <th style="font-size:1.2em">{{ friend.local.name.first }} {{ friend.local.name.last }}</th>
+    </thead>
+    <!--tr>
+        <td colspan="2">{{ friend.local.name.first }}</td>
+        <td colspan="2">{{ friend.local.name.last }}</td>
+    </tr-->
+</table>
+{% endfor %}
+{% if a == "0" %}
+<p class="text-white text-center"> Nessun invito accettato </p>
+{% endif %}
+<div id="loading" style="display:none">
+  <img  src="/img/ajax-loader-1.gif" alt="Loading..." />
+</div>
 
 <script  type="text/javascript">
-
   document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("loading").style.display = 'none';
   });
 
-  async function share(token,parentName,server) {
+  async function share(friendName,token,parentName,server,residualTime) {
 
-    if (document.getElementById("inputFirstName").value == "") {
-      let text = "Inserire il Nome";
-      document.getElementById("wrongFirstName").innerHTML = text;
-      document.getElementById("inputFirstName").focus();
-    } else {
-      //--------------------------------------------
-      // Disabilito il pulsante e abilito il loading
-      //--------------------------------------------
-      document.getElementById("mybutton").disabled = 'true';
-      document.getElementById("loading").style.display = 'block';
+    //--------------------------------------------
+    // Disabilito il pulsante e abilito il loading
+    //--------------------------------------------
+    document.getElementById("mybutton").disabled = 'true';
+    document.getElementById("loading").style.display = 'block';
 
-      let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
+    let firstName = capitalizeFirstLetter(friendName);
 
-      fetch('/recomm',
+    fetch('/updateNotify',
         {
           method: 'POST',
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            "firstName": firstName,
+            'token': token,
           })
         }
       ).then(function(result)
         {
           return result.json();
         }
-      ).then( async function(data)
-        {
+      ).then( async (data) => {
           if (data.ok) {
-            let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale. \nTi mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
-            //console.log('textText -->', textText)
+            //"Ciao Carlo. Non dimenticare di registrarti su https://www.esempio.it. Hai ancora 10 giorni per utilizzare il tuo link personale [link] e assicurarti una birra omaggio." 
+            let textText = "Ciao "+friendName+", non dimenticare di registrarti su Sharingbeer. \n\nHai ancora "+residualTime+" giorni per utilizzare il tuo link personale e assicurarti una birra omaggio.\n\n"+server+"/validation?token="+token+"\n\nNon perdere l'occasione!\n"+parentName; 
+            console.log('textText -->', textText)
             let shareData = {
               title: 'Birrificio Viana - Codice invito SharingBeer',
               text: textText
@@ -136,35 +161,22 @@
             }
             if (navigator.canShare) {
               try {
-                //console.log("Prima del navigator")
-                //document.getElementById("loading").style.display = 'block';
-                /*await*/ navigator.share(shareData);
-                //document.getElementById("loading").style.display = 'none';
-                //console.log("Dopo il navigator")
-                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+                await navigator.share(shareData);
+                post('/listOfFriends');
               } catch (e) {
                 console.log("nel catch: ", e)
-                //document.getElementById("loading").style.display = 'none';
-                post('/infoShare',{firstName:data.friendName,flag:data.flag});
+                post('/listOfFriends');
               }
             } else {
-              //console.log("nell'else del if navigator")
               let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
-              //console.log("MAILTO ", a)
-              post('/infoShare',{firstName:data.friendName,flag:data.flag});
+              post('/listOfFriends');
             }
-          } else {
-              post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito", type:"warning", err:data.err});
           }
         }
-
-      ).catch((error)=> {
-          document.getElementById("loading").style.display = 'none';
-          post('/infoShare',{firstName:data.friendName,flag:data.flag});
-          }
-      ).finally(()=> {document.getElementById("loading").style.display = 'none';});
-    }
-  }
+      ).catch((error)=> {      
+      post('/listOfFriends',{msg:"Condivisione non avvenuta. Effettua nuovamente la richiesta avviso", type:"warning", err:data.err});
+      })          
+  };
 
   function capitalizeFirstLetter(string) {
     if (typeof(string) != "undefined") {

@@ -1,5 +1,7 @@
 var Users = require('../app/models/user');
 var lib = require('./libfunction');
+const mailToCustomerWithOrder  = require('../config/mailToCustomerWithOrder');
+const mailToCustomerWithoutOrder  = require('../config/mailToCustomerWithoutOrder');
 
 module.exports = (app, moment, mongoose) => {
 
@@ -8,11 +10,12 @@ module.exports = (app, moment, mongoose) => {
 	// =============================================================================
 	//GET
 	app.get('/listOfCustomer', lib.isAdmin, async (req, res) => {
-		console.debug('LISTA DEI CLIENTI');
 		try {
-			const users = await Users.find( {$or: [ { 'local.status': 'customer'}, {'local.status':'validated' }]}).sort({"local.initDate": 1});
+			const usersWithOrders = await getCustomerWithOrderDone()
+			const usersWithoutOrders = await getCustomerWithoutOrder()
 			res.render('elencoClienti.njk', {
-				users: users,
+				usersWithOrders: usersWithOrders,
+				usersWithoutOrders: usersWithoutOrders,
 				user: req.user
 			})
 		} catch (err) {
@@ -20,43 +23,206 @@ module.exports = (app, moment, mongoose) => {
 		}
 	})
 
-	//GET
-	app.get('/listOfFriends', lib.isLoggedIn, async (req, res) => {
-		console.debug('LISTA DI AMICI');
+	app.post('/sendNotifyMail', lib.isAdmin, async (req,res) => {
+
+		var selectedCustomers = req.body.customers; // Array di ID dei clienti selezionati
+
+		console.debug('CUSTOMERS ID',selectedCustomers)
+		if (typeof selectedCustomers === "string") selectedCustomers = [selectedCustomers]
+		try {		
+			for (const customerId of selectedCustomers) {
+				//console.debug(customerId)
+	    	const customer = await Users.findById(customerId);
+	    	const server = lib.getServer(req);
+	    	console.debug('CUSTOMER', customer.local.email)
+	    	if (req.body.tipoCliente == 'conOrdini') {
+		    	res.send(mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server))    		    	
+		    	//await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme', server);
+	    	} else if (req.body.tipoCliente == 'senzaOrdini') {
+	    		res.send(mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server))    		    	
+		    	//await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme', server);
+	    	}
+	    }
+	  } catch (e) {
+	  	console.error(e);
+	  }
+	});
+
+	//ALL
+	app.all('/listOfFriends', lib.isLoggedIn, async (req, res) => {		
+		
+		let msg = req.body.msg;
+    let msgType = req.body.type;
+    req.flash('message', msg);
 		try {
-
+			var isScaduti = false
 			const userId = req.user._id;
-			const friendsTokens = await findFriendsTokens(userId);
-			var usersWithTokens = await findNewUsersFromTokens(friendsTokens);		
+			const friendsTokens = await findFriendsTokens(userId); //ricavo i token perchè non ho ancora l'id
+			const friendsId = await findFriendsId(userId); //ricavo l'id perchè il token è cambiato
+			const filteredFriendsId = friendsId.filter(item => item !== undefined);
 
-			console.debug(friendsTokens);
-			console.debug(usersWithTokens);
+			//console.debug("FRIENDS TOKEN",friendsTokens);
+			console.debug("FRIENDS ID",filteredFriendsId);
 
-			for (const documento of usersWithTokens) {
- 				 console.debug(`ID: ${documento.id}, initDate: ${documento.local.resetPasswordExpires}`);
+			var usersFriendsNew = await findUsersFromTokensAndStatus(friendsTokens,['new','waiting']); 		
+			var usersFriendsValidated = await findUsersFromIdAndStatus(filteredFriendsId,['validated']);
+			var usersFriendsCustomer = await findUsersFromIdAndStatus(filteredFriendsId,['customer']);
+
+			//console.debug("FRIENDS NEW & WAITING ->",usersFriendsNew);
+			//console.debug("FRIENDS VALIDATED ->",usersFriendsValidated);
+			//console.debug("FRIENDS CUSTOMER ->",usersFriendsCustomer);
+
+			for (const documento of usersFriendsNew) {
+ 				 //console.debug(`ID PARENT:${documento.local.idParent} TOKEN:${documento.local.token} STATUS:${documento.local.status}, Name: ${documento.local.name.first}`);
  				 const giorni = giorniTraDueDate(documento.local.resetPasswordExpires, Date.now());
-				 console.debug(`Ci sono ${giorni} giorni tra le due date.`);
+				 //console.debug(`Ci sono ${giorni} giorni tra le due date.`);
 				 documento.local.residualTime = giorni; 
 
 				 if (giorni <= 0) {
-				 	ret = await Users.findOneAndUpdate({'friends.token':documento.local.token},{'friend.status': 'expired'})
+				 		isScaduti = true
+				 		//console.debug(req.user._id, documento.local.token)
+				 		await updateFriendStatusByToken(req.user._id, documento.local.token, 'expired')
 				 }
-
-			}
-
-			const usersAccepted = await findUsersPerStatus(req.user._id,'accepted')
-			console.debug(usersAccepted)
-
+			}			
 			res.render('elencoAmici.njk', {
-				friendsNonValidated: usersWithTokens,
-				friendsValidated: usersAccepted,
+				friendsNew: usersFriendsNew,
+				friendsValidated: usersFriendsValidated,
+				friendsCustomer: usersFriendsCustomer,
 				user: req.user,
-				amiciDaInvitare: req.session.amiciDaInvitare
+				numProducts : req.session.numProducts,
+				isScaduti: isScaduti,
+				amiciDaInvitare: req.session.amiciDaInvitare,
+				server: lib.getServer(req),
+				message: req.flash('message'),
+				type: msgType
 			})
 		} catch (err) {
 			console.error(err);
+			let msg = 'Ci dispiace, si è verificato un errore inatteso. Riprova'
+      req.flash('error', msg);
+      return res.render('info.njk', {
+                                      message: req.flash('error'),
+                                      type: "warning"
+                                    });
 		}
 	})
+
+	app.post('/updateNotify', lib.isLoggedIn, async (req, res) => {
+		const token = req.body.token
+		console.debug('updateNotify-TOKEN->',token)
+		try {
+			await updateCountNotifyByToken(req.user._id, token)			
+			return res.status(200).send({ok: true})
+		} catch (e) {      
+      console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /updateNotify" USERS_ID: {"_id":ObjectId("' + req.user._id + '")} ERR: ' + e);
+      return res.status(500).send({ err: e, ok: false })
+    }
+	})
+
+	app.get('/updateAllExpire/:gg', lib.isAdmin, async (req, res) => {		
+		var giorni = req.params.gg || 0;
+		try {
+			if (giorni > 0) {
+		    const result = await Users.updateMany(
+		      { 'local.status': 'new' }, // Condizione per selezionare i documenti
+		      [
+		        {
+		          $set: {
+		            'local.resetPasswordExpires': {
+		              $add: ['$local.initDate', 60 * 24 * 60 * 60 * 1000], // gg * ore * min * seco * millles =  Aggiungi 60 giorni a initDate
+		            },
+		          },
+		        },
+		      ]
+		    );
+
+		    console.log(`${result.modifiedCount} documenti aggiornati.`);
+		    let msg = 'La data di expire è stata aggiornata ed è uguale alla data initDate +' + giorni
+	      req.flash('error', msg);
+	      return res.render('info.njk', {
+	                                      message: req.flash('error'),
+	                                      type: "warning"
+	                                    });
+      } else {
+      	let msg = 'La data di expire non è stata modificata'
+	      req.flash('error', msg);
+	      return res.render('info.njk', {
+	                                      message: req.flash('error'),
+	                                      type: "warning"
+	                                    });
+      }
+	  } catch (error) {
+	    console.error('Errore durante l\'aggiornamento:', error);
+	    let msg = 'Si è verificato un errore nell\'update della data di Expire. La data di Expire è calcolata a partire dalla di initDate'
+      req.flash('error', msg);
+      return res.render('info.njk', {
+                                      message: req.flash('error'),
+                                      type: "danger"
+                                    });
+	  }
+	})
+} // end module
+
+//========================================================================
+// FUNCTION
+//========================================================================
+async function getCustomerWithOrderDone()  {
+	try {
+		const users = await Users.find({	$and: [
+									    { $or: [
+									      { 'local.status': 'customer' },
+									      { 'local.status': 'validated' }
+									    ]},
+									    { orders: { $exists: true, $not: { $size: 0 } } }
+									  ]
+									}).sort({ "local.initDate": 1 });
+		return users
+	} catch (e) {
+		console.error('Error getCustomerWithOrderDone:', e);
+	}
+	
+} 
+
+async function getCustomerWithoutOrder()  {
+	try {
+		const users = await Users.find({	$and: [
+									    { $or: [
+									      { 'local.status': 'customer' },
+									      { 'local.status': 'validated' }
+									    ]},
+									    { $or: [
+									      { orders: { $exists: false } },
+									      { orders: { $size: 0 } }
+									    ]}
+									  ]
+									}).sort({ "local.initDate": 1 });
+		return users
+	} catch (e) {
+		console.error('Error getCustomerWithoutOrder:', e);
+	}
+	
+} 
+
+async function updateFriendStatusByToken(userId, friendToken, status) {
+    try {
+        const result = await Users.updateOne(
+            { _id: userId, 'friends.token': friendToken }, // Trova l'utente e il friend con il token specificato
+            { $set: { 'friends.$.status': status } } // Aggiorna lo stato del friend al valore del parametro status
+        );
+    } catch (error) {
+        console.error('Error updateFriendStatusByToken:', error);
+    }
+}
+
+async function updateCountNotifyByToken(userId, friendToken) {
+    try {
+      const result = await Users.updateOne(
+          { _id: userId, 'friends.token': friendToken }, // Trova l'utente e il friend con il token specificato
+          { $inc: { 'friends.$.numOfNotify': 1 } } // incrementa di 1, vuol dire che ha cliccato su "Avvisa"
+      );
+    } catch (error) {
+        console.error('Error updateCountNotifyByToken:', error);
+    }
 }
 
 // Funzione per trovare i token dei friends di un utente
@@ -68,26 +234,30 @@ async function findFriendsTokens(userId) {
   const friendsTokens = user.friends.map(friend => friend.token);
   return friendsTokens;
 }
-
-// Funzione per trovare gli utenti con token specifici
-async function findNewUsersFromTokens(tokens) {
-  const users = await Users.find({ $and: [{ 'local.token': { $in: tokens } },{'local.status':'new'},{'local.name.first':{$ne : ""}}]},'local').sort({'local.name.first': 1});
-  return users;
+// Funzione per trovare gli id dei friends di un utente
+async function findFriendsId(userId) {
+  const user = await Users.findById(userId).select('friends.id');
+  if (!user) {
+    throw new Error('Utente non trovato');
+  }
+  const friendsId = user.friends.map(friend => friend.id);
+  return friendsId;
 }
 
-/* Funzione per trovare gli utenti validati
-async function findUsersValidated(id) {
-  const users = await Users.find({ $and: [{ 'local.idParent': id },{'local.status':'validated'}]},'local');
+// Funzione per trovare gli utenti per token e status (new, waiting, validated, customer)
+async function findUsersFromTokensAndStatus(tokens,status) {
+  const users = await Users.find({ $and: [{ 'local.token': { $in: tokens }},{'local.status':{ $in: status }},{'local.name.first':{$ne : ""}}]},'local').sort({'local.name.first': 1});
+  if (!users) {
+    throw new Error('Utente non trovato');
+  }
   return users;
-}*/
-
-// Funzione per trovare gli utenti accepted (documento frinds dell'utente)
-async function findUsersPerStatus(_id, status) {
-  	const users = await Users.aggregate([{$match:{ '_id': _id }}, 
-  						{$unwind:"$friends"},
-  						{$match:{'friends.status': status}}/*, 
-  						{$project:{"_id":0,"privacy":0, "local":0, "addresses":0, "orders":0}} */
-  						]);
+}
+// Funzione per trovare gli utenti per id e status (new, waiting, validated, customer)
+async function findUsersFromIdAndStatus(ids,status) {
+  const users = await Users.find({ $and: [{ '_id': { $in: ids }},{'local.status':{ $in: status }},{'local.name.first':{$ne : ""}}]},'local').sort({'local.name.first': 1});
+  if (!users) {
+    throw new Error('Utenti non trovati');
+  }
   return users;
 }
 

@@ -1,18 +1,6 @@
-/*"Ciao userName, vuoi sapere se hai inviti  disposnibili? Sei curioso di sapere chi ha già accettato il tuo invito? 
-Entra nella sezione "I miei amici" per scoprirlo! 
-E ricorda, ogni nuovo amico che si unisce e ogni acquisto che effettua ti fa guadagnare punti Pinta. 
-Non esitare a invitarli di nuovo... o di nuovi... e condividi la tua passione per SharingBeer!" 
+module.exports = (Name, Email, server) => {
 
-Ciao [nome cliente], non dimenticare la tua birra omaggio! Hai ancora tempo, ma non aspettare troppo
-Entra in Sharingbeer, effettua un acquisto e la birra omaggio sarà tua! Non perdere l'occasione.
-Se hai domande o problemi non esitare a contattarci.
-*/
-
-module.exports = (parentName, parentEmail, friendName, friendEmail, server) => {
-var userName = 'CARLO'
-var userSurname = 'VIANA'
-var friendToken = 'xxxxxxxxxxxx'
-var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
+var mailToCustomerWithOrder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
 <html xmlns="https://www.w3.org/1999/xhtml"> \
     <head> \
         <meta https-equiv="Content-Type" content="text/html; charset=utf-8" /> \
@@ -44,19 +32,20 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   					<tr> \
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
-  								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
-  								<p> nella sezione <span style="font-weight:bold"> I miei amici </span> puoi controllare lo stato dei tuoi inviti. <br> Ricorda che per ogni amico che accetta il tuo invito e per \
-                  ogni acquisto che effettua, guadagni punti <span style="font-weight:bold"> Pinta</span>! <p> \
-                  <p> Se alcuni amici non hanno ancora accettato, invitali di nuovo e aiutaci a far conoscere <a href="'+server+'/frinedStatus" target="_blank"> SharingBeer. </a> \
+  								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + Name + '</span>  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/clinking-beer-mugs.png" height="30" width="30"> </p> \
+  								<p> Sei curioso di sapere chi ha già accettato il tuo invito? <br>O se hai ancora inviti disponibili? <p> \
+                  <p> Entra nella sezione <span style="font-weight:bold"> I miei amici  </span> per scoprirlo. <p>\
+                  <p> E ricorda, ogni tuo nuovo amico che si unisce e ogni suo acquisto aumenta i tuoi punti <span style="font-weight:bold">Pinta</span>! \
+                  <p> Non esitare a invitarli di nuovo... o di nuovi... e condividi la tua passione per <a href="'+server+'/listOfFriends" target="_blank"> SharingBeer. </a> \
   								<div align="center"> \
-  								<a href="'+server+'/friendStatus"> \
+  								<a href="'+server+'/listOfFriends"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
                     I miei amici</button> \
                   </a> \
 									</div> \
                   <div align="center">   <p> oppure </p>  </div> \
-                  <div><p> se non riesci ad accedere copia il seguente link nella barra degli indirizzi del browser </p></div> \
-                  <div align="center">   <p> '+server+'/friendStatus </p>  </div> \
+                  <div><p> se non riesci ad accedere copia il seguente link nella barra degli indirizzi del browser: </p></div> \
+                  <div align="center">   <p> '+server+'/listOfFriends </p>  </div> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
                 	<p>A presto dal birrificio Viana. </br>Mi raccomando, bevi in modo responsabile :)</p> \
@@ -104,5 +93,5 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 </table> \
 </body> \
 </html>';
-  return mailrecom;
+  return mailToCustomerWithOrder;
 };
