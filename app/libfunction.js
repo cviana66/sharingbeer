@@ -25,13 +25,13 @@ module.exports = {
       const invitiDisponibili = await getFriendsInfo(req)
       console.debug('isLoggedIn -> AMICI DA INVITARE?:',invitiDisponibili.isInviteAvialable)
       if (invitiDisponibili.isInviteAvialable) {
-        req.session.amiciDaInvitare = true;
+        req.session.haiAmiciDaInvitare = true;
       } else {
-        req.session.amiciDaInvitare = false;
+        req.session.haiAmiciDaInvitare = false;
       }
       return next();
     } else {
-      req.session.amiciDaInvitare = false;
+      req.session.haiAmiciDaInvitare = false;
       console.debug('INDIRIZZO DA DOVE ARRIVO: ', req.originalUrl);
       req.session.returnTo = req.originalUrl;
       res.redirect('/login');
@@ -353,8 +353,9 @@ module.exports = {
     return risultati;
   }
 }
-//================================ LOCAL FUNCTION ===============================
-// Funzione per trovare gli utenti accepted (documento frinds dell'utente)
+//========================================= LOCAL FUNCTION ========================================
+
+// Funzione per trovare gli gli amici nel documento friends dell'utente clasterizzati per status
 async function getFriendsInfo(req) {
   //conteggio dei friends dello user raggruppato per staus
   const users = await Users.aggregate([
@@ -369,18 +370,20 @@ async function getFriendsInfo(req) {
       }
     }
   ]);
-  
+  console.debug('getFriendsInfo -> ELIGIBLEFRIENDS',req.user.local.eligibleFriends )
   if (users.length > 0) {
     users[0].numInviteAvialable = req.user.local.eligibleFriends - users[0].new - users[0].accepted
     users[0].numFriendsInvited = users[0].new + users[0].accepted
     users[0].isInviteAvialable = (users[0].numInviteAvialable == 0) ? false : true;
-    console.debug('getFriendsInfo -> SITUAZIONE INVITI:',users)
+    console.debug('getFriendsInfo -> SITUAZIONE INVITI:',users[0])
     return users[0];
   } else {
+    numInviteAvialable = (req.user.friends.length == 0) ? req.user.local.eligibleFriends : 0
+    isInviteAvialable = (req.user.friends.length == 0 && req.user.local.eligibleFriends > 0) ? true : false
     let users = []
-    users[0] = {  numInviteAvialable : 0,
-                  numFriendsInvited : 0,
-                  isInviteAvialable : false }
+    users[0] = {  numInviteAvialable : numInviteAvialable,
+                  numFriendsInvited : req.user.friends.length,
+                  isInviteAvialable : isInviteAvialable }
 
     console.debug('getFriendsInfo -> SITUAZIONE INVITI:',users)
     return users[0];

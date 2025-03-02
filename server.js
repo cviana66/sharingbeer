@@ -90,6 +90,9 @@ console.log("DEBUG SETTING=", global.debug);
 console.log('NODE ENVIRONMENT =', process.env.NODE_ENV);
 console.log('GESTPAY =', process.env.SHOPLOGIN);
 
+//==================================================
+// Settaggio della data di scadenza di un invito
+global.giorniScadenzaInvito = (3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settimane
 
 /*=======================================================================
     Delivery price
@@ -104,8 +107,10 @@ global.priceCurier = ['7.70', '7.90', '6.60', '6.60', '5.20', '11.10', '9.80', '
     ======================================================================= */
 global.numBottigliePerBeerBox = 6
 global.invitiPerOgniAcquisto = 4;
+global.invitiPerOgniInvito = 4;
 global.numAcquistiPerUnaBottigliaOmaggio = 12;
 global.valoreUnPuntoPinta = 0.05 // euro
+global.valoreUnInvito = 0.2 //euro
 //global.puntiPintaPerAcquisto = 1;
 // equivalente in € di 1 Punto Pinta = PrezzoBirra / numBottigliePerBeerBox / puntiPintaPerUnaBottiglia
 //global.mkt = 0.45;
@@ -272,7 +277,7 @@ var SharingBeer = function () {
 
         // Initialize session variable
         self.app.use((req, res, next) => {
-            if (!req.session.amiciDaInvitare) req.session.amiciDaInvitare = false;
+            if (!req.session.haiAmiciDaInvitare) req.session.haiAmiciDaInvitare = false;
             if (!req.session.returnTo) req.session.returnTo = '/'
             next();
         });

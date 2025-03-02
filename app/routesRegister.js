@@ -189,7 +189,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         'local.resetPasswordToken': req.query.token,
         'local.resetPasswordExpires': { $gt: Date.now() }
       });
-
+      console.debug('VALIDATION USER:',user)
       if (!user) {
         const userByToken = await User.findOne({
           'local.token': req.query.token
@@ -198,7 +198,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         if (!userByToken) {
           let msg = 'Invito non più valido o scaduto';
           req.flash('warning', msg);
-          console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: utente non trovato' + msg);
+          console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FLASH:' + msg);
           return res.render('info.njk', {
             message: req.flash('warning'),
             type: "warning"
@@ -213,8 +213,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         }
       } else {
         if (user.local.status === 'new') {
-          const video = process.env.NODE_ENV === 'development' ? "" : "video/BirraViannaColor_Final_Logo_38.mp4";
-          //inserire invitoVisitato = true
+          const video = process.env.NODE_ENV === 'development' ? "" : "video/BirraViannaColor_Final_Logo_38.mp4";         
           console.debug('INVITO VISITATO = TRUE')
           user.local.invitoVisitato = true;
           await user.save()
@@ -223,7 +222,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
             message: req.flash('validateMessage'),
             type: "danger",
             video: video,
-            amiciDaInvitare: req.session.amiciDaInvitare
+            amiciDaInvitare: req.session.haiAmiciDaInvitare
           });
         } else if (user.local.status === 'waiting') {
           const session = await mongoose.startSession();
@@ -235,7 +234,16 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
             user.local.token = req.query.token;
             user.local.resetPasswordToken = undefined;
             user.local.resetPasswordExpires = undefined;
+            user.local.eligibleFriends = invitiPerOgniInvito;
             await user.save(opts);
+            //----------------------------------------------------------------------------------
+            // aggiungo per ogni invito accettato Punti Pinta al PARENT => booze(€)=global.valoreUnInvito
+            //----------------------------------------------------------------------------------
+            await User.findOneAndUpdate(
+              {'_id': new mongoose.Types.ObjectId(user.local.idParent)},
+              {'$inc': {'local.booze':valoreUnInvito}}
+              ).session(session);
+
             await session.commitTransaction();
           } catch (e) {
             console.debug("errore: ", e);
@@ -256,7 +264,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
               console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {_id:ObjectId("' + req.user._id + '")}');
               return res.render('conferme.njk', {
                 user: req.user,
-                numProducts: req.session.numProducts
+                numProducts: req.session.numProducts,
+                numInviti: invitiPerOgniInvito
               });
             }
           });
@@ -341,7 +350,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         if (e.code === 11000) {
           let msg = 'Indirizzo e-mail già registrato';
           req.flash('validateMessage', msg);
-          console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+          console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /validation" TOKEN: {"token":"' + req.body.token + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
           return res.redirect("/validation?token=" + req.body.token);
         } else {
           let msg = 'Spiacente ma qualche cosa non ha funzionato nella validazione della tua e-mail! Riprova';
@@ -447,7 +456,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         //user.privacy.transfer              = req.body.checkPrivacyCessione;
         user.local.status = 'customer';
         user.local.mobilePrefix = '+39';
-        user.local.mobileNumber = numMobil;
+        user.local.mobileNumber = numMobil;        
 
         console.debug('USER in REGISTER', user)
         //console.debug('req.body.checkPrivacyOptional in REGISTER',req.body.checkPrivacyOptional)
@@ -609,7 +618,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         lastName: req.user.local.name.last,
         user: req.user,
         numProducts: req.session.numProducts,
-        amiciDaInvitare: req.session.amiciDaInvitare
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
 
     } catch (err) {
@@ -664,7 +673,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       const inviti = await lib.getInviteAvailable(req) 
         
       req.session.invitationAvailable = parseInt(user.local.eligibleFriends, 10); // Numero di inviti disponibili = amici ammissibili
-      req.session.friendsInvited = parseInt(inviti.numFriendsInvited, 10);             // Numero di amici già invitati
+      req.session.friendsInvited = parseInt(inviti.numFriendsInvited, 10);        // Numero di amici già invitati
 
       console.debug("INVITI DISPONIBILI=", req.session.invitationAvailable);
       console.debug("AMICI INVITATI= ", req.session.friendsInvited);
@@ -683,6 +692,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
 
       console.debug('MAIL PARENT', req.user.local.email.toLowerCase());
       const isBirrificioEmail = req.user.local.email.toLowerCase() === 'birrificioviana@gmail.com';
+      const dataScadenzaInvito = new Date(Date.now() + giorniScadenzaInvito)
 
       const model = {
         controlSates: controlSates,
@@ -697,7 +707,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         parentName: req.user.local.name.first,
         parentEmail: req.user.local.email,
         server: server,
-        amiciDaInvitare: req.session.amiciDaInvitare
+        amiciDaInvitare: req.session.haiAmiciDaInvitare,
+        scadenzaInvito : dataScadenzaInvito.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
       };
 
       if (isBirrificioEmail) {
@@ -757,7 +768,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       newUser.local.token = token;
       newUser.local.resetPasswordToken = token;
       //newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
-      newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settimane
+      newUser.local.resetPasswordExpires = Date.now() + giorniScadenzaInvito //(3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settimane
       await newUser.save(opts);
 
       //-------------------------------------------------
@@ -835,7 +846,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       newUser.local.token = token;
       newUser.local.resetPasswordToken = token;
       //newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 365); // 1 hour in secondi * 24 * 365 = 1 anno
-      newUser.local.resetPasswordExpires = Date.now() + (3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settiamana
+      newUser.local.resetPasswordExpires = Date.now() + giorniScadenzaInvito //(3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settiamana
       await newUser.save(opts);
 
       //-------------------------------------------------
@@ -913,7 +924,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       flag: req.body.flag,
       user: req.user,
       numProducts: req.session.numProducts,
-      amiciDaInvitare: req.session.amiciDaInvitare
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     });
   });
 

@@ -1,5 +1,5 @@
 /*"Ciao userName, vuoi sapere se hai inviti  disposnibili? Sei curioso di sapere chi ha già accettato il tuo invito? 
-Entra nella sezione "I miei amici" per scoprirlo! 
+Entra nella sezione "Amici" per scoprirlo! 
 E ricorda, ogni nuovo amico che si unisce e ogni acquisto che effettua ti fa guadagnare punti Pinta. 
 Non esitare a invitarli di nuovo... o di nuovi... e condividi la tua passione per SharingBeer!" 
 

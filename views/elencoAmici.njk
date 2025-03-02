@@ -31,7 +31,21 @@
         /* Colore di sfondo per l'intestazione */
     }
 </style>
-
+{% if amiciDaInvitare %}
+<h3 class="text-white text-center bg-dark"> Inviti disponibili </h3>
+    <table>        
+      <tr >
+        <td width="40%"> 
+            <span style="font-size:1.3em; font-weight: bold;" >Hai {{invitiDisponibili}} inviti </span> 
+        </td>
+        <td>
+            <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" 
+              onclick="return goToInvite()">
+                Invita 
+            </button>
+        </td>         
+    </table>
+{% endif %}
 <h3 class="text-white text-center bg-dark"> Inviti in scadenza </h3>
 {% set c = "0" %}
   {% for friend in friendsNew %}
@@ -208,6 +222,10 @@
     }
     document.body.appendChild(form);
     form.submit();
+  }
+
+  function goToInvite() {
+    window.location.href = '/recomm';
   }
 </script>
 

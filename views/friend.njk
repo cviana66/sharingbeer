@@ -54,7 +54,7 @@
               name="firstName" placeholder="Nome" required {{controlSates}} >
             </div>
             <div style="margin-bottom: 40px; margin-top: 40px;">
-              <button type="button" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
+              <button type="button" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}','{{scadenzaInvito}}')">
                 Crea l'invito e condividilo
               </button>
             </div>
@@ -72,7 +72,7 @@
     document.getElementById("loading").style.display = 'none';
   });
 
-  async function share(token,parentName,server) {
+  async function share(token,parentName,server,scadenzaInvito) {
 
     if (document.getElementById("inputFirstName").value == "") {
       let text = "Inserire il Nome";
@@ -104,8 +104,10 @@
       ).then( async function(data)
         {
           if (data.ok) {
-            let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale. \nTi mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
-            //console.log('textText -->', textText)
+            //let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale. \nTi mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
+            
+            let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale del Birrificio Viana e che ti consiglio di provare. \nTi mando il link con il codice invito per accedere in Sharingbeer.\n\n"+data.server+"/validation?token="+data.token+"\n\nRegistra il tuo account entro il "+scadenzaInvito+" per riservarti una birra OMAGGIO. Non perdere l'occasione!\n" +data.parentName;
+
             let shareData = {
               title: 'Birrificio Viana - Codice invito SharingBeer',
               text: textText
@@ -115,7 +117,7 @@
               try {
                 //console.log("Prima del navigator")
                 //document.getElementById("loading").style.display = 'block';
-                /*await*/ navigator.share(shareData);
+                await navigator.share(shareData);
                 //document.getElementById("loading").style.display = 'none';
                 //console.log("Dopo il navigator")
                 post('/infoShare',{firstName:data.friendName,flag:data.flag});

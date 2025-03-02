@@ -3,10 +3,17 @@
 
 <h3 class="text-white text-center bg-dark">Shop</h3>
 <div class="align-self-center">
-	<p class="text-white text-justify" style="font-size:0.9em;">Birra artigianale ad alta fermentazione, non filtrata, non pastorizzata e rifermentata in bottiglia per una naturale frizzantezza.</p>
+	<p class="text-white text-justify" style="font-size:0.8em;">Birra artigianale ad alta fermentazione, non filtrata, non pastorizzata e rifermentata in bottiglia per una naturale frizzantezza.</p>
 </div>
 <hr style="border-top: 1px solid #5375BD;">
-
+{% if nOrders == 0 %}
+	 <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.1em;">
+			<!-- Shipping -->
+			<tr class="text-white">
+				<td width="100%"  padding-left: 15px;" valign="middle" align="center" >E' il tuo primo acquisto! <br> Una bottiglia omaggio per te</td>
+			</tr>
+		</table>
+{%endif%}
 {% for prod in products %}
  <form id="shop" method="POST" action="/shop">
 	<input type="hidden" id="item_id" name="item_id" value="{{prod.id}}">

@@ -54,7 +54,7 @@
               name="firstName" placeholder="Nome" required {{controlSates}} >
             </div>
             <div style="margin-bottom: 40px; margin-top: 40px;">
-              <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}')">
+              <button type="submit" class="btn btn-my btn-lg btn-block {{controlSates}}" id="mybutton" onfocus="this.disabled={{[flag]}}" onclick="return share('{{token}}','{{parentName}}','{{server}}','{{scadenzaInvito}}')">
                 Crea l'invito e condividilo
               </button>
             </div>
@@ -72,7 +72,7 @@
     document.getElementById("loading").style.display = 'none';
   });
 
-  async function share(token,parentName,server) {
+  async function share(token,parentName,server,scadenzaInvito) {
 
     if (document.getElementById("inputFirstName").value == "") {
       let text = "Inserire il Nome";
@@ -104,7 +104,7 @@
       ).then( async function(data)
         {
           if (data.ok) {
-            let textText = "Ciao "+data.friendName+",\n\nBirrificio Viana è entusiasta di invitarti a scoprire la nostra birra artigianale. \nAbbiamo incluso un link personale con il codice invito per accedere in Sharingbeer dove potrai visionare i nostri prodotti e fare i tuoi acquisti in tutta comodità.\n\n"+data.server+"/validation?token="+data.token+"\n\nNon vediamo l'ora che tu entri a far parte della community Sharingbeer\n\n"+data.parentName;
+            let textText = "Ciao "+data.friendName+",\n\nBirrificio Viana è entusiasta di invitarti a far parte della community Sharingbeer: gli amanti della birra artigianale. \nRegistrati con il seguente link personale entro il "+scadenzaInvito+" per riservarti una birra OMAGGIO.\n\n"+data.server+"/validation?token="+data.token+"\n\nIn Sharingbeer potrai visionare i nostri prodotti e farteli consegnare comodamente a casa tua.\n\nNon perdere l'occasione!\n"+data.parentName;
             //console.log('textText -->', textText)
             let shareData = {
               title: 'Birrificio Viana - Codice invito SharingBeer',

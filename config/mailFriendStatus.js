@@ -45,13 +45,13 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + friendName + '</span>, </p> \
-  								<p> nella sezione <span style="font-weight:bold"> I miei amici </span> puoi controllare lo stato dei tuoi inviti. <br> Ricorda che per ogni amico che accetta il tuo invito e per \
+  								<p> nella sezione <span style="font-weight:bold"> Amici </span> puoi controllare lo stato dei tuoi inviti. <br> Ricorda che per ogni amico che accetta il tuo invito e per \
                   ogni acquisto che effettua, guadagni punti <span style="font-weight:bold"> Pinta</span>! <p> \
                   <p> Se alcuni amici non hanno ancora accettato, invitali di nuovo e aiutaci a far conoscere <a href="'+server+'/frinedStatus" target="_blank"> SharingBeer. </a> \
   								<div align="center"> \
   								<a href="'+server+'/friendStatus"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
-                    I miei amici</button> \
+                    Amici</button> \
                   </a> \
 									</div> \
                   <div align="center">   <p> oppure </p>  </div> \

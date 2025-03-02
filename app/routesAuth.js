@@ -1,5 +1,3 @@
-// app/routes.js
-
 const transporter = require('../config/mailer');
 const Users = require('./models/user');
 const lib = require('./libfunction');
@@ -23,7 +21,7 @@ module.exports = function (app, passport, moment, mongoose) {
       user: req.user,
       numProducts: req.session.numProducts,
       video: video,
-      amiciDaInvitare: req.session.amiciDaInvitare
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     });
   });
 
@@ -37,7 +35,7 @@ module.exports = function (app, passport, moment, mongoose) {
     res.render('login.njk', {
       message: req.flash('loginMessage'),
       returnTo: req.session.returnTo,
-      amiciDaInvitare: req.session.amiciDaInvitare
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     });
   });
 
@@ -64,10 +62,10 @@ module.exports = function (app, passport, moment, mongoose) {
           const invitiDisponibili = await lib.getInviteAvailable(req) 
           console.debug('INVITIDISPONIBILE', invitiDisponibili)
           if (invitiDisponibili.isInviteAvialable) {
-            req.session.amiciDaInvitare = true;
+            req.session.haiAmiciDaInvitare = true;
             console.debug("INVITI DISPONIBILI=",invitiDisponibili.numInviteAvialable)            
           } else {
-            req.session.amiciDaInvitare = false;
+            req.session.haiAmiciDaInvitare = false;
             console.debug("INVITI DISPONIBILI=",invitiDisponibili.numInviteAvialable)
           }
           res.redirect(req.body.returnTo || '/shop');
@@ -114,7 +112,7 @@ module.exports = function (app, passport, moment, mongoose) {
 
       let msg = req.flash('infoProfile');
       console.debug('MESSAGGIO', msg, req.user.privacy);
-      console.debug('INVITI DISPONIBULI?', req.session.amiciDaInvitare);
+      console.debug('INVITI DISPONIBULI?', req.session.haiAmiciDaInvitare);
       res.render('profile.njk', {
         user: req.user.local, // get the user out of session and pass to template
         privacy: req.user.privacy,
@@ -124,7 +122,7 @@ module.exports = function (app, passport, moment, mongoose) {
         message: msg,
         type: "info",
         numProducts: req.session.numProducts, //numero di proodotti nel carrello
-        amiciDaInvitare: req.session.amiciDaInvitare
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
 
     } catch (e) {
@@ -283,7 +281,7 @@ module.exports = function (app, passport, moment, mongoose) {
       //await req.logIn(user);
       req.logIn(user, (err) => {
         if (err) { return next(err); }
-        req.flash('success', 'Perfetto! La tua password è stata cambianta.');
+        req.flash('infoProfile', 'Perfetto! La tua password è stata cambianta.');
         return res.redirect('profile');
       });
 
@@ -351,7 +349,6 @@ module.exports = function (app, passport, moment, mongoose) {
       return res.render('info.njk', { message: req.flash('error'), type: "danger" });
     }
   });
-
 
   // =====================================
   // FACEBOOK ROUTES =====================

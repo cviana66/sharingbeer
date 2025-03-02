@@ -61,29 +61,34 @@ module.exports = (app, moment, mongoose) => {
 			const friendsId = await findFriendsId(userId); //ricavo l'id perchè il token è cambiato
 			const filteredFriendsId = friendsId.filter(item => item !== undefined);
 
-			//console.debug("FRIENDS TOKEN",friendsTokens);
+			console.debug("FRIENDS TOKEN",friendsTokens);
 			console.debug("FRIENDS ID",filteredFriendsId);
-
+			// La ricerca viene fatta leggendo il documento dell'utente a partire dall'elenco friends
+			// filtrando per il token e così ottenendo l'elenco di utente-friend, poi viene clusterizzato in funzione dello stato dell'utente-friend.
+			// NOTA: in usersFriendsNew ci sono anche quelli expired che vengono poi catturati analizzando la data: resetPasswordExpires
 			var usersFriendsNew = await findUsersFromTokensAndStatus(friendsTokens,['new','waiting']); 		
 			var usersFriendsValidated = await findUsersFromIdAndStatus(filteredFriendsId,['validated']);
 			var usersFriendsCustomer = await findUsersFromIdAndStatus(filteredFriendsId,['customer']);
 
-			//console.debug("FRIENDS NEW & WAITING ->",usersFriendsNew);
-			//console.debug("FRIENDS VALIDATED ->",usersFriendsValidated);
-			//console.debug("FRIENDS CUSTOMER ->",usersFriendsCustomer);
+			console.debug("FRIENDS NEW & WAITING ->",usersFriendsNew); 
+			console.debug("FRIENDS VALIDATED ->",usersFriendsValidated);
+			console.debug("FRIENDS CUSTOMER ->",usersFriendsCustomer);
 
 			for (const documento of usersFriendsNew) {
  				 //console.debug(`ID PARENT:${documento.local.idParent} TOKEN:${documento.local.token} STATUS:${documento.local.status}, Name: ${documento.local.name.first}`);
  				 const giorni = giorniTraDueDate(documento.local.resetPasswordExpires, Date.now());
-				 //console.debug(`Ci sono ${giorni} giorni tra le due date.`);
+				 console.debug(`Ci sono ${giorni} giorni tra le due date.`);
 				 documento.local.residualTime = giorni; 
 
 				 if (giorni <= 0) {
 				 		isScaduti = true
-				 		//console.debug(req.user._id, documento.local.token)
+				 		console.debug(req.user._id, documento.local.token)
 				 		await updateFriendStatusByToken(req.user._id, documento.local.token, 'expired')
 				 }
 			}			
+
+			const inviti = await lib.getInviteAvailable(req) 
+			
 			res.render('elencoAmici.njk', {
 				friendsNew: usersFriendsNew,
 				friendsValidated: usersFriendsValidated,
@@ -91,7 +96,8 @@ module.exports = (app, moment, mongoose) => {
 				user: req.user,
 				numProducts : req.session.numProducts,
 				isScaduti: isScaduti,
-				amiciDaInvitare: req.session.amiciDaInvitare,
+				amiciDaInvitare: req.session.haiAmiciDaInvitare,
+				invitiDisponibili: inviti.numInviteAvialable,
 				server: lib.getServer(req),
 				message: req.flash('message'),
 				type: msgType
@@ -119,7 +125,7 @@ module.exports = (app, moment, mongoose) => {
     }
 	})
 
-	app.get('/updateAllExpire/:gg', lib.isAdmin, async (req, res) => {		
+	app.get('/updateAllExpireStartFromInitDate/:gg', lib.isAdmin, async (req, res) => {		
 		var giorni = req.params.gg || 0;
 		try {
 			if (giorni > 0) {

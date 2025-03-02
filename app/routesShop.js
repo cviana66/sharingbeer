@@ -111,7 +111,7 @@ module.exports = function(app, moment, mongoose) {
                   attivaRitiro      : attivaRitiro,
                   attivaConsegna    : attivaConsegna,
                   orderId           : req.query.orderId,
-                  amiciDaInvitare : req.session.amiciDaInvitare
+                  amiciDaInvitare : req.session.haiAmiciDaInvitare
                })
 	})
 
@@ -305,7 +305,7 @@ module.exports = function(app, moment, mongoose) {
         fatturaSDI  : refFatturaSDI,
         nOrders : nOrders,
         omaggio:  req.session.omaggioPrimoAcquisto,
-        amiciDaInvitare: req.session.amiciDaInvitare
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       })
     }
     catch (e) {
@@ -378,13 +378,28 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
     lib.retriveCart(req);
     //console.debug('CATALOGO PRODOTTI: ', prods);
 
+    //-------------------------------------------
+    // Verifica se è il primo ordine
+    //-------------------------------------------
+    const resNorder = await User.aggregate([
+      { $match: { "_id": req.user._id } },
+      { $unwind: "$orders" },
+      { $match: { "orders.payment.s2sStatus": "OK" } },
+      { $project: { _id: 0, friends: 0, addresses: 0, local: 0, privacy: 0 } },
+      { $group: { _id: null, count: { $count: {} } } }
+    ]);
+
+    const nOrders = resNorder.length > 0 ? resNorder[0].count : 0;
+    console.debug("N° ORDINI", nOrders);
+
     const model = {
       products: prods, // Prodotti dello shop
       user: req.user, // Utente loggato
       numProducts: req.session.numProducts, // Numero di prodotti nel carrello
       message: req.flash('info'),
       type: "info",
-      amiciDaInvitare: req.session.amiciDaInvitare
+      amiciDaInvitare: req.session.haiAmiciDaInvitare,
+      nOrders: nOrders
     };
 
     res.render('shop.njk', model);
@@ -600,7 +615,7 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
       totalPrice: req.session.totalPrc,
       nOrders: nOrders,
       message: req.flash('cartMessage'),
-      amiciDaInvitare: req.session.amiciDaInvitare
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     };
 
     res.render('cart.njk', model);
