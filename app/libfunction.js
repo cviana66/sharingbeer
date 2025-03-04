@@ -77,15 +77,15 @@ module.exports = {
       if (req.hostname == "sb.sharingbeer.it") {
         server = 'https://' + req.hostname
       } else {
-        server = req.protocol + '://' + req.hostname + ':' + process.env.PORT
+        server = 'https://' + req.hostname + ':' + process.env.PORT
       }
     } else {
-      server = req.protocol + '://' + req.hostname;
+      server = 'https://' + req.hostname;
     }
     console.debug('SERVER',server)
     return server;
   },
-  
+
   sendmailToPerson: async (Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server, html) => {
     console.debug('MAIL TYPE: ', typeOfMail);
     console.debug("SERVER:", server);

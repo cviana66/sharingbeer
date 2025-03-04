@@ -12,7 +12,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
     src: url("'+server+'/font/bauserif.ttf"); \
   } \
   .sb-font { \
-    font-family: myFont; \
+    font-family: myFont, sans-serif; \
   } \
 </style> \
 <body yahoo> \
@@ -25,7 +25,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
 					<tr> \
               <td style="border-top-left-radius:12px;border-top-right-radius:12px;padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:5px;background-color:#2A0009" align="center"> \
                 <div> \
-                  <p> <span class="text-center sb-font" style="font-size:3.5em;color:#FF9139;">Birrificio Viana</span> <p> \
+                  <p> <span class="text-center sb-font" style="font-size:2rem;color:#FF9139;">Birrificio Viana</span> <p> \
                 </div> \
               </td> \
             </tr> \
@@ -77,10 +77,11 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
 		</table> \
 	  </td> \
 	</tr> \
-  	<tr> \
+  <tr> \
 		<td style="font-weight:300;font-size:10px;color:#88a1af;padding-left:24px;padding-right:24px" align="center"><br><br>  \
-			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.herokuapp.com" target="_blank">sharingbeer.it </a> - \
-			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.herokuapp.com" target="_blank"> sharingbeer.com </a> - \
+			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.it" target="_blank">sharingbeer.it </a> - \
+			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.it" target="_blank"> sharingbeer.com </a> - \
+			<a style="text-decoration:none;color:#88a1af" href="https://sharingbeer.it" target="_blank"> sharingbeer.eu </a> \
 		</td> \
 	</tr> \
  </tbody> \
