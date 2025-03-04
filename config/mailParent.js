@@ -9,7 +9,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
 <style type="text/css"> \
   @font-face { \
     font-family: myFont; \
-    src: url("/font/bauserif.ttf"); \
+    src: url("'+server+'/font/bauserif.ttf"); \
   } \
   .sb-font { \
     font-family: myFont; \

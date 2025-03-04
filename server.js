@@ -110,8 +110,7 @@ global.invitiPerOgniAcquisto = 4;
 global.invitiPerOgniInvito = 4;
 global.numAcquistiPerUnaBottigliaOmaggio = 12;
 global.valoreUnPuntoPinta = 0.05 // euro
-global.valoreUnInvito = 0.2 //euro
-//global.puntiPintaPerAcquisto = 1;
+global.valoreUnInvito = 0.1 //euro
 // equivalente in € di 1 Punto Pinta = PrezzoBirra / numBottigliePerBeerBox / puntiPintaPerUnaBottiglia
 //global.mkt = 0.45;
 

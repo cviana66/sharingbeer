@@ -196,13 +196,15 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         });
 
         if (!userByToken) {
-          let msg = 'Invito non più valido o scaduto';
-          req.flash('warning', msg);
+          let msg = 'Invito non più valido o scaduto. Se ti sei già registrato accedi con il tuo indirizzo email e password.';
+          //req.flash('warning', msg);
+          req.flash('loginMessage', msg);
           console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FLASH:' + msg);
-          return res.render('info.njk', {
-            message: req.flash('warning'),
-            type: "warning"
-          });
+          // return res.render('info.njk', {
+          //   message: req.flash('warning'),
+          //   type: "warning"
+          // });
+          return res.redirect('/login');
         }
 
         if (userByToken.local.status === 'validated') {
@@ -265,7 +267,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
               return res.render('conferme.njk', {
                 user: req.user,
                 numProducts: req.session.numProducts,
-                numInviti: invitiPerOgniInvito
+                numInviti: invitiPerOgniInvito,
+                amiciDaInvitare: req.session.haiAmiciDaInvitare
               });
             }
           });

@@ -8,9 +8,9 @@
         border-spacing: 0; /* Rimuove lo spazio tra le celle */
         border-collapse: separate; /* Permette di avere bordi separati */
         background-color: #2A0009; /* Colore di sfondo della tabella */
-        border-radius: 10px; /* Arrotonda gli angoli della tabella */
-        overflow: hidden; /* Nasconde gli angoli arrotondati */
-        border: 1px solid #903246; /* Bordo della tabella */
+        /* border-radius: 10px; Arrotonda gli angoli della tabella */
+        /* overflow: hidden;  Nasconde gli angoli arrotondati */
+        /* border: 1px solid #903246; Bordo della tabella */
     }
 
     th,
@@ -77,7 +77,7 @@
     {% endif %}
   {% endfor %}
 {% if c == "0" %}
-<p class="text-white text-center bg-dark"> Nessun invito in scadenza </p>
+<p class="text-white text-center"> Nessun invito in scadenza </p>
 {% endif %}
 
 <h3 class="text-white text-center bg-dark"> Inviti scaduti </h3>
@@ -87,7 +87,7 @@
     <table>
         <thead >
             <th colspan="2"> 
-                <span style="font-size:1.5em">{{ friend.local.name.first }} {{ friend.local.residualTime }}</span>
+                <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
             </th>
         </thead>
         <!--tr>
