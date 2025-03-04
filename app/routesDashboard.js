@@ -127,6 +127,7 @@ module.exports = (app, moment, mongoose) => {
 
 	app.get('/updateAllExpireStartFromInitDate/:gg', lib.isAdmin, async (req, res) => {		
 		var giorni = req.params.gg || 0;
+		const daysToAdd = giorni * 24 * 60 * 60 * 1000 // gg * ore * min * seco * millles
 		try {
 			if (giorni > 0) {
 		    const result = await Users.updateMany(
@@ -135,7 +136,7 @@ module.exports = (app, moment, mongoose) => {
 		        {
 		          $set: {
 		            'local.resetPasswordExpires': {
-		              $add: ['$local.initDate', 60 * 24 * 60 * 60 * 1000], // gg * ore * min * seco * millles =  Aggiungi 60 giorni a initDate
+		              $add: ['$local.initDate', daysToAdd]
 		            },
 		          },
 		        },
@@ -160,6 +161,50 @@ module.exports = (app, moment, mongoose) => {
 	  } catch (error) {
 	    console.error('Errore durante l\'aggiornamento:', error);
 	    let msg = 'Si è verificato un errore nell\'update della data di Expire. La data di Expire è calcolata a partire dalla di initDate'
+      req.flash('error', msg);
+      return res.render('info.njk', {
+                                      message: req.flash('error'),
+                                      type: "danger"
+                                    });
+	  }
+	});
+
+	app.get('/updateAllExpireStartFromTodayDate/:gg', lib.isAdmin, async (req, res) => {		
+		var giorni = req.params.gg || 0;
+		const daysToAdd = giorni * 24 * 60 * 60 * 1000 // gg * ore * min * seco * millles
+		//const newExpirationDate = new Date(+new Date() + daysToAdd)
+		const newExpirationDate = new Date(+lib.nowDate("Europe/Rome") + daysToAdd)
+		try {
+			if (giorni > 0) {
+		    const result = await Users.updateMany(
+		      { 'local.status': 'new' }, // Condizione per selezionare i documenti
+		      [
+		        {
+		          $set: {
+		            'local.resetPasswordExpires': newExpirationDate
+		          },
+		        },
+		      ]
+		    );
+
+		    console.debug(`${result.modifiedCount} documenti aggiornati con la data ${newExpirationDate}.`);
+		    let msg = 'La data di expire è stata aggiornata ed è uguale '+ newExpirationDate;
+	      req.flash('error', msg);
+	      return res.render('info.njk', {
+	                                      message: req.flash('error'),
+	                                      type: "warning"
+	                                    });
+      } else {
+      	let msg = 'La data di expire non è stata modificata'
+	      req.flash('error', msg);
+	      return res.render('info.njk', {
+	                                      message: req.flash('error'),
+	                                      type: "warning"
+	                                    });
+      }
+	  } catch (error) {
+	    console.error('Errore durante l\'aggiornamento:', error);
+	    let msg = 'Si è verificato un errore nell\'update della data di Expire.'
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
