@@ -75,15 +75,17 @@ module.exports = {
     var server;
     if (process.env.NODE_ENV == "development") {
       if (req.hostname == "sb.sharingbeer.it") {
-        server = req.protocol + '://' + req.hostname
+        server = 'https://' + req.hostname
       } else {
         server = req.protocol + '://' + req.hostname + ':' + process.env.PORT
       }
     } else {
       server = req.protocol + '://' + req.hostname;
     }
+    console.debug('SERVER',server)
     return server;
   },
+  
   sendmailToPerson: async (Name, Email, Password, Token, userName, userSurname, userEmail, typeOfMail, server, html) => {
     console.debug('MAIL TYPE: ', typeOfMail);
     console.debug("SERVER:", server);
@@ -274,18 +276,6 @@ module.exports = {
     var now = new Date(moment(a).format());
     var d = moment(now).utc().format('YYYY-MM-DD hh:mm');
     return d;
-  },
-  getServer: (req) => {
-    if (process.env.NODE_ENV == "development") {
-      if (req.hostname == 'sb.sharingbeer.it') {
-        server = req.protocol + '://' + req.hostname
-      } else {
-        server = req.protocol + '://' + req.hostname + ':' + process.env.PORT
-      }
-    } else {
-      server = req.protocol + '://' + req.hostname;
-    }
-    return server;
   },
 
   findClosestCombination: (products, T) => {

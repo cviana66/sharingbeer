@@ -9,7 +9,7 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
 <style type="text/css"> \
   @font-face { \
     font-family: myFont; \
-    src: url("https://dev-sharingbeer.fly.dev/font/bauserif.ttf"); \
+    src: url("'+server+'/font/bauserif.ttf"); \
   } \
   .sb-font { \
     font-family: myFont; \
