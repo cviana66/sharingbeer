@@ -17,6 +17,9 @@
 <div class="tab-content">
 
   <div class="tab-pane {{attivaConsegna}} text-white " id="home" role="tabpanel" aria-labelledby="home-tab" style="margin: 20px 0px 0px 0px;">
+  {% if ordiniInConsegna.length == 0 %}
+   <p class="text-white font-weight-light text-center" style="font-size:1..0rem"> Non ci sono ordini in consegna </p> 
+  {% else %}
     {% for purchase in ordiniInConsegna %}
 
       {% if purchase.orders._id == orderId %}
@@ -73,9 +76,13 @@
       </div>
     </div>
     {% endfor %}
+  {% endif %}
   </div>
 
   <div class="tab-pane {{attivaRitiro}} text-white " id="profile" role="tabpanel" aria-labelledby="profile-tab" style="margin: 20px 0px 0px 0px;">
+  {% if ordiniInRitiro.length == 0 %}
+   <p class="text-white font-weight-light text-center" style="font-size:1..0rem"> Non ci sono ordini da ritirare </p> 
+  {% else %}    
     {% for purchase in ordiniInRitiro %}
       {% if purchase.orders._id == orderId %}
         <div class="card" style="background-color:#2A0009;border-color:#c67605;margin: 0px 0px 20px 0px;">
@@ -131,9 +138,13 @@
       </div>
     </div>
     {% endfor %}
+  {% endif %}
   </div>
 
   <div class="tab-pane text-white " id="messages" role="tabpanel" aria-labelledby="messages-tab" style="margin: 20px 0px 0px 0px;">
+  {% if ordiniConsegnati.length == 0 %}
+   <p class="text-white font-weight-light text-center" style="font-size:1..0rem"> Non ci sono ordini evasi </p> 
+  {% else %}    
     {% for purchase in ordiniConsegnati %}
     <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 0px 0px 20px 0px;">
       <div class="flex-row" style="margin: 10px 0px 10px 0px;">
@@ -183,6 +194,7 @@
       </div>
     </div>
     {% endfor %}
+  {% endif %}
   </div>
 </div>
 
