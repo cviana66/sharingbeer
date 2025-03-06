@@ -250,7 +250,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           } catch (e) {
             console.debug("errore: ", e);
             await session.abortTransaction();
-            req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
+            req.flash('error', 'L\'applicazione ha riscontrato un errore imprevisto.');
             console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: ' + e);
             return res.render('info.njk', { message: req.flash('error'), type: "danger" });
           } finally {
@@ -268,7 +268,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
                 user: req.user,
                 numProducts: req.session.numProducts,
                 numInviti: invitiPerOgniInvito,
-                amiciDaInvitare: req.session.haiAmiciDaInvitare
+                amiciDaInvitare: req.session.haiAmiciDaInvitare //TODO: verificare se è necessario forzare a true
               });
             }
           });

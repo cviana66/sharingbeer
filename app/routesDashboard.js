@@ -16,7 +16,8 @@ module.exports = (app, moment, mongoose) => {
 			res.render('elencoClienti.njk', {
 				usersWithOrders: usersWithOrders,
 				usersWithoutOrders: usersWithoutOrders,
-				user: req.user
+				user: req.user,
+				amiciDaInvitare: req.session.haiAmiciDaInvitare
 			})
 		} catch (err) {
 			console.error(err);
@@ -36,11 +37,12 @@ module.exports = (app, moment, mongoose) => {
 	    	const server = lib.getServer(req);
 	    	console.debug('CUSTOMER', customer.local.email)
 	    	if (req.body.tipoCliente == 'conOrdini') {
-		    	res.send(mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server))    		    	
-		    	//await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme', server);
+		    	const html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
+		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
 	    	} else if (req.body.tipoCliente == 'senzaOrdini') {
-	    		res.send(mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server))    		    	
-		    	//await lib.sendmailToPerson(req.body.firstName, email, '', newToken, req.body.firstName, '', email, 'conferme', server);
+	    		//res.send(mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server))    	
+	    		const html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
+		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
 	    	}
 	    }
 	  } catch (e) {
@@ -70,9 +72,9 @@ module.exports = (app, moment, mongoose) => {
 			var usersFriendsValidated = await findUsersFromIdAndStatus(filteredFriendsId,['validated']);
 			var usersFriendsCustomer = await findUsersFromIdAndStatus(filteredFriendsId,['customer']);
 
-			console.debug("FRIENDS NEW & WAITING ->",usersFriendsNew); 
-			console.debug("FRIENDS VALIDATED ->",usersFriendsValidated);
-			console.debug("FRIENDS CUSTOMER ->",usersFriendsCustomer);
+			//console.debug("FRIENDS NEW & WAITING ->",usersFriendsNew); 
+			//console.debug("FRIENDS VALIDATED ->",usersFriendsValidated);
+			//console.debug("FRIENDS CUSTOMER ->",usersFriendsCustomer);
 
 			for (const documento of usersFriendsNew) {
  				 //console.debug(`ID PARENT:${documento.local.idParent} TOKEN:${documento.local.token} STATUS:${documento.local.status}, Name: ${documento.local.name.first}`);
@@ -211,6 +213,43 @@ module.exports = (app, moment, mongoose) => {
                                       type: "danger"
                                     });
 	  }
+	});
+
+	app.get('/addIviteToAll/:num', lib.isAdmin, async (req, res) => {		
+		var inviti = req.params.num;
+		console.debug('INVITI DA AGGIUNGERE', inviti)
+		try {
+			if (inviti > 0) {
+		    const result = await Users.updateMany(
+		      { 'local.status': { $in: ['validated','customer'] } }, // Condizione per selezionare i documenti
+		        {
+		         $inc: { 'local.eligibleFriends': inviti }
+		        },
+		    );
+		    console.debug(`${result.modifiedCount} documenti aggiornati. Incrementato eligibleFriends di ${inviti}`);
+		    let msg = 'Incrementato in numero di inviti possibili di '+ inviti;
+	      req.flash('error', msg);
+	      return res.render('info.njk', {
+	                                      message: req.flash('error'),
+	                                      type: "warning"
+	                                    });
+      } else {
+      	let msg = 'Non sono stati aggiunti Inviti'
+	      req.flash('error', msg);
+	      return res.render('info.njk', {
+	                                      message: req.flash('error'),
+	                                      type: "warning"
+	                                    });
+      }
+	  } catch (error) {
+	    console.error('Errore durante l\'aggiornamento:', error);
+	    let msg = 'Si è verificato un errore nell\'aggiunta di Inviti.'
+      req.flash('error', msg);
+      return res.render('info.njk', {
+                                      message: req.flash('error'),
+                                      type: "danger"
+                                    });
+	  }
 	})
 } // end module
 
@@ -269,7 +308,10 @@ async function updateCountNotifyByToken(userId, friendToken) {
     try {
       const result = await Users.updateOne(
           { _id: userId, 'friends.token': friendToken }, // Trova l'utente e il friend con il token specificato
-          { $inc: { 'friends.$.numOfNotify': 1 } } // incrementa di 1, vuol dire che ha cliccato su "Avvisa"
+          { 
+          	$inc: { 'friends.$.numOfNotify': 1 }, // incrementa di 1, vuol dire che ha cliccato su "Avvisa"
+           	$set: { 'friends.$.lastNotifyDate': lib.nowDate("Europe/Rome") } // Aggiorna lastNotifyDate con la data corrente
+          }
       );
     } catch (error) {
         console.error('Error updateCountNotifyByToken:', error);

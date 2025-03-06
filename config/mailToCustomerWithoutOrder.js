@@ -47,10 +47,11 @@ var mailToCustomerWithoutOrder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 T
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + Name + '</span>, </p> \
-  								<p> è il momento di utilizzare i <span style="font-weight:bold">tuoi inviti</span> e di goderti la tua <span style="font-weight:bold">birra omaggio</span>! </p> \
+  								<p> è il momento di goderti la tua <span style="font-weight:bold">birra omaggio</span>! </p> \
                   <p> Entra in <a href="'+server+'/login" target="_blank"> SharingBeer.it </a>, effettua un acquisto e la birra omaggio sarà tua! \
                     <span style="font-weight:bold">Non perdere l\'occasione</span>.</p> \
-                  <p> E ricorda, ogni tuo nuovo amico che si unisce e ogni suo acquisto aumenta i tuoi punti <span style="font-weight:bold">Pinta</span>! \
+                  <p> Controlla la sezione <span style="font-style:oblique;font-weight:bold">Invita</span> per vedere gli inviti disponibili e inviali ai tuoi amici \
+                  <p> Ricorda, ogni tuo nuovo amico che si registra e ogni suo acquisto aumenta i tuoi punti <span style="font-weight:bold">Pinta</span>! \
   								<div align="center"> \
   								<a href="'+server+'/login"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \

@@ -120,9 +120,9 @@ var mailorder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
         <table style="text-align:center;width:90%;max-width:500px;background-color:#fff;border-radius:12px" cellpadding="0" cellspacing="0" width="100%"> \
           <tbody> \
             <tr> \
-              <td style="border-top-left-radius:12px;border-top-right-radius:12px;padding-left:0px;padding-right:0px;padding-top:30px;padding-bottom:12px;background-color:#2A0009" align="center"> \
+              <td style="border-top-left-radius:12px;border-top-right-radius:12px;padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:5px;background-color:#2A0009" align="center"> \
                 <div> \
-                  <img src="'+server+'/img/birrificio_viana.png" title="LOGO Birrificio Viana" alt="LOGO Birrificio Viana"> \
+                  <p> <span class="text-center sb-font" style="font-size:2.5em;color:#FF9139;">Birrificio Viana</span> <p> \
                 </div> \
               </td> \
             </tr> \

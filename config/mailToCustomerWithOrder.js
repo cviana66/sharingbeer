@@ -35,7 +35,7 @@ var mailToCustomerWithOrder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Tran
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + Name + '</span>  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/clinking-beer-mugs.png" height="30" width="30"> </p> \
   								<p> Sei curioso di sapere chi ha già accettato il tuo invito? <br>O se hai ancora inviti disponibili? <p> \
                   <p> Entra nella sezione <span style="font-weight:bold"> Amici  </span> per scoprirlo. <p>\
-                  <p> E ricorda, ogni tuo nuovo amico che si unisce e ogni suo acquisto aumenta i tuoi punti <span style="font-weight:bold">Pinta</span>! \
+                  <p> E ricorda, ogni tuo nuovo amico che si registra e ogni suo acquisto aumenta i tuoi punti <span style="font-weight:bold">Pinta</span>! \
                   <p> Non esitare a invitarli di nuovo... o di nuovi... e condividi la tua passione per <a href="'+server+'/listOfFriends" target="_blank"> SharingBeer. </a> \
   								<div align="center"> \
   								<a href="'+server+'/listOfFriends"> \

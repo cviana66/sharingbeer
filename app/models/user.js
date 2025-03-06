@@ -57,6 +57,7 @@ const userSchema = new Schema({
                 email       : {type: String, unique: true},
                 insertDate  : {type: Date, default: Date.now},
                 numOfNotify : {type: Number, default: 0},
+                lastNotifyDate  : {type: Date},
             }],
   orders: [{
               email       : { type: String, required: true },
