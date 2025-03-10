@@ -34,7 +34,7 @@ var mailvalidatemail = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitiona
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao.</p> \
-  								<p> Hai ricevuto questa mail perchè Tu (o qualcuno altro) ha richiesto di reimpostare la password del Tuo account. </p>\
+  								<p> Hai ricevuto questa mail perchè Tu (o qualcun altro) hai richiesto di reimpostare la password del Tuo account. </p>\
   								<p> Procedi con la reimpostazione: </p>\
                   <div align="center"> \
     								<a href="'+server+'/reset?token='+token+'"> \

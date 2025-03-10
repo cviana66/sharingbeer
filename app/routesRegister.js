@@ -890,6 +890,16 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       nodeEnv: process.env.NODE_ENV
     })
   })
+
+  app.get('/Vcard', lib.isAdmin, (req, res) => {
+    console.debug('NODE_ENV =', process.env.NODE_ENV)
+    res.render('Vcard.njk', {
+      user: req.user,
+      nodeEnv: process.env.NODE_ENV,
+      numProducts: req.session.numProducts,
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
+    })
+  })
   // =================================================================================================
   // MESSAGGISTICA
   // =================================================================================================
