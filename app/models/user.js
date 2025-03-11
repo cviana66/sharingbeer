@@ -22,7 +22,8 @@ const userSchema = new Schema({
               resetPasswordToken    : {type: String},
               resetPasswordExpires  : {type: Date},
               role                  	: {type: String},
-              invitoVisitato		: {type: Boolean, default: false}
+              invitoVisitato		: {type: Boolean, default: false},
+              organization  : {type: String},
             },
   privacy : {
               needs     : {type: Boolean, default: true},

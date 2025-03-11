@@ -1,8 +1,9 @@
 // =============================================================================
 // MIDDLEWARE
 // =============================================================================
-var nodemailer        = require('nodemailer');
-var mailgun           = require('nodemailer-mailgun-transport');
+var nodemailer   = require('nodemailer');
+//const { google } = require('googleapis');
+//var mailgun      = require('nodemailer-mailgun-transport');
 
 // Access to mailgun free plan
 /*

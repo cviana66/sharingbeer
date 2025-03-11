@@ -184,16 +184,19 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
   //==================================================================================================
 
   app.get('/validation', async function (req, res) {
+    //console.debug('QUERY',req.query)
     try {
       const user = await User.findOne({
         'local.resetPasswordToken': req.query.token,
         'local.resetPasswordExpires': { $gt: Date.now() }
       });
-      console.debug('VALIDATION USER:',user)
+      //console.debug('VALIDATION USER:',user)
+      
       if (!user) {
         const userByToken = await User.findOne({
           'local.token': req.query.token
         });
+        //console.debug('USERBYTOKEN',userByToken)
 
         if (!userByToken) {
           let msg = 'Invito non più valido o scaduto. Se ti sei già registrato accedi con il tuo indirizzo email e password.';
@@ -227,6 +230,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
             amiciDaInvitare: req.session.haiAmiciDaInvitare
           });
         } else if (user.local.status === 'waiting') {
+          console.debug('WAITING VS VALIDATED')
           const session = await mongoose.startSession();
           session.startTransaction();
           const opts = { session };
@@ -715,7 +719,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       };
 
       if (isBirrificioEmail) {
-        res.render('birrificioToFriend.njk', model);
+        res.render('birrificioToFriend.njk', model); //il funzionamento è identico al friends.njk tranne il messaggio che viene costruito per l'invio al prospect
       } else {
         res.render('friend.njk', model);
       }
@@ -817,7 +821,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     }
   });
 
-  //-------------------------------------------
+  /*/-------------------------------------------
   //POST
   //-------------------------------------------
   app.get('/invite/:Id', async (req, res) => {
@@ -868,7 +872,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       //-------------------------------------------------
       //send email to Parent
       //-------------------------------------------------
-      //ib.sendmailToPerson(user.local.name.first, user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
+      //lib.sendmailToPerson(user.local.name.first, user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite',server)
 
       await session.commitTransaction();
 
@@ -881,7 +885,91 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     } finally {
       await session.endSession();
     }
-  });
+  }); */
+
+  app.get('/selfInvite', (req,res) => {
+    res.render('selfInvite.njk', {
+      message: req.flash('validateMessage')
+    })
+  }) 
+
+  app.post('/selfInvite', async (req,res) => {
+    var server = lib.getServer(req);
+    
+    console.debug('BNI BODY', req.body) 
+    
+    const email = req.body.email.toLowerCase().trim();
+    //--------------------------
+    // Validazione dell'email
+    //--------------------------
+    if (!lib.emailValidation(email)) {
+      let msg = 'Indirizzo mail non valido';
+      req.flash('validateMessage', msg);
+      console.info(lib.logDate("Europe/Rome") + ' [WARNING][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '", _id:' + user._id + '"} FLASH: ' + msg);
+      return res.redirect("/selfInvite");
+    }
+
+    try {
+      //-------------------------------------------------
+      // creo nuovo user 
+      //-------------------------------------------------
+      const newUser = await new User();
+      const password = req.body.password;
+      const firstName = lib.capitalizeFirstLetter(req.body.firstName);
+      const token = lib.generateToken(20);
+
+      console.debug('TOKEN: ', token);
+
+      // Set the newUser's local credentials
+      newUser.local.password = newUser.generateHash(password);
+      newUser.local.name.first = firstName;
+      newUser.local.idParent = req.body.id; //id parent
+      newUser.local.status = 'waiting';  // status
+      newUser.local.email = email;
+      newUser.local.token = token;
+      newUser.local.resetPasswordToken = token;
+      newUser.local.resetPasswordExpires = Date.now() + giorniScadenzaInvito //(3600000 * 24 * 15); // 1 hour in secondi * 24 * 15 = 2 settimane
+      newUser.local.organization = 'BNI'//req.body.organization //TODO: settare dinamicamente ma per ora metto BNI
+      await newUser.save();
+
+      console.debug('BNI NEW USER',newUser)
+
+      //-------------------------------------------------
+      // Push a new Friend in PARENT
+      //-------------------------------------------------
+      const user = await User.findById(req.body.id);
+      user.friends.push({
+        'name.first': firstName,
+        'token': token,
+        'status': 'accepted',
+        'insertDate': lib.nowDate("Europe/Rome")
+      });
+      await user.save();
+      
+      await lib.sendmailToPerson(firstName, email, '', token, firstName, '', email, 'conferme', server);
+      let msg = 'Inviata email di verifica';
+      console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /selfInvite" USER: {id:"' + req.body.id + '"} FLASH: ' + msg);
+      
+      res.render('emailValidation.njk', { email: email });
+
+    } catch (e) {
+      
+      if (e.code === 11000) {
+        let msg = 'Indirizzo e-mail già registrato';
+        req.flash('validateMessage', msg);
+        console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /selfInvite" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
+        return res.redirect("/selfInvite");
+      } else {
+        let msg = 'Spiacente ma qualche cosa non ha funzionato nella richiesta di invito. Riprova';
+        req.flash('error', msg);
+        console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /selfInvite" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' e.code: ' + e.code + ' FLASH: ' + msg);
+        return res.render('info.njk', {
+          message: req.flash('error'),
+          type: "danger"
+        });
+      }
+    }
+  })
 
   app.get('/inviteQrcode', lib.isAdmin, (req, res) => {
     console.debug('NODE_ENV =', process.env.NODE_ENV)
@@ -1050,6 +1138,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
 
   app.get('/testval', lib.isAdmin, function (req, res) {
     res.render('validation.njk');
+  });
+
+  app.get('/testbni', lib.isAdmin, function (req, res) {
+    res.render('selfInvite.njk');
   });
 
   app.get('/testreg', lib.isAdmin, function (req, res) {
