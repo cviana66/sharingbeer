@@ -896,8 +896,6 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
   app.post('/selfInvite', async (req,res) => {
     var server = lib.getServer(req);
     
-    console.debug('BNI BODY', req.body) 
-    
     const email = req.body.email.toLowerCase().trim();
     //--------------------------
     // Validazione dell'email
@@ -955,10 +953,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     } catch (e) {
       
       if (e.code === 11000) {
-        let msg = 'Indirizzo e-mail già registrato';
-        req.flash('validateMessage', msg);
+        let msg = 'Indirizzo e-mail già registrato. Puoi accedere con le credenziali con cui ti sei iscritto.';
+        req.flash('loginMessage', msg);
         console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /selfInvite" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
-        return res.redirect("/selfInvite");
+        return res.redirect("/login");
       } else {
         let msg = 'Spiacente ma qualche cosa non ha funzionato nella richiesta di invito. Riprova';
         req.flash('error', msg);
