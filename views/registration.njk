@@ -4,10 +4,6 @@
     <h3 class="text-white text-center bg-dark">Dati Registrazione</h3>
     <hr style="border-top: 1px solid #5375BD;">
 
-    <div id="loading">
-      <img  src="img/ajax-loader-1.gif" alt="Loading..." />
-    </div>
-
     <div class="card-body text-white font-weight-light text-justify">
       <span style="font-size:1.1em;">Completa con i tuoi dati personali </span>
     </div>
@@ -109,7 +105,7 @@
 
   document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("loading").style.display = 'none';
-    });
+  });
 /*==================================================================*/
 /* GESTIONE della CITTA' con query MONGODB                          */
 /* Gestione delle VIE con query su OpenStreetMaps (Overpass)        */
@@ -164,18 +160,21 @@ async function controlInputAndValidateAddress() {
             //checkPrivacyCessione : document.getElementById('checkPrivacyCessione').checked
           }
           //console.log('PARAM',JSON.stringify(postData,null,2));
+          document.getElementById("loading").style.display = 'block';
           post('/register',postData);
 
         } else {
           console.error('ERRORE nella ricerca dello indirizzo');
           document.getElementById("hiddenCAP").value ="";
           document.getElementById("hiddenAddressIsValid").value = "errato";
+          document.getElementById("loading").style.display = 'block';
           post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
         }
       },
       error: function (e) {
         //console.log("OVERPASS_CAP", e);
         //document.getElementById("loading").style.display = 'none';
+        document.getElementById("loading").style.display = 'block';
         post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
       }
     });

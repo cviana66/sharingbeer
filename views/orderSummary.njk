@@ -3,10 +3,6 @@
 
   <h3 class="text-white text-center bg-dark"> Riepilogo ordine </h3>
 
-	<div id="loading">
-		<img  src="img/ajax-loader-1.gif" alt="Loading..." />
-	</div>
-
  {% if nOrders == 0 %}
 	 <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.1em;">
       <!-- Shipping -->
@@ -271,11 +267,11 @@
         }
       });
       // azione richiesta nel carico della pagina
-      document.addEventListener("DOMContentLoaded", function() {
-        //console.log('DOMContentLoaded in ORDERSUMMARY')
-        document.getElementById("loading").style.display = 'none';
-        document.getElementById("mybutton").removeAttribute("disabled")
-      });
+      // document.addEventListener("DOMContentLoaded", function() {
+      //   //console.log('DOMContentLoaded in ORDERSUMMARY')
+      //   document.getElementById("loading").style.display = 'none';
+      //   document.getElementById("mybutton").removeAttribute("disabled")
+      // });
 
       function startAxerve() {
         document.getElementById("mybutton").setAttribute("disabled","disabled");

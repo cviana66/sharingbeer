@@ -18,10 +18,6 @@
   }
 </style>
 
-<div id="loading">
-	<img  src="img/ajax-loader-1.gif" alt="Loading..." />
-</div>
-
 <div class="text-center sb-font" style="margin:5px 0px 0px 0px; font-size:2em; color:#FF9139;"> Sharingbeer </div>
 
 <div class="font-weight-light text-center" style="margin:5px 0px 0px 0px; font-size:0.8em; color:#FF9139;">
@@ -156,46 +152,46 @@
 </form>
 
 <script type="text/javascript">
-		  document.addEventListener("DOMContentLoaded", function() {
-			document.getElementById("loading").style.display = 'none';
-		  });
+	document.addEventListener("DOMContentLoaded", function() {
+		document.getElementById("loading").style.display = 'none';
+	});
 
-		function  accettaInvito() {
-				if (fieldsValidationControl()) {
-					document.getElementById("loading").style.display = 'block';
-					return true
-				} else {
-					return false
-				}
+	function  accettaInvito() {
+		if (fieldsValidationControl()) {
+			document.getElementById("loading").style.display = 'block';
+			return true
+		} else {
+			return false
 		}
+	}
 
-        const passwordField = document.getElementById("inputPassword");
-        const togglePassword = document.querySelector(".password-toggle-icon i");
-        const confirmPasswordField = document.getElementById("confirmPassword");
-        const toggleConfirmPassword = document.querySelector(".passwordConfirm-toggle-icon i");
+	const passwordField = document.getElementById("inputPassword");
+	const togglePassword = document.querySelector(".password-toggle-icon i");
+	const confirmPasswordField = document.getElementById("confirmPassword");
+	const toggleConfirmPassword = document.querySelector(".passwordConfirm-toggle-icon i");
 
-        togglePassword.addEventListener("click", function () {
-          if (passwordField.type === "password") {
-            passwordField.type = "text";
-            togglePassword.classList.remove("bi-eye");
-            togglePassword.classList.add("bi-eye-slash");
-          } else {
-            passwordField.type = "password";
-            togglePassword.classList.remove("bi-eye-slash");
-            togglePassword.classList.add("bi-eye");
-          }
-        });
+	togglePassword.addEventListener("click", function () {
+		if (passwordField.type === "password") {
+			passwordField.type = "text";
+			togglePassword.classList.remove("bi-eye");
+			togglePassword.classList.add("bi-eye-slash");
+		} else {
+			passwordField.type = "password";
+			togglePassword.classList.remove("bi-eye-slash");
+			togglePassword.classList.add("bi-eye");
+		}
+	});
 
-        toggleConfirmPassword.addEventListener("click", function () {
-          if (confirmPasswordField.type === "password") {
-            confirmPasswordField.type = "text";
-            toggleConfirmPassword.classList.remove("bi-eye");
-            toggleConfirmPassword.classList.add("bi-eye-slash");
-          } else {
-            confirmPasswordField.type = "password";
-            toggleConfirmPassword.classList.remove("bi-eye-slash");
-            toggleConfirmPassword.classList.add("bi-eye");
-          }
-        });
+	toggleConfirmPassword.addEventListener("click", function () {
+		if (confirmPasswordField.type === "password") {
+			confirmPasswordField.type = "text";
+			toggleConfirmPassword.classList.remove("bi-eye");
+			toggleConfirmPassword.classList.add("bi-eye-slash");
+		} else {
+			confirmPasswordField.type = "password";
+			toggleConfirmPassword.classList.remove("bi-eye-slash");
+			toggleConfirmPassword.classList.add("bi-eye");
+		}
+	});
 </script>
 {% endblock %}

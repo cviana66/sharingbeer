@@ -21,7 +21,7 @@
       </div>
       <div class="col">
         <form method="GET" action="/shop">
-          <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+          <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return goToShop()">
            <h4>Shop</h4>
           </button>
           <br>
@@ -29,7 +29,16 @@
       </div>
     </div>
   </div>
-          
+<script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("loading").style.display = 'none';
+  });
+
+  function goToShop() {
+    document.getElementById("loading").style.display = 'block';
+    return window.location.href = ('/shop')  
+  }
+</script>          
 {% endblock %}
 
 

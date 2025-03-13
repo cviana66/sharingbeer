@@ -17,7 +17,8 @@ module.exports = (app, moment, mongoose) => {
 				usersWithOrders: usersWithOrders,
 				usersWithoutOrders: usersWithoutOrders,
 				user: req.user,
-				amiciDaInvitare: req.session.haiAmiciDaInvitare
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
 			})
 		} catch (err) {
 			console.error(err);
@@ -110,7 +111,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "warning"
+                                      type: "warning",
+                                      user: req.user,
+															        numProducts: req.session.numProducts,
+															        amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 		}
 	})
@@ -157,7 +161,10 @@ module.exports = (app, moment, mongoose) => {
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       }
 	  } catch (error) {
@@ -166,7 +173,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user: req.user,
+															        numProducts: req.session.numProducts,
+															        amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 	  }
 	});
@@ -194,14 +204,20 @@ module.exports = (app, moment, mongoose) => {
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       } else {
       	let msg = 'La data di expire non è stata modificata'
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       }
 	  } catch (error) {
@@ -210,7 +226,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user: req.user,
+																      numProducts: req.session.numProducts,
+																      amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 	  }
 	});
@@ -231,14 +250,20 @@ module.exports = (app, moment, mongoose) => {
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       } else {
       	let msg = 'Non sono stati aggiunti Inviti'
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       }
 	  } catch (error) {
@@ -247,7 +272,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user: req.user,
+																		  numProducts: req.session.numProducts,
+																		  amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 	  }
 	})

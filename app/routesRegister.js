@@ -202,11 +202,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           let msg = 'Invito non più valido o scaduto. Se ti sei già registrato accedi con il tuo indirizzo email e password.';
           //req.flash('warning', msg);
           req.flash('loginMessage', msg);
-          console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FLASH:' + msg);
-          // return res.render('info.njk', {
-          //   message: req.flash('warning'),
-          //   type: "warning"
-          // });
+          console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FLASH:' + msg);          
           return res.redirect('/login');
         }
 
@@ -220,13 +216,17 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         if (user.local.status === 'new') {
           const video = process.env.NODE_ENV === 'development' ? "" : "video/BirraViannaColor_Final_Logo_38.mp4";         
           console.debug('INVITO VISITATO = TRUE')
-          user.local.invitoVisitato = true;
+          user.local.invitoVisitato = true;          
           await user.save()
+
+          user.local.email = (user.local.email == req.query.token+'@sb.sb') ? '' : user.local.email //per non far visualizzare l'email farlocca
           res.render('validation.njk', {
             prospect: user.local,
             message: req.flash('validateMessage'),
             type: "danger",
             video: video,
+            user: req.user,
+            numProducts: req.session.numProducts,
             amiciDaInvitare: req.session.haiAmiciDaInvitare
           });
         } else if (user.local.status === 'waiting') {
@@ -256,7 +256,13 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
             await session.abortTransaction();
             req.flash('error', 'L\'applicazione ha riscontrato un errore imprevisto.');
             console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" USERS_ID: {_id:ObjectId("' + user._id + '")} TRANSACTION: ' + e);
-            return res.render('info.njk', { message: req.flash('error'), type: "danger" });
+            return res.render('info.njk', { 
+              message: req.flash('error'), 
+              type: "danger",
+              user: req.user,
+              numProducts: req.session.numProducts,
+              amiciDaInvitare: req.session.haiAmiciDaInvitare
+            });
           } finally {
             await session.endSession();
           }
@@ -265,7 +271,13 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
             if (err) {
               req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
               console.info(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" FUNCTION: req.logIn ERROR: ' + err);
-              return res.render('info.njk', { message: req.flash('error'), type: "danger" });
+              return res.render('info.njk', { 
+                message: req.flash('error'), 
+                type: "danger",
+                user: req.user,
+                numProducts: req.session.numProducts,
+                amiciDaInvitare: req.session.haiAmiciDaInvitare
+              });
             } else {
               console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {_id:ObjectId("' + req.user._id + '")}');
               return res.render('conferme.njk', {
@@ -284,7 +296,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
       return res.render('info.njk', {
         message: req.flash('error'),
-        type: "warning"
+        type: "warning",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
     }
   });
@@ -302,7 +317,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" TOKEN - USER: {resetPasswordToken:"' + req.body.token + '"} FUNCTION: User.findOne: utente non trovato' + msg);
         return res.render('info.njk', {
           message: req.flash('error'),
-          type: "danger"
+          type: "danger",
+          user: req.user,
+          numProducts: req.session.numProducts,
+          amiciDaInvitare: req.session.haiAmiciDaInvitare
         });
       }
 
@@ -351,7 +369,12 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /validation" USER: {_id:"' + user._id + '"} FLASH: ' + msg);
         }
 
-        res.render('emailValidation.njk', { email: email });
+        res.render('emailValidation.njk', { 
+          email: email,
+          user: req.user,
+          numProducts: req.session.numProducts,
+          amiciDaInvitare: req.session.haiAmiciDaInvitare
+        });
 
       } catch (e) {
         if (e.code === 11000) {
@@ -365,7 +388,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' e.code: ' + e.code + ' FLASH: ' + msg);
           return res.render('info.njk', {
             message: req.flash('error'),
-            type: "danger"
+            type: "danger",
+            user: req.user,
+            numProducts: req.session.numProducts,
+            amiciDaInvitare: req.session.haiAmiciDaInvitare
           });
         }
       }
@@ -375,7 +401,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /validation" FUNCTION: User.findOne: ' + err + ' FLASH: ' + msg);
       return res.render('info.njk', {
         message: req.flash('error'),
-        type: "danger"
+        type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
     }
   });
@@ -396,7 +425,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         user: req.user,
         numProducts: req.session.numProducts,
         message: req.flash('validateMessage'),
-        type: "warning"
+        type: "warning",        
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       }
       res.render('registration.njk', model);
 
@@ -410,7 +440,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       req.flash('warning', msg);
       return res.render('info.njk', {
         message: req.flash('warning'),
-        type: "warning"
+        type: "warning",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       })
     }
   });
@@ -588,7 +621,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           user: req.user,
           payType: "axerve", //"paypal"  "axerve"
           nOrders: nOrders,
-          omaggio: req.session.omaggioPrimoAcquisto
+          omaggio: req.session.omaggioPrimoAcquisto,
+          amiciDaInvitare: req.session.haiAmiciDaInvitare
 
         })
       }
@@ -605,7 +639,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /register" ID: {"id":"' + req.user.id + '"} FUNCTION: User.save: ' + e + ' FLASH: ' + msg);
         return res.render('info.njk', {
           message: req.flash('error'),
-          type: "danger"
+          type: "danger",
+          amiciDaInvitare: req.session.haiAmiciDaInvitare,
+          user: req.user,
+          numProducts: req.session.numProducts,
         })
       }
     } finally {
@@ -633,7 +670,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       req.flash('error', 'L\'applicazione ha riscontrato un errore inatteso')
       res.render('info.njk', {
         message: req.flash('error'),
-        type: "danger"
+        type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
     }
 
@@ -654,7 +694,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
       return res.render('info.njk', {
         message: req.flash('error'),
-        type: "danger"
+        type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
 
     }
@@ -707,7 +750,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         message: req.flash('info'),
         type: "info",
         numProducts: req.session.numProducts, // Numero di prodotti nel carrello
-        user: req.user.local,
+        user: req.user,
         invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
         friendsInvited: req.session.friendsInvited,
         percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable), // Percentuale di amici invitati
@@ -729,7 +772,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       req.flash('error', 'L\'applicazione ha riscontrato un errore non previsto.');
       return res.render('info.njk', {
         message: req.flash('error'),
-        type: "danger"
+        type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
     }
   });
@@ -744,7 +790,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         type: "info",
         invitationAvailable: req.session.invitationAvailable - req.session.friendsInvited,
         friendsInvited: req.session.friendsInvited,
-        percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable)
+        percentage: Math.round(req.session.friendsInvited * 100 / req.session.invitationAvailable),
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
     }
 
@@ -889,7 +938,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
 
   app.get('/selfInvite', (req,res) => {
     res.render('selfInvite.njk', {
-      message: req.flash('validateMessage')
+      message: req.flash('validateMessage'),
+      user: req.user,
+      numProducts: req.session.numProducts,
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     })
   }) 
 
@@ -948,7 +1000,12 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       let msg = 'Inviata email di verifica';
       console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /selfInvite" USER: {id:"' + req.body.id + '"} FLASH: ' + msg);
       
-      res.render('emailValidation.njk', { email: email });
+      res.render('emailValidation.njk', { 
+        email: email,
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare 
+      });
 
     } catch (e) {
       
@@ -963,7 +1020,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "POST /selfInvite" EMAIL: {"email":"' + email + '"} FUNCTION: User.save: ' + e + ' e.code: ' + e.code + ' FLASH: ' + msg);
         return res.render('info.njk', {
           message: req.flash('error'),
-          type: "danger"
+          type: "danger",
+          user: req.user,
+          numProducts: req.session.numProducts,
+          amiciDaInvitare: req.session.haiAmiciDaInvitare
         });
       }
     }
@@ -973,7 +1033,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     console.debug('NODE_ENV =', process.env.NODE_ENV)
     res.render('qrcode4Invite.njk', {
       user: req.user,
-      nodeEnv: process.env.NODE_ENV
+      nodeEnv: process.env.NODE_ENV,
+      user: req.user,
+      numProducts: req.session.numProducts,
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     })
   })
 
@@ -997,9 +1060,10 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     req.flash('message', msg);
     res.render('info.njk', {
       message: req.flash('message'),
-      type: msgType,
+      type: msgType,      
       user: req.user,
-      numProducts: req.session.numProducts
+      numProducts: req.session.numProducts,
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     })
   });
 
@@ -1013,7 +1077,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       message: req.flash('message'),
       type: msgType,
       user: req.user,
-      numProducts: req.session.numProducts
+      numProducts: req.session.numProducts,
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     })
   });
 

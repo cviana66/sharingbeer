@@ -95,7 +95,7 @@
 			</div>
 			<form role="form" action="/register" method="GET">
 			<div style="margin-bottom: 40px;">
-				<button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+				<button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return goTo('/register')">
 					Procedi con l'acquisto
 				</button>
 			</div>
@@ -108,7 +108,7 @@
 		</div>
 		<div class="col">
 			<form method="GET" action="/shop">
-				<button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+				<button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return goTo('/shop')">
 					<h4>Shop</h4>
 				</button>
 				<br>
@@ -118,4 +118,10 @@
 		</td>
 	</tr>
 </table>
+<script type="text/javascript">
+	function goTo(pagina) {
+  	document.getElementById("loading").style.display = 'block';
+  	return window.location.href = (pagina)  
+	}
+</script>
 {% endblock %}

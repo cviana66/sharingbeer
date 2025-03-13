@@ -75,47 +75,50 @@
 {% endfor %}
 
 <script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("loading").style.display = 'none';
+  });
 
-  async function animateDiv(item_id) {
+	async function animateDiv(item_id) {
     document.querySelector('#carrello').classList.add('animate-div'); //animazione
     document.getElementById("mybutton").setAttribute("disabled","disabled"); //disattivo il bottone
 
     var data = {}
     data.item_id = item_id;
     await $.ajax({
-        type: 'POST',
-        dataType: 'json',
-        url: '/shop',
-        data: data,
-        success: function(res) {
+    	type: 'POST',
+    	dataType: 'json',
+    	url: '/shop',
+    	data: data,
+    	success: function(res) {
           //console.log(res.statusText)
           //console.log(res.msg)
-          if (res.statusText == 'ok') {
-            var spanElement = document.getElementById('lblCartCount');
-            var num = Number(document.getElementById('lblCartCount').textContent) + 1
+    		if (res.statusText == 'ok') {
+    			var spanElement = document.getElementById('lblCartCount');
+    			var num = Number(document.getElementById('lblCartCount').textContent) + 1
             //console.log('NUMERO DI ITEM', num.toString())
-            spanElement.textContent = num.toString();
+    			spanElement.textContent = num.toString();
 
             document.querySelector('#carrello').classList.remove('animate-div'); //animazione
             sleep(500)
             document.getElementById("mybutton").removeAttribute("disabled")  //riattivo il pulsante
 
           } else {
-            window.location.href = '/shop?msg='+ res.msg;
+          	window.location.href = '/shop?msg='+ res.msg;
           }
         },
         error: function (e) {
-          console.log('Errore',e)
+        	console.log('Errore',e)
         }
-    });
+      });
 
 
   }
 
   function sleep(ms) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms);
-    })
+  	return new Promise((resolve) => {
+  		setTimeout(resolve, ms);
+  	})
   }
 </script>
 

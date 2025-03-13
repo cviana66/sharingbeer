@@ -278,8 +278,8 @@ const gestpayService = new GestpayService();
             deliveryDate  : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'),
             ritiroDate    : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Ritiro'),
             user          : req.user,
-            numProducts   : 0,
-            amiciDaInvitare: true
+            numProducts : req.session.numProducts,
+            amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
 
     }catch (e){
@@ -288,7 +288,10 @@ const gestpayService = new GestpayService();
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user    : req.user,
+                                      numProducts : req.session.numProducts,
+                                      amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
     }
   });
@@ -297,33 +300,32 @@ const gestpayService = new GestpayService();
 
     console.debug('PARAMETRI RISPOSTA NEGATIVA: ',req.session);
 
-
     //================================================
     // Chiamo Axerve per ottenere la stringa DENCRYPT
     //================================================
     let shopLogin = req.query.a;
     let cryptedString = req.query.b;
     const decryptedString = await gestpayService
-      .decrypt({
-        shopLogin,
-        cryptedString
-      })
-      .then(result => {
-        console.debug(result);
-        return result
-      })
-      .catch(err => {
-        console.log('ERRORE in encrypt', err)
-        throw new Error("Dencrypt fallita")
-      });
+    .decrypt({
+      shopLogin,
+      cryptedString
+    })
+    .then(result => {
+      console.debug(result);
+      return result
+    })
+    .catch(err => {
+      console.log('ERRORE in encrypt', err)
+      throw new Error("Dencrypt fallita")
+    });
 
     try {
-
       req.user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin,decryptedString.ShopTransactionID);
       res.render('orderOutcome.njk', {
-              status  : 'KO',
-              user    : req.user,
-              numProducts : req.session.numProducts
+        status  : 'KO',
+        user    : req.user,
+        numProducts : req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
 
     }catch (e){
@@ -331,9 +333,12 @@ const gestpayService = new GestpayService();
       let msg = 'Ci dispiace, si è verificato un errore inatteso. L\'esito del pagamento sarà verificato e ti manterremo informato. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
       req.flash('error', msg);
       return res.render('info.njk', {
-                                      message: req.flash('error'),
-                                      type: "danger"
-                                    });
+        message: req.flash('error'),
+        type: "danger",
+        user    : req.user,
+        numProducts : req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      });
     }
   });
 };
