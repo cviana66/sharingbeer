@@ -841,9 +841,11 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       //throw new Error('ERROR in RECOMM generato da me');
 
       //-------------------------------------------------
-      //send email to Parent
+      //send email to Parent con l'invito da copiare e inviare se non ancora fatto
       //-------------------------------------------------
-      lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite', server)
+      const dataScadenzaInvito = new Date(Date.now() + giorniScadenzaInvito)
+      const html = mailinvite(req.user.local.name.first, req.user.local.email, token, newUser.local.name.first, server, dataScadenzaInvito.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }) )
+      lib.sendmailToPerson(req.user.local.name.first, req.user.local.email, '', token, newUser.local.name.first, '', newUser.local.email, 'invite', server, html)
 
       await session.commitTransaction();
 
@@ -1125,8 +1127,9 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
   })
 
   app.get('/mailinvite', lib.isAdmin, function (req, res) {
-    var server = lib.getServer(req);
-    res.send(mailinvite('Name', 'Email', 'Token', 'userName', server))
+    const server = lib.getServer(req);
+    const dataScadenzaInvito = new Date(Date.now() + giorniScadenzaInvito)
+    res.send(mailinvite('Name', 'Email', 'Token', 'userName', server, dataScadenzaInvito.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })))
   })
 
   app.get('/mailorder', lib.isAdmin, function (req, res) {

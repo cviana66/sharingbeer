@@ -114,7 +114,7 @@ module.exports = {
         from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
         to: Email, //'cviana66@gmail.com', // list of receivers
         subject: 'Invito - Birrificio Viana', // Subject line
-        html: mailinvite(Name, Email, Token, userName, server)
+        html: html //mailinvite(Name, Email, Token, userName, server)
       }
     } else if (typeOfMail == 'conferme') {
       var mailOptions = {

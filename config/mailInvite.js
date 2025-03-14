@@ -1,4 +1,4 @@
-module.exports = function(parentName, parentEmail, token, friendName, server) {
+module.exports = function(parentName, parentEmail, token, friendName, server, scadenza) {
 
 var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
 <html xmlns="https://www.w3.org/1999/xhtml"> \
@@ -38,8 +38,10 @@ var mailrecom = '<!DOCTYPE html PUBLIC "-W3CDTD XHTML 1.0 Transitional//EN" "htt
 							</div> \
 							<div style="font-family:Arial,Verdana;font-weight:300;font-size:14px;text-align:left;color:#222541;margin-top:10px;background-color:#F5F5F5;border-radius:6px; padding:10px 5px 15px 20px"> \
 								<p>Ciao ' +friendName+ ', </p> \
-								<p> ho appena assaggiato una nuova birra artigianale. <br>Ti mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.</p> \
+								<p> ho appena assaggiato una nuova birra artigianale del Birrificio Viana e che ti consiglio di provare. <br>\
+								Ti mando il link con il codice invito per accedere in Sharingbeer.</p> \
 								<p> ' +server+ '/validation?token=' +token+ ' </p> \
+								<p> Registra il tuo account entro il ' +scadenza+ ' per riservarti una birra OMAGGIO. Non perdere l\'occasione! </p> \
 								<p> ' +parentName+ ' </p> \
 							</div> \
 							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
