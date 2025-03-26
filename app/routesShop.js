@@ -312,8 +312,11 @@ module.exports = function(app, moment, mongoose) {
       console.log ('ERROR ',e)
       req.flash('error', 'Si è verificato un errore inatteso. Siamo al lavoro per risolverlo. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com')
       res.render('info.njk', {
-          message: req.flash('error'),
-          type: "danger"
+        message: req.flash('error'),
+        type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
     }
 
@@ -329,7 +332,8 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
       status  : status,
       user    : req.user,
       deliveryDate: lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM',req.user.orders.deliveryType),
-      numProducts : req.session.numProducts
+      numProducts : req.session.numProducts,    
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     })
  });
 
@@ -410,7 +414,10 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
     req.flash('message', msg);
     return res.render('info.njk', {
       message: req.flash('message'),
-      type: "warning"
+      type: "warning",
+      user: req.user,
+      numProducts: req.session.numProducts,
+      amiciDaInvitare: req.session.haiAmiciDaInvitare
     });
   }
 });
@@ -431,8 +438,11 @@ app.post('/shop', lib.isLoggedIn, async function (req, res) {
             let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
             req.flash('message', msg);
             return res.render('info.njk', {
-                message: req.flash('message'),
-                type: "warning"
+              message: req.flash('message'),
+              type: "warning",
+              user: req.user,
+              numProducts: req.session.numProducts,
+              amiciDaInvitare: req.session.haiAmiciDaInvitare
             });
         }
 
@@ -481,77 +491,14 @@ app.post('/shop', lib.isLoggedIn, async function (req, res) {
         req.flash('message', msg);
         return res.render('info.njk', {
             message: req.flash('message'),
-            type: "warning"
+            type: "warning",
+            user: req.user,
+            numProducts: req.session.numProducts,
+            amiciDaInvitare: req.session.haiAmiciDaInvitare
         });
     }
 });
 
-/*/POST
-	app.post('/shop', lib.isLoggedIn ,async function (req, res) {
-		//Load (or initialize) the cart and session.cart
-		var cart = req.session.cart = req.session.cart || {};
-		//Read the incoming product data from shop.njk
-		var id = req.body.item_id;
-    console.debug('SHOP ITEM ID',id )
-
-		//Locate the product to be added
-		Product.findById(id, function (err, prod) {
-			if (err) {
-				//console.log('SHOP POST Error adding product to cart: ', err);
-				//res.redirect('/shop');
-				//return;
-        let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
-        req.flash('message', msg);
-        return res.render('info.njk', {
-            message: req.flash('message'),
-            type: "warning"
-        })
-			} else {
-				/------------------------------------------------------------------------------
-				/ Verifico se il prodotto selezioanto è disponibile.
-				/ La verifica è parziale a causa della possibilità di concorrenza nell'acquisto
-				/ da più users.
-				/ La verifica finale è fatta in orderSummary.
-				/------------------------------------------------------------------------------/
-				var q =  (!cart[id]) ? 0 : cart[id].qty; //se il carrello è vuoto
-
-				console.debug('DISPONIBILITA: ', Number(prod.quantity), Number(q), priceCurier.length)
-
-				if (req.session.numProducts < priceCurier.length) { // verifico il numero massimo di beerbox spedibili
-          if ((Number(prod.quantity) - Number(q)) > 0) {
-
-  					//Increase quantity or add the product in the shopping cart.
-  					if (cart[id]) {
-  						cart[id].qty++;
-  						cart[id].subtotal=(cart[id].qty*cart[id].price).toFixed(2);
-  						req.session.numProducts++;
-  					}	else { //il prodotto è scelto per la prima volta
-  						cart[id] = {
-  							id : prod._id,
-  							name: prod.name,
-  		          linkImage: prod.linkImage,
-  		          quantity: prod.quantity,
-  							price: prod.price.toFixed(2),
-  							prettyPrice: prod.prettyPrice(),
-  							qty: 1,
-  							subtotal: prod.price.toFixed(2)
-  						};
-  						req.session.numProducts++;
-  					}
-            res.status(200).send('{"statusText":"ok", "msg": ""}');
-  				} else {
-  					const msg = 'Hai aggiunto l\'ultimo beerBox disponibile. La birra '+prod.name+' è ora esaurita. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.'
-            res.status(200).send('{"statusText":"ko", "msg":"'+msg+'"}');
-  				}
-        } else {
-          const msg = "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'\indirizzo email birrificioviana@gmail.com"
-          res.status(200).send('{"statusText":"ko", "msg":"'+msg+'"}');
-        }
-			}
-
-		});
-	});
-	*/
 // =============================================================================
 // CART ========================================================================
 // =============================================================================
@@ -844,61 +791,6 @@ app.post('/cart/delete', lib.isLoggedIn, async function (req, res) {
     }
 });
 
-/*	app.post('/cart/delete', lib.isLoggedIn, function (req, res) {
-		//Load (or initialize) the cart
-		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart; //cart è l'oggetto sessione
-
-		//Read the incoming product data
-		var id = req.body.item_id;
-
-		//Locate the product to be added
-		Product.findById(id, function (err, prod) {
-			if (err) {
-				console.log('Error deleting product to cart: ', err);
-				res.redirect('/shop');
-				return;
-			} else {
-  			if (cart[id]) {
-  				delete req.session.cart[id];
-  				req.session.numProducts=0;
-  			}
-      }
-			res.redirect('/cart');
-		});
-	});
-*/
-/*
-  // GET ORDER ===========================================================================
-  app.get('/order', lib.isLoggedIn, function(req, res) {
-    Order.find({idUser:req.user._id}, function(err, orders) {
-
-      var displayOrder = {items: []};
-
-      if (err) {
-        var error = 'Something bad happened! Please try again.';
-        console.log("error code: ",err.code);
-      } else {
-
-        if (!orders) {
-          //TODO manahement if not exist order ????
-          console.log("Order not exist");
-        } else {
-        //Prepare JSON Items for transactions
-          for (var item in orders) {
-
-            if (orders[item].status != 'reserved') {
-              displayOrder.items.push(orders[item]);
-            }
-          }
-
-          var model = { order: displayOrder };
-          res.render('order.dust', model);
-        }
-      }
-
-    });
-*/
 // ========================= SHOP ADMIN ROUTE ==================================
 // =============================================================================
 // Add a new product to the database.
@@ -914,7 +806,12 @@ app.get('/product', lib.isAdmin, async (req, res) => {
         });
 
         console.debug(prods);
-        var model = { products: prods };
+        var model = { 
+          products: prods,
+          user: req.user,
+          numProducts: req.session.numProducts,
+          amiciDaInvitare: req.session.haiAmiciDaInvitare
+        };
         console.debug(model);
 
         // Renderizza la vista con i prodotti

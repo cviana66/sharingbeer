@@ -6,7 +6,7 @@ const mailToCustomerWithoutOrder  = require('../config/mailToCustomerWithoutOrde
 module.exports = (app, moment, mongoose) => {
 
 	// =============================================================================
-	// DASBOARD ====================================================================
+	// DASHBOARD ====================================================================
 	// =============================================================================
 	//GET
 	app.get('/listOfCustomer', lib.isAdmin, async (req, res) => {
@@ -31,6 +31,7 @@ module.exports = (app, moment, mongoose) => {
 
 		console.debug('CUSTOMERS ID',selectedCustomers)
 		if (typeof selectedCustomers === "string") selectedCustomers = [selectedCustomers]
+		var html = ""
 		try {		
 			for (const customerId of selectedCustomers) {
 				//console.debug(customerId)
@@ -38,16 +39,31 @@ module.exports = (app, moment, mongoose) => {
 	    	const server = lib.getServer(req);
 	    	console.debug('CUSTOMER', customer.local.email)
 	    	if (req.body.tipoCliente == 'conOrdini') {
-		    	const html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
+		    	html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
 		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
 	    	} else if (req.body.tipoCliente == 'senzaOrdini') {
 	    		//res.send(mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server))    	
-	    		const html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
+	    		 html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
 		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
 	    	}
+	    	// TODO: aggiornare nel cliente il numero di comunicazioni inviate, tipo  e data ultimo invio	    	
 	    }
+	    model = {
+				user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare,
+        html: html	
+			}
+	    res.render('info.njk',model)
 	  } catch (e) {
 	  	console.error(e);
+	  	model = {
+				user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare,
+        messaggio: e	
+			}
+	  	res.render('info.njk', model)
 	  }
 	});
 
@@ -152,10 +168,14 @@ module.exports = (app, moment, mongoose) => {
 		    console.log(`${result.modifiedCount} documenti aggiornati.`);
 		    let msg = 'La data di expire è stata aggiornata ed è uguale alla data initDate +' + giorni
 	      req.flash('error', msg);
-	      return res.render('info.njk', {
-	                                      message: req.flash('error'),
-	                                      type: "warning"
-	                                    });
+	      const model = {
+					user: req.user,
+			    numProducts: req.session.numProducts,
+			    amiciDaInvitare: req.session.haiAmiciDaInvitare,
+			    message: req.flash('error'),
+	        type: "warning"
+				}
+	      return res.render('info.njk', model);
       } else {
       	let msg = 'La data di expire non è stata modificata'
 	      req.flash('error', msg);

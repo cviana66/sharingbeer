@@ -7,36 +7,36 @@ async function loadDeliveryData(moment) {
 	var spedizioneOrders=[];
 
 	const aggregationResultRitiro = await User.aggregate([
-	    { $unwind: { path: '$orders' } },
+		{ $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: {$and: [{'orders.status': 'OK'},
-	    				 {'orders.payment.s2sStatus': 'OK'},
-	    				 {$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
-						 { $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
-	  ]
-	);
+		{ $match: {$and: [{'orders.status': 'OK'},
+			{'orders.payment.s2sStatus': 'OK'},
+			{$or: [{'orders.deliveryType': {$exists: false}}, {'orders.deliveryType': {$ne: 'Consegna'} } ] }] } },
+			{ $sort: { 'orders.address.name.last': 1, 'orders.address.name.first': 1 } }
+		]
+		);
 
 	const aggregationResultConsegna = await User.aggregate([
-	    { $unwind: { path: '$orders' } },
+		{ $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { $and: [	{'orders.status': 'OK'},
-										{'orders.payment.s2sStatus': 'OK'},
-										{'orders.deliveryType': 'Consegna'},
-										{'orders.address.distance':  {$lte: 15000}}] } },
-		{$project:{_id:0,friends:0, addresses:0,privacy:0,local:0}}
-	  ]
-	);
+		{ $match: { $and: [	{'orders.status': 'OK'},
+			{'orders.payment.s2sStatus': 'OK'},
+			{'orders.deliveryType': 'Consegna'},
+			{'orders.address.distance':  {$lte: 15000}}] } },
+			{$project:{_id:0,friends:0, addresses:0,privacy:0,local:0}}
+		]
+		);
 
 	const aggregationResultSpedizione = await User.aggregate([
-	    { $unwind: { path: '$orders' } },
+		{ $unwind: { path: '$orders' } },
 	    //{ $match: { 'orders.status': 'OK', 'orders.typeShipping': 'consegna' } }
-	    { $match: { $and: [	{'orders.status': 'OK'},
-										{'orders.payment.s2sStatus': 'OK'},
-										{'orders.deliveryType': 'Consegna'},
-										{'orders.address.distance':  {$gt: 15000}}] } },
-		{$project:{_id:0,friends:0, addresses:0,privacy:0}}
-	  ]
-	);
+		{ $match: { $and: [	{'orders.status': 'OK'},
+			{'orders.payment.s2sStatus': 'OK'},
+			{'orders.deliveryType': 'Consegna'},
+			{'orders.address.distance':  {$gt: 15000}}] } },
+			{$project:{_id:0,friends:0, addresses:0,privacy:0}}
+		]
+		);
 
 	/* --------------------------
 	 * RITIRO
@@ -55,9 +55,9 @@ async function loadDeliveryData(moment) {
 		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
 		var customerMobile = orders.address.mobileNumber;
 		var customerAddress = orders.address.address + ' ' +
-							  orders.address.houseNumber + ' ' +
-							  orders.address.city +  ' ' +
-							  orders.address.province;
+		orders.address.houseNumber + ' ' +
+		orders.address.city +  ' ' +
+		orders.address.province;
 
 		var orderItems = orders.items;
 
@@ -91,9 +91,9 @@ async function loadDeliveryData(moment) {
 		var customerAnag = orders.address.name.last + ' ' + orders.address.name.first;
 		var customerMobile = orders.address.mobileNumber;
 		var customerAddress = orders.address.address + ' ' +
-							  orders.address.houseNumber + ' ' +
-							  orders.address.city +  ' ' +
-							  orders.address.province;
+		orders.address.houseNumber + ' ' +
+		orders.address.city +  ' ' +
+		orders.address.province;
 		var customerAddressCoordinate = orders.address.coordinateGPS;
 		var customerAddressAffidability = orders.address.affidability;
 
@@ -129,9 +129,9 @@ async function loadDeliveryData(moment) {
 		var customerAnag = sOrders.address.name.last + ' ' + sOrders.address.name.first;
 		var customerMobile = sOrders.address.mobileNumber;
 		var customerAddress = sOrders.address.address + ' ' +
-							  sOrders.address.houseNumber + ' ' +
-							  sOrders.address.city +  ' ' +
-							  sOrders.address.province;
+		sOrders.address.houseNumber + ' ' +
+		sOrders.address.city +  ' ' +
+		sOrders.address.province;
 		var customerAddressCoordinate = sOrders.address.coordinateGPS;
 		var customerAddressAffidability = sOrders.address.affidability;
 
@@ -169,13 +169,13 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 
 	const session = await mongoose.startSession();
 	session.startTransaction();
-    const opts = { session };
+	const opts = { session };
 
 	try {
 		const aggregationResult = await User.aggregate([
-										{ $unwind: { path: '$orders' } },
-										{ $match: { 'orders._id': orderID } }
-										]);
+			{ $unwind: { path: '$orders' } },
+			{ $match: { 'orders._id': orderID } }
+		]);
 
 		console.debug('aggregationResult', aggregationResult);
 
@@ -190,34 +190,34 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 				await User.updateOne(
 					{ "orders._id": order._id },
 					{ $set: { "orders.$.status": actionStatus[actionCode].status } }
-				);
+					);
 			}
 
 			if (actionCode.toString() == 'NOK01') {
 				await User.updateOne(
 					{ "orders._id": order._id },
 					{ $set: { "orders.$.deliveryType": 'Ritiro' } }
-				);
+					);
 			}
 
 			var deliveryDocUpd = {_id: new mongoose.Types.ObjectId(),
-												status 		: deliveryStatus,
-												note  		: deliveryStatusDesc,
-												date_ref 	: lib.nowDate("Europe/Rome")
-											};
+				status 		: deliveryStatus,
+				note  		: deliveryStatusDesc,
+				date_ref 	: lib.nowDate("Europe/Rome")
+			};
 
 			//order['delivery'] = deliveryDocUpd;
 
 			await User.updateOne(
-					{ "orders._id": order._id },
-					{ $push: { "orders.$.delivery": deliveryDocUpd } }
+				{ "orders._id": order._id },
+				{ $push: { "orders.$.delivery": deliveryDocUpd } }
 				);
 		}
 
 		const aggregationResultDone = await User.aggregate([
-											{ $unwind: { path: '$orders' } },
-											{ $match: { 'orders._id': orderID } }
-											]);
+			{ $unwind: { path: '$orders' } },
+			{ $match: { 'orders._id': orderID } }
+		]);
 
 		//console.debug('aggregationResultDone', aggregationResultDone);
 
@@ -257,10 +257,15 @@ module.exports = function(app, mongoose, moment) {
 
 		} catch (error) {
 			console.debug(error);
-
 			req.flash('error', "Errore durante l'aggiornamento della consegna.");
-
-        	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+			const model = {
+        message: req.flash('error'), 
+        type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      }
+			return res.render('info.njk', model);
 		}
 
 
@@ -273,17 +278,23 @@ module.exports = function(app, mongoose, moment) {
 
 			if (!ordersInHouse) {
 				req.flash('info', 'Non ci sono consegne previste al momento');
-
-	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
+				const model = {
+	        message: req.flash('info'), 
+	        type: "info",
+	        user: req.user,
+	        numProducts: req.session.numProducts,
+	        amiciDaInvitare: req.session.haiAmiciDaInvitare
+	      }
+				return res.render('info.njk', model);
 			} else {
 				return res.render('consegneToDelivery.njk', {ordersInHouseString: JSON.stringify(ordersInHouse)});
 			}
-    	} catch (error) {
+		} catch (error) {
 			console.debug(error);
 
-	        req.flash('error', error);
+			req.flash('error', error);
 
-	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+			return res.render('info.njk', {message: req.flash('error'), type: "danger"});
 		}
 	});
 	
@@ -301,10 +312,15 @@ module.exports = function(app, mongoose, moment) {
 
 		} catch (error) {
 			console.debug(error);
-
 			req.flash('error', "Errore durante l'aggiornamento della consegna.");
-
-        	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+			const model = {
+	        message: req.flash('error'), 
+	        type: "danger",
+	        user: req.user,
+	        numProducts: req.session.numProducts,
+	        amiciDaInvitare: req.session.haiAmiciDaInvitare
+	      }
+			return res.render('info.njk', model);
 		}
 
 
@@ -318,17 +334,34 @@ module.exports = function(app, mongoose, moment) {
 
 			if (!ordersInHouse) {
 				req.flash('info', 'Non ci sono consegne previste al momento');
-
-	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
+				const model = {
+	        message: req.flash('info'), 
+	        type: "info",
+	        user: req.user,
+	        numProducts: req.session.numProducts,
+	        amiciDaInvitare: req.session.haiAmiciDaInvitare
+	      }
+				return res.render('info.njk', model);
 			} else {
-				return res.render('consegneInHouse.njk', {ordersInHouseString: JSON.stringify(ordersInHouse)});
+				const model = {
+	        ordersInHouseString: JSON.stringify(ordersInHouse),
+	        user: req.user,
+	        numProducts: req.session.numProducts,
+	        amiciDaInvitare: req.session.haiAmiciDaInvitare
+	      }				
+				return res.render('consegneInHouse.njk', model);
 			}
-    	} catch (error) {
+		} catch (error) {
 			console.debug(error);
-
-	        req.flash('error', error);
-
-	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+			req.flash('error', error);
+			const model = {        
+				message: req.flash('error'), 
+				type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      }				
+			return res.render('info.njk', model);
 		}
 	});
 
@@ -345,12 +378,16 @@ module.exports = function(app, mongoose, moment) {
 
 		} catch (error) {
 			console.debug(error);
-
 			req.flash('error', "Errore durante l'aggiornamento della consegna.");
-
-        	return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+			const model = {        
+				message: req.flash('error'), 
+				type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      }	
+			return res.render('info.njk', model);
 		}
-
 
 		try {
 			// Carico la lista degli ordini da spedire
@@ -362,22 +399,38 @@ module.exports = function(app, mongoose, moment) {
 
 			if (!ordersToShip) {
 				req.flash('info', 'Non ci sono consegne previste al momento');
-
-	        	return res.render('info.njk', {message: req.flash('info'), type: "info"});
+				const model = {        
+					message: req.flash('info'), 
+					type: "info",
+	        user: req.user,
+	        numProducts: req.session.numProducts,
+	        amiciDaInvitare: req.session.haiAmiciDaInvitare
+	      }	
+				return res.render('info.njk', model);
 			} else {
 				//console.debug('SHIPPING -> ', JSON.stringify(ordersToShip))
 				return res.render('consegneToShip.njk', {ordersInHouseString: JSON.stringify(ordersToShip)});
 			}
-    	} catch (error) {
+		} catch (error) {
 			console.debug(error);
-
-	        req.flash('error', error);
-
-	        return res.render('info.njk', {message: req.flash('error'), type: "danger"});
+			req.flash('error', error);
+			const model = {        
+				message: req.flash('error'), 
+				type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      }	
+			return res.render('info.njk', model);
 		}
 	});
 
 	app.all('/dashboard', lib.isAdmin, (req, res) => {
-		res.render('dashboard.njk')
+		const model = {
+			user: req.user,
+			numProducts: req.session.numProducts,
+			amiciDaInvitare: req.session.haiAmiciDaInvitare
+		}
+		res.render('dashboard.njk',model)
 	});
 }

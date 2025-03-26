@@ -41,12 +41,13 @@ module.exports = {
     if (req.isAuthenticated() && req.user.local.role == 'admin') {
       return next();
     } else {
-      res.render('info.njk', { 
+      model = {
         messaggio: 'Accesso negato',
         user: req.user,
         numProducts: req.session.numProducts,
         amiciDaInvitare: req.session.haiAmiciDaInvitare
-      })
+      }
+      res.render('info.njk', model)
     }
   },
   getInviteAvailable: (req) => {

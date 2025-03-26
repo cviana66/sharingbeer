@@ -294,7 +294,14 @@ module.exports = function (app, passport, moment, mongoose) {
       const msg = 'Spiacente, si è verificato un errore inatteso! Per cortesia riprova';
       req.flash('error', msg);
       console.error(lib.logDate("Europe/Rome") + ' [ERROR][RECOVERY:NO] "GET /reset" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FUNCTION: Users.findOne: ' + err + ' FLASH: ' + msg);
-      return res.render('info.njk', { message: req.flash('error'), type: "danger" });
+      const model = {
+        message: req.flash('error'), 
+        type: "danger",
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      }
+      return res.render('info.njk', model);
     }
   });
 
