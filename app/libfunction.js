@@ -76,6 +76,12 @@ module.exports = {
       return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
   },
+  capitalizeFirstLetterOfEachWord: function capitalizeFirstLetterOfEachWord(sentence) {
+    return sentence
+        .split(' ') // Dividi la frase in parole
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Trasforma la prima lettera in maiuscola
+        .join(' '); // Ricompone la frase
+  },
   getServer: (req) => {
     var server;
     if (process.env.NODE_ENV == "development") {
@@ -200,9 +206,12 @@ module.exports = {
       return true;
     }
   },
+  //-------------------------------------------------------------------------------------
   deliveryDate: (timeZone, dataType, format, deliveryType) => {
     moment.locale('it');
     var d = moment(data).utc(timeZone).format('dddd');
+    var h = moment(data).utc(timeZone).format('HH');
+    console.debug('Giorno=',d,'ORA=',h)
     var data = new Date();
 
     Date.prototype.addDays = function (days) {
@@ -214,19 +223,19 @@ module.exports = {
     if (deliveryType == 'Consegna') {
       var daysToAdd = 0
       if (d == "sabato") {
-        daysToAdd = 4
+        daysToAdd = (h<=13) ? 3 : 3
       } else if (d == "domenica") {
-        daysToAdd = 3
+        daysToAdd = (h<=13) ? 3 : 3
       } else if (d == "lunedì") {
-        daysToAdd = 3
+        daysToAdd = (h<=13) ? 2 : 3
       } else if (d == "martedì") {
-        daysToAdd = 3
+        daysToAdd = (h<=13) ? 2 : 3
       } else if (d == "mercoledì") {
-        daysToAdd = 3
+        daysToAdd = (h<=13) ? 2 : 3
       } else if (d == "giovedì") {
-        daysToAdd = 4
+        daysToAdd = (h<=13) ? 4 : 5
       } else if (d == "venerdì") {
-        daysToAdd = 4
+        daysToAdd = (h<=13) ? 4 : 4
       }
     } else if (deliveryType == 'Ritiro') {
       if (d == "sabato") {
@@ -282,7 +291,7 @@ module.exports = {
     var d = moment(now).utc().format('YYYY-MM-DD hh:mm');
     return d;
   },
-
+//-------------------------------------------------------------------------------------
   findClosestCombination: (products, T) => {
     let closestSum = 0;
     let bestCombination = [];

@@ -184,19 +184,19 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
   //==================================================================================================
 
   app.get('/validation', async function (req, res) {
-    //console.debug('QUERY',req.query)
+    console.debug('QUERY',req.query);
     try {
       const user = await User.findOne({
         'local.resetPasswordToken': req.query.token,
         'local.resetPasswordExpires': { $gt: Date.now() }
       });
-      //console.debug('VALIDATION USER:',user)
+      console.debug('VALIDATION USER:',user)
       
       if (!user) {
         const userByToken = await User.findOne({
           'local.token': req.query.token
         });
-        //console.debug('USERBYTOKEN',userByToken)
+        console.debug('USERBYTOKEN',userByToken)
 
         if (!userByToken) {
           let msg = 'Invito non più valido o scaduto. Se ti sei già registrato accedi con il tuo indirizzo email e password.';
@@ -288,8 +288,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
               });
             }
           });
-        }
-      }
+        };
+      };
     } catch (err) {
       let msg = 'Token non più valido o scaduto';
       req.flash('error', msg);
@@ -347,7 +347,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           const newToken = lib.generateToken(20);
           user.local.email = email;
           user.local.password = user.generateHash(req.body.password);
-          user.local.name.first = lib.capitalizeFirstLetter(req.body.firstName);
+          user.local.name.first = lib.capitalizeFirstLetterOfEachWord(req.body.firstName);
           user.local.resetPasswordToken = newToken;
           user.privacy.optional = optional;
           user.privacy.transfer = cessione;
@@ -359,7 +359,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           const update = {
             'friends.$.status': 'accepted',
             'friends.$.email': email,
-            'friends.$.name.first': lib.capitalizeFirstLetter(req.body.firstName),
+            'friends.$.name.first': lib.capitalizeFirstLetterOfEachWord(req.body.firstName),
             'friends.$.id': user._id.toString()
           };
           await User.findOneAndUpdate(filter, { '$set': update });
@@ -490,8 +490,8 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         console.debug('REGISTER countMobileNumber:', countMobileNumber, 'LENGTH', countMobileNumber.length)
         if (countMobileNumber.length > 0) throw ({ code: 11000 })
 
-        user.local.name.first = req.body.firstName;
-        user.local.name.last = req.body.lastName;
+        user.local.name.first = lib.capitalizeFirstLetterOfEachWord(req.body.firstName);
+        user.local.name.last = lib.capitalizeFirstLetterOfEachWord(req.body.lastName);
         //user.privacy.optional              = req.body.checkPrivacyOptional;
         //user.privacy.transfer              = req.body.checkPrivacyCessione;
         user.local.status = 'customer';
@@ -810,7 +810,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       //-------------------------------------------------
       const newUser = await new User();
       const password = lib.generatePassword(6);
-      const firstName = lib.capitalizeFirstLetter(req.body.firstName);
+      const firstName = lib.capitalizeFirstLetterOfEachWord(req.body.firstName);
       const token = lib.generateToken(20);
 
       console.debug('TOKEN: ', token);
@@ -890,7 +890,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       //-------------------------------------------------
       const newUser = await new User();
       const password = lib.generatePassword(6);
-      const firstName = ""; //lib.capitalizeFirstLetter(req.body.firstName);
+      const firstName = ""; //lib.capitalizeFirstLetterOfEachWord(req.body.firstName);
       const token = lib.generateToken(20);
 
       console.debug('INVITE TOKEN: ', token);
@@ -967,7 +967,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
       //-------------------------------------------------
       const newUser = await new User();
       const password = req.body.password;
-      const firstName = lib.capitalizeFirstLetter(req.body.firstName);
+      const firstName = lib.capitalizeFirstLetterOfEachWord(req.body.firstName);
       const token = lib.generateToken(20);
 
       console.debug('TOKEN: ', token);

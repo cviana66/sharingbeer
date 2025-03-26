@@ -68,6 +68,7 @@ function fieldsValidationControlSelf() {
   } else {
     document.getElementById("inputFirstName").value = nome.charAt(0).toUpperCase() + nome.slice(1);
   }
+
   if(email =="" || !re.test(String(email))) {
     document.getElementById("wrongMail").innerHTML = iwar+"Inserisci una Email valida";
     document.getElementById("inputUsernameEmail").focus();
@@ -162,6 +163,7 @@ function fieldsValidationControlSelf() {
 }
 
 function fieldsValidationControl() {
+  if (document.getElementById("wrongFirstName") != null) document.getElementById("wrongFirstName").innerHTML = "";
   if (document.getElementById("wrongMail") != null) document.getElementById("wrongMail").innerHTML = "";
   if (document.getElementById("wrongPwd") != null) document.getElementById("wrongPwd").innerHTML = "";
   if (document.getElementById("wrongPrivacy") != null) document.getElementById("wrongPrivacy").innerHTML = "";
@@ -173,6 +175,17 @@ function fieldsValidationControl() {
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var email = document.getElementById("inputUsernameEmail").value.trim();
   var controlEmail = document.getElementById("inputControlUsernameEmail").value.trim();
+  var nome = document.getElementById("inputFirstName").value;
+
+  if (nome == "") {
+    text = iwar+"Inserire il Nome";
+    document.getElementById("wrongFirstName").innerHTML = text;
+    document.getElementById("inputFirstName").focus();
+    document.getElementById("wrongFirstName").scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  } else {
+    document.getElementById("inputFirstName").value = nome.charAt(0).toUpperCase() + nome.slice(1);
+  }
 
   if(email =="" || !re.test(String(email))) {
     document.getElementById("wrongMail").innerHTML = iwar+"Inserisci una Email valida";
@@ -186,13 +199,13 @@ function fieldsValidationControl() {
   }
 
   let pwd1 = "";
-  let pwd2 = "";
+  // let pwd2 = "";
   if (document.getElementById("inputPassword") != null) {
     pwd1 = document.getElementById("inputPassword").value;
   }
-  if (document.getElementById("confirmPassword") != null) {
-    pwd2 = document.getElementById("confirmPassword").value;
-  }
+  // if (document.getElementById("confirmPassword") != null) {
+  //   pwd2 = document.getElementById("confirmPassword").value;
+  // }
 
   if(pwd1 != "") {
     if(pwd1.length < 6) {
@@ -235,19 +248,19 @@ function fieldsValidationControl() {
     return false;
   }
 
-  if(pwd2 != "") {
-    if(pwd2.length < 6) {
-      document.getElementById("wrongPwd").innerHTML = iwar+"La Password di conferma deve essere di almeno 6 caratteri";
-      document.getElementById("confirmPassword").focus();
-      return false;
-    }
-  }
+  // if(pwd2 != "") {
+  //   if(pwd2.length < 6) {
+  //     document.getElementById("wrongPwd").innerHTML = iwar+"La Password di conferma deve essere di almeno 6 caratteri";
+  //     document.getElementById("confirmPassword").focus();
+  //     return false;
+  //   }
+  // }
 
-  if(pwd1 != pwd2) {
-      document.getElementById("wrongConfirmPwd").innerHTML = iwar+"La password di conferma è differente";
-      document.getElementById("confirmPassword").focus();
-      return false;
-  }
+  // if(pwd1 != pwd2) {
+  //     document.getElementById("wrongConfirmPwd").innerHTML = iwar+"La password di conferma è differente";
+  //     document.getElementById("confirmPassword").focus();
+  //     return false;
+  // }
 
   if(!document.getElementById('checkAge').checked) {
     document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella solo se hai più di 18 anni";

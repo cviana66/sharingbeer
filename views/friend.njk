@@ -80,7 +80,7 @@
       document.getElementById("mybutton").disabled = 'true';
       document.getElementById("loading").style.display = 'block';
 
-      let firstName = capitalizeFirstLetter(document.getElementById("inputFirstName").value);
+      let firstName = capitalizeFirstLetterOfEachWord(document.getElementById("inputFirstName").value);
 
       fetch('/recomm',
         {
@@ -101,7 +101,7 @@
           if (data.ok) {
             //let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale. \nTi mando il link con il codice invito per accedere in Sharingbeer dove potrai anche tu gustare Birra Viana e ricevere un omaggio.\n\n"+data.server+"/validation?token="+data.token+"\n\n"+data.parentName;
             
-            let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale del Birrificio Viana e che ti consiglio di provare. \nTi mando il link con il codice invito per accedere in Sharingbeer.\n\n"+data.server+"/validation?token="+data.token+"\n\nRegistra il tuo account entro il "+scadenzaInvito+" per riservarti una birra OMAGGIO. Non perdere l'occasione!\n" +data.parentName;
+            let textText = "Ciao "+data.friendName+",\n\nho appena assaggiato una nuova birra artigianale del Birrificio Viana e che ti consiglio di provare. \nTi mando il link con il codice invito per accedere in Sharingbeer.\n\n"+data.server+"/validation?token="+data.token+"\n\nRegistra il tuo account entro il "+scadenzaInvito+" per riservarti una birra OMAGGIO. Non perdere l'occasione!\n\n" +data.parentName;
 
             let shareData = {
               title: 'Birrificio Viana - Codice invito SharingBeer',
@@ -139,10 +139,11 @@
     }
   }
 
-  function capitalizeFirstLetter(string) {
-    if (typeof(string) != "undefined") {
-      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    }
+  function capitalizeFirstLetterOfEachWord(sentence) {
+    return sentence
+        .split(' ') // Dividi la frase in parole
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Trasforma la prima lettera in maiuscola
+        .join(' '); // Ricompone la frase
   }
   /**
   * sends a request to the specified url from a form. this will change the window location.

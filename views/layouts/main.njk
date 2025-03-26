@@ -355,10 +355,8 @@
 					Birrificio Viana Srl (capitale sociale €10.000)<br>
 					Sede legale in Via Molignati 12, 13878 - Candelo (BI)<br>
 					P.IVA n° 02792790020 - n° REA BI – 314117 <br>
-					Cod. accisa IT00BIA00026R <br>
+					Cod. Accisa IT00BIA00026R <br>
 					email: birrificioviana@sharingbeer.it <br>
-					PEC: birrificioviana@pec.poste.it
-
 				</div>
 			</div>
 			<div class="col-sm-2 col-lg-4"></div>
@@ -372,8 +370,18 @@
 <script type="text/javascript" src="/js/plusMinus.js"></script>
 
 <script type="text/javascript">	
+	// Loading iniziale della pagina con azioni da effettuare
 	document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("loading").style.display = 'none';
+  });
+
+  // Ricarico la pagina se l'utente clicca INDIETRO sul bottone del browser
+  window.addEventListener('pageshow', function(event) {
+    // Controlla se la pagina è stata effettivamente caricata dal server
+    if (event.persisted) {
+      // Ricarica la pagina
+      location.reload();
+    }
   });
 
 	if ( {{amiciDaInvitare}} ) {

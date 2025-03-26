@@ -17,6 +17,8 @@ module.exports = function (app, passport, moment, mongoose) {
       video = ""
     }
 
+    console.debug('DELIVERYDATE',lib.deliveryDate('Europe/Rome', 'TXT', 'dddd DD MMMM', 'Consegna'))
+
     res.render('index.njk', {
       user: req.user,
       numProducts: req.session.numProducts,
