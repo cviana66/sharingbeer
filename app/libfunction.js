@@ -233,7 +233,7 @@ module.exports = {
       } else if (d == "mercoledì") {
         daysToAdd = (h<=13) ? 2 : 3
       } else if (d == "giovedì") {
-        daysToAdd = (h<=13) ? 4 : 5
+        daysToAdd = (h<=13) ? 2 : 5
       } else if (d == "venerdì") {
         daysToAdd = (h<=13) ? 4 : 4
       }
