@@ -114,7 +114,7 @@
 <p class="text-white text-center"> Nessun invito scaduto </p>
 {% endif %}
 
-<h3 class="text-white text-center bg-dark"> Inviti accettati <span style="font-size:0.8rem;"> ({{friendsValidated | length}})</span> </h3>
+<h3 class="text-white text-center bg-dark"> Inviti accettati <span style="font-size:0.8rem;"> ({{(friendsValidated | length) + (friendsCustomer | length)}})</span> </h3>
 {% set a = 0 %}
 {% for friend in friendsValidated %}
 {% set a = 1 %}
