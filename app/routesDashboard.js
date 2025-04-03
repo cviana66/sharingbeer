@@ -76,7 +76,8 @@ module.exports = (app, moment, mongoose) => {
 		try {
 			var isScaduti = false
 			const userId = req.user._id;
-			const friendsTokens = await findFriendsTokens(userId); //ricavo i token perchè non ho ancora l'id
+			const tokensArray = await findFriendsTokens(userId); //ricavo i token perchè non ho ancora l'id
+			const friendsTokens = tokensArray.map(friend => friend.token);
 			const friendsId = await findFriendsId(userId); //ricavo l'id perchè il token è cambiato
 			const filteredFriendsId = friendsId.filter(item => item !== undefined);
 
@@ -98,9 +99,11 @@ module.exports = (app, moment, mongoose) => {
  				 const giorni = giorniTraDueDate(documento.local.resetPasswordExpires, Date.now());
 				 console.debug(`Ci sono ${giorni} giorni tra le due date.`);
 				 documento.local.residualTime = giorni; 
+				 const found = tokensArray.find(item => item.token === documento.local.token);
+				 documento.local.numOfNotify = found.numOfNotify;
 
 				 if (giorni <= 0) {
-				 		isScaduti = true
+				 		//
 				 		console.debug(req.user._id, documento.local.token)
 				 		await updateFriendStatusByToken(req.user._id, documento.local.token, 'expired')
 				 }
@@ -114,7 +117,7 @@ module.exports = (app, moment, mongoose) => {
 				friendsCustomer: usersFriendsCustomer,
 				user: req.user,
 				numProducts : req.session.numProducts,
-				isScaduti: isScaduti,
+				//isScaduti: isScaduti,
 				amiciDaInvitare: req.session.haiAmiciDaInvitare,
 				invitiDisponibili: inviti.numInviteAvialable,
 				server: lib.getServer(req),
@@ -368,12 +371,16 @@ async function updateCountNotifyByToken(userId, friendToken) {
 
 // Funzione per trovare i token dei friends di un utente
 async function findFriendsTokens(userId) {
-  const user = await Users.findById(userId).select('friends.token');
+  const user = await Users.findById(userId).select('friends');
   if (!user) {
     throw new Error('Utente non trovato');
   }
-  const friendsTokens = user.friends.map(friend => friend.token);
-  return friendsTokens;
+  // Mappa gli amici per restituire un array di oggetti con token e numOfNotify
+  const friendsData = user.friends.map(friend => ({
+    token: friend.token,
+    numOfNotify: friend.numOfNotify
+  }));
+  return friendsData;
 }
 // Funzione per trovare gli id dei friends di un utente
 async function findFriendsId(userId) {
