@@ -10,28 +10,20 @@ body {
   min-height: 480px;
 }
 
-
-/* Aumenta la dimensione dell'icona */
-.material-symbols-outlined {
-  font-size: 30px; /* Puoi modificare questo valore per aumentare o diminuire la dimensione */
-}
-
 /* estende le classi di Bootstrap */
 
 .text-emphasis {
   color: #FFBB35;
 }
-
 /* Animate  Invito*/
-
 .invita_div {
-    animation: cambiaDimensione 1.5s infinite;
+    animation: pulsa 1.8s infinite;
 }
 
-@keyframes cambiaDimensione {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.5); }
-    100% { transform: scale(1); }
+@keyframes pulsa {
+    0% {transform: scale(1);}
+    50% {transform: scale(1.8);}
+    100% {transform: scale(1);}
 }
 
 .pulsa {
@@ -40,9 +32,12 @@ body {
 }
 
 @keyframes cambiaColore {
-    0% { color: #FFF; } /* Colore iniziale */
-    50% { color: #FF9139; } /* Colore intermedio */
-    100% { color: #FFF; } /* Colore finale */
+    0%, 100% {
+        fill: white; /* Colore iniziale */
+    }
+    50% {
+        fill: orange; /* Colore finale */
+    }
 }
 
 /* ------------------- */
@@ -53,16 +48,17 @@ body {
 }
 @keyframes my-animation {
   0% { transform: scale(1); }
-  50% { transform: scale(2.8); }
+  50% { transform: scale(1.8); }
   100% { transform: scale(1); }
 }
 /*-------------*/
 
 .badge {
-  position: absolute; transform: translate(50%, -50%);  
-  -webkit-border-radius: 18px;
-  -moz-border-radius: 18px;
-  border-radius: 18px;
+  padding-left: 10px;
+  padding-right: 10px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
 }
 
 .label-warning[href],
@@ -73,7 +69,9 @@ body {
     font-size: 18px;
     background: #FFBB35;
     color: #2A0009;
-    padding: 4px 4px 4px 4px;
+    padding: 0 8px;
+    vertical-align: top;
+    margin-left: -22px;
 }
 
 /*------------------*/

@@ -343,44 +343,42 @@ app.post('/orderOutcome', lib.isLoggedIn, function(req, res) {
 //GET
 app.get('/shop', lib.isLoggedIn, async function (req, res) {
   try {
-    const prods = await Product.find();
-
     req.flash('info', req.query.msg);
+    const prods = await Product.find();
 
     // Mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
     lib.retriveCart(req);
-    const cart = req.session.cart;
-    //console.debug('SHOP CART', cart);
-    let numProds = req.session.numProducts;
-    console.debug('SHOP CART', cart);
+    const cart = req.session.cart || {};
+    //var numProds = req.session.numProducts;
+    console.debug('CART in SHOP', cart)
+    ;
+    //----------------------------------------------
     // GESTIONE della concorrenza nella fase di acquisto
     prods.forEach(prod => {
       prod.prettyPrice = prod.prettyPrice();
       prod.price = prod.price.toFixed(2);
       const prodId = prod._id.toString();
-      //if (cart !== undefined && cart[prodId] !== undefined) {
-      //if (cart !== null && cart[prodId] !== null) {
-      if (cart !== undefined && cart !== null ) {
-        console.debug('SHOP CART PROD ID', cart[prodId]);
+      
+      if (cart !== {} ) {
+        console.debug('SHOP CART PROD ID ->', cart[prodId]);
         if (cart[prodId]) {
 				  prod.quantity -= cart[prodId].qty; // Tolgo dallo shop quanto ho in carrello
 				  // Controllo che nel frattempo non abbiano acquistato beerbox
 				  // e nel caso aggiusto i quantitativi
 				  if (prod.quantity < 0) {
             cart[prodId].qty += prod.quantity;
-            numProds += prod.quantity;
+            //numProds += prod.quantity;
             prod.quantity = 0;
             req.flash('info', 'Mi dispiace, ma la quantità disponibile dei beerbox per la birra ' + prod.name + ' è inferiore alla richieste ricevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo ' + cart[prodId].qty + ' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
           }
         }
       }
     });
-
+    //----------------------------------------------
+    
     req.session.cart = cart;
-
     // Rimetto in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
     lib.retriveCart(req);
-    //console.debug('CATALOGO PRODOTTI: ', prods);
 
     //-------------------------------------------
     // Verifica se è il primo ordine
@@ -395,6 +393,7 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
 
     const nOrders = resNorder.length > 0 ? resNorder[0].count : 0;
     console.debug("N° ORDINI", nOrders);
+    //------------------------------------------
 
     const model = {
       products: prods, // Prodotti dello shop
@@ -403,7 +402,8 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
       message: req.flash('info'),
       type: "info",
       amiciDaInvitare: req.session.haiAmiciDaInvitare,
-      nOrders: nOrders
+      nOrders: nOrders,
+      numBottigliePerBeerBox: numBottigliePerBeerBox
     };
 
     res.render('shop.njk', model);
@@ -421,70 +421,80 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
     });
   }
 });
-
+//----------------------------------------
+//POST SHOP
+//----------------------------------------
 app.post('/shop', lib.isLoggedIn, async function (req, res) {
     // Load (or initialize) the cart and session.cart
-    var cart = req.session.cart = req.session.cart || {};
-    // Read the incoming product data from shop.njk
-    var id = req.body.item_id;
-    console.debug('SHOP ITEM ID', id);
-
+    var cart = req.session.cart || {};
+    console.debug('CART in SHOP:', cart);
+    
+    const products = req.body; // Cambiato per gestire più prodotti
+    console.debug('SHOP BODY', products);
+    var numeroTotaleBottiglie = 0
+    
     try {
-        // Locate the product to be added
-        const prod = await Product.findById(id);
+        for (const product of products) {
+            const id = product.id;
+            const quantityToAdd = Number(product.quantity); // Converti la quantità in numero
+            console.debug('SHOP ITEM ID', id);
+            console.debug('Quantity to add:', quantityToAdd);
 
-        // Verifico se il prodotto è stato trovato
-        if (!prod) {
-            let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
-            req.flash('message', msg);
-            return res.render('info.njk', {
-              message: req.flash('message'),
-              type: "warning",
-              user: req.user,
-              numProducts: req.session.numProducts,
-              amiciDaInvitare: req.session.haiAmiciDaInvitare
-            });
-        }
+            numeroTotaleBottiglie += quantityToAdd
+            
+            // Locate the product to be added
+            const prod = await Product.findById(id);
 
-        /*------------------------------------------------------------------------------
-        / Verifico se il prodotto selezionato è disponibile.
-        / La verifica è parziale a causa della possibilità di concorrenza nell'acquisto
-        / da più users.
-        / La verifica finale è fatta in orderSummary.
-        /------------------------------------------------------------------------------*/
-        var q = (!cart[id]) ? 0 : cart[id].qty; // se il carrello è vuoto
+            // Verifico se il prodotto è stato trovato
+            if (!prod) {
+                let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
+                req.flash('message', msg);
+                return res.render('info.njk', {
+                    message: req.flash('message'),
+                    type: "warning",
+                    user: req.user,
+                    numProducts: req.session.numProducts,
+                    amiciDaInvitare: req.session.haiAmiciDaInvitare
+                });
+            }
 
-        console.debug('DISPONIBILITA: ', Number(prod.quantity), Number(q), priceCurier.length);
+            // Verifico se il prodotto selezionato è disponibile.
+            var q = (!cart[id]) ? 0 : cart[id].qty; // se il carrello è vuoto
 
-        if (req.session.numProducts < priceCurier.length) { // verifico il numero massimo di beerbox spedibili
-            if ((Number(prod.quantity) - Number(q)) > 0) {
-                // Increase quantity or add the product in the shopping cart.
-                if (cart[id]) {
-                    cart[id].qty++;
-                    cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2);
-                    req.session.numProducts++;
-                } else { // il prodotto è scelto per la prima volta
-                    cart[id] = {
-                        id: prod._id,
-                        name: prod.name,
-                        linkImage: prod.linkImage,
-                        quantity: prod.quantity,
-                        price: prod.price.toFixed(2),
-                        prettyPrice: prod.prettyPrice(),
-                        qty: 1,
-                        subtotal: prod.price.toFixed(2)
-                    };
-                    req.session.numProducts++;
+            console.debug('MAGAZZINO:',Number(prod.quantity), 'QTY in CART',Number(q), 'MAX QTY per SPEDIZIONE',priceCurier.length);
+
+            if ((req.session.numProducts + quantityToAdd)/numBottigliePerBeerBox <= priceCurier.length) { // verifico il numero massimo di beerbox per una spedizione
+                if ((Number(prod.quantity) - Number(q) - quantityToAdd) >= 0) {
+                    // Increase quantity or add the product in the shopping cart.
+                    if (cart[id]) {
+                        cart[id].qty += quantityToAdd; // Aggiungi la quantità specificata
+                        cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2);
+                        req.session.numProducts += quantityToAdd; // Aggiorna il numero totale di prodotti
+                    } else { // il prodotto è scelto per la prima volta
+                        cart[id] = {
+                            id: prod._id.toString(),
+                            name: prod.name,
+                            linkImage: prod.linkImage,
+                            quantity: prod.quantity,
+                            price: prod.price.toFixed(2),
+                            prettyPrice: prod.prettyPrice(),
+                            qty: quantityToAdd, // Imposta la quantità iniziale
+                            subtotal: (prod.price * quantityToAdd).toFixed(2) // Calcola il subtotal
+                        };
+                        req.session.numProducts += quantityToAdd; // Aggiorna il numero totale di prodotti
+                    }
+                } else {
+                    const msg = 'Hai aggiunto l\'ultimo beerBox disponibile. La birra ' + prod.name + ' è ora esaurita. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.';
+                    return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
                 }
-                return res.status(200).send('{"statusText":"ok", "msg": ""}');
             } else {
-                const msg = 'Hai aggiunto l\'ultimo beerBox disponibile. La birra ' + prod.name + ' è ora esaurita. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.';
+                const msg = "Hai aggiunto il numero massimo di beerBox per una spedizione. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com";
                 return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
             }
-        } else {
-            const msg = "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com";
-            return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
         }
+
+        // Se tutto va bene, restituisci un messaggio di successo
+        return res.status(200).send('{"statusText":"ok", "msg": "","ntb":"'+numeroTotaleBottiglie+'"}');
     } catch (err) {
         console.error('Error adding product to cart: ', err);
         let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
@@ -498,6 +508,74 @@ app.post('/shop', lib.isLoggedIn, async function (req, res) {
         });
     }
 });
+
+
+// Route per la pagina di selezione birra
+app.get('/composer', lib.isLoggedIn, async (req, res) => {
+    try {
+        const products = await Product.find(); // Recupera tutti i prodotti
+        res.render('composer.njk', { 
+          products,
+          user: req.user,
+          numProducts: req.session.numProducts,
+          amiciDaInvitare: req.session.haiAmiciDaInvitare 
+        }); // Passa i prodotti alla pagina
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Errore nel recupero dei prodotti');
+    }
+});
+
+app.post('/composer', lib.isLoggedIn, async (req, ser) => {
+  console.log('BODY:', req.body);
+  var parameters = {};
+  if (isObjectOfArrays(req.body)) {
+    parameters = req.body;
+  } else {
+    let beer = req.body;
+    parameters = { beerType: [beer.beerType], quantity: [beer.quantity], productId: [beer.productId] };
+  }
+  console.log('PARAMETRI:', parameters);
+
+  // Iteriamo attraverso i parametri
+  const result = [];
+  for (let i = 0; i < parameters.beerType.length; i++) {
+    const beer = parameters.beerType[i];
+    const qty = parseInt(parameters.quantity[i], 10); // Convertiamo la quantità in numero
+    const productId = parameters.productId[i];
+    console.debug(beer, qty, productId);
+    // Controlliamo se la descrizione è vuota o la quantità è 0
+    if (beer && qty > 0) {
+      // Se la birra esiste già nel risultato, sommiamo la quantità
+      const existingBeer = result.find(item => item.type === beer);
+      if (existingBeer) {
+        existingBeer.quantity += qty;
+      } else {
+        // Altrimenti, iniziamo una nuova entry
+        result.push({ type: beer, quantity: qty, productId: productId });
+      }
+    }
+  }
+
+  console.debug('ARRAY di OGEETI')
+  //   beerType: beer,
+  //   productId: data.productId[index],
+  //   quantity: data.quantity[index]
+  // }));
+
+  // console.log(outArray);
+
+  // // Convertiamo l'oggetto risultato in un formato desiderato
+  // const finalBeerTypes = Object.keys(result);
+  // const finalQuantities = finalBeerTypes.map(beer => result[beer].quantity);
+  // const finalProductIds = finalBeerTypes.map(beer => result[beer].productId);
+
+  // // Mostriamo il risultato
+  // console.log("Beer Types:", finalBeerTypes);
+  // console.log("Quantities:", finalQuantities);
+  // console.log("Product IDs:", finalProductIds);
+});
+
 
 // =============================================================================
 // CART ========================================================================
@@ -525,10 +603,10 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
     // Mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
     lib.retriveCart(req);
 
-    if (req.session.numProducts <= priceCurier.length) { // Verifico il numero massimo di beerbox spedibili
+    if (req.session.numProducts <= priceCurier.length) { // Verifico il numero massimo di beerbox per una spedizione
       const cart = req.session.cart;
       console.debug('CART in CART', cart);
-      let numProds = req.session.numProducts;
+      //var numProds = req.session.numProducts;
 
       // Prods sono tutti i prodotti in catalogo su DB products
       prods.forEach(prod => {
@@ -540,7 +618,7 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
 					prod.quantity -= cart[prodId].qty;
 					if (prod.quantity < 0) {
 						cart[prodId].qty += prod.quantity;
-						numProds += prod.quantity;
+						//numProds += prod.quantity;
 						prod.quantity = 0;
 						req.flash('cartMessage', 'Mi dispiace, ma la quantità disponibile dei beerbox per la birra ' + prod.name + ' è inferiore alla richieste ricevute a causa di acquisti simultanei. Attualmente abbiamo disponibili solo ' + cart[prodId].qty + ' beerBox. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
 					}
@@ -552,7 +630,7 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
       // Mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
       lib.retriveCart(req);
     } else {
-      req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com");
+      req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox per una spedizione. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com");
     }
 
     const model = {
@@ -612,33 +690,6 @@ app.post('/cart/minus', lib.isLoggedIn, async (req, res) => {
     }
 });
 
-/*	app.post('/cart/minus', lib.isLoggedIn, function (req, res) {
-		//Load (or initialize) the cart
-		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart;
-
-		//Read the incoming product data
-		var id = req.body.item_id;
-
-		//Locate the product to be added
-		Product.findById(id, function (err, prod) {
-			if (err) {
-				console.log('Error deleting product to cart: ', err);
-				res.redirect('/shop');
-				return;
-			} else {
-  			//decrement the product quantity in the shopping cart.
-  			if (cart[id].qty > 1) {
-  				cart[id].qty--;
-  				cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
-  				req.session.numProducts--;
-          //prod.quantity++;
-  			}
-      }
-  			res.redirect('/cart');
-		});
-	}); */
-
 //POST PLUS ====================================================================
 app.post('/cart/minus', lib.isLoggedIn, async function (req, res) {
     // Load (or initialize) the cart
@@ -694,7 +745,7 @@ app.post('/cart/plus', lib.isLoggedIn, async function (req, res) {
     console.debug('PROD QUANTITY in PLUS test', prod.quantity - (cart[id] ? cart[id].qty : 0));
     console.debug('PROD TEST', req.session.numProducts, priceCurier.length);
 
-    if (cart[id] && req.session.numProducts < priceCurier.length) { // Verifico il numero massimo di beerbox spedibili
+    if (cart[id] && req.session.numProducts < priceCurier.length) { // Verifico il numero massimo di beerbox per una spedizione
       if (prod.quantity - cart[id].qty > 0) { // Quantità disponibile > quantità nel carrello
         cart[id].qty++;
         cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2);
@@ -708,7 +759,7 @@ app.post('/cart/plus', lib.isLoggedIn, async function (req, res) {
         req.flash('cartMessage', 'Mi spiace ma la disponibilità di birra ' + prod.name + ' è di solo ' + cart[id].qty + ' beerBox e non puoi più aggiungerne. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
       }
     } else {
-      req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com");
+      req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox per una spedizione. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com");
     }
 
     res.redirect('/cart');
@@ -719,45 +770,6 @@ app.post('/cart/plus', lib.isLoggedIn, async function (req, res) {
   }
 });
 
-/*	app.post('/cart/plus', lib.isLoggedIn, function (req, res) {
-		//Load (or initialize) the cart
-		req.session.cart = req.session.cart || {};
-		var cart = req.session.cart;
-
-		//Read the incoming product data
-		var id = req.body.item_id;
-		//Locate the product to be added
-		Product.findById(id, function (err, prod) {
-			if (err) {
-				console.log('Error adding product to cart: ', err);
-				res.redirect('/shop');
-				return;
-			} else {
-        console.debug('PROD QUANTITY in PLUS',prod.quantity)
-        console.debug('PROD QUANTITY in PLUS test',prod.quantity-cart[id].qty)
-        console.debug('PROD TEST',req.session.numProducts, priceCurier.length)
-  			if (cart[id] && req.session.numProducts < priceCurier.length) { // verifico il numero massimo di beerbox spedibili
-          if (prod.quantity-cart[id].qty > 0) { // quantità disponibile > quantità nel carrello
-    				cart[id].qty++;
-    				cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
-    				req.session.numProducts++;
-            //prod.quantity--;
-          } else if (prod.quantity-cart[id].qty < 0){  // quantità disponibile è inferiore a quella nel carrello. Può succedere se viene fatto acquiaro da altro cliente
-            console.debug('PROD QUANTITY in PLUS < 0')
-            cart[id].qty = cart[id].qty - prod.quantity;
-            cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2)
-            req.flash('cartMessage', 'Mi spiace ma la disponibilità è inferiore alla richiesta a causa di acquisti simultanei. I beerbox disponibili per la birra '+prod.name+' sono '+cart[id].qty+'. A breve sarà in riassortimento');
-          } else {
-            req.flash('cartMessage', 'Mi spiace ma la disponibilità di birra '+prod.name+' è di solo '+cart[id].qty+' beerBox e non puoi più aggiungerne. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
-          }
-        } else {
-          req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'\indirizzo email birrificioviana@gmail.com")
-        }
-      }
-			res.redirect('/cart');
-		});
-	});
-*/
 //POST DELETE ==================================================================
 app.post('/cart/delete', lib.isLoggedIn, async function (req, res) {
     // Load (or initialize) the cart
@@ -823,48 +835,18 @@ app.get('/product', lib.isAdmin, async (req, res) => {
     }
 });
 
-/*    app.get('/product',lib.isAdmin, (req,res) => {
+app.post('/product', lib.isAdmin, async (req, res) => {
+  const product = new Product(req.body);
 
-      Product.find(function (err, prods) {
-  			if (err) {
-  				console.log(err);
-  			}
-        prods.forEach(function(prod) {
-          prod.prettyPrice = prod.prettyPrice();
-        });
-        console.debug(prods);
-        var model = { products: prods	};
-        console.debug(model);
-        res.render('newProduct.njk', model);
-      });
-    });
-*/
-
-	app.post('/product', lib.isAdmin, async (req, res) => {
-    const product = new Product(req.body);
-
-    try {
+  try {
         // Salva il prodotto nel database
-        await product.save();
-        res.send({ message: 'Prodotto creato con successo' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send({ message: 'Errore durante la creazione del prodotto' });
-    }
+    await product.save();
+    res.send({ message: 'Prodotto creato con successo' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ message: 'Errore durante la creazione del prodotto' });
+  }
 });
-/*
-	app.post('/product', (req, res) => {
-		const product = new Product(req.body);
-    product.save((err, product) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send({ message: 'Errore durante la creazione del prodotto' });
-      } else {
-        res.send({ message: 'Prodotto creato con successo' });
-      }
-    });
-	});
-*/
 
 app.delete('/admin/product',lib.isAdmin,  async (req, res) => {
     try {
@@ -879,14 +861,23 @@ app.delete('/admin/product',lib.isAdmin,  async (req, res) => {
     res.redirect('/admin/product');
 });
 
-/*
-  app.delete('/admin/product', function (req, res) {
-		Product.remove({_id: req.body.item_id}, function (err) {
-			if (err) {
-				console.log('Remove error: ', err);
-			}
-			res.redirect('/admin/product');
-		});
-	});
-*/
 };
+
+//========================================================================
+// FUNCTION
+//========================================================================
+function isObjectOfArrays(variable) {
+    // Controlla se la variabile è un oggetto e non è null
+    if (typeof variable !== 'object' || variable === null) {
+        return false;
+    }
+
+    // Controlla se tutte le proprietà dell'oggetto sono array
+    for (let key in variable) {
+        if (Array.isArray(variable[key]) === false) {
+            return false; // Se una proprietà non è un array, restituisci false
+        }
+    }
+
+    return true; // Se tutte le proprietà sono array, restituisci true
+}

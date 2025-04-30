@@ -1,0 +1,285 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<h3 class="text-white text-center bg-dark">Componi il tuo BeerBox</h3>
+<div class="align-self-center">
+    <p class="text-white text-center" style="font-size:0.8em;">Scegli il tipo di birra e la quantità desiderata.</p>
+</div>
+<hr style="border-top: 1px solid #5375BD;">
+
+<div class="container">
+    <form id="beerSelectionForm" action="/composer" method="POST">
+        <div id="selectionContainer">
+            <div class="form-group selection">
+                <select class="form-control beerType" name="beerType" onchange="updateResult()">
+                    <option value="">Tipo di birra...</option>
+                    {% for product in products %}
+                        <option value="{{ product.name }}" data-price="{{ product.price }}" data-id="{{ product.id }}">{{ product.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="quantity" class="text-white"></label>
+                <select class="form-control quantity" name="quantity" onchange="updateResult()">
+                    <option value="0">Quantità Bottiglie:...</option>
+                    <option value="1">1 Bottiglia</option>
+                    <option value="2">2 Bottiglie</option>
+                    <option value="3">3 Bottiglie</option>
+                    <option value="4">4 Bottiglie</option>
+                    <option value="5">5 Bottiglie</option>
+                    <option value="6">6 Bottiglie</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="result0" class="text-white mt-3" style="margin-bottom: 15px;">
+            <!-- Il risultato delle scelte sarà visualizzato qui -->
+        </div>
+
+        <div class="d-flex justify-content-between"> 
+            <button type="button" class="btn btn-danger" style="width: 50px;" onclick="removeLastSelection()">-</button>
+            <button type="button" class="btn btn-primary" style="width: 50px;" onclick="addSelection()" id="addButton" disabled>+</button>
+        </div>        
+
+        <div id="result1" class="text-warning mt-3" style="margin-bottom: 15px;">
+            <!-- Il risultato delle scelte sarà visualizzato qui -->
+        </div>
+
+        <div id="result" class="text-white mt-3" style="margin-bottom: 15px;">
+            <!-- Il risultato delle scelte sarà visualizzato qui -->
+        </div>
+
+        <div id="result2" class="text-white mt-3" style="margin-bottom: 15px;">
+            <!-- Il risultato delle scelte sarà visualizzato qui -->
+        </div>
+
+        <div class="d-flex justify-content-center" style="margin: 15px 0px 15px 0px;" > 
+            <button type="button" class="btn btn-my btn-lg btn-block" id="submitButton" onclick="submitForm()" disabled>Aggiungi al Carrello</button>
+        </div>
+    </form>
+
+</div>
+
+<script type="text/javascript">
+    function updateResult() {
+        const selections = document.querySelectorAll('.selection');
+        let resultText = "";
+        let resultText0 = "";
+        let resultText1 = "";
+        let resultText2 = "";
+        let allFieldsFilled = true;
+        const totals = {};
+        let totalBottles = 0;
+        let totalPrice = 0;
+
+        selections.forEach(selection => {
+            const beerType = selection.querySelector('.beerType').value;
+            const quantity = parseInt(selection.querySelector('.quantity').value);
+            const pricePerSix = parseFloat(selection.querySelector('.beerType').selectedOptions[0].dataset.price);
+            const pricePerBottle = pricePerSix / 6;
+            const id = selection.querySelector('.beerType').selectedOptions[0].dataset.id;
+
+            if (beerType && quantity > 0) {
+                if (!totals[beerType]) {
+                    totals[beerType] = { quantity: 0, subtotal: 0 };
+                }
+                totals[beerType].quantity += quantity;
+                totals[beerType].subtotal += quantity * pricePerBottle;
+                totalBottles += quantity;
+                totalPrice += quantity * pricePerBottle;
+            } else if (beerType) {
+                resultText0 += `Hai selezionato ${beerType}, ma non hai scelto la quantità.<br>`;
+                allFieldsFilled = false;
+            } else if (quantity > 0) {
+                resultText0 += `Hai selezionato ${quantity} bottiglia/e, ma non hai scelto il tipo di birra.<br>`;
+                allFieldsFilled = false;
+            } else {
+                resultText0 += "Seleziona un tipo di birra e una quantità.<br>";
+                allFieldsFilled = false;
+            }
+        });
+        for (const [beerType, data] of Object.entries(totals)) {
+            resultText += `
+              <table width="100%">
+                <tr>
+                    <td width="100px"><div class="text-left" style="color:#FFBB35; font-size:1.5em;font-weight:bold"> ${beerType} </div></td>
+                    <td width="10%"><div class="text-center" style="font-size:1.2em;font-weight:normal"> x ${data.quantity} </div></td>
+                    <td width="20%"><div class="text-white text-right" style="font-size:1.5em;font-weight:bold"> €${data.subtotal.toFixed(2)} </div></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                      <div class="text-white text-left" style="font-size:0.8em;"> Prezzo per bottiglia 
+                        <span style="font-size:0.9em;font-weight:bold;"> €${(data.subtotal / data.quantity).toFixed(2)} </span>
+                      </div></td>
+                </tr>
+              </table>`;
+          }
+          const groupsOfSix = Math.floor(totalBottles / 6);
+          if ((totalBottles % 6) == 0 && groupsOfSix > 0) {
+
+            resultText2 += `
+                <table width="100%">
+                    <tr>
+                        <td width="100px"><div class="text-left" text-white; font-size:1.5em;font-weight:bold"> Totale </div></td>
+                        <td width="30%"><div class="text-center" style="font-size:1.2em;font-weight:normal"> x ${groupsOfSix} beerbox </div></td>
+                        <td width="20%"><div class="text-white text-right" style="font-size:1.5em;font-weight:bold"> €${totalPrice.toFixed(2)} </div></td>
+                    </tr>
+                </table>`;
+            } else {
+                resultText2 += `
+                <table width="100%">
+                    <tr>
+                        <td width="100px"><div class="text-left" text-white; font-size:1.5em;font-weight:bold"> Totale </div></td>                    
+                        <td width="20%"><div class="text-white text-right" style="font-size:1.5em;font-weight:bold"> €${totalPrice.toFixed(2)} </div></td>
+                    </tr>
+                    </table>`;
+                }
+
+                if (totalBottles % 6 === 0 && totalBottles > 0) {
+                    document.getElementById("submitButton").disabled = false;
+                } else if (Math.floor(totalBottles / 6) < 1){
+                    document.getElementById("submitButton").disabled = true;
+                    const missingBottles = 6 - (totalBottles % 6);
+                    //const groupsOfSix = Math.floor(totalBottles / 6) + 1;                    
+                    resultText1 += `Mancano ${missingBottles} bottiglia/e per completare il beerBox.<br>`;
+                }
+
+                if (totalBottles > 6) {
+                    document.getElementById("submitButton").disabled = true;
+                    allFieldsFilled = false
+                    resultText1 += `Il beerBox è al massimo di 6 bottiglie. <br> Ne hai selezionate ${totalBottles}.<br>`;
+                }
+
+                document.getElementById("result").innerHTML = resultText;
+                document.getElementById("result0").innerHTML = resultText0;
+                document.getElementById("result1").innerHTML = resultText1;
+                document.getElementById("result2").innerHTML = resultText2;
+                document.getElementById("addButton").disabled = !allFieldsFilled;
+            }
+
+            async function submitForm() {
+                document.querySelector('#carrello').classList.add('animate-div'); //animazione
+                document.getElementById("submitButton").setAttribute("disabled","disabled"); //disattivo il bottone
+                const selections = document.querySelectorAll('.selection');
+                const dataToSend = [];
+
+                console.log("Selections:", selections)
+
+                selections.forEach(selection => {
+                    const beerType = selection.querySelector('.beerType').value;
+                    const quantity = selection.querySelector('.quantity').value;
+                    const id = selection.querySelector('.beerType').selectedOptions[0].dataset.id;
+
+                    if (beerType && quantity > 0) {
+                        dataToSend.push({
+                            beerType: beerType,
+                            id: id,
+                            quantity: quantity
+                        });
+                    }
+                });
+
+                try {
+
+                  const response = await fetch('/shop', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(dataToSend)
+              });
+
+                  const res = await response.json();
+
+                  if (res.statusText === 'ok') {
+                    var spanElement = document.getElementById('lblCartCount');
+                    var num = Number(document.getElementById('lblCartCount').textContent) + Number(res.ntb);
+                    spanElement.textContent = num.toString();
+
+            document.querySelector('#carrello').classList.remove('animate-div'); // animazione
+            sleep(500);
+            document.getElementById("submitButton").removeAttribute("disabled"); // riattivo il pulsante
+            resetFormSelections()
+            removeAllSelection()
+        } else {
+            window.location.href = '/shop?msg=' + res.msg;
+        }
+    } catch (e) {
+      console.log('Errore', e);
+  }    
+}
+
+function addSelection() {
+    const selectionContainer = document.getElementById("selectionContainer");        
+    const newSelection = document.createElement("div");
+    newSelection.classList.add("form-group", "selection");
+    newSelection.innerHTML = `
+                <p style="color: white; text-align: center;">+</p>
+                <select class="form-control beerType" name="beerType" onchange="updateResult()">
+                    <option value="">Tipo di birra...</option>
+                    {% for product in products %}
+                        <option value="{{ product.name }}" data-price="{{ product.price }}" data-id="{{ product.id }}">{{ product.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="quantity" class="text-white"></label>
+                <select class="form-control quantity" name="quantity" onchange="updateResult()">
+                    <option value="0">Quantità Bottiglie:...</option>
+                    <option value="1">1 Bottiglia</option>
+                    <option value="2">2 Bottiglie</option>
+                    <option value="3">3 Bottiglie</option>
+                    <option value="4">4 Bottiglie</option>
+                    <option value="5">5 Bottiglie</option>
+                    <option value="6">6 Bottiglie</option>
+                </select>
+    `;
+    selectionContainer.appendChild(newSelection);
+    updateResult();
+}
+
+function resetFormSelections() {
+    const selections = document.querySelectorAll('.selection');
+    selections.forEach(selection => {
+        selection.querySelector('.beerType').selectedIndex = 0;
+        selection.querySelector('.quantity').selectedIndex = 0;
+    });
+    updateResult();
+}
+
+function removeAllSelection() {
+    var selectionContainer = document.getElementById("selectionContainer");
+    var selections = selectionContainer.querySelectorAll('.selection');    
+    while (selections.length > 1) {
+       selectionContainer = document.getElementById("selectionContainer");
+       selections = selectionContainer.querySelectorAll('.selection');
+
+    // Rimuovi tutte le selezioni tranne l'ultima
+
+       selectionContainer.removeChild(selections[selections.length - 1]);
+
+       selectionContainer = document.getElementById("selectionContainer");
+       selections = selectionContainer.querySelectorAll('.selection');
+   }
+
+    // Aggiorna il risultato
+    updateResult();
+    document.getElementById("result").innerHTML = ""
+    document.getElementById("result0").innerHTML = ""
+    document.getElementById("result1").innerHTML = ""
+    document.getElementById("result2").innerHTML = ""
+}
+
+function removeLastSelection() {
+    const selectionContainer = document.getElementById("selectionContainer");
+    const selections = selectionContainer.querySelectorAll('.selection');
+    if (selections.length > 1) {
+        selectionContainer.removeChild(selections[selections.length - 1]);
+        updateResult();
+    }
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    })
+}
+</script>
+
+{% endblock %}

@@ -170,16 +170,16 @@ module.exports = {
   },
   retriveCart: (req) => {
     //Retrieve the shopping cart from memory
-    var cart = req.session.cart || null
+    var cart = req.session.cart || {}
     cartItems = { items: [], totalPrice: 0, totalQty: 0 },
     totalPrice = 0,
     totalQty = 0
     req.session.numProducts = 0;
     req.session.numProductsPerId = [];
 
-    console.debug('CART IN LIB: ', cart)
+    console.debug('CART in LIB: ', cart)
 
-    if (cart) { //se ho rpodotti in carrello
+    if (cart) { //se ho prodotti in carrello
       for (var item in cart) {
         if (cart[item].qty > 0) {
           cartItems.items.push(cart[item]);

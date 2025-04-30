@@ -186,19 +186,20 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
   app.get('/validation', async function (req, res) {
     console.debug('QUERY',req.query);
     try {
+      //verifico che l'utente abbia ancora l'invito
       const user = await User.findOne({
         'local.resetPasswordToken': req.query.token,
         'local.resetPasswordExpires': { $gt: Date.now() }
       });
       console.debug('VALIDATION USER:',user)
-      
+      //se l'utente non è stato trovato è perchè il token non è più valido o l'invito è già stato accettato
       if (!user) {
         const userByToken = await User.findOne({
           'local.token': req.query.token
         });
         console.debug('USERBYTOKEN',userByToken)
 
-        if (!userByToken) {
+        if (!userByToken || userByToken.local.status === 'new' || userByToken.local.status === 'waiting') {
           let msg = 'Invito non più valido o scaduto. Se ti sei già registrato accedi con il tuo indirizzo email e password.';
           //req.flash('warning', msg);
           req.flash('loginMessage', msg);
@@ -212,6 +213,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
           console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" USER_ID: {"resetPasswordToken":"' + userByToken.id + '"} FLASH' + msg);
           return res.redirect('/login');
         }
+
       } else {
         if (user.local.status === 'new') {
           const video = process.env.NODE_ENV === 'development' ? "" : "video/BirraViannaColor_Final_Logo_38.mp4";         
@@ -593,7 +595,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         nOrders = 0
         req.session.omaggioPrimoAcquisto = c1b
       }
-      console.debug("N° ORDINI", nOrders)
+      console.debug("N° ORDINI COMPLETATI", nOrders)
       //--------------------------------------------
       console.debug('COSTO DI 1 BOTTIGLIA!!: ', c1b)
       if (req.user.local.booze >= c1b && req.user.local.booze <= req.session.totalPrc / 2) {
@@ -1190,7 +1192,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
     let txt = ""
     for (const tipo in risultato) {
       console.debug(`Array ${tipo}:`, risultato[tipo]);
-      txt = txt + `Array ${tipo}:[` + risultato[tipo] + "]      "
+      txt = txt + `Array ${tipo}:[` + risultato[tipo] + "]"
     }
     res.send(txt);
   });

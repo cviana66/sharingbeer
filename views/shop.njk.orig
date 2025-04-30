@@ -32,12 +32,12 @@
 				</tr>
 				<tr>
 					<td><div class="text-white text-left" style="font-size:1.2em;"> BeeBox da 6 bottiglie da {{prod.formatoCl}} </div></td>
-					<td><div class="text-white text-right" style="font-size:1.2em;font-weight:bold;">€{{ (prod.price / 6).toFixed(2) }} cad.</div></td>
+					<td><div class="text-white text-right" style="font-size:1.2em;font-weight:bold;">€4,90 cad.</div></td>
 				</tr>
 			</table>
 		{% if prod.quantity > 0 %}
 			<div style="margin: 10px 0px 10px 0px;">
-				<button type="Button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}', '{{prod.name | replace("'", "\\'")}}','{{numBottigliePerBeerBox}}')">
+				<button type="Button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}')">
 					<div>Aggiungi al Carrello</div>
 				</button>
 			</div>
@@ -79,35 +79,27 @@
 		document.getElementById("loading").style.display = 'none';
 	});
 
-	async function animateDiv(item_id,beerType,quantity) {
+	async function animateDiv(item_id) {
     document.querySelector('#carrello').classList.add('animate-div'); //animazione
     document.getElementById("mybutton").setAttribute("disabled","disabled"); //disattivo il bottone
 
-		var data = {};		
+		var data = {};
 		data.item_id = item_id;
-		const dataToSend = [];
 
 		try {
-			if (beerType && quantity > 0) {
-                dataToSend.push({
-                    beerType: beerType,
-                    id: item_id,
-                    quantity: quantity
-                });
-            }
 		  const response = await fetch('/shop', {
 		    method: 'POST',
 		    headers: {
 		      'Content-Type': 'application/json'
 		    },
-		    body: JSON.stringify(dataToSend)
+		    body: JSON.stringify(data)
 		  });
 
 		  const res = await response.json();
 
 		  if (res.statusText === 'ok') {
 		    var spanElement = document.getElementById('lblCartCount');
-		    var num = Number(document.getElementById('lblCartCount').textContent) + Number(res.ntb);
+		    var num = Number(document.getElementById('lblCartCount').textContent) + 1;
 		    spanElement.textContent = num.toString();
 
 		    document.querySelector('#carrello').classList.remove('animate-div'); // animazione
