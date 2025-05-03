@@ -27,7 +27,7 @@
                 <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;{{item.subtotal}}</td>
               </tr>
               <tr>
-                <td colspan="2">{{item.qty}} Beerbox a {{item.price}} &euro;/cad.</td>
+                <td colspan="2">N° {{item.quantity}} bottiglie {{(item.subtotal / item.quantity) | round(1)}} &euro;/cad.</td>
               </tr>
             </table>
           </td>

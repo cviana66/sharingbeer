@@ -79,6 +79,8 @@ const userSchema = new Schema({
                   price     : {type: Number},
                   qty       : {type: Number},
                   linkImage : {type: String},
+                  qtyBottle : {type: Number},
+                  idBBX     : {type: String},
               }],
               address :{
                   addressId: {type: String},

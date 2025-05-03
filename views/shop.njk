@@ -14,6 +14,16 @@
 			</tr>
 		</table>
 {%endif%}
+<div style="margin: 15px 0px 15px 0px;">
+  <button type="submit" class="btn btn-my btn-lg btn-block" id="goComposer" onclick="window.location.href='/composer';">
+    Componi il tuo Beerbox
+  </button>
+</div>
+
+<div class="text-white text-center" style="margin: 0px 0px 15px 0px;">
+	oppure scegli scegli il beerbox per tipo di birra
+</div>
+
 {% for prod in products %}
  <form id="shop" method="POST" action="/shop">
 	<input type="hidden" id="item_id" name="item_id" value="{{prod.id}}">
@@ -32,12 +42,12 @@
 				</tr>
 				<tr>
 					<td><div class="text-white text-left" style="font-size:1.2em;"> BeeBox da 6 bottiglie da {{prod.formatoCl}} </div></td>
-					<td><div class="text-white text-right" style="font-size:1.2em;font-weight:bold;">€{{ (prod.price / 6).toFixed(2) }} cad.</div></td>
+					<td><div class="text-white text-right" style="font-size:1.2em;font-weight:bold;">€{{ prod.bottlePrice }} cad.</div></td>
 				</tr>
 			</table>
 		{% if prod.quantity > 0 %}
 			<div style="margin: 10px 0px 10px 0px;">
-				<button type="Button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}', '{{prod.name | replace("'", "\\'")}}','{{numBottigliePerBeerBox}}')">
+				<button type="Button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="animateDiv('{{prod.id}}')">
 					<div>Aggiungi al Carrello</div>
 				</button>
 			</div>
@@ -79,23 +89,21 @@
 		document.getElementById("loading").style.display = 'none';
 	});
 
-	async function animateDiv(item_id,beerType,quantity) {
+	async function animateDiv(item_id) {
     document.querySelector('#carrello').classList.add('animate-div'); //animazione
     document.getElementById("mybutton").setAttribute("disabled","disabled"); //disattivo il bottone
 
-		var data = {};		
-		data.item_id = item_id;
-		const dataToSend = [];
+		//var data = {};
+		//data.item_id = item_id;
 
+		const dataToSend = [];
+		dataToSend.push({
+        id: item_id.toString(),
+        quantity: "6"
+    });
+		console.log('DATATOSEND', dataToSend)
 		try {
-			if (beerType && quantity > 0) {
-                dataToSend.push({
-                    beerType: beerType,
-                    id: item_id,
-                    quantity: quantity
-                });
-            }
-		  const response = await fetch('/shop', {
+		  const response = await fetch('/composer', {
 		    method: 'POST',
 		    headers: {
 		      'Content-Type': 'application/json'
@@ -107,18 +115,21 @@
 
 		  if (res.statusText === 'ok') {
 		    var spanElement = document.getElementById('lblCartCount');
-		    var num = Number(document.getElementById('lblCartCount').textContent) + Number(res.ntb);
+		    var num = Number(document.getElementById('lblCartCount').textContent) + 1;
 		    spanElement.textContent = num.toString();
 
 		    document.querySelector('#carrello').classList.remove('animate-div'); // animazione
-		    sleep(500);
+		    //sleep(500);
 		    document.getElementById("mybutton").removeAttribute("disabled"); // riattivo il pulsante
 
 		  } else {
+		  	let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
 		    window.location.href = '/shop?msg=' + res.msg;
 		  }
 		} catch (e) {
 		  console.log('Errore', e);
+		  let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
+		  window.location.href = '/shop?msg=' + res.msg;
 		}
 
   }

@@ -10,7 +10,7 @@ var ProductSchema = new Schema({
   linkImage   	: {type: String, required: true},
   description 	: {type: String},
   caratteristiche 	: {type: String},
-  quantity    		: {type: Number}, //stock di beerbox disponibili
+  quantity    		: {type: Number}, //stock di beerbox disponibili in magazzino
   colorEBC     	: {type: String},
   volAlcol    		: {type: String},
   gradoPlato  	: {type: String},
@@ -20,7 +20,9 @@ var ProductSchema = new Schema({
   quantitaXtipo : {type: String}, //TODO: da eliminare
   prezzoXtipo 	: {type: String}, //TODO: da eliminare
   promo			: {type: Boolean},
-  allergeni		: {type: String}
+  allergeni		: {type: String},
+  bottlePrice : {type: Number},   //prezzo per bottiglia
+  bottleQuantity : {type: Number} //quantità di bottiglie in magazzino
 });
 
 // methods =====================================================================

@@ -14,25 +14,27 @@
 <hr style="border-top: 1px solid #5375BD;">
 
 <table class="mx-auto" width="100%">
-{% for prod in cart.items %}
+{% for groupId, products in dati %}
+	{% for productId, prod in products %}
 	<tr>
-		<td width="40%" rowspan="3">
+		<td width="30%" rowspan="2">
 			<div>
-				<img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="100%" height="100%">
+				<img class="img-responsive rounded mx-auto" src="{{prod.linkImage}}" width="80%" height="80%">
 			</div>
 		</td>
-		<td width="60%">
+		<td width="70%">
 			<div class="col"> <h5 class="card-title text-white text-left font-weight-bold"><p style="font-size:1.3em;color:#FFBB35;">{{prod.name}}</p></h5> </div>
-			<div class="col text-white text-left" style="font-size:1.0em">Beerbox: 6 birre da 50cl</div>
+			<div class="col text-white text-left" style="font-size:1.2em">N° {{prod.quantity}} bottiglie (50cl)</div>
 		</td>
 	</tr>
 	<tr>
-		<td width="60%" class="text-white" valign="middle" align="right">
-			<span style="font-size:1.6em;">{{prod.prettyPrice}}</span>
+		<td width="70%" class="text-white" valign="middle" align="right">
+			<span style="font-size:1.3em;">€{{ prod.subtotal }}</span>
 		</td>
 	</tr>
+	{% endfor %}
 	<tr>
-		<td width="60%">
+		<td colspan="3" width="60%">
 			<table width="100%" valign="middle">
 				<tr>
 					<td width="15%" valign="middle">
@@ -73,6 +75,7 @@
 			</table>
 		</td>
 	</tr>
+
 	<tr>
 		<td colspan="2">
 			<hr style="border-top: 1px solid #5375BD;">
@@ -88,13 +91,16 @@
 
 	{% if numProducts != 0 %}
 
-			<div>
-				<div>
-					<h4 class="text-white text-center">Totale ordine: <strong>€{{totalPrice}}</strong></h4>
-				</div>
+			<div <div class="d-flex justify-content-between"> >
+				<span>
+					<h4 class="text-white text-center">Totale ordine: </strong></h4>
+				</span>
+				<span>
+					<h4 class="text-white text-center"><strong>€{{totalPrice}}</strong></h4>
+				</span>
 			</div>
 			<form role="form" action="/register" method="GET">
-			<div style="margin-bottom: 40px;">
+			<div style="margin-bottom: 30px;">
 				<button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return goTo('/register')">
 					Procedi con l'acquisto
 				</button>
