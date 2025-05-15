@@ -118,12 +118,12 @@ function fieldsValidationControlSelf() {
       document.getElementById("inputPassword").focus();
       return false;
     }
-    var re4 = /\W|_/g;
+    /*var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
       document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
-    }
+    }*/
   } else {
     document.getElementById("wrongPwd").innerHTML = iwar+"Crea una nuova Password";
     document.getElementById("inputPassword").focus();
@@ -236,12 +236,12 @@ function fieldsValidationControl() {
       document.getElementById("inputPassword").focus();
       return false;
     }
-    var re4 = /\W|_/g;
+   /* var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
       document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
-    }
+    }*/
   } else {
     document.getElementById("wrongPwd").innerHTML = iwar+"Crea una nuova Password";
     document.getElementById("inputPassword").focus();
@@ -315,12 +315,12 @@ function fieldsResetControl() {
       document.getElementById("inputPassword").focus();
       return false;
     }
-    var re4 = /\W|_/g;
+    /*var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
       document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
-    }
+    }*/
     if(pwd1!=pwd2) {
       document.getElementById("wrongPwd2").innerHTML = iwar+"Le Password inserite sono differenti ";
       document.getElementById("confirmPassword").focus();

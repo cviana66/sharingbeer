@@ -188,17 +188,19 @@ module.exports = {
         // Ciclo attraverso i prodotti nella beer box
         Object.keys(products).forEach(productId => {
           const product = products[productId];
+          product.beerboxId = beerBoxId;
+          product.subtotal = ((product.quantity * product.price * product.moltiplica) / numBottigliePerBeerBox).toFixed(2)
           //console.log('---------------->product',product)
           cartItems.items.push(product);
-          totalPrice += (product.quantity * product.price / numBottigliePerBeerBox);
-          totalQty += product.qty;          
-
-          let npXid = { "id": product.id, "qty": product.qty }
+          totalPrice += ((product.quantity * product.price * product.moltiplica) / numBottigliePerBeerBox);
+          totalQty += product.qty * product.moltiplica;          
+          let npXid = { "id": product.id, "qty": product.qty, "moltiplica": product.moltiplica }
           req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino
-        });
-        console.info('totalQty=',totalQty)
-        req.session.numProducts = totalQty;
+          console.debug('NUM PRODOTTI PER ID',req.session.numProductsPerId)
+        }); 
       });
+      console.info('totalQty=',totalQty)
+      req.session.numProducts = totalQty;
       console.debug('NUMERO PRODOTTI PER ID: ', req.session.numProductsPerId.length, req.session.numProductsPerId)
       req.session.cartItems = cartItems;  //questi sono gli Items che vengono poi inseriti nell'ordine in routeAxerve
       req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
@@ -210,38 +212,38 @@ module.exports = {
     req.session.newcart = cart
   },
   //---------------------------------------------------------------
-  retriveCart: (req) => {
-    //Retrieve the shopping cart from memory
-    var cart = req.session.cart || {}
-    cartItems = { items: [], totalPrice: 0, totalQty: 0 },
-    totalPrice = 0,
-    totalQty = 0
-    req.session.numProducts = 0;
-    req.session.numProductsPerId = [];
+  // retriveCart: (req) => {
+  //   //Retrieve the shopping cart from memory
+  //   var cart = req.session.cart || {}
+  //   cartItems = { items: [], totalPrice: 0, totalQty: 0 },
+  //   totalPrice = 0,
+  //   totalQty = 0
+  //   req.session.numProducts = 0;
+  //   req.session.numProductsPerId = [];
 
-    console.debug('CART IN LIB: ', cart)
+  //   console.debug('CART IN LIB: ', cart)
 
-    if (cart) { //se ho prodotti in carrello
-      for (var item in cart) {
-        if (cart[item].qty > 0) {
-          cartItems.items.push(cart[item]);
-          totalPrice += (cart[item].qty * cart[item].price);
-          totalQty += cart[item].qty;
-          req.session.numProducts += cart[item].qty;
-          let npXid = { "id": cart[item].id.toString(), "qty": cart[item].qty }
-          req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino
-          //console.debug('PRODOTTI NEL CARRELLO: ITEM =', item, ' PRODOTTO: ', cart[item])
-        }
-      }
-      console.debug('NUMERO PRODOTTI PER ID: ', req.session.numProductsPerId.length, req.session.numProductsPerId)
-      req.session.cartItems = cartItems;  //questi sono gli Items che vengono poi inseriti nell'ordine in routeAxerve
-      req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
-      req.session.totalQty = cartItems.totalQty = totalQty;
-      //console.debug("TOTAL PRICE:", req.session.totalPrc, "TOTAL QTY BeeBox:", req.session.totalQty)
-      console.debug('CARTITEMS -> ', req.session.cartItems ) // req.session.cartItems.items è quanto viene memorizzato in tabella in items
-    }
-    req.session.cart = cart
-  },
+  //   if (cart) { //se ho prodotti in carrello
+  //     for (var item in cart) {
+  //       if (cart[item].qty > 0) {
+  //         cartItems.items.push(cart[item]);
+  //         totalPrice += (cart[item].qty * cart[item].price);
+  //         totalQty += cart[item].qty;
+  //         req.session.numProducts += cart[item].qty;
+  //         let npXid = { "id": cart[item].id.toString(), "qty": cart[item].qty }
+  //         req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino
+  //         //console.debug('PRODOTTI NEL CARRELLO: ITEM =', item, ' PRODOTTO: ', cart[item])
+  //       }
+  //     }
+  //     console.debug('NUMERO PRODOTTI PER ID: ', req.session.numProductsPerId.length, req.session.numProductsPerId)
+  //     req.session.cartItems = cartItems;  //questi sono gli Items che vengono poi inseriti nell'ordine in routeAxerve
+  //     req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
+  //     req.session.totalQty = cartItems.totalQty = totalQty;
+  //     //console.debug("TOTAL PRICE:", req.session.totalPrc, "TOTAL QTY BeeBox:", req.session.totalQty)
+  //     console.debug('CARTITEMS -> ', req.session.cartItems ) // req.session.cartItems.items è quanto viene memorizzato in tabella in items
+  //   }
+  //   req.session.cart = cart
+  // },
   emailValidation: (email) => {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (email == "" || !re.test(String(email))) {

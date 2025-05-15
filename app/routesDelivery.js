@@ -244,7 +244,7 @@ async function updateDeliveryData(mongoose, orderIDPar, actionCode) {
 module.exports = function(app, mongoose, moment) {
 
 	// ALL
-	app.all('/delivery', async function(req, res) {
+	app.all('/delivery', lib.isAdmin, async function(req, res) {
 
 		var actionCode = req.body.actionCode;
 		var orderID = req.body.orderID;
@@ -299,7 +299,7 @@ module.exports = function(app, mongoose, moment) {
 	});
 	
 	// ALL
-	app.all('/deliveryInHouse', async function(req, res) {
+	app.all('/deliveryInHouse', lib.isAdmin, async function(req, res) {
 
 		var actionCode = req.body.actionCode;
 		var orderID = req.body.orderID;
@@ -330,7 +330,7 @@ module.exports = function(app, mongoose, moment) {
 			const result = await loadDeliveryData(moment);
 			const ordersInHouse = result[0];
 
-			//console.debug('ordersInHouse', ordersInHouse);
+			console.debug('ordersInHouse', ordersInHouse);
 
 			if (!ordersInHouse) {
 				req.flash('info', 'Non ci sono consegne previste al momento');
@@ -365,7 +365,7 @@ module.exports = function(app, mongoose, moment) {
 		}
 	});
 
-	app.all('/deliveryToShip', async function(req, res) {
+	app.all('/deliveryToShip', lib.isAdmin, async function(req, res) {
 
 		var actionCode = req.body.actionCode;
 		var orderID = req.body.orderID;

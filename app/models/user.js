@@ -73,6 +73,7 @@ const userSchema = new Schema({
               totalPriceBeer      : { type: Number}, //
               totalPriceTotal     : { type: Number}, //
               totalQty            : { type: Number},
+              totalDiscount       : { type: Number},
               items : [{
                   id        : {type: String},
                   name      : {type: String},
@@ -80,7 +81,9 @@ const userSchema = new Schema({
                   qty       : {type: Number},
                   linkImage : {type: String},
                   qtyBottle : {type: Number},
-                  idBBX     : {type: String},
+                  beerboxId : {type: String},
+                  moltiplica: {type: Number},
+                  subtotal  : {type: Number},
               }],
               address :{
                   addressId: {type: String},

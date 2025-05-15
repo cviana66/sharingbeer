@@ -131,7 +131,6 @@
 	const completeIcon = '<svg xmlns="http://www.w3.org/2000/svg" height="40" viewBox="0 -960 960 960" width="40"><path fill="green" d="m379.333-216.667-252.999-253 76.332-76.332 176.667 177.666L757-746l76.333 75.333-454 454Z"/></svg>';
 
 	var ordersInHouse = {{ ordersInHouseString | safe }};
-	//console.log('ordersInHouse', ordersInHouse);
 
 	handledList();
 
@@ -181,7 +180,7 @@
 			var customerFullName = orderInHouse.address.name.last + ' ' + orderInHouse.address.name.first;
 			var orderInsertDate = moment(new Date(orderInHouse.dateInsert)).format("DD/MM/YYYY");
 			var items = orderInHouse.items;
-
+			//console.log('orderInHouse.items',orderInHouse.items)
 			//console.log('customer', customerFullName, 'indexOf(criteria)', customerFullName.toLowerCase().indexOf(criteria));
 
 			if (!criteria || criteria.length < 3 || (criteria.length >= 3 && customerFullName.toLowerCase().indexOf(criteria) >= 0)) {
@@ -191,10 +190,16 @@
 				contentTable += `<div style="font-size: 10px; padding-left: 10px;"><i>Data ordine: ${orderInsertDate}</i><br></div>`;
 				
 				for (j = 0; j < items.length; j++) {
-					var qty = items[j].qty;
-					var name = items[j].name;
-
-					contentTable += `<div style="font-size: 14px; padding-left: 10px;">- <b>${qty}</b> birra <b>${name}</b></div>`;
+					if (typeof items[j].moltiplica === 'undefined') {
+						var qty = items[j].qty * 6;
+						var name = items[j].name;						
+						contentTable += `<div style="font-size: 14px; padding-left: 10px;">- N° <b>${qty}</b> bottiglia/e birra <b>${name}</b></div>`;
+					} else {
+						var qty = items[j].qty * items[j].moltiplica * 6;
+						var name = items[j].name;
+						var bbx = items[j].beerboxId					
+						contentTable += `<div style="font-size: 14px; padding-left: 10px;">-${bbx}- N° <b>${qty}</b> bottiglia/e birra <b>${name}</b></div>`;
+					}
 				}
 
 				contentTable += `</td>`;

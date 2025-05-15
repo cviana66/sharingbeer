@@ -21,7 +21,7 @@
 </div>
 
 <div class="text-white text-center" style="margin: 0px 0px 15px 0px;">
-	oppure scegli scegli il beerbox per tipo di birra
+	oppure scegli il beerbox per tipo di birra
 </div>
 
 {% for prod in products %}
@@ -41,8 +41,8 @@
 					<td width="30%"><div class="card-title text-white text-right" style="font-size:1.5em;font-weight:bold">{{prod.prettyPrice}}</div></td>
 				</tr>
 				<tr>
-					<td><div class="text-white text-left" style="font-size:1.2em;"> BeeBox da 6 bottiglie da {{prod.formatoCl}} </div></td>
-					<td><div class="text-white text-right" style="font-size:1.2em;font-weight:bold;">€{{ prod.bottlePrice }} cad.</div></td>
+					<td><div class="text-white text-left" style="font-size:1.1em;"> BeeBox: 6 bottiglie da {{prod.formatoCl}} </div></td>
+					<td ><div class="text-white text-right" style="font-size:1.1em;font-weight:bold;">€{{ prod.bottlePrice }} cad.</div></td>
 				</tr>
 			</table>
 		{% if prod.quantity > 0 %}
