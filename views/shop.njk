@@ -33,7 +33,10 @@
 				<div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
 			</div>
 		{% if prod.promo %}
-			<div class="corner-text">Promo</div>
+			<div class="corner-text-promo">Promo</div>
+		{% endif %}
+		{% if prod.new %}
+			<div class="corner-text-new">New</div>
 		{% endif %}
 			<table width="100%">
 				<tr>

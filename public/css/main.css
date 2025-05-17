@@ -283,12 +283,22 @@ color: #4e4e4e;
     position: relative;
 }
 
-.corner-text {
+.corner-text-promo {
     position: absolute;
     top: 10px; /* Distanza dal bordo superiore */
     left: 10px; /* Distanza dal bordo sinistro */
     color: white; /* Colore del testo */
-    font-size: 22px; /* Dimensione dl testo */
+    font-size: 26px; /* Dimensione dl testo */
+    background-color: rgba(255, 187, 53, 0.8); /* Sfondo semi-trasparente */
+    padding: 5px; /* Padding attorno al testo */
+    border-radius: 5px; /* Angoli arrotondati */
+}
+.corner-text-new {
+    position: absolute;
+    top: 10px; /* Distanza dal bordo superiore */
+    left: 10px; /* Distanza dal bordo sinistro */
+    color: white; /* Colore del testo */
+    font-size: 30px; /* Dimensione dl testo */
     background-color: rgba(255, 187, 53, 0.8); /* Sfondo semi-trasparente */
     padding: 5px; /* Padding attorno al testo */
     border-radius: 5px; /* Angoli arrotondati */

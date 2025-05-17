@@ -453,7 +453,8 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
 
     //==================================================
     // GESTIONE della concorrenza nella fase di acquisto
-    const prods = await Product.find();
+    //const prods = await Product.find();
+    const prods = await Product.find().sort({ ordinam: -1 });
     //--------------------------------------------------
     // Ciclo attraverso le beer box
     prods.forEach(prod => {

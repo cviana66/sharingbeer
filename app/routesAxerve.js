@@ -20,7 +20,7 @@ const gestpayService = new GestpayService();
 //-------------------------------------------
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
 
-    var cart = req.session.cart;
+    var cart = req.session.newcart;
     const currency='EUR';
     const shopLogin=process.env.SHOPLOGIN;
 
@@ -269,7 +269,8 @@ const gestpayService = new GestpayService();
       //=====================================
       // Svuoto il carrello
       //=====================================
-      req.session.cart = {};
+      //req.session.cart = {};
+      req.session.newcart = {};
       req.session.order = {};
       req.session.numProducts = 0;
       //-------------------------------------

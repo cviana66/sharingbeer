@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <div id="result0" class="text-white mt-3" style="margin-bottom: 15px;">
+        <div id="result0" class="text-white text-center mt-3" style="margin-bottom: 15px;">
             <!-- Il risultato delle scelte sarà visualizzato qui -->
         </div>
 
@@ -151,6 +151,7 @@
                     allFieldsFilled = false
                     resultText1 += `Il beerBox è al massimo di 6 bottiglie. <br> Ne hai selezionate ${totalBottles}.<br>`;
                 } else if (totalBottles == 6) {
+                    resultText0 += `BeerBox COMPLETO, aggiungilo al Carrello`;
                     allFieldsFilled = false
                 }
 
@@ -204,7 +205,7 @@
                     document.getElementById("submitButton").removeAttribute("disabled"); // riattivo il pulsante
                     document.querySelector('#carrello').classList.remove('animate-div'); // animazione
                     //sleep(500);
-                    window.location.href = '/composer'
+                    window.location.href = '/shop'
                     //resetFormSelections() //da riabilitare se non uso il window.location
                     //removeAllSelection() //da riabilitare se non uso il window.location
                   } else {

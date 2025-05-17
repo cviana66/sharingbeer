@@ -5,6 +5,7 @@ var Schema = mongoose.Schema;
 // Define product schema
 var ProductSchema = new Schema({
   codProd			: {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required
+  ordinam     : {type: Number}, //ordinamento nella visualizzazione dello shop: valori bassi vanno in coda
   name        		: {type: String, required: true},
   price       		: {type: Number, required: true}, // per beerbox = 6 bottiglie
   linkImage   	: {type: String, required: true},
@@ -20,6 +21,7 @@ var ProductSchema = new Schema({
   quantitaXtipo : {type: String}, //TODO: da eliminare
   prezzoXtipo 	: {type: String}, //TODO: da eliminare
   promo			: {type: Boolean},
+  new       : {type: Boolean},
   allergeni		: {type: String},
   bottlePrice : {type: Number},   //prezzo per bottiglia
   bottleQuantity : {type: Number} //quantità di bottiglie in magazzino

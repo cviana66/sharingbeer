@@ -55,7 +55,13 @@
           </td>
         </tr>
         <tr>
-          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox}} di bottiglie (50cl)</td>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
+          }
         </tr>
         <tr>
           <td class="text-white font-weight-light">Prezzo: €{{prod.price}}</td>
@@ -76,7 +82,12 @@
           </td>
         </tr>
         <tr>
-          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox}} di bottiglie (50cl)</td>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
         </tr>
         <tr>
           <td class="text-white font-weight-light">Prezzo: €{{prod.subtotal}}</td>
@@ -143,7 +154,12 @@
           </td>
         </tr>
         <tr>
-          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox}} di bottiglie (50cl)</td>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
         </tr>
         <tr>
           <td class="text-white font-weight-light">Prezzo: €{{prod.price}}</td>
@@ -164,7 +180,12 @@
           </td>
         </tr>
         <tr>
-          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox}} di bottiglie (50cl)</td>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
         </tr>
         <tr>
           <td class="text-white font-weight-light">Prezzo: €{{prod.subtotal}}</td>
@@ -220,7 +241,12 @@
             <td class="text-white font-weight-light">{{prod.name}}</td>
           </tr>
           <tr>
-            <td class="text-white font-weight-light">N° di bottiglie (50cl): {{prod.qty * numBottigliePerBeerBox}}</td>
+            {% if prod.moltiplica %}
+              {%set moltiplica = prod.moltiplica %}
+            {% else %} 
+              {%set moltiplica = 1 %}
+            {% endif %}
+            <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
           </tr>
           <tr>
             <td class="text-white font-weight-light">Prezzo: €{{prod.price}}</td>
