@@ -366,8 +366,8 @@ async function listOfStreets(citta,istat) {
 //-------------------- MAIN STREET ------------------
 async function selectStreet(v) {
   document.getElementById("wrongStreet").innerHTML = "";
-  document.getElementById("wrongNumciv").innerHTML = ''
-  let vl = v.toLowerCase();
+  document.getElementById("wrongNumciv").innerHTML = "";
+  let vl = v.toLowerCase().trimEnd();
   if (vl.length > 3) {
     let data = {};
     data.street = vl;
@@ -483,7 +483,7 @@ async function setValueCity(comune, provincia, istat) {
 
 //----------------------------CITY-------------------------------------
 async function listOfCities(v) {
-  let vl = v.toLowerCase();
+  let vl = v.toLowerCase().trimEnd();
   var data = {};
   data.city = vl;
   await $.ajax({
