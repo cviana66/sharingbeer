@@ -197,7 +197,7 @@ module.exports = {
         }); 
       });
       //console.info('totalQty=',totalQty)
-      req.session.numProducts = totalQty;
+      req.session.numProducts = totalQty.toFixed(0);
       console.debug('NUMERO PRODOTTI PER ID: ', req.session.numProductsPerId.length, req.session.numProductsPerId)
       req.session.cartItems = cartItems;  //questi sono gli Items che vengono poi inseriti nell'ordine in routeAxerve
       req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);

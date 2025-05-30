@@ -841,7 +841,7 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
                 if (prod.quantity < 0) { // Controllo che nel frattempo non abbiano acquistato beerbox e nel caso aggiusto i quantitativi
                   if (products[productId].moltiplica > 1 ) {
                     disponibile = false
-                    const numBottiglieRimanenti = (prod.quantity + (products[productId].qty * products[productId].moltiplica)) * numBottigliePerBeerBox
+                    const numBottiglieRimanenti = ((prod.quantity + (products[productId].qty * products[productId].moltiplica)) * numBottigliePerBeerBox).toFixed(0)
                     req.flash('cartMessage', 'Mi spiace ma la disponibilità di birra ' + prod.name + ' è di solo ' + numBottiglieRimanenti + ' bottiglie. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
                   } else { 
                     console.debug('DELETE BEERBOX:',beerBoxId)

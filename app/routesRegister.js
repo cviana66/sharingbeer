@@ -202,8 +202,14 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
         });
         console.debug('USERBYTOKEN',userByToken)
 
-        if (!userByToken || userByToken.local.status === 'new' || userByToken.local.status === 'waiting') {
-          let msg = 'Invito non più valido o scaduto. Se ti sei già registrato accedi con il tuo indirizzo email e password.';
+        if (!userByToken || userByToken.local.status === 'new' || userByToken.local.status === 'waiting' || userByToken.local.status === 'customer') {
+          
+          if (userByToken.local.status === 'customer') {
+            var msg = 'Ti sei già registrato. Accedi con il tuo indirizzo email e password.';
+          } else {
+            var msg = 'Invito non più valido o scaduto. Se ti sei già registrato accedi con il tuo indirizzo email e password.';
+          }
+
           req.flash('loginMessage', msg);
           console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "GET /validation" TOKEN: {"resetPasswordToken":"' + req.query.token + '"} FLASH:' + msg);          
           return res.redirect('/login');

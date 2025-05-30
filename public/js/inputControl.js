@@ -4,7 +4,8 @@ const iwar = '<svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/s
              <polygon points="13,16 11,16 11,18 13,18"/><polygon points="13,10 11,10 11,15 13,15"/></g></g></g></svg>';
 
 function fieldLoginControl(){
-  var email = document.getElementById("inputUsernameEmail").value;
+  var email = (document.getElementById("inputUsernameEmail").value).trim();
+  //console.log("EMAIL:",'|'+email+'|')
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var submit = true;
   if (email == "" || !re.test(String(email))) {
