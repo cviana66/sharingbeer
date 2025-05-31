@@ -2,6 +2,7 @@ var Users = require('../app/models/user');
 var lib = require('./libfunction');
 const mailToCustomerWithOrder  = require('../config/mailToCustomerWithOrder');
 const mailToCustomerWithoutOrder  = require('../config/mailToCustomerWithoutOrder');
+const mailToCustomerNewProducts  = require('../config/mailToCustomerNewProducts');
 
 module.exports = (app, moment, mongoose) => {
 
@@ -28,8 +29,11 @@ module.exports = (app, moment, mongoose) => {
 	app.post('/sendNotifyMail', lib.isAdmin, async (req,res) => {
 
 		var selectedCustomers = req.body.customers; // Array di ID dei clienti selezionati
+		var tipoMessaggio = req.body.mybutton
 
 		console.debug('CUSTOMERS ID',selectedCustomers)
+		console.debug('BUTTON',tipoMessaggio)
+
 		if (typeof selectedCustomers === "string") selectedCustomers = [selectedCustomers]
 		var html = ""
 		try {		
@@ -37,21 +41,38 @@ module.exports = (app, moment, mongoose) => {
 				//console.debug(customerId)
 	    	const customer = await Users.findById(customerId);
 	    	const server = lib.getServer(req);
+	    	var tom = "";
 	    	console.debug('CUSTOMER', customer.local.email)
-	    	if (req.body.tipoCliente == 'conOrdini') {
-		    	html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
-		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
-	    	} else if (req.body.tipoCliente == 'senzaOrdini') {
-	    		//res.send(mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server))    	
-	    		 html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
-		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
-	    	}
-	    	// TODO: aggiornare nel cliente il numero di comunicazioni inviate, tipo  e data ultimo invio	    	
+	    	if (tipoMessaggio == "notifica") {
+		    	if (req.body.tipoCliente == 'conOrdini') {
+			    	html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
+			    	tom = 'notificaClienteConOrdiniFatti'
+			    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
+		    	} else if (req.body.tipoCliente == 'senzaOrdini') {
+		    		html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
+		    		tom = 'notificaClienteSenzaOrdiniFatti'
+			    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
+		    	}
+		    } else if (tipoMessaggio == "nuoviProdotti") {
+		    	html = mailToCustomerNewProducts(customer.local.name.first, customer.local.email, server)
+			    tom = 'notificaClienteNuoviProdotti'
+			    await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
+		    }
+	    	const newMarketingElement = {
+        	typeOfMessage: tom, 
+        	dataInvioMessaggio: lib.nowDate("Europe/Rome")
+    		};
+    		const updatedDocument = await Users.findByIdAndUpdate(
+            customerId,
+            { $push: { marketing: newMarketingElement } }, // Aggiungi il nuovo elemento all'array
+            { new: true, useFindAndModify: false } // Restituisce il documento aggiornato
+        );
 	    }
 	    model = {
 				user: req.user,
         numProducts: req.session.numProducts,
         amiciDaInvitare: req.session.haiAmiciDaInvitare,
+        messaggio : 'Inviato notifica',
         html: html	
 			}
 	    res.render('info.njk',model)

@@ -43,7 +43,7 @@
       <thead>
       <th colspan="4" style="font-size:1.2em">    
         <input type="checkbox" name="customers" value="{{ user.id }}" class="clienteConOrdini"> 
-        {{ user.local.name.first }} {{ user.local.name.last }}
+        {{ user.local.name.first }} {{ user.local.name.last }} <span style="font-size:0.9rem;">(notifiche: {{user.marketing | length}})</span>
       </th>
     </thead>
     <tr>
@@ -116,8 +116,11 @@
     }
   </script>
   {% endfor %}
-  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-     Invia e-mail di notifica <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
+  <button type="submit" class="btn btn-my btn-lg btn-block" name="mybutton" value="notifica">
+     Invia e-mail di notifica
+  </button>
+  <button type="submit" class="btn btn-my btn-lg btn-block" name="mybutton" value="nuoviProdotti">
+     Invia e-mail nuovi prodotti
   </button>
 </form>
 
@@ -132,7 +135,7 @@
     <thead>
       <th colspan="4" style="font-size:1.2em">    
         <input type="checkbox" name="customers" value="{{ user.id }}" class="clienteSenzaOrdini"> 
-        {{ user.local.name.first }} {{ user.local.name.last }}
+        {{ user.local.name.first }} {{ user.local.name.last }} <span style="font-size:0.9rem;">(notifiche: {{user.marketing | length}})</span>
       </th>
     </thead>
     <tr>
@@ -205,8 +208,11 @@
     }
   </script>
   {% endfor %}
-  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-     Invia e-mail di notifica <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
+  <button type="submit" class="btn btn-my btn-lg btn-block" name="mybutton" value="notifica">
+     Invia e-mail di notifica
+  </button>
+  <button type="submit" class="btn btn-my btn-lg btn-block" name="mybutton" value="nuoviProdotti">
+     Invia e-mail nuovi prodotti
   </button>
   <br>
 </form>

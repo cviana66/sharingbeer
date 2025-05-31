@@ -126,7 +126,11 @@ const userSchema = new Schema({
                   note      : {type: String},
                   date_ref  : {type: Date}
               }]
-          }]
+          }],
+    marketing : [{
+        typeOfMessage       : {type: String},
+        dataInvioMessaggio  : {type: Date},        
+    }]
 });
 
 // methods =====================================================================
