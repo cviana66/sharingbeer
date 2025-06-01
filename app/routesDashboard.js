@@ -47,11 +47,11 @@ module.exports = (app, moment, mongoose) => {
 		    	if (req.body.tipoCliente == 'conOrdini') {
 			    	html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
 			    	tom = 'notificaClienteConOrdiniFatti'
-			    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
+			    	await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
 		    	} else if (req.body.tipoCliente == 'senzaOrdini') {
 		    		html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
 		    		tom = 'notificaClienteSenzaOrdiniFatti'
-			    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
+			    	await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
 		    	}
 		    } else if (tipoMessaggio == "nuoviProdotti") {
 		    	html = mailToCustomerNewProducts(customer.local.name.first, customer.local.email, server)
