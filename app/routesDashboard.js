@@ -27,10 +27,10 @@ module.exports = (app, moment, mongoose) => {
 	})
 
 	app.post('/sendNotifyMail', lib.isAdmin, async (req,res) => {
-
-		var selectedCustomers = req.body.customers; // Array di ID dei clienti selezionati
+		var selectedCustomers = [];
 		var tipoMessaggio = req.body.mybutton
 
+		selectedCustomers = req.body.customers; // Array di ID dei clienti selezionati
 		console.debug('CUSTOMERS ID',selectedCustomers)
 		console.debug('BUTTON',tipoMessaggio)
 
@@ -41,8 +41,10 @@ module.exports = (app, moment, mongoose) => {
 				//console.debug(customerId)
 	    	const customer = await Users.findById(customerId);
 	    	const server = lib.getServer(req);
-	    	var tom = "";
-	    	console.debug('CUSTOMER', customer.local.email)
+	    	var tom = "";	    
+	    	const currentDate = new Date();	
+	    	console.debug(`AVVISO: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
+	    	//TODO mettere in database le notifiche con data e le info del cliente
 	    	if (tipoMessaggio == "notifica") {
 		    	if (req.body.tipoCliente == 'conOrdini') {
 			    	html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
@@ -55,8 +57,8 @@ module.exports = (app, moment, mongoose) => {
 		    	}
 		    } else if (tipoMessaggio == "nuoviProdotti") {
 		    	html = mailToCustomerNewProducts(customer.local.name.first, customer.local.email, server)
-			    tom = 'notificaClienteNuoviProdotti'
-			    await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
+			    tom = 'nuoviProdotti'
+			    await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'nuoviProdotti', server, html);
 		    }
 	    	const newMarketingElement = {
         	typeOfMessage: tom, 
@@ -67,6 +69,8 @@ module.exports = (app, moment, mongoose) => {
             { $push: { marketing: newMarketingElement } }, // Aggiungi il nuovo elemento all'array
             { new: true, useFindAndModify: false } // Restituisce il documento aggiornato
         );
+        // Aspetta 15 secondi (15000 millisecondi) prima di continuare con il prossimo cliente
+        await new Promise(resolve => setTimeout(resolve, 15000));
 	    }
 	    model = {
 				user: req.user,

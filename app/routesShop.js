@@ -469,9 +469,9 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
           // Ciclo attraverso i prodotti nella beer box
           Object.keys(products).forEach(productId => {
             if (prodId === productId) {
-              console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+              console.debug('CONTROLLO DISPONIBILITA\' PRIMA',prod.quantity)
               prod.quantity -= products[productId].qty * products[productId].moltiplica;
-              console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+              console.debug('CONTROLLO DISPONIBILITA\' DOPO',prod.quantity)
               if (prod.quantity < 0) { // Controllo che nel frattempo non abbiano acquistato beerbox e nel caso aggiusto i quantitativi
                 delete cart[beerBoxId]; 
                 req.flash('info', 'Mi dispiace, ma la quantità disponibile di birra ' + prod.name + ' è inferiore alla richiesta a causa di acquisti simultanei. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile. ');
@@ -622,9 +622,9 @@ app.get('/composer', lib.isLoggedIn, async (req, res) => {
           // Ciclo attraverso i prodotti nella beer box
           Object.keys(products).forEach(productId => {
             if (prodId === productId) {
-              console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+              console.debug('CONTROLLO DISPONIBILITA\' PRIMA',prod.quantity)
               prod.quantity -= products[productId].qty * products[productId].moltiplica;
-              console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+              console.debug('CONTROLLO DISPONIBILITA\' DOPO',prod.quantity)
               if (prod.quantity < 0) { // Controllo che nel frattempo non abbiano acquistato beerbox e nel caso aggiusto i quantitativi
                 delete cart[beerBoxId]; 
                 req.flash('info', 'Mi dispiace, ma la quantità disponibile di birra ' + prod.name + ' è inferiore alla richiesta a causa di acquisti simultanei. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
@@ -743,9 +743,9 @@ app.post('/composer', lib.isLoggedIn, async (req,res) => {
               // Ciclo attraverso i prodotti nella beer box
               Object.keys(products).forEach(productId => {
                 if (prodId === productId) {
-                  console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+                  console.debug('CONTROLLO DISPONIBILITA\' PRIMA',prod.quantity)
                   prod.quantity -= products[productId].qty * products[productId].moltiplica;
-                  console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+                  console.debug('CONTROLLO DISPONIBILITA\' DOPO',prod.quantity)
                   if (prod.quantity < 0) { // Controllo che nel frattempo non abbiano acquistato beerbox e nel caso aggiusto i quantitativi
                     console.debug('DELETE BEERBOX:',beerBoxId)
                     delete cart[beerBoxId]; 
@@ -835,9 +835,9 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
             // Ciclo attraverso i prodotti nella beer box
             Object.keys(products).forEach(productId => {
               if (prodId === productId) {
-                console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+                console.debug('CONTROLLO DISPONIBILITA\' PRIMA',prod.quantity)
                 prod.quantity -= products[productId].qty * products[productId].moltiplica;
-                console.debug('CONTROLLO DISPONIBILITA\'',prod.quantity)
+                console.debug('CONTROLLO DISPONIBILITA\' DOPO',prod.quantity)
                 if (prod.quantity < 0) { // Controllo che nel frattempo non abbiano acquistato beerbox e nel caso aggiusto i quantitativi
                   if (products[productId].moltiplica > 1 ) {
                     disponibile = false

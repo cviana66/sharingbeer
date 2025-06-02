@@ -158,6 +158,13 @@ module.exports = {
         subject: 'Avviso - Birrificio Viana', // Subject line
         html: html
       }
+    } else if (typeOfMail == 'nuoviProdotti') {
+      var mailOptions = {
+        from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
+        to: Email, //'cviana66@gmail.com', // list of receivers
+        subject: 'Nuove birre - Birrificio Viana', // Subject line
+        html: html
+      }
     }
     // effettua l'invio della mail
     try {
