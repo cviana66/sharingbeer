@@ -35,9 +35,9 @@ var mailToCustomerWithOrder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Tran
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + Name + ',</span> </p> \
   								<p> è arrivata la primavera e il caldo è alle porte! <p> \
                   <p> Per rinfrescarti abbiamo prodotto <span style="font-weight:bold"> 2 nuove birre </span>: <p>\
-                  <p>&#x1F37A; la <span style="font-weight:bold">Robis\' Blonde</span> leggera e beverina</p> \
+                  <p>&#x1F37A; la <span style="font-weight:bold">Robis\' Blonde</span> una bionda leggera e beverina</p> \
                   <p>&#x1F37A; la <span style="font-weight:bold">Kunt\'s IPA</span>, una Indian Pale Ale dal profumo intenso e dal gusto amaro dissetante </p> \
-                  <p align="center"> Accedi in <a href="'+server+'/shop" target="_blank"> Sharingbeer </a> per visionare le \
+                  <p align="center"> Accedi in <a href="'+server+'/shop" target="_blank"> Sharingbeer </a> e prova le \
   								<div align="center"> \
   								<a href="'+server+'/shop"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
