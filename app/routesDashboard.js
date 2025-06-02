@@ -43,19 +43,22 @@ module.exports = (app, moment, mongoose) => {
 	    	const server = lib.getServer(req);
 	    	var tom = "";	    
 	    	const currentDate = new Date();	
-	    	console.debug(`AVVISO: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
+	    	//console.debug(`AVVISO: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
 	    	//TODO mettere in database le notifiche con data e le info del cliente
 	    	if (tipoMessaggio == "notifica") {
 		    	if (req.body.tipoCliente == 'conOrdini') {
+		    		console.debug(`AVVISO CON Ordini: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
 			    	html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
 			    	tom = 'notificaClienteConOrdiniFatti'
 			    	await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
 		    	} else if (req.body.tipoCliente == 'senzaOrdini') {
+		    		console.debug(`AVVISO SENZA Ordini: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
 		    		html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
 		    		tom = 'notificaClienteSenzaOrdiniFatti'
 			    	await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
 		    	}
 		    } else if (tipoMessaggio == "nuoviProdotti") {
+		    	console.debug(`AVVISO NUOVI Prodotti: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
 		    	html = mailToCustomerNewProducts(customer.local.name.first, customer.local.email, server)
 			    tom = 'nuoviProdotti'
 			    await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'nuoviProdotti', server, html);
