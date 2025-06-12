@@ -244,7 +244,7 @@ module.exports = function(app, moment, mongoose) {
 		 * Calcolo della distanza
 		 * ----------------------------------------------------*/
         let customerAddress = address[0].addresses.address + ' ' +
-                          address[0].addresses.houseNumber + ' ' +
+                          //address[0].addresses.houseNumber + ' ' +
                           address[0].addresses.city +  ' ' +
                           address[0].addresses.province;
         let customerCoordinate = null;

@@ -584,7 +584,7 @@ module.exports = function (app, moment, mongoose, fastcsv, fs, util) {
        * Calcolo della distanza
        * ----------------------------------------------------*/
       let customerAddress = address[0].addresses.address + ' ' +
-        address[0].addresses.houseNumber + ' ' +
+        //address[0].addresses.houseNumber + ' ' +
         address[0].addresses.city + ' ' +
         address[0].addresses.province;
       let customerCoordinate = null;
