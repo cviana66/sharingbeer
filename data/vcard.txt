@@ -1,0 +1,51 @@
+BEGIN:VCARD
+VERSION:2.1
+N:Viana;Carlo
+FN:Carlo Viana
+ORG:Birrificio Viana S.r.l
+URL:https://sharingbeer.it/
+EMAIL;WORK:birrificioviana@sharingbeer.it
+EMAIL;HOME:cviana66@gmail.com
+TEL;CELL:+39 393 033 2728
+ADR:;;Via Molignati 12;Candelo;Biella;13878;ITALY
+END:VCARD
+
+BEGIN:VCARD
+VERSION:2.1
+N:Viana;Roberta
+FN:Roberta Viana
+ORG:Birrificio Viana S.r.l
+URL:https://sharingbeer.it/
+EMAIL;WORK:birrificioviana@sharingbeer.it
+EMAIL;HOME:rbtvna@gmail.com
+TEL;CELL:+39 349 126 9736
+ADR:;;Via Molignati 12;Candelo;Biella;13878;ITALY
+END:VCARD
+
+
+BEGIN:VCARD
+VERSION:2.1
+N:Viana;Birrificio
+FN:Birrificio Viana di Roberta e Carlo
+ORG:Birrificio Viana S.r.l
+URL:https://sharingbeer.it/
+EMAIL;WORK:birrificioviana@sharingbeer.it
+EMAIL;WORK:birrificioviana@pec.poste.it
+TEL;CELL:+39 349 126 9736
+TEL;CELL:+39 393 033 2728
+ADR:;;Via Molignati 12;Candelo;Biella;13878;ITALY
+END:VCARD
+
+
+BEGIN:VCARD
+VERSION:2.1
+N:Viana;Birrificio
+FN:Birrificio Viana di Roberta e Carlo
+ORG:Birrificio Viana S.r.l
+URL:https://sharingbeer.it/
+EMAIL;WORK:birrificioviana@sharingbeer.it
+EMAIL;WORK:birrificioviana@pec.poste.it
+TEL;TYPE=ROBERTA:+39 349 126 9736
+TEL;TYPE=CARLO:+39 393 033 2728
+ADR:;;Via Molignati 12;Candelo;Biella;13878;ITALY
+END:VCARD

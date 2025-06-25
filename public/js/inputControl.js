@@ -4,7 +4,8 @@ const iwar = '<svg style="vertical-align:bottom" xmlns="http://www.w3.org/2000/s
              <polygon points="13,16 11,16 11,18 13,18"/><polygon points="13,10 11,10 11,15 13,15"/></g></g></g></svg>';
 
 function fieldLoginControl(){
-  var email = document.getElementById("inputUsernameEmail").value;
+  var email = (document.getElementById("inputUsernameEmail").value).trim();
+  //console.log("EMAIL:",'|'+email+'|')
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var submit = true;
   if (email == "" || !re.test(String(email))) {
@@ -44,18 +45,30 @@ function fieldsFatturaControl() {
   }
 }
 
-function fieldsValidationControl() {
+function fieldsValidationControlSelf() {
+  if (document.getElementById("wrongFirstName") != null) document.getElementById("wrongFirstName").innerHTML = "";
   if (document.getElementById("wrongMail") != null) document.getElementById("wrongMail").innerHTML = "";
   if (document.getElementById("wrongPwd") != null) document.getElementById("wrongPwd").innerHTML = "";
   if (document.getElementById("wrongPrivacy") != null) document.getElementById("wrongPrivacy").innerHTML = "";
   if (document.getElementById("wrongAge") != null) document.getElementById("wrongAge").innerHTML = "";
   if (document.getElementById("wrongControlMail") != null) document.getElementById("wrongControlMail").innerHTML = "";
-  if (document.getElementById("wrongConfirmPwd") != null) document.getElementById("wrongConfirmPwd").innerHTML = "";
+  //if (document.getElementById("wrongConfirmPwd") != null) document.getElementById("wrongConfirmPwd").innerHTML = "";
   if (document.getElementById("wrongPrivacyNeed") != null) document.getElementById("wrongPrivacyNeed").innerHTML = "";
 
   var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   var email = document.getElementById("inputUsernameEmail").value.trim();
   var controlEmail = document.getElementById("inputControlUsernameEmail").value.trim();
+  var nome = document.getElementById("inputFirstName").value;
+
+  if (nome == "") {
+    text = iwar+"Inserire il Nome";
+    document.getElementById("wrongFirstName").innerHTML = text;
+    document.getElementById("inputFirstName").focus();
+    document.getElementById("wrongFirstName").scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  } else {
+    document.getElementById("inputFirstName").value = nome.charAt(0).toUpperCase() + nome.slice(1);
+  }
 
   if(email =="" || !re.test(String(email))) {
     document.getElementById("wrongMail").innerHTML = iwar+"Inserisci una Email valida";
@@ -69,13 +82,13 @@ function fieldsValidationControl() {
   }
 
   let pwd1 = "";
-  let pwd2 = "";
+  //let pwd2 = "";
   if (document.getElementById("inputPassword") != null) {
     pwd1 = document.getElementById("inputPassword").value;
   }
-  if (document.getElementById("confirmPassword") != null) {
-    pwd2 = document.getElementById("confirmPassword").value;
-  }
+  // if (document.getElementById("confirmPassword") != null) {
+  //   pwd2 = document.getElementById("confirmPassword").value;
+  // }
 
   if(pwd1 != "") {
     if(pwd1.length < 6) {
@@ -106,31 +119,149 @@ function fieldsValidationControl() {
       document.getElementById("inputPassword").focus();
       return false;
     }
-    var re4 = /\W|_/g;
+    /*var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
       document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
-    }
+    }*/
   } else {
     document.getElementById("wrongPwd").innerHTML = iwar+"Crea una nuova Password";
     document.getElementById("inputPassword").focus();
     return false;
   }
 
-  if(pwd2 != "") {
-    if(pwd2.length < 6) {
-      document.getElementById("wrongPwd").innerHTML = iwar+"La Password di conferma deve essere di almeno 6 caratteri";
-      document.getElementById("confirmPassword").focus();
+  // if(pwd2 != "") {
+  //   if(pwd2.length < 6) {
+  //     document.getElementById("wrongPwd").innerHTML = iwar+"La Password di conferma deve essere di almeno 6 caratteri";
+  //     document.getElementById("confirmPassword").focus();
+  //     return false;
+  //   }
+  // }
+
+  // if(pwd1 != pwd2) {
+  //     document.getElementById("wrongConfirmPwd").innerHTML = iwar+"La password di conferma è differente";
+  //     document.getElementById("confirmPassword").focus();
+  //     return false;
+  // }
+
+  if(!document.getElementById('checkAge').checked) {
+    document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella solo se hai più di 18 anni";
+    document.getElementById("wrongAge").scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  }
+
+  if (document.getElementById("wrongPrivacyNeed") != null) {
+    if(!document.getElementById('checkPrivacyNeed').checked) {
+      document.getElementById("wrongPrivacyNeed").innerHTML = iwar+"Spunta la casella (Necessario) per poter proseguire";
+      document.getElementById("wrongPrivacyNeed").scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
   }
+  console.debug('FIELDS VALIDATION CONTROL')
+  return true;
 
-  if(pwd1 != pwd2) {
-      document.getElementById("wrongConfirmPwd").innerHTML = iwar+"La password di conferma è differente";
-      document.getElementById("confirmPassword").focus();
-      return false;
+}
+
+function fieldsValidationControl() {
+  if (document.getElementById("wrongFirstName") != null) document.getElementById("wrongFirstName").innerHTML = "";
+  if (document.getElementById("wrongMail") != null) document.getElementById("wrongMail").innerHTML = "";
+  if (document.getElementById("wrongPwd") != null) document.getElementById("wrongPwd").innerHTML = "";
+  if (document.getElementById("wrongPrivacy") != null) document.getElementById("wrongPrivacy").innerHTML = "";
+  if (document.getElementById("wrongAge") != null) document.getElementById("wrongAge").innerHTML = "";
+  if (document.getElementById("wrongControlMail") != null) document.getElementById("wrongControlMail").innerHTML = "";
+  if (document.getElementById("wrongConfirmPwd") != null) document.getElementById("wrongConfirmPwd").innerHTML = "";
+  if (document.getElementById("wrongPrivacyNeed") != null) document.getElementById("wrongPrivacyNeed").innerHTML = "";
+
+  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  var email = document.getElementById("inputUsernameEmail").value.trim();
+  var controlEmail = document.getElementById("inputControlUsernameEmail").value.trim();
+  var nome = document.getElementById("inputFirstName").value;
+
+  if (nome == "") {
+    text = iwar+"Inserire il Nome";
+    document.getElementById("wrongFirstName").innerHTML = text;
+    document.getElementById("inputFirstName").focus();
+    document.getElementById("wrongFirstName").scrollIntoView({ behavior: "smooth", block: "center" });
+    return false;
+  } else {
+    document.getElementById("inputFirstName").value = nome.charAt(0).toUpperCase() + nome.slice(1);
   }
+
+  if(email =="" || !re.test(String(email))) {
+    document.getElementById("wrongMail").innerHTML = iwar+"Inserisci una Email valida";
+    document.getElementById("inputUsernameEmail").focus();
+    return false;
+  };
+  if(email.toLowerCase() != controlEmail.toLowerCase()) {
+    document.getElementById("wrongControlMail").innerHTML = iwar+"Indirizzo email di conferma differente";
+    document.getElementById("inputControlUsernameEmail").focus();
+    return false;
+  }
+
+  let pwd1 = "";
+  // let pwd2 = "";
+  if (document.getElementById("inputPassword") != null) {
+    pwd1 = document.getElementById("inputPassword").value;
+  }
+  // if (document.getElementById("confirmPassword") != null) {
+  //   pwd2 = document.getElementById("confirmPassword").value;
+  // }
+
+  if(pwd1 != "") {
+    if(pwd1.length < 6) {
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve essere di almeno 6 caratteri";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    if(pwd1 == email) {
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve essere dfferente dall'Email";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re1 = /[0-9]/;
+    if(!re1.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un numero";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re2 = /[a-z]/;
+    if(!re2.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno una lettera minuscola";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+    var re3 = /[A-Z]/;
+    if(!re3.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno una lettera maiuscola";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }
+   /* var re4 = /\W|_/g;
+    if(!re4.test(pwd1)) {
+      document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
+      document.getElementById("inputPassword").focus();
+      return false;
+    }*/
+  } else {
+    document.getElementById("wrongPwd").innerHTML = iwar+"Crea una nuova Password";
+    document.getElementById("inputPassword").focus();
+    return false;
+  }
+
+  // if(pwd2 != "") {
+  //   if(pwd2.length < 6) {
+  //     document.getElementById("wrongPwd").innerHTML = iwar+"La Password di conferma deve essere di almeno 6 caratteri";
+  //     document.getElementById("confirmPassword").focus();
+  //     return false;
+  //   }
+  // }
+
+  // if(pwd1 != pwd2) {
+  //     document.getElementById("wrongConfirmPwd").innerHTML = iwar+"La password di conferma è differente";
+  //     document.getElementById("confirmPassword").focus();
+  //     return false;
+  // }
 
   if(!document.getElementById('checkAge').checked) {
     document.getElementById("wrongAge").innerHTML = iwar+"Spunta la casella solo se hai più di 18 anni";
@@ -185,12 +316,12 @@ function fieldsResetControl() {
       document.getElementById("inputPassword").focus();
       return false;
     }
-    var re4 = /\W|_/g;
+    /*var re4 = /\W|_/g;
     if(!re4.test(pwd1)) {
       document.getElementById("wrongPwd").innerHTML = iwar+"La Password deve contenere almeno un carattere speciale";
       document.getElementById("inputPassword").focus();
       return false;
-    }
+    }*/
     if(pwd1!=pwd2) {
       document.getElementById("wrongPwd2").innerHTML = iwar+"Le Password inserite sono differenti ";
       document.getElementById("confirmPassword").focus();

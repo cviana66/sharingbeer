@@ -4,12 +4,15 @@
     <div class="card-body">
 	    <div class="flex-row">
         	<div class="align-self-center">
-		    	<p class="text-white font-weight-light text-center">
-					{{messaggio}}
-				</p>
-				
-				{{html | safe}}
-				
+		    	{%if nodeEnv != 'production' %}
+		    	<div>
+					<img src="/img/qr-code-Vcard-BirrificioViana.svg">
+				</div>
+		    	{%else%}
+		    	<div>
+					<img src="/img/qr-code-Vcard-BirrificioViana.svg">
+		    	</div>
+			    {%endif%}
 			</div>
 		</div>
 	</div>

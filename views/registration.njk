@@ -4,10 +4,6 @@
     <h3 class="text-white text-center bg-dark">Dati Registrazione</h3>
     <hr style="border-top: 1px solid #5375BD;">
 
-    <div id="loading">
-      <img  src="img/ajax-loader-1.gif" alt="Loading..." />
-    </div>
-
     <div class="card-body text-white font-weight-light text-justify">
       <span style="font-size:1.1em;">Completa con i tuoi dati personali </span>
     </div>
@@ -31,6 +27,7 @@
 
         <div class="form-group" style="margin: 10px 10px 10px 10px;">
           <div class="input-error" id="wrongCity"></div>
+          <div class="text-white font-weight-light text-justify" style="font-size:0.7em;">Inserisci il nome della Città, anche parziale e seleziona dalla lista proposta</div>
           <input type="text" class="form-control" id="inputCity" value="{{city}}"
            name="city" placeholder="Città" required autocomplete="off" oninput="selectCity(this.value)"/>
           <div class="w-100"></div>
@@ -109,7 +106,7 @@
 
   document.addEventListener("DOMContentLoaded", function() {
         document.getElementById("loading").style.display = 'none';
-    });
+  });
 /*==================================================================*/
 /* GESTIONE della CITTA' con query MONGODB                          */
 /* Gestione delle VIE con query su OpenStreetMaps (Overpass)        */
@@ -164,18 +161,21 @@ async function controlInputAndValidateAddress() {
             //checkPrivacyCessione : document.getElementById('checkPrivacyCessione').checked
           }
           //console.log('PARAM',JSON.stringify(postData,null,2));
+          document.getElementById("loading").style.display = 'block';
           post('/register',postData);
 
         } else {
           console.error('ERRORE nella ricerca dello indirizzo');
           document.getElementById("hiddenCAP").value ="";
           document.getElementById("hiddenAddressIsValid").value = "errato";
+          document.getElementById("loading").style.display = 'block';
           post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
         }
       },
       error: function (e) {
         //console.log("OVERPASS_CAP", e);
         //document.getElementById("loading").style.display = 'none';
+        document.getElementById("loading").style.display = 'block';
         post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
       }
     });
@@ -232,7 +232,7 @@ async function listOfStreets(citta,istat) {
 async function selectStreet(v) {
   document.getElementById("wrongStreet").innerHTML = "";
   document.getElementById("wrongNumciv").innerHTML = ''
-  let vl = v.toLowerCase();
+  let vl = v.toLowerCase().trimEnd();
   if (vl.length > 3) {
     let data = {};
     data.street = vl;
@@ -276,6 +276,7 @@ async function selectStreet(v) {
 
             for (var i = 0; i <res.length; i += 1) {
                 let option = document.createElement('li');
+                option.setAttribute('style','padding: 5px')
                 a = document.createElement('a');
                 a.textContent = res[i];
                 a.setAttribute('href',"javascript:void(0)");
@@ -347,7 +348,7 @@ async function setValueCity(comune, provincia, istat) {
 
 //----------------------------CITY-------------------------------------
 async function listOfCities(v) {
-  let vl = v.toLowerCase();
+  let vl = v.toLowerCase().trimEnd();
   var data = {};
   data.city = vl;
   await $.ajax({
@@ -450,6 +451,7 @@ async function selectCity(v) {
 
         for (var i = 0; i <res.length; i += 1) {
           let option = document.createElement('li');
+          option.setAttribute('style','padding: 5px')
           a = document.createElement('a');
           a.textContent = res[i].Comune;
           a.setAttribute('href',"javascript:void(0)");

@@ -32,9 +32,17 @@
             color: #FFBB35;
             text-decoration: none;            
         }
+  .button-container {
+            display: flex; /* Utilizza Flexbox per affiancare i bottoni */
+            justify-content: center; /* Centra i bottoni orizzontalmente */
+            gap: 10px; /* Spazio tra i bottoni */
+        }
+  .button-container .btn {
+            flex: 1; /* Ogni bottone occupa la stessa larghezza */
+        }
 </style>
 
-<h3 class="text-white text-center bg-dark"> Clienti con Ordini </h3>
+<h3 class="text-white text-center bg-dark"> Clienti con Ordini <span style="font-size:0.8rem;">({{usersWithOrders | length}})</span></h3>
 <h4 class="text-white text-center bg-dark"> <input type="checkbox" id="selezionaTuttiConOrdini" /> Seleziona Tutti </h4>
 <form action="/sendNotifyMail" method="POST">
   <input type="hidden" name="tipoCliente" value="conOrdini" />
@@ -43,7 +51,7 @@
       <thead>
       <th colspan="4" style="font-size:1.2em">    
         <input type="checkbox" name="customers" value="{{ user.id }}" class="clienteConOrdini"> 
-        {{ user.local.name.first }} {{ user.local.name.last }}
+        {{ user.local.name.first }} {{ user.local.name.last }} <span style="font-size:0.9rem;">(notifiche: {{user.marketing | length}})</span>
       </th>
     </thead>
     <tr>
@@ -116,14 +124,19 @@
     }
   </script>
   {% endfor %}
-  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-     Invia e-mail di notifica <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
-  </button>
+    <div class="button-container">
+    <button type="submit" class="btn btn-my btn-lg" name="mybutton" value="notifica">
+       Invia e-mail <br> di notifica
+    </button>
+    <button type="submit" class="btn btn-my btn-lg" name="mybutton" value="nuoviProdotti">
+       Invia e-mail <br> nuovi prodotti
+    </button>
+  </div>
 </form>
 
 <!------------------------------------------------------------------------------------------------------------>
 
-<h3 class="text-white text-center bg-dark"> Clienti senza Ordini </h3>
+<h3 class="text-white text-center bg-dark"> Clienti senza Ordini <span style="font-size:0.8rem;">({{usersWithoutOrders | length}})</span></h3>
 <h4 class="text-white text-center bg-dark"> <input type="checkbox" id="selezionaTuttiSenzaOrdini" /> Seleziona Tutti </h4>
 <form action="/sendNotifyMail" method="POST">
   <input type="hidden" name="tipoCliente" value="senzaOrdini" />
@@ -132,7 +145,7 @@
     <thead>
       <th colspan="4" style="font-size:1.2em">    
         <input type="checkbox" name="customers" value="{{ user.id }}" class="clienteSenzaOrdini"> 
-        {{ user.local.name.first }} {{ user.local.name.last }}
+        {{ user.local.name.first }} {{ user.local.name.last }} <span style="font-size:0.9rem;">(notifiche: {{user.marketing | length}})</span>
       </th>
     </thead>
     <tr>
@@ -205,9 +218,15 @@
     }
   </script>
   {% endfor %}
-  <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
-     Invia e-mail di notifica <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
-  </button>
+  <div class="button-container">
+    <button type="submit" class="btn btn-my btn-lg" name="mybutton" value="notifica">
+       Invia e-mail <br> di notifica
+    </button>
+    <button type="submit" class="btn btn-my btn-lg" name="mybutton" value="nuoviProdotti">
+       Invia e-mail <br> nuovi prodotti
+    </button>
+  </div>
+  <br>
 </form>
 
 <script>

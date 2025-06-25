@@ -1,12 +1,8 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-      <h3 class="text-white text-center bg-dark">Sul tuo ordine</h3>
+      <h3 class="text-white text-center bg-dark">Ritiro o Consegna</h3>
       <hr style="border-top: 1px solid #5375BD;">
-
-      <div id="loading">
-        <img  src="img/ajax-loader-1.gif" alt="Loading..." />
-      </div>
 
       <!--div>
         <form role="form" method="post" id="fatturaForm">
@@ -44,20 +40,20 @@
       <hr style="border-top: 1px solid #5375BD;"-->
 
       <div class="text-white text-center" style="background-color:#2A0009;border-color:#903246;margin-bottom:15px;">
-        <span style="font-size:0.9em;">Scegli o inserisci l'indirizzo di consegna del tuo ordine</span>
+        <span style="font-size:0.9em;">Scegli tu se ritirare l'ordine o se preferisci la consegna</span>
       </div>
       <form role="form" action="/orderSummary" method="POST" id="selectedAddress">
         <div class="card text-white" style="background-color:#6B1628;border-color:#903246;margin-bottom:10px;">
           <div class="card-body">
             <p style="font-size:1.1em;" class="card-text text-center">Vieni tu a ritirarlo direttamente al birrificio!</p>
             <p style="font-size:1.0em;" class="card-text text-center">Ti aspettiamo in
-            Via Molignati 12, Candelo - 13878 (Biella)</p>
+            Via Molignati 12, Candelo - 13878 (Biella) </p>
             <!--p class="card-text text-center">mobile: +39 123 456 7890</p-->
-            <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton" >
+            <button type="button" class="btn btn-my btn-sm btn-block" id="mybutton" onclick="return goToOrderSummary('{{address.id}}','ritiro')">
               Seleziona e vai al riepilogo
             </button>
-            <input type="hidden" name="addressID" value="{{address.id}}"/>
-            <input type="hidden" name="typeOfDelivery" value="ritiro" />
+            <!--input type="hidden" name="addressID" value="{{address.id}}"/>
+            <input type="hidden" name="typeOfDelivery" value="ritiro" /-->
           </div>
         </div> 
       </form> 
@@ -89,11 +85,11 @@
                   <td colspan="2">
                     <form role="form" action="/orderSummary" method="POST" id="selectedAddress">
                       <p class="card-text text-left">mobile: {{address.mobilePrefix}} {{address.mobileNumber}}</p>
-                      <button type="submit" class="btn btn-my btn-sm btn-block" id="mybutton">
+                      <button type="button" class="btn btn-my btn-sm btn-block" id="mybutton" onclick="return goToOrderSummary('{{address.id}}','consegna')">
                         Seleziona e vai al riepilogo
                       </button>
-                      <input type="hidden" name="addressID" value="{{address.id}}" />
-                      <input type="hidden" name="typeOfDelivery" value="consegna" />
+                      <!--input type="hidden" name="addressID" value="{{address.id}}" />
+                      <input type="hidden" name="typeOfDelivery" value="consegna" /-->
                     </form>
                   </td>
                 </tr>
@@ -168,6 +164,10 @@
       <br>
 
 <script type="text/javascript">
+  //!!!!!!!!!!!!!!!!! ATTENZIONE !!!!!!!!!!!!!!!!!
+  // La funzione post(path, params, method='post')
+  // è definita in main.njk
+  //==============================================
 
   // Ricarico la pagina se l'utente clicca INDIETRO sul bottone del browser
   window.addEventListener('pageshow', function(event) {
@@ -178,10 +178,10 @@
     }
   });
   // azione richiesta nel carico della pagina
-  document.addEventListener("DOMContentLoaded", function() {
-    //console.log('DOMContentLoaded in ADDRESSES');
-    document.getElementById("loading").style.display = 'none';
-  });
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   console.log('DOMContentLoaded in ADDRESSES');
+  //   document.getElementById("loading").style.display = 'none';
+  // });
   
   function toggleFatturaDetails() {
 
@@ -296,19 +296,22 @@ async function controlInputAndValidateAddress() {
             lat : res.lat,
             lon : res.lon
           }
-          console.debug('PARAM',JSON.stringify(postData,null,2));          
+          console.debug('PARAM',JSON.stringify(postData,null,2)); 
+          document.getElementById("loading").style.display = 'block';         
           post('/register',postData);
 
         } else {
           console.debug('ERRORE nella ricerca dello indirizzo');
           document.getElementById("hiddenCAP").value ="";
           document.getElementById("hiddenAddressIsValid").value = "errato";
+          document.getElementById("loading").style.display = 'block';
           post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
         }
       },
       error: function (e) {
         //console.log("OVERPASS_CAP", e);
         //document.getElementById("loading").style.display = 'none';
+        document.getElementById("loading").style.display = 'block';
         post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
       }
     });
@@ -363,8 +366,8 @@ async function listOfStreets(citta,istat) {
 //-------------------- MAIN STREET ------------------
 async function selectStreet(v) {
   document.getElementById("wrongStreet").innerHTML = "";
-  document.getElementById("wrongNumciv").innerHTML = ''
-  let vl = v.toLowerCase();
+  document.getElementById("wrongNumciv").innerHTML = "";
+  let vl = v.toLowerCase().trimEnd();
   if (vl.length > 3) {
     let data = {};
     data.street = vl;
@@ -408,6 +411,7 @@ async function selectStreet(v) {
 
             for (var i = 0; i <res.length; i += 1) {
                 let option = document.createElement('li');
+                option.setAttribute('style','padding: 5px')
                 a = document.createElement('a');
                 a.textContent = res[i];
                 a.setAttribute('href',"javascript:void(0)");
@@ -479,7 +483,7 @@ async function setValueCity(comune, provincia, istat) {
 
 //----------------------------CITY-------------------------------------
 async function listOfCities(v) {
-  let vl = v.toLowerCase();
+  let vl = v.toLowerCase().trimEnd();
   var data = {};
   data.city = vl;
   await $.ajax({
@@ -517,6 +521,7 @@ async function selectCity(v) {
     //*******************************************************
     try {
       var res = await listOfCities(v);
+      // Azzero gli erorri
       document.getElementById("wrongProvincia").innerHTML = "";
       document.getElementById("wrongStreet").innerHTML = "";
       document.getElementById("wrongNumciv").innerHTML = "";
@@ -582,6 +587,7 @@ async function selectCity(v) {
 
         for (var i = 0; i <res.length; i += 1) {
           let option = document.createElement('li');
+          option.setAttribute('style','padding: 5px')
           a = document.createElement('a');
           a.textContent = res[i].Comune;
           a.setAttribute('href',"javascript:void(0)");
@@ -622,53 +628,31 @@ var inputCN = document.createElement("input");
       inputCN.setAttribute("value", "false");
       document.getElementById("addresses").appendChild(inputCN);
 
-  var inputCAP = document.createElement("input");
-      inputCAP.setAttribute("type", "hidden");
-      inputCAP.setAttribute("id","hiddenCAP");
-      inputCAP.setAttribute("name", "hiddenCAP");
-      inputCAP.setAttribute("value", "");
-      document.getElementById("addresses").appendChild(inputCAP);
+var inputCAP = document.createElement("input");
+    inputCAP.setAttribute("type", "hidden");
+    inputCAP.setAttribute("id","hiddenCAP");
+    inputCAP.setAttribute("name", "hiddenCAP");
+    inputCAP.setAttribute("value", "");
+    document.getElementById("addresses").appendChild(inputCAP);
 
-  var inputStreet = document.createElement("input");
-      inputStreet.setAttribute("type", "hidden");
-      inputStreet.setAttribute("id","hiddenStreet");
-      inputStreet.setAttribute("name", "hiddenStreet");
-      inputStreet.setAttribute("value", "KO");
-      document.getElementById("addresses").appendChild(inputStreet);
+var inputStreet = document.createElement("input");
+    inputStreet.setAttribute("type", "hidden");
+    inputStreet.setAttribute("id","hiddenStreet");
+    inputStreet.setAttribute("name", "hiddenStreet");
+    inputStreet.setAttribute("value", "KO");
+    document.getElementById("addresses").appendChild(inputStreet);
 
-  var inputIstat = document.createElement("input");
-      inputIstat.setAttribute("type", "hidden");
-      inputIstat.setAttribute("id","hiddenIstat");
-      inputIstat.setAttribute("name", "hiddenIstat");
-      inputIstat.setAttribute("value", "");
-      document.getElementById("addresses").appendChild(inputIstat);
+var inputIstat = document.createElement("input");
+    inputIstat.setAttribute("type", "hidden");
+    inputIstat.setAttribute("id","hiddenIstat");
+    inputIstat.setAttribute("name", "hiddenIstat");
+    inputIstat.setAttribute("value", "");
+    document.getElementById("addresses").appendChild(inputIstat);
 
-/**
-  * sends a request to the specified url from a form. this will change the window location.
-  * @param {string} path the path to send the post request to
-  * @param {object} params the parameters to add to the url
-  * @param {string} [method=post] the method to use on the form
-  */
-  function post(path, params, method='post') {
-
-    // The rest of this code assumes you are not using a library.
-    // It can be made less verbose if you use one.
-    const form = document.createElement('form');
-    form.method = method;
-    form.action = path;
-
-    for (const key in params) {
-      if (params.hasOwnProperty(key)) {
-        const hiddenField = document.createElement('input');
-        hiddenField.type = 'hidden';
-        hiddenField.name = key;
-        hiddenField.value = params[key];
-        form.appendChild(hiddenField);
-      }
-    }
-    document.body.appendChild(form);
-    form.submit();
-  }
+function goToOrderSummary(addressId,tipo) {
+  document.getElementById("loading").style.display = 'block';
+  post('/orderSummary',{addressID:addressId,typeOfDelivery:tipo})
+}
 
 function sleep(ms) {
   return new Promise((resolve) => {

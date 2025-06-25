@@ -51,6 +51,9 @@ async function getCoordinatesFromAddress(address) {
         format: 'json',
         polygon_kml: 1
       },
+      headers: {
+        'User-Agent': 'sharingbeer.it/1.0 (birrificioviana@gmail.com)'
+    }
     });
     //console.log('geocodeResponse', geocodeResponse.data);
 

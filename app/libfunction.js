@@ -41,7 +41,13 @@ module.exports = {
     if (req.isAuthenticated() && req.user.local.role == 'admin') {
       return next();
     } else {
-      res.render('info.njk', { messaggio: 'Accesso negato' })
+      model = {
+        messaggio: 'Accesso negato',
+        user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      }
+      res.render('info.njk', model)
     }
   },
   getInviteAvailable: (req) => {
@@ -70,6 +76,12 @@ module.exports = {
     if (typeof (string) != "undefined") {
       return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
     }
+  },
+  capitalizeFirstLetterOfEachWord: function capitalizeFirstLetterOfEachWord(sentence) {
+    return sentence
+        .split(' ') // Dividi la frase in parole
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Trasforma la prima lettera in maiuscola
+        .join(' '); // Ricompone la frase
   },
   getServer: (req) => {
     var server;
@@ -109,7 +121,7 @@ module.exports = {
         from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
         to: Email, //'cviana66@gmail.com', // list of receivers
         subject: 'Invito - Birrificio Viana', // Subject line
-        html: mailinvite(Name, Email, Token, userName, server)
+        html: html //mailinvite(Name, Email, Token, userName, server)
       }
     } else if (typeOfMail == 'conferme') {
       var mailOptions = {
@@ -146,6 +158,13 @@ module.exports = {
         subject: 'Avviso - Birrificio Viana', // Subject line
         html: html
       }
+    } else if (typeOfMail == 'nuoviProdotti') {
+      var mailOptions = {
+        from: '"Birrificio Viana by Sharingbeer" birrificioviana@gmail.com', // sender address
+        to: Email, //'cviana66@gmail.com', // list of receivers
+        subject: 'Nuove birre - Birrificio Viana', // Subject line
+        html: html
+      }
     }
     // effettua l'invio della mail
     try {
@@ -156,37 +175,79 @@ module.exports = {
       throw new Error('SENDMAIL' + e);
     }
   },
-  retriveCart: (req) => {
-    //Retrieve the shopping cart from memory
-    var cart = req.session.cart || null
-    cartItems = { items: [], totalPrice: 0, totalQty: 0 },
-    totalPrice = 0,
-    totalQty = 0
+  newRetriveCart: (req) => {
+    var cart = req.session.newcart || {},
+        cartItems = { items: [], totalPrice: 0, totalQty: 0 }, //oggeto di quanto viene memorizzato in collection users->orders->items
+        totalPrice = 0, 
+        totalQty = 0
     req.session.numProducts = 0;
     req.session.numProductsPerId = [];
 
-    console.debug('CART IN LIB: ', cart)
+    console.debug('NEW CART IN LIB: ', cart)
 
-    if (cart) { //se ho rpodotti in carrello
-      for (var item in cart) {
-        if (cart[item].qty > 0) {
-          cartItems.items.push(cart[item]);
-          totalPrice += (cart[item].qty * cart[item].price);
-          totalQty += cart[item].qty;
-          req.session.numProducts += cart[item].qty;
-          let npXid = { "id": cart[item].id.toString(), "qty": cart[item].qty }
+    if (cart) { //se ho prodotti nel carrello
+
+      // Ciclo attraverso le beerbox
+      Object.keys(cart).forEach(beerBoxId => {
+        const products = cart[beerBoxId];
+
+        // Ciclo attraverso i prodotti nella beerbox
+        Object.keys(products).forEach(productId => {
+          const product = products[productId];
+          product.beerboxId = beerBoxId;
+          product.subtotal = ((product.quantity * product.price * product.moltiplica) / numBottigliePerBeerBox).toFixed(2)          
+          cartItems.items.push(product);
+          totalPrice += ((product.quantity * product.price * product.moltiplica) / numBottigliePerBeerBox);
+          totalQty += product.qty * product.moltiplica;          
+          let npXid = { "id": product.id, "qty": product.qty, "moltiplica": product.moltiplica }
           req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino
-          console.debug('PRODOTTI NEL CARRELLO: ITEM =', item, ' PRODOTTO: ', cart[item])
-        }
-      }
+        }); 
+      });
+      //console.info('totalQty=',totalQty)
+      req.session.numProducts = totalQty.toFixed(0);
       console.debug('NUMERO PRODOTTI PER ID: ', req.session.numProductsPerId.length, req.session.numProductsPerId)
-      req.session.cartItems = cartItems;
+      req.session.cartItems = cartItems;  //questi sono gli Items che vengono poi inseriti nell'ordine in routeAxerve
       req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
-      req.session.totalQty = cartItems.totalQty = totalQty;
-      console.debug("TOTAL PRICE:", req.session.totalPrc, "TOTAL QTY BeeBox:", req.session.totalQty)
+      req.session.totalQty = cartItems.totalQty = req.session.numProducts;
+  
+      console.debug('NEW CARTITEMS -> ', req.session.cartItems ) // req.session.cartItems.items è quanto viene memorizzato in collection users->orders->items
     }
-    req.session.cart = cart
+
+    req.session.newcart = cart
   },
+  //---------------------------------------------------------------
+  // retriveCart: (req) => {
+  //   //Retrieve the shopping cart from memory
+  //   var cart = req.session.cart || {}
+  //   cartItems = { items: [], totalPrice: 0, totalQty: 0 },
+  //   totalPrice = 0,
+  //   totalQty = 0
+  //   req.session.numProducts = 0;
+  //   req.session.numProductsPerId = [];
+
+  //   console.debug('CART IN LIB: ', cart)
+
+  //   if (cart) { //se ho prodotti in carrello
+  //     for (var item in cart) {
+  //       if (cart[item].qty > 0) {
+  //         cartItems.items.push(cart[item]);
+  //         totalPrice += (cart[item].qty * cart[item].price);
+  //         totalQty += cart[item].qty;
+  //         req.session.numProducts += cart[item].qty;
+  //         let npXid = { "id": cart[item].id.toString(), "qty": cart[item].qty }
+  //         req.session.numProductsPerId.push(npXid);  //serve poi per decrementare la quantità in magazzino
+  //         //console.debug('PRODOTTI NEL CARRELLO: ITEM =', item, ' PRODOTTO: ', cart[item])
+  //       }
+  //     }
+  //     console.debug('NUMERO PRODOTTI PER ID: ', req.session.numProductsPerId.length, req.session.numProductsPerId)
+  //     req.session.cartItems = cartItems;  //questi sono gli Items che vengono poi inseriti nell'ordine in routeAxerve
+  //     req.session.totalPrc = cartItems.totalPrice = totalPrice.toFixed(2);
+  //     req.session.totalQty = cartItems.totalQty = totalQty;
+  //     //console.debug("TOTAL PRICE:", req.session.totalPrc, "TOTAL QTY BeeBox:", req.session.totalQty)
+  //     console.debug('CARTITEMS -> ', req.session.cartItems ) // req.session.cartItems.items è quanto viene memorizzato in tabella in items
+  //   }
+  //   req.session.cart = cart
+  // },
   emailValidation: (email) => {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     if (email == "" || !re.test(String(email))) {
@@ -195,9 +256,12 @@ module.exports = {
       return true;
     }
   },
+  //-------------------------------------------------------------------------------------
   deliveryDate: (timeZone, dataType, format, deliveryType) => {
     moment.locale('it');
     var d = moment(data).utc(timeZone).format('dddd');
+    var h = moment(data).utc(timeZone).format('HH');
+    console.debug('Giorno=',d,'ORA=',h)
     var data = new Date();
 
     Date.prototype.addDays = function (days) {
@@ -209,19 +273,22 @@ module.exports = {
     if (deliveryType == 'Consegna') {
       var daysToAdd = 0
       if (d == "sabato") {
-        daysToAdd = 4
+        //daysToAdd = (h<=13) ? 3 : 3
+        daysToAdd = (h<=13) ? 4 : 4 //modificato perVarazze il 14/6/25 e il 16/6/25
       } else if (d == "domenica") {
-        daysToAdd = 3
+        //daysToAdd = (h<=13) ? 3 : 3
+        daysToAdd = (h<=13) ? 4 : 4 //modificato perVarazze il 14/6/25 e il 16/6/25
       } else if (d == "lunedì") {
-        daysToAdd = 3
+        //daysToAdd = (h<=13) ? 2 : 3
+        daysToAdd = (h<=13) ? 3 : 3  //modificato perVarazze il 14/6/25 e il 16/6/25
       } else if (d == "martedì") {
-        daysToAdd = 3
+        daysToAdd = (h<=13) ? 2 : 3
       } else if (d == "mercoledì") {
-        daysToAdd = 3
+        daysToAdd = (h<=13) ? 2 : 3
       } else if (d == "giovedì") {
-        daysToAdd = 4
+        daysToAdd = (h<=13) ? 2 : 5
       } else if (d == "venerdì") {
-        daysToAdd = 4
+        daysToAdd = (h<=13) ? 4 : 4
       }
     } else if (deliveryType == 'Ritiro') {
       if (d == "sabato") {
@@ -277,7 +344,7 @@ module.exports = {
     var d = moment(now).utc().format('YYYY-MM-DD hh:mm');
     return d;
   },
-
+//-------------------------------------------------------------------------------------
   findClosestCombination: (products, T) => {
     let closestSum = 0;
     let bestCombination = [];

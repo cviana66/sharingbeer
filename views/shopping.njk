@@ -4,7 +4,6 @@
 <h3 class="text-white text-center bg-dark">Ordini</h3>
 <hr style="border-top: 1px solid #5375BD;">
 
-
 <!-- Nav tabs -->
 
 <nav class="nav nav-pills nav-justified">
@@ -37,15 +36,17 @@
         </div>
       </div>
 
-      <div class="text-white font-weight-light text-center" style="margin: 5px 5px 20px 5px;">
-        <div><span style="font-size:0.9em">Consegna entro </span> {{purchase.orders.deliveryDate}}</div>
+      <div class="text-white font-weight-light text-center" style="margin: 5px 10px 20px 10px;">
+        <div style="font-size:1em;font-weight: bold;">Consegna entro {{purchase.orders.deliveryDate}}</div>
       </div>
 
-      {% for prod in purchase.orders.items %}
-      <table style="margin: 0px 5px 10px 5px;">
+    {% for key, items in purchase.orders.groupItems %}
+    {% if key == "XXXX" %}
+      {% for prod in items %}      
+      <table class="mx-auto" width="100%">        
         <tr>
-          <td width="16%" rowspan="3" style="padding: 5px;">
-            <div>
+          <td width="20%" rowspan="3" style="padding: 10px;">
+            <div>              
               <img src="{{prod.linkImage}}" width="100%" height="100%">
             </div>
           </td>
@@ -54,13 +55,49 @@
           </td>
         </tr>
         <tr>
-          <td class="text-white font-weight-light">N° di BeerBox: {{prod.qty}}</td>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
+          }
         </tr>
         <tr>
-          <td class="text-white font-weight-light">Prezzo per BeerBox: €{{prod.price}}</td>
+          <td class="text-white font-weight-light">Prezzo: €{{prod.price}}</td>
         </tr>
       </table>
       {% endfor %}
+    {% else %}
+      {% for prod in items %}      
+      <table class="mx-auto" width="100%">        
+        <tr>
+          <td width="20%" rowspan="3" style="padding: 10px;">
+            <div>              
+              <img src="{{prod.linkImage}}" width="100%" height="100%">
+            </div>
+          </td>
+          <td class="text-white font-weight-light">
+            Tipo: {{prod.name}}
+          </td>
+        </tr>
+        <tr>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
+        </tr>
+        <tr>
+          <td class="text-white font-weight-light">Prezzo: €{{prod.subtotal}}</td>
+        </tr>
+      </table>
+      {% endfor %}
+    {% endif %}
+      <hr style="border-top: 1px solid #903246; margin: 0 10px;">      
+  {% endfor %}
+
       <div class="text-center" style="margin: 0px 5px 5px 5px;">
         <span style="font-size:1.0em;font-weight: bold;">Totale</span>
         <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span>
@@ -102,11 +139,13 @@
         <div><span style="font-size:0.9em">Ritiro entro </span> {{purchase.orders.deliveryDate}}</div>
       </div>
 
-      {% for prod in purchase.orders.items %}
-      <table style="margin: 0px 5px 10px 5px;">
+      {% for key, items in purchase.orders.groupItems %}
+    {% if key == "XXXX" %}
+      {% for prod in items %}      
+      <table class="mx-auto" width="100%">        
         <tr>
-          <td width="16%" rowspan="3" style="padding: 5px;">
-            <div>
+          <td width="20%" rowspan="3" style="padding: 10px;">
+            <div>              
               <img src="{{prod.linkImage}}" width="100%" height="100%">
             </div>
           </td>
@@ -115,13 +154,49 @@
           </td>
         </tr>
         <tr>
-          <td class="text-white font-weight-light">N° di BeerBox: {{prod.qty}}</td>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
         </tr>
         <tr>
-          <td class="text-white font-weight-light">Prezzo per BeerBox: €{{prod.price}}</td>
+          <td class="text-white font-weight-light">Prezzo: €{{prod.price}}</td>
         </tr>
       </table>
       {% endfor %}
+    {% else %}
+      {% for prod in items %}      
+      <table class="mx-auto" width="100%">        
+        <tr>
+          <td width="20%" rowspan="3" style="padding: 10px;">
+            <div>              
+              <img src="{{prod.linkImage}}" width="100%" height="100%">
+            </div>
+          </td>
+          <td class="text-white font-weight-light">
+            Tipo: {{prod.name}}
+          </td>
+        </tr>
+        <tr>
+          {% if prod.moltiplica %}
+            {%set moltiplica = prod.moltiplica %}
+          {% else %} 
+            {%set moltiplica = 1 %}
+          {% endif %}
+          <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
+        </tr>
+        <tr>
+          <td class="text-white font-weight-light">Prezzo: €{{prod.subtotal}}</td>
+        </tr>
+      </table>
+      {% endfor %}
+    {% endif %}
+      <hr style="border-top: 1px solid #903246; margin: 0 10px;">      
+  {% endfor %}
+
+      
       <div class="text-center" style="margin: 5px 5px 5px 5px;">
         <span style="font-size:1.0em;font-weight: bold;">Totale</span>
         <span class="text-white font-weight-light" style="font-size:0.6em;">(con sconti e trasporto)</span>
@@ -166,10 +241,15 @@
             <td class="text-white font-weight-light">{{prod.name}}</td>
           </tr>
           <tr>
-            <td class="text-white font-weight-light">N° di BeerBox: {{prod.qty}}</td>
+            {% if prod.moltiplica %}
+              {%set moltiplica = prod.moltiplica %}
+            {% else %} 
+              {%set moltiplica = 1 %}
+            {% endif %}
+            <td class="text-white font-weight-light">N° {{prod.qty * numBottigliePerBeerBox * moltiplica}} bottiglie (50cl)</td>
           </tr>
           <tr>
-            <td class="text-white font-weight-light">Prezzo per BeerBox: €{{prod.price}}</td>
+            <td class="text-white font-weight-light">Prezzo: €{{prod.price}}</td>
           </tr>
         </table>
         {% endfor %}
@@ -198,12 +278,10 @@
   </div>
 </div>
 
-
-
-<script type="text/javascript">
+<script type="text/javascript">  
   $('#myTab a').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
+    e.preventDefault()
+    $(this).tab('show')
   })
 </script>
 

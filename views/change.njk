@@ -1,14 +1,14 @@
 {% extends "layouts/main.njk" %}
 {% block body %}
 
-<h3 class="text-white text-center bg-dark" style="margin:6px 0px 0px 0px;">Change Password</h3>
+<h3 class="text-white text-center bg-dark" style="margin:6px 0px 0px 0px;">Cambio Password</h3>
 <hr style="border-top: 1px solid #5375BD;">
 
 <form role="form" autocomplete="off" action="/change" method="post">
 	<input type="hidden" name="token" value="{{token}}">
 	<input type="hidden" name="email" id="email" value="{{email}}">
 	<div class="form-group">
-		<p class="text-white font-weight-light text-justify" style="font-size:0.7em;">La password deve essere di almeno 6 caratteri, contenente un numero, una lettera minuscola, una maiuscola e un carattere speciale.</p>             
+		<p class="text-white font-weight-light text-justify" style="font-size:0.7em;">La password deve essere di almeno 6 caratteri, contenente un numero, una lettera minuscola e una maiuscola </p>             
 		<div style="color:#ffc107; font-size:0.9em; margin-bottom:5px;" id="wrongPwd"></div>            
 		<div class="contenitore">
 			<input placeholder="Password" autocomplete="new-password" type="password" class="form-control" id="inputPassword" name="password" autofocus  required>
@@ -25,7 +25,7 @@
 	</div>
 	<div style="margin-bottom: 40px; margin-top:40px;">
 		<button type="submit" class="btn btn-my btn-lg btn-block" onclick="return fieldsResetControl()">
-			Change Password
+			Conferma cambio Password
 		</button>
 	</div>
 </form>

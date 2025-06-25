@@ -2,232 +2,247 @@
 {% block body %}
 
 <style>
-    table {
-        width: 100%; /* Larghezza della tabella */
-        margin: 10px auto; /* Centra la tabella n pagina */
-        border-spacing: 0; /* Rimuove lo spazio tra le celle */
-        border-collapse: separate; /* Permette di avere bordi separati */
-        background-color: #2A0009; /* Colore di sfondo della tabella */
-        /* border-radius: 10px; Arrotonda gli angoli della tabella */
-        /* overflow: hidden;  Nasconde gli angoli arrotondati */
-        /* border: 1px solid #903246; Bordo della tabella */
-    }
+  table {
+    width: 100%; /* Larghezza della tabella */
+    margin: 10px auto; /* Centra la tabella n pagina */
+    border-spacing: 0; /* Rimuove lo spazio tra le celle */
+    border-collapse: separate; /* Permette di avere bordi separati */
+    background-color: #2A0009; /* Colore di sfondo della tabella */
+    /* border-radius: 10px; Arrotonda gli angoli della tabella */
+    /* overflow: hidden;  Nasconde gli angoli arrotondati */
+    /* border: 1px solid #903246; Bordo della tabella */
+  }
 
-    th,
-    td {
-        border: 1px solid #903246;
-        /* Colore del bordo più chiaro */
-        padding: 5px;
-        /* Interspaziatura interna */
-        color: white;
-        /* Colore del testo */
-        text-align: left;
-        /* Allineamento del testo */
-        font-size: 0.8em
-    }
+  th,
+  td {
+    border: 1px solid #903246;
+    /* Colore del bordo più chiaro */
+    padding: 5px;
+    /* Interspaziatura interna */
+    color: white;
+    /* Colore del testo */
+    text-align: left;
+    /* Allineamento del testo */
+    font-size: 0.8em
+  }
 
-    th {
-        background-color: #3B1A1E;
-        /* Colore di sfondo per l'intestazione */
-    }
+  th {
+    background-color: #3B1A1E;
+    /* Colore di sfondo per l'intestazione */
+  }
 </style>
 {% if amiciDaInvitare %}
 <h3 class="text-white text-center bg-dark"> Inviti disponibili </h3>
-    <table>        
-      <tr >
-        <td width="40%"> 
-            <span style="font-size:1.3em; font-weight: bold;" >Hai {{invitiDisponibili}} inviti </span> 
-        </td>
-        <td>
-            <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" 
-              onclick="return goToInvite()">
-                Invita 
-            </button>
-        </td>         
-    </table>
+<table>        
+  <tr >
+    <td width="40%"> 
+      <span style="font-size:1.3em; font-weight: bold;" >Hai {{invitiDisponibili}} inviti </span> 
+    </td>
+    <td>
+      <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" 
+      onclick="return goToInvite()">
+      Invita 
+    </button>
+  </td>         
+</table>
 {% endif %}
-<h3 class="text-white text-center bg-dark"> Inviti in scadenza </h3>
-{% set c = "0" %}
-  {% for friend in friendsNew %}
-    {% if friend.local.residualTime > 0 %}
-    {% set c = "1" %}
-    <table>
-        <thead >
-            <th colspan="2"> 
-                <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
-            </th>
-        </thead>
-        <tr >
-            <td width="40%"> 
-                Invito effettuato il <span style="font-size:1.3em; font-weight: bold;" >{{ friend.local.initDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })}} </span>
-            </td>
-            <td rowspan="2">
-                <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" 
-                  onclick="return share('{{friend.local.name.first}}','{{friend.local.token}}','{{user.local.name.first}}','{{server}}','{{friend.local.residualTime}}')">
-                    Avvisa <br> <span style="font-size:0.8em";> {{ friend.local.name.first }} </span>
-                </button>
-            </td> 
-        </tr>
-        <tr>
-            <td> 
-                Scade tra <span style="font-size:1.3em; font-weight: bold;"> {{ friend.local.residualTime }} </span> giorni 
-            </td>        
-        </tr>
-    </table>
-    {% endif %}
-  {% endfor %}
-{% if c == "0" %}
+
+{% set c = 0 %}
+{% set d = 0 %}
+{% for friend in friendsNew %}
+  {% if friend.local.residualTime > 0 %}
+    {% set c = c + 1 %}
+  {% else %}
+    {% set d = d + 1 %}
+  {% endif %}
+{% endfor %}
+<h3 class="text-white text-center bg-dark"> Inviti in scadenza <span style="font-size:0.8rem;">({{c}}) </span> </h3>
+{% set c = 0 %}
+{% for friend in friendsNew %}
+  {% if friend.local.residualTime > 0 %}
+<table>
+  <thead >
+    <th colspan="2"> 
+      <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
+    </th>
+  </thead>
+  <tr >
+    <td width="40%"> 
+      Invito effettuato il <span style="font-size:1.3em; font-weight: bold;" >{{ friend.local.initDate.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })}} </span>
+    </td>
+    <td rowspan="2">
+      <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton"  
+        onclick="return share('{{friend.local.name.first}}','{{friend.local.token}}','{{user.local.name.first}}','{{server}}','{{friend.local.residualTime}}')">
+        Avvisa <span style="font-size:0.5em";>({{ friend.local.numOfNotify }})</span> <br>
+        <span style="font-size:0.8em";> {{ friend.local.name.first }} </span> <br>
+      {% if user.local.role == 'admin'%}
+        <span style="font-size:0.5em";> {{ friend.local.token }} </span>
+      {% endif %}
+      </button>
+    </td> 
+  </tr>
+  <tr>
+    <td> 
+      Scade tra <span style="font-size:1.3em; font-weight: bold;"> {{ friend.local.residualTime }} </span> giorni 
+    </td>        
+  </tr>
+</table>
+  {% endif %}
+{% endfor %}
+{% if c == 0 %}
 <p class="text-white text-center"> Nessun invito in scadenza </p>
 {% endif %}
 
-<h3 class="text-white text-center bg-dark"> Inviti scaduti </h3>
-{% if isScaduti %}
-  {% for friend in friendsNew %}
-    {% if friend.local.residualTime <= 0 %}
-    <table>
-        <thead >
-            <th colspan="2"> 
-                <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
-            </th>
-        </thead>
-        <!--tr>
-            <td width="50%"> Invito scaduto</td>
-            <td>{{ friend.local.token }}</td>
-        </tr-->
-    </table>                                                                                                                                                                        
-    {% endif %}
-  {% endfor %}
-{% else %}
-  <p class="text-white text-center"> Nessun invito scaduto </p>
+<h3 class="text-white text-center bg-dark"> Inviti scaduti <span style="font-size:0.8rem;">({{d}}) </span></h3>
+{% for friend in friendsNew %}
+  {% if friend.local.residualTime <= 0 %}
+<table>
+  <thead >
+    <th colspan="2"> 
+      <span style="font-size:1.5em">{{ friend.local.name.first }}</span>
+    </th>
+  </thead>
+    <!--tr>
+        <td width="50%"> Invito scaduto</td>
+        <td>{{ friend.local.token }}</td>
+    </tr-->
+</table>                                                                                                                                                                        
+  {% endif %}
+{% endfor %}
+
+{% if d == 0 %}
+<p class="text-white text-center"> Nessun invito scaduto </p>
 {% endif %}
 
-<h3 class="text-white text-center bg-dark"> Inviti accettati </h3>
-{% set a = "0" %}
+<h3 class="text-white text-center bg-dark"> Inviti accettati <span style="font-size:0.8rem;"> ({{(friendsValidated | length) + (friendsCustomer | length)}})</span> </h3>
+{% set a = 0 %}
 {% for friend in friendsValidated %}
-{% set a = "1" %}
+{% set a = 1 %}
 <table>
-    <thead>
-        <th style="font-size:1.2em">{{ friend.local.name.first }} {{ friend.local.name.last }}</th>
-    </thead>
-    <!--tr>
-        <td colspan="2">{{ friend.local.name.first }}</td>
-        <td colspan="2">{{ friend.local.name.last }}</td>
-    </tr-->
+  <thead>
+    <th style="font-size:1.2em">{{ friend.local.name.first }} {{ friend.local.name.last }}</th>
+
+  </thead>
+  {% if user.local.role == 'admin'%}
+  <tr>        
+    <td>{{ friend.local.email }}</td>
+  </tr>
+  {% endif %}
 </table>
 {% endfor %}
 {% for friend in friendsCustomer %}
-{% set a = "1" %}
+{% set a = 1 %}
 <table>
-    <thead>
-        <th style="font-size:1.2em">{{ friend.local.name.first }} {{ friend.local.name.last }}</th>
-    </thead>
-    <!--tr>
-        <td colspan="2">{{ friend.local.name.first }}</td>
-        <td colspan="2">{{ friend.local.name.last }}</td>
-    </tr-->
+  <thead>
+    <th style="font-size:1.2em">{{ friend.local.name.first }} {{ friend.local.name.last }}</th>
+  </thead>
+{% if user.local.role == 'admin'%}
+  <tr>
+    <td>{{ friend.local.email }}</td>        
+  </tr>
+{% endif %}
 </table>
 {% endfor %}
-{% if a == "0" %}
+{% if a == 0 %}
 <p class="text-white text-center"> Nessun invito accettato </p>
 {% endif %}
-<div id="loading" style="display:none">
-  <img  src="/img/ajax-loader-1.gif" alt="Loading..." />
-</div>
 
-<script  type="text/javascript">
-  document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("loading").style.display = 'none';
-  });
+  <script  type="text/javascript">
+  // document.addEventListener("DOMContentLoaded", function() {
+  //   document.getElementById("loading").style.display = 'none';
+  // });
 
-  async function share(friendName,token,parentName,server,residualTime) {
+    async function share(friendName,token,parentName,server,residualTime) {
 
     //--------------------------------------------
     // Disabilito il pulsante e abilito il loading
     //--------------------------------------------
-    document.getElementById("mybutton").disabled = 'true';
-    document.getElementById("loading").style.display = 'block';
+      document.getElementById("mybutton").disabled = 'true';
+      document.getElementById("loading").style.display = 'block';
 
-    let firstName = capitalizeFirstLetter(friendName);
+      friendName = capitalizeFirstLetterOfEachWord(friendName);      
 
-    fetch('/updateNotify',
-        {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            'token': token,
-          })
-        }
+      fetch('/updateNotify',
+      {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          'token': token,
+        })
+      }
       ).then(function(result)
-        {
-          return result.json();
-        }
+      {
+        return result.json();
+      }
       ).then( async (data) => {
-          if (data.ok) {
+        if (data.ok) {
             //"Ciao Carlo. Non dimenticare di registrarti su https://www.esempio.it. Hai ancora 10 giorni per utilizzare il tuo link personale [link] e assicurarti una birra omaggio." 
-            let textText = "Ciao "+friendName+", non dimenticare di registrarti su Sharingbeer. \n\nHai ancora "+residualTime+" giorni per utilizzare il tuo link personale e assicurarti una birra omaggio.\n\n"+server+"/validation?token="+token+"\n\nNon perdere l'occasione!\n"+parentName; 
-            console.log('textText -->', textText)
-            let shareData = {
-              title: 'Birrificio Viana - Codice invito SharingBeer',
-              text: textText
+          let textText = "Ciao "+friendName+", non dimenticare di registrarti su Sharingbeer. \n\nHai ancora "+residualTime+" giorni per utilizzare il tuo link personale e assicurarti una birra omaggio.\n\n"+server+"/validation?token="+token+"\n\nNon perdere l'occasione!\n"+parentName; 
+          console.log('textText -->', textText)
+          let shareData = {
+            title: 'Birrificio Viana - Codice invito SharingBeer',
+            text: textText
               //url: server+"/validation?token="+token
-            }
-            if (navigator.canShare) {
-              try {
-                await navigator.share(shareData);
-                post('/listOfFriends');
-              } catch (e) {
-                console.log("nel catch: ", e)
-                post('/listOfFriends');
-              }
-            } else {
-              let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
+          }
+          if (navigator.canShare) {
+            try {
+              await navigator.share(shareData);
+              post('/listOfFriends');
+            } catch (e) {
+              console.log("nel catch: ", e)
               post('/listOfFriends');
             }
+          } else {
+            let a = window.location.href = "mailto:?subject="+encodeURIComponent("Birrificio Viana - Codice invito SharingBeer")+"&body="+encodeURIComponent(textText);
+            post('/listOfFriends');
           }
         }
+      }
       ).catch((error)=> {      
-      post('/listOfFriends',{msg:"Condivisione non avvenuta. Effettua nuovamente la richiesta di avviso", type:"warning", err:data.err});
+        post('/listOfFriends',{msg:"Condivisione non avvenuta. Effettua nuovamente la richiesta di avviso", type:"warning", err:data.err});
       })          
-  };
+    };
 
-  function capitalizeFirstLetter(string) {
-    if (typeof(string) != "undefined") {
-      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    }
-  }
+    function capitalizeFirstLetterOfEachWord(sentence) {
+      return sentence
+        .split(' ') // Dividi la frase in parole
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Trasforma la prima lettera in maiuscola
+        .join(' '); // Ricompone la frase
+      }
   /**
   * sends a request to the specified url from a form. this will change the window location.
   * @param {string} path the path to send the post request to
   * @param {object} params the parameters to add to the url
   * @param {string} [method=post] the method to use on the form
   */
-  function post(path, params, method='post') {
+      function post(path, params, method='post') {
 
     // The rest of this code assumes you are not using a library.
     // It can be made less verbose if you use one.
-    const form = document.createElement('form');
-    form.method = method;
-    form.action = path;
+        const form = document.createElement('form');
+        form.method = method;
+        form.action = path;
 
-    for (const key in params) {
-      if (params.hasOwnProperty(key)) {
-        const hiddenField = document.createElement('input');
-        hiddenField.type = 'hidden';
-        hiddenField.name = key;
-        hiddenField.value = params[key];
-        form.appendChild(hiddenField);
+        for (const key in params) {
+          if (params.hasOwnProperty(key)) {
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = key;
+            hiddenField.value = params[key];
+            form.appendChild(hiddenField);
+          }
+        }
+        document.body.appendChild(form);
+        form.submit();
       }
-    }
-    document.body.appendChild(form);
-    form.submit();
-  }
 
-  function goToInvite() {
-    window.location.href = '/recomm';
-  }
-</script>
+      function goToInvite() {
+        document.getElementById("loading").style.display = 'block';
+        window.location.href = '/recomm';
+      }
+    </script>
 
 
-{% endblock %}
+    {% endblock %}

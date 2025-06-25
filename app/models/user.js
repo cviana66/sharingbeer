@@ -22,7 +22,8 @@ const userSchema = new Schema({
               resetPasswordToken    : {type: String},
               resetPasswordExpires  : {type: Date},
               role                  	: {type: String},
-              invitoVisitato		: {type: Boolean, default: false}
+              invitoVisitato		: {type: Boolean, default: false},
+              organization  : {type: String},
             },
   privacy : {
               needs     : {type: Boolean, default: true},
@@ -72,12 +73,17 @@ const userSchema = new Schema({
               totalPriceBeer      : { type: Number}, //
               totalPriceTotal     : { type: Number}, //
               totalQty            : { type: Number},
+              totalDiscount       : { type: Number},
               items : [{
                   id        : {type: String},
                   name      : {type: String},
                   price     : {type: Number},
                   qty       : {type: Number},
                   linkImage : {type: String},
+                  qtyBottle : {type: Number},
+                  beerboxId : {type: String},
+                  moltiplica: {type: Number},
+                  subtotal  : {type: Number},
               }],
               address :{
                   addressId: {type: String},
@@ -120,7 +126,11 @@ const userSchema = new Schema({
                   note      : {type: String},
                   date_ref  : {type: Date}
               }]
-          }]
+          }],
+    marketing : [{
+        typeOfMessage       : {type: String},
+        dataInvioMessaggio  : {type: Date},        
+    }]
 });
 
 // methods =====================================================================

@@ -1,12 +1,12 @@
-// MODULO preparazione mail HTML
-module.exports = function( token, server) {
+module.exports = (Name, Email, server) => {
 
-var mailvalidatemail = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
+var mailToCustomerWithOrder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> \
 <html xmlns="https://www.w3.org/1999/xhtml"> \
     <head> \
         <meta https-equiv="Content-Type" content="text/html; charset=utf-8" /> \
         <title>Recommendation</title> \
     </head> \
+<body yahoo> \
 <style type="text/css"> \
   @font-face { \
     font-family: myFont; \
@@ -16,7 +16,6 @@ var mailvalidatemail = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitiona
     font-family: myFont; \
   } \
 </style> \
-<body yahoo> \
 <table bgcolor="#F0F0F0" border="0" cellpadding="0" cellspacing="0" height="100%" width="100%"> \
   <tbody> \
   	<tr> \
@@ -33,22 +32,24 @@ var mailvalidatemail = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitiona
   					<tr> \
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
-  								<p> Ciao.</p> \
-  								<p> Hai ricevuto questa mail perchè Tu (o qualcun altro) hai richiesto di reimpostare la password del Tuo account. </p>\
-  								<p> Procedi con la reimpostazione: </p>\
-                  <div align="center"> \
-    								<a href="'+server+'/reset?token='+token+'"> \
-  										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
-                      Cambio Password</button> \
-                    </a> \
-									</div> \
+  								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + Name + ',</span> </p> \
+  								<p> è arrivata la primavera e il caldo è alle porte! <p> \
+                  <p> Per rinfrescarti abbiamo prodotto <span style="font-weight:bold"> 2 nuove birre </span>: <p>\
+                  <p>&#x1F37A; la <span style="font-weight:bold">Robis\' Blonde</span> una bionda leggera e beverina</p> \
+                  <p>&#x1F37A; la <span style="font-weight:bold">Kunt\'s IPA</span>, una Indian Pale Ale dal profumo intenso e dal gusto amaro dissetante </p> \
+                  <p align="center"> Accedi in <a href="'+server+'/shop" target="_blank"> Sharingbeer </a> e prova le \
+  								<div align="center"> \
+  								<a href="'+server+'/shop"> \
+										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
+                     nuove birre </button> \
+                  </a> \
+									</div> </p> \
                   <div align="center">   <p> oppure </p>  </div> \
-                  <div><p> copia il seguente link nella barra degli indirizzi del browser </p></div> \
-                  <div align="center">   <p> '+server+'/reset?token='+token+' </p>  </div> \
-                  <div><p> e premi invio. </p></div> \
+                  <div><p> se non riesci ad accedere copia il seguente link nella barra degli indirizzi del browser: </p></div> \
+                  <div align="center">   <p> '+server+'/shop </p>  </div> \
                 </div> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
-                	<p>A presto dal birrificio Viana. </br>Mi raccomando, bevi in modo responsabile :)</p> \
+                	<p>A presto dal birrificio Viana. </br>Mi raccomando, bevi in modo responsabile &#x1F37B;</p> \
   							</div>  \
                 <div align="left"> \
                   <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/cellphone-android.png" height="24" width="24"> \
@@ -74,7 +75,7 @@ var mailvalidatemail = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitiona
               <td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:12px;padding-bottom:12px;background-color:#ffffff" align="right"> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:10px;text-align:left;color:#88a1af;margin-top:10px"> \
                   Le informazioni contenute in questo messaggio di posta elettronica sono riservate, rivolte esclusivamente al destinatario e non comportano alcun vincolo ne\' alcun obbligo. \
-                  L\'invito ti è stato inviato tramite una persona che è a conoscenza del tuo indirizzo email o perchè ti sei registrato su SharingBeer. Segnalaci eventuali abusi rispondendo a questa email. \
+                  Il messaggio ti è stato inviato perchè ti sei registrato su SharingBeer. Segnalaci eventuali abusi rispondendo a questa email. \
                 </div> \
               </td> \
             </tr> \
@@ -93,5 +94,5 @@ var mailvalidatemail = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitiona
 </table> \
 </body> \
 </html>';
-  return mailvalidatemail;
+  return mailToCustomerWithOrder;
 };

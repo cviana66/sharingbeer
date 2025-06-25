@@ -20,15 +20,15 @@ const gestpayService = new GestpayService();
 //-------------------------------------------
   app.post('/axerve_create', lib.isLoggedIn, async function(req, res) {
 
-    var cart = req.session.cart;
+    var cart = req.session.newcart;
     const currency='EUR';
     const shopLogin=process.env.SHOPLOGIN;
 
     req.session.order = {};
 
-    //==========================================
+    //==============================================
     // Inizializzo la Transazione
-    //==========================================
+    //==============================================
     const session = await mongoose.startSession();
     session.startTransaction();
     const opts = { session };
@@ -39,15 +39,17 @@ const gestpayService = new GestpayService();
       // Decurto i prodotti dalla disponibilità
       // per ciacun prodotto in acquisto
       //=============================================
-      for (var index = 0; index < req.session.numProductsPerId.length; index++) {
+      const summedItems = sumQuantitiesById(req.session.numProductsPerId) //sommo le quantità dello stesso id prodotto
+      console.debug('SOMMO LE QUANTITà DELLO STESSO PRODOTTO',summedItems)
+      for (var index = 0; index < summedItems.length; index++) {
 
-        const filter = {_id:req.session.numProductsPerId[index].id};
+        const filter = { _id: summedItems[index].id };
         console.debug("FILTER: ",filter)
 
         let doc = await Product.findOne(filter)
         console.debug('QUANTITY UPDATE PRIMA DELLA DECURTAZIONE: ',doc.quantity)
 
-        const update = { quantity: (Number(doc.quantity) - Number(req.session.numProductsPerId[index].qty))};
+        const update = { quantity: (Number(doc.quantity) - summedItems[index].qty)};
         let doc1 = await Product.findOneAndUpdate(filter,update, {new:true}).session(session);
         console.debug('QUANTITY UPDATE DOPO LA DECURTAZIONE: ',doc1.quantity)
       }
@@ -267,7 +269,8 @@ const gestpayService = new GestpayService();
       //=====================================
       // Svuoto il carrello
       //=====================================
-      req.session.cart = {};
+      //req.session.cart = {};
+      req.session.newcart = {};
       req.session.order = {};
       req.session.numProducts = 0;
       //-------------------------------------
@@ -278,8 +281,8 @@ const gestpayService = new GestpayService();
             deliveryDate  : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Consegna'),
             ritiroDate    : lib.deliveryDate('Europe/Rome','TXT','dddd DD MMMM','Ritiro'),
             user          : req.user,
-            numProducts   : 0,
-            amiciDaInvitare: true
+            numProducts : req.session.numProducts,
+            amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
 
     }catch (e){
@@ -288,7 +291,10 @@ const gestpayService = new GestpayService();
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user    : req.user,
+                                      numProducts : req.session.numProducts,
+                                      amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
     }
   });
@@ -297,33 +303,32 @@ const gestpayService = new GestpayService();
 
     console.debug('PARAMETRI RISPOSTA NEGATIVA: ',req.session);
 
-
     //================================================
     // Chiamo Axerve per ottenere la stringa DENCRYPT
     //================================================
     let shopLogin = req.query.a;
     let cryptedString = req.query.b;
     const decryptedString = await gestpayService
-      .decrypt({
-        shopLogin,
-        cryptedString
-      })
-      .then(result => {
-        console.debug(result);
-        return result
-      })
-      .catch(err => {
-        console.log('ERRORE in encrypt', err)
-        throw new Error("Dencrypt fallita")
-      });
+    .decrypt({
+      shopLogin,
+      cryptedString
+    })
+    .then(result => {
+      console.debug(result);
+      return result
+    })
+    .catch(err => {
+      console.log('ERRORE in encrypt', err)
+      throw new Error("Dencrypt fallita")
+    });
 
     try {
-
       req.user = await axerveResMgm.getUserByShopLoginAndOrderId(shopLogin,decryptedString.ShopTransactionID);
       res.render('orderOutcome.njk', {
-              status  : 'KO',
-              user    : req.user,
-              numProducts : req.session.numProducts
+        status  : 'KO',
+        user    : req.user,
+        numProducts : req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
       });
 
     }catch (e){
@@ -331,9 +336,41 @@ const gestpayService = new GestpayService();
       let msg = 'Ci dispiace, si è verificato un errore inatteso. L\'esito del pagamento sarà verificato e ti manterremo informato. Se lo ritieni opportuno puoi contattarci all\'indirizzo birrificioviana@gmail.com'
       req.flash('error', msg);
       return res.render('info.njk', {
-                                      message: req.flash('error'),
-                                      type: "danger"
-                                    });
+        message: req.flash('error'),
+        type: "danger",
+        user    : req.user,
+        numProducts : req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
+      });
     }
   });
 };
+
+//========================================================================
+// FUNCTION
+//========================================================================
+// Funzione per sommare le quantità per id uguali
+const sumQuantitiesById = (items) => {
+  const result = {};
+  console.debug(JSON.stringify(items,null,2))
+  items.forEach(item => {
+    if (result[item.id]) {
+      if (typeof item.moltiplica === 'undefined') {
+        result[item.id] += item.qty; // Somma la quantità se l'id esiste già
+      } else
+        result[item.id] += item.qty * item.moltiplica; 
+        console.debug('-------------------->MOLTIPLICA',item.moltiplica, result[item.id])
+    } else {
+      if (typeof item.moltiplica === 'undefined') {
+        result[item.id] = item.qty; // Inizializza la quantità se l'id non esiste
+      } else {
+        result[item.id] = item.qty * item.moltiplica; 
+        console.debug('-------------------->MOLTIPLICA',item.moltiplica, result[item.id])
+      }
+    }
+  });
+
+  // Converti l'oggetto di risultati in un array
+  return Object.keys(result).map(id => ({ id, qty: result[id] }));
+};
+

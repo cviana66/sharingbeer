@@ -2,11 +2,12 @@ var Users = require('../app/models/user');
 var lib = require('./libfunction');
 const mailToCustomerWithOrder  = require('../config/mailToCustomerWithOrder');
 const mailToCustomerWithoutOrder  = require('../config/mailToCustomerWithoutOrder');
+const mailToCustomerNewProducts  = require('../config/mailToCustomerNewProducts');
 
 module.exports = (app, moment, mongoose) => {
 
 	// =============================================================================
-	// DASBOARD ====================================================================
+	// DASHBOARD ====================================================================
 	// =============================================================================
 	//GET
 	app.get('/listOfCustomer', lib.isAdmin, async (req, res) => {
@@ -17,7 +18,8 @@ module.exports = (app, moment, mongoose) => {
 				usersWithOrders: usersWithOrders,
 				usersWithoutOrders: usersWithoutOrders,
 				user: req.user,
-				amiciDaInvitare: req.session.haiAmiciDaInvitare
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare
 			})
 		} catch (err) {
 			console.error(err);
@@ -25,28 +27,71 @@ module.exports = (app, moment, mongoose) => {
 	})
 
 	app.post('/sendNotifyMail', lib.isAdmin, async (req,res) => {
+		var selectedCustomers = [];
+		var tipoMessaggio = req.body.mybutton
 
-		var selectedCustomers = req.body.customers; // Array di ID dei clienti selezionati
-
+		selectedCustomers = req.body.customers; // Array di ID dei clienti selezionati
 		console.debug('CUSTOMERS ID',selectedCustomers)
+		console.debug('BUTTON',tipoMessaggio)
+
 		if (typeof selectedCustomers === "string") selectedCustomers = [selectedCustomers]
+		var html = ""
 		try {		
 			for (const customerId of selectedCustomers) {
 				//console.debug(customerId)
 	    	const customer = await Users.findById(customerId);
 	    	const server = lib.getServer(req);
-	    	console.debug('CUSTOMER', customer.local.email)
-	    	if (req.body.tipoCliente == 'conOrdini') {
-		    	const html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
-		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
-	    	} else if (req.body.tipoCliente == 'senzaOrdini') {
-	    		//res.send(mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server))    	
-	    		const html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
-		    	//await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
-	    	}
+	    	var tom = "";	    
+	    	const currentDate = new Date();	
+	    	//console.debug(`AVVISO: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
+	    	//TODO mettere in database le notifiche con data e le info del cliente
+	    	if (tipoMessaggio == "notifica") {
+		    	if (req.body.tipoCliente == 'conOrdini') {
+		    		console.debug(`AVVISO CON Ordini: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
+			    	html = mailToCustomerWithOrder(customer.local.name.first, customer.local.email, server)
+			    	tom = 'notificaClienteConOrdiniFatti'
+			    	await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteConOrdiniFatti', server, html);
+		    	} else if (req.body.tipoCliente == 'senzaOrdini') {
+		    		console.debug(`AVVISO SENZA Ordini: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
+		    		html = mailToCustomerWithoutOrder(customer.local.name.first, customer.local.email, server)
+		    		tom = 'notificaClienteSenzaOrdiniFatti'
+			    	await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'notificaClienteSenzaOrdiniFatti', server, html);
+		    	}
+		    } else if (tipoMessaggio == "nuoviProdotti") {
+		    	console.debug(`AVVISO NUOVI Prodotti: Email inviata a ${customer.local.email} il ${currentDate.toLocaleString('it-IT')}`);
+		    	html = mailToCustomerNewProducts(customer.local.name.first, customer.local.email, server)
+			    tom = 'nuoviProdotti'
+			    await lib.sendmailToPerson('', customer.local.email, '', '', '', '', '', 'nuoviProdotti', server, html);
+		    }
+	    	const newMarketingElement = {
+        	typeOfMessage: tom, 
+        	dataInvioMessaggio: lib.nowDate("Europe/Rome")
+    		};
+    		const updatedDocument = await Users.findByIdAndUpdate(
+            customerId,
+            { $push: { marketing: newMarketingElement } }, // Aggiungi il nuovo elemento all'array
+            { new: true, useFindAndModify: false } // Restituisce il documento aggiornato
+        );
+        // Aspetta 15 secondi (15000 millisecondi) prima di continuare con il prossimo cliente
+        await new Promise(resolve => setTimeout(resolve, 15000));
 	    }
+	    model = {
+				user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare,
+        messaggio : 'Inviato notifica',
+        html: html	
+			}
+	    res.render('info.njk',model)
 	  } catch (e) {
 	  	console.error(e);
+	  	model = {
+				user: req.user,
+        numProducts: req.session.numProducts,
+        amiciDaInvitare: req.session.haiAmiciDaInvitare,
+        messaggio: e	
+			}
+	  	res.render('info.njk', model)
 	  }
 	});
 
@@ -59,7 +104,8 @@ module.exports = (app, moment, mongoose) => {
 		try {
 			var isScaduti = false
 			const userId = req.user._id;
-			const friendsTokens = await findFriendsTokens(userId); //ricavo i token perchè non ho ancora l'id
+			const tokensArray = await findFriendsTokens(userId); //ricavo i token perchè non ho ancora l'id
+			const friendsTokens = tokensArray.map(friend => friend.token);
 			const friendsId = await findFriendsId(userId); //ricavo l'id perchè il token è cambiato
 			const filteredFriendsId = friendsId.filter(item => item !== undefined);
 
@@ -81,9 +127,11 @@ module.exports = (app, moment, mongoose) => {
  				 const giorni = giorniTraDueDate(documento.local.resetPasswordExpires, Date.now());
 				 console.debug(`Ci sono ${giorni} giorni tra le due date.`);
 				 documento.local.residualTime = giorni; 
+				 const found = tokensArray.find(item => item.token === documento.local.token);
+				 documento.local.numOfNotify = found.numOfNotify;
 
 				 if (giorni <= 0) {
-				 		isScaduti = true
+				 		//
 				 		console.debug(req.user._id, documento.local.token)
 				 		await updateFriendStatusByToken(req.user._id, documento.local.token, 'expired')
 				 }
@@ -97,7 +145,7 @@ module.exports = (app, moment, mongoose) => {
 				friendsCustomer: usersFriendsCustomer,
 				user: req.user,
 				numProducts : req.session.numProducts,
-				isScaduti: isScaduti,
+				//isScaduti: isScaduti,
 				amiciDaInvitare: req.session.haiAmiciDaInvitare,
 				invitiDisponibili: inviti.numInviteAvialable,
 				server: lib.getServer(req),
@@ -110,7 +158,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "warning"
+                                      type: "warning",
+                                      user: req.user,
+															        numProducts: req.session.numProducts,
+															        amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 		}
 	})
@@ -148,16 +199,23 @@ module.exports = (app, moment, mongoose) => {
 		    console.log(`${result.modifiedCount} documenti aggiornati.`);
 		    let msg = 'La data di expire è stata aggiornata ed è uguale alla data initDate +' + giorni
 	      req.flash('error', msg);
-	      return res.render('info.njk', {
-	                                      message: req.flash('error'),
-	                                      type: "warning"
-	                                    });
+	      const model = {
+					user: req.user,
+			    numProducts: req.session.numProducts,
+			    amiciDaInvitare: req.session.haiAmiciDaInvitare,
+			    message: req.flash('error'),
+	        type: "warning"
+				}
+	      return res.render('info.njk', model);
       } else {
       	let msg = 'La data di expire non è stata modificata'
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       }
 	  } catch (error) {
@@ -166,7 +224,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user: req.user,
+															        numProducts: req.session.numProducts,
+															        amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 	  }
 	});
@@ -194,14 +255,20 @@ module.exports = (app, moment, mongoose) => {
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       } else {
       	let msg = 'La data di expire non è stata modificata'
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       }
 	  } catch (error) {
@@ -210,7 +277,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user: req.user,
+																      numProducts: req.session.numProducts,
+																      amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 	  }
 	});
@@ -231,14 +301,20 @@ module.exports = (app, moment, mongoose) => {
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       } else {
       	let msg = 'Non sono stati aggiunti Inviti'
 	      req.flash('error', msg);
 	      return res.render('info.njk', {
 	                                      message: req.flash('error'),
-	                                      type: "warning"
+	                                      type: "warning",
+	                                      user: req.user,
+																        numProducts: req.session.numProducts,
+																        amiciDaInvitare: req.session.haiAmiciDaInvitare
 	                                    });
       }
 	  } catch (error) {
@@ -247,7 +323,10 @@ module.exports = (app, moment, mongoose) => {
       req.flash('error', msg);
       return res.render('info.njk', {
                                       message: req.flash('error'),
-                                      type: "danger"
+                                      type: "danger",
+                                      user: req.user,
+																		  numProducts: req.session.numProducts,
+																		  amiciDaInvitare: req.session.haiAmiciDaInvitare
                                     });
 	  }
 	})
@@ -320,12 +399,16 @@ async function updateCountNotifyByToken(userId, friendToken) {
 
 // Funzione per trovare i token dei friends di un utente
 async function findFriendsTokens(userId) {
-  const user = await Users.findById(userId).select('friends.token');
+  const user = await Users.findById(userId).select('friends');
   if (!user) {
     throw new Error('Utente non trovato');
   }
-  const friendsTokens = user.friends.map(friend => friend.token);
-  return friendsTokens;
+  // Mappa gli amici per restituire un array di oggetti con token e numOfNotify
+  const friendsData = user.friends.map(friend => ({
+    token: friend.token,
+    numOfNotify: friend.numOfNotify
+  }));
+  return friendsData;
 }
 // Funzione per trovare gli id dei friends di un utente
 async function findFriendsId(userId) {

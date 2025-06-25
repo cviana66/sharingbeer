@@ -3,10 +3,6 @@
 
   <h3 class="text-white text-center bg-dark"> Riepilogo ordine </h3>
 
-	<div id="loading">
-		<img  src="img/ajax-loader-1.gif" alt="Loading..." />
-	</div>
-
  {% if nOrders == 0 %}
 	 <table class="mx-auto" width="100%" style="margin: 10px; border: 1px solid; color: #FFBB35; font-size:1.1em;">
       <!-- Shipping -->
@@ -17,9 +13,11 @@
 {%endif%}
 
   <hr style="border-top: 1px solid #5375BD;">
-
+  {% for groupId, products in cart %}
     <table class="mx-auto" width="100%">
-      {% for item in cartItems.items %}
+      
+        {% for productId, item in products %}
+      
         <tr class="text-white" valign="top">
           <td width="16%" style="padding-right: 10px; padding:0px 5px 10px 0px;">
             <img src="{{item.linkImage}}" width="100%" height="auto">
@@ -31,13 +29,15 @@
                 <td width="20%" style="font-size:1.3em;padding:0px 10px 0px 0px;" align="right">&euro;{{item.subtotal}}</td>
               </tr>
               <tr>
-                <td colspan="2">{{item.qty}} Beerbox a {{item.price}} &euro;/cad.</td>
+                <td colspan="2">N° {{item.quantity * item.moltiplica}} bottiglie {{(item.subtotal / item.quantity / item.moltiplica) | round(1)}} &euro;/cad.</td>
               </tr>
             </table>
           </td>
         </tr>
       {% endfor %}
     </table>
+      <hr style="border-top: 1px solid #903246;">
+  {% endfor %}
 
     {% if friendsDiscount >0%}
     <table class="mx-auto" width="100%" style="margin: 10px;">
@@ -263,19 +263,20 @@
 
 
       // Ricarico la pagina se l'utente clicca INDIETRO sul bottone del browser
-      window.addEventListener('pageshow', function(event) {
-        // Controlla se la pagina è stata effettivamente caricata dal server
-        if (event.persisted) {
-          // Ricarica la pagina
-          location.reload();
-        }
-      });
+      // window.addEventListener('pageshow', function(event) {
+      //   // Controlla se la pagina è stata effettivamente caricata dal server
+      //   if (event.persisted) {
+      //     // Ricarica la pagina
+      //     location.reload();
+      //   }
+      // });
+      
       // azione richiesta nel carico della pagina
-      document.addEventListener("DOMContentLoaded", function() {
-        //console.log('DOMContentLoaded in ORDERSUMMARY')
-        document.getElementById("loading").style.display = 'none';
-        document.getElementById("mybutton").removeAttribute("disabled")
-      });
+      // document.addEventListener("DOMContentLoaded", function() {
+      //   //console.log('DOMContentLoaded in ORDERSUMMARY')
+      //   document.getElementById("loading").style.display = 'none';
+      //   document.getElementById("mybutton").removeAttribute("disabled")
+      // });
 
       function startAxerve() {
         document.getElementById("mybutton").setAttribute("disabled","disabled");

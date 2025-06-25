@@ -37,7 +37,7 @@
             generali di vendita)</span>
         </p>
         {% endif %}
-        <p class="text-white font-weight-light text-left"> Ti abbiamo inviato una e-mail di conferma al tuo indirizzo:
+        <p class="text-white font-weight-light text-center"> Ti abbiamo inviato una e-mail di conferma al tuo indirizzo:
           <b>{{user.local.email}}</b> </p>
         <br>
         <p class="text-white font-weight-light text-lect"> Mi raccomando, bevi in modo responsabile :)</p>
@@ -48,7 +48,7 @@
 <div>
   <form role="form" action="/shopping?type={{user.orders.deliveryType}}&orderId={{orderId}}" method="GET">
     <div style="margin-bottom: 40px;">
-      <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+      <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return goToShipping('/shopping?type={{user.orders.deliveryType}}&orderId={{orderId}}')">
         Riepilogo ordini
       </button>
     </div>
@@ -56,6 +56,12 @@
     <input type="hidden" name="orderId" value="{{orderId}}" />
   </form>
 </div>
+
+<script type="text/javascript">
+  document.querySelector('#ic').classList.add('invita_div'); // colora a intermittenza
+  document.querySelector('#imin').classList.add('pulsa');  //anima l'immagine"
+</script>
+
 {% else %}
 <div class="card" style="background-color:#2A0009;border-color:#903246;margin: 30px 0px 10px 0px;">
   <div class="card-body">
@@ -63,11 +69,10 @@
       <div class="align-self-center">
         <p class="text-white text-center" style="font-size:1.2em"> Pagamento non effettuato </p>
         <p class="text-white font-weight-light text-left"> Ci spiace ma il tuo ordine di aquisto <b>non</b> è andato a
-          buon fine. </p>
+          buon fine. </p>          
         <p class="text-white font-weight-light text-left"> Riprova e se il problema persiste puoi contattarci
-          all'indirizzo:
-        <div class="text-white text-center"> birrificioviana@gmail.com </div>
-        </p>
+          all'indirizzo:</p>
+        <div class="text-white text-center"> birrificioviana@sharingbeer.it </div>
       </div>
     </div>
   </div>
@@ -75,7 +80,7 @@
 <div>
   <form role="form" action="/cart" method="GET">
     <div style="margin-bottom: 40px;">
-      <button type="submit" class="btn btn-my btn-lg btn-block" id="mybutton">
+      <button type="button" class="btn btn-my btn-lg btn-block" id="mybutton" onclick="return goToCart()">
         Vai al carrello
       </button>
     </div>
@@ -84,7 +89,15 @@
 {% endif %}
 
 <script type="text/javascript">
-  document.querySelector('#ic').classList.add('invita_div'); // colora a intermittenza
-  document.querySelector('#imin').classList.add('pulsa');  //anima l'immagine"
+  function goToShipping(url) {
+    document.getElementById("loading").style.display = 'block';
+    window.location.href = (url)
+  }  
+  
+  function goToCart() {
+    document.getElementById("loading").style.display = 'block';
+    window.location.href = ('/cart')
+  }  
 </script>
+
 {% endblock %}

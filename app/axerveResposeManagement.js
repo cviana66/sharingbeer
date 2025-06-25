@@ -102,7 +102,7 @@ module.exports = {
 			// calcolo dei Booze (€):
 			// (Prezzo Medio per bottiglia / numero di acquisti necessari per ottenere una bottiglia omaggio (costante =12) * n° beerbox acquistati
 			let booze4Parent = (((user.orders.totalPriceBeer / (user.orders.totalQty * numBottigliePerBeerBox)) / numAcquistiPerUnaBottigliaOmaggio) * user.orders.totalQty).toFixed(2); // definisce i booze da riconoscere al parent in €;  user.orders.totalQty=n° Berrbox acquistati
-			console.debug("BOOZE FOR PARENT:",booze4Parent)
+			console.debug("BOOZE FOR PARENT:",booze4Parent,'= ( ',user.orders.totalPriceBeer, '/ (', user.orders.totalQty,' * ',numBottigliePerBeerBox,')) / ',numAcquistiPerUnaBottigliaOmaggio,') * ',user.orders.totalQty,')')
 			await User.findOneAndUpdate(
 				{'_id': new mongoose.Types.ObjectId(user.local.idParent)},
 				{'$inc': {'local.booze':booze4Parent}}
@@ -151,7 +151,7 @@ module.exports = {
 			let doc = await Product.findOne(filter)
 
 			console.debug('QUANTITY UPDATE PRIMA DELLA AGGIUNTA: ', doc.quantity)
-			const update = { quantity: (Number(doc.quantity) + Number(items[index].qty))};
+			const update = { quantity: (Number(doc.quantity) + (Number(items[index].qty * Number(items[index].moltiplica))))};
 			let doc1 = await Product.findOneAndUpdate(filter,update, {new:true});
 			console.debug('QUANTITY UPDATE DOPO AGGIUNTA: ',doc1.quantity)
 		}

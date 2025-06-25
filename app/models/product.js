@@ -5,22 +5,26 @@ var Schema = mongoose.Schema;
 // Define product schema
 var ProductSchema = new Schema({
   codProd			: {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required
+  ordinam     : {type: Number}, //ordinamento nella visualizzazione dello shop: valori bassi vanno in coda
   name        		: {type: String, required: true},
   price       		: {type: Number, required: true}, // per beerbox = 6 bottiglie
   linkImage   	: {type: String, required: true},
   description 	: {type: String},
   caratteristiche 	: {type: String},
-  quantity    		: {type: Number}, //stock di beerbox disponibili
+  quantity    		: {type: Number}, //stock di beerbox disponibili in magazzino
   colorEBC     	: {type: String},
   volAlcol    		: {type: String},
   gradoPlato  	: {type: String},
   tempServ    	: {type: String}, //temperatura di servizio consigliata
   amaroIBU   	: {type: String},
   formatoCl   	: {type: String}, //formato della bottiglia es: 50 cl
-  quantitaXtipo : {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:   [{"codProd_A": quantità},{"codProd_B": quantità},...]
-  prezzoXtipo 	: {type: String}, //TODO: mettere  "required: true" e aggiornare dati  su MDB altrimenti da errore essendo campo required  es:  [{"codProd_A": prezzo},{"codProd_B": prezzo},...]
+  quantitaXtipo : {type: String}, //TODO: da eliminare
+  prezzoXtipo 	: {type: String}, //TODO: da eliminare
   promo			: {type: Boolean},
-  allergeni		: {type: String}
+  new       : {type: Boolean},
+  allergeni		: {type: String},
+  bottlePrice : {type: Number},   //prezzo per bottiglia
+  bottleQuantity : {type: Number} //quantità di bottiglie in magazzino
 });
 
 // methods =====================================================================

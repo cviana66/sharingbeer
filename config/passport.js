@@ -96,7 +96,7 @@ module.exports = function(passport) {
             // find a user whose email is the same as the forms email
             // we are checking to see if the user trying to login already exists
             try {
-					 const user = await User.findOne({ 'local.email' :  email.toLowerCase()})
+					 const user = await User.findOne({ 'local.email' :  email.toLowerCase().trim() })
                 // if no user is found, return the message
                 if (!user) {
                     console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /logn" User Not Found"');

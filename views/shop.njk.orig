@@ -14,16 +14,6 @@
 			</tr>
 		</table>
 {%endif%}
-<div style="margin: 15px 0px 15px 0px;">
-  <button type="submit" class="btn btn-my btn-lg btn-block" id="goComposer" onclick="window.location.href='/composer';">
-    Componi il tuo Beerbox
-  </button>
-</div>
-
-<div class="text-white text-center" style="margin: 0px 0px 15px 0px;">
-	oppure scegli il beerbox per tipo di birra
-</div>
-
 {% for prod in products %}
  <form id="shop" method="POST" action="/shop">
 	<input type="hidden" id="item_id" name="item_id" value="{{prod.id}}">
@@ -33,10 +23,7 @@
 				<div ><img class="mx-auto d-block" src="{{prod.linkImage}}" style="height:100%;width:100%;margin-bottom:10px"></div>
 			</div>
 		{% if prod.promo %}
-			<div class="corner-text-promo">Promo</div>
-		{% endif %}
-		{% if prod.new %}
-			<div class="corner-text-new">New</div>
+			<div class="corner-text">Promo</div>
 		{% endif %}
 			<table width="100%">
 				<tr>
@@ -44,8 +31,8 @@
 					<td width="30%"><div class="card-title text-white text-right" style="font-size:1.5em;font-weight:bold">{{prod.prettyPrice}}</div></td>
 				</tr>
 				<tr>
-					<td><div class="text-white text-left" style="font-size:1.1em;"> BeeBox: 6 bottiglie da {{prod.formatoCl}} </div></td>
-					<td ><div class="text-white text-right" style="font-size:1.1em;font-weight:bold;">€{{ prod.bottlePrice }} cad.</div></td>
+					<td><div class="text-white text-left" style="font-size:1.2em;"> BeeBox da 6 bottiglie da {{prod.formatoCl}} </div></td>
+					<td><div class="text-white text-right" style="font-size:1.2em;font-weight:bold;">€4,90 cad.</div></td>
 				</tr>
 			</table>
 		{% if prod.quantity > 0 %}
@@ -96,22 +83,16 @@
     document.querySelector('#carrello').classList.add('animate-div'); //animazione
     document.getElementById("mybutton").setAttribute("disabled","disabled"); //disattivo il bottone
 
-		//var data = {};
-		//data.item_id = item_id;
+		var data = {};
+		data.item_id = item_id;
 
-		const dataToSend = [];
-		dataToSend.push({
-        id: item_id.toString(),
-        quantity: "6"
-    });
-		console.log('DATATOSEND', dataToSend)
 		try {
-		  const response = await fetch('/composer', {
+		  const response = await fetch('/shop', {
 		    method: 'POST',
 		    headers: {
 		      'Content-Type': 'application/json'
 		    },
-		    body: JSON.stringify(dataToSend)
+		    body: JSON.stringify(data)
 		  });
 
 		  const res = await response.json();
@@ -122,17 +103,14 @@
 		    spanElement.textContent = num.toString();
 
 		    document.querySelector('#carrello').classList.remove('animate-div'); // animazione
-		    //sleep(500);
+		    sleep(500);
 		    document.getElementById("mybutton").removeAttribute("disabled"); // riattivo il pulsante
 
 		  } else {
-		  	let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
 		    window.location.href = '/shop?msg=' + res.msg;
 		  }
 		} catch (e) {
 		  console.log('Errore', e);
-		  let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
-		  window.location.href = '/shop?msg=' + res.msg;
 		}
 
   }

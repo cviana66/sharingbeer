@@ -10,26 +10,28 @@ body {
   min-height: 480px;
 }
 
+
+/* Aumenta la dimensione dell'icona */
+.material-symbols-outlined {
+  font-size: 30px; /* Puoi modificare questo valore per aumentare o diminuire la dimensione */
+}
+
 /* estende le classi di Bootstrap */
 
 .text-emphasis {
   color: #FFBB35;
 }
+
 /* Animate  Invito*/
+
 .invita_div {
-    animation: pulsa 1.5s infinite;
+    animation: cambiaDimensione 1.5s infinite;
 }
 
-@keyframes pulsa {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-    }
+@keyframes cambiaDimensione {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.5); }
+    100% { transform: scale(1); }
 }
 
 .pulsa {
@@ -38,12 +40,9 @@ body {
 }
 
 @keyframes cambiaColore {
-    0%, 100% {
-        fill: white; /* Colore iniziale */
-    }
-    50% {
-        fill: orange; /* Colore finale */
-    }
+    0% { color: #FFF; } /* Colore iniziale */
+    50% { color: #FF9139; } /* Colore intermedio */
+    100% { color: #FFF; } /* Colore finale */
 }
 
 /* ------------------- */
@@ -54,17 +53,16 @@ body {
 }
 @keyframes my-animation {
   0% { transform: scale(1); }
-  50% { transform: scale(1.5); }
+  50% { transform: scale(2.8); }
   100% { transform: scale(1); }
 }
 /*-------------*/
 
 .badge {
-  padding-left: 10px;
-  padding-right: 10px;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  border-radius: 10px;
+  position: absolute; transform: translate(50%, -50%);  
+  -webkit-border-radius: 18px;
+  -moz-border-radius: 18px;
+  border-radius: 18px;
 }
 
 .label-warning[href],
@@ -75,9 +73,7 @@ body {
     font-size: 18px;
     background: #FFBB35;
     color: #2A0009;
-    padding: 0 8px;
-    vertical-align: top;
-    margin-left: -22px;
+    padding: 4px 4px 4px 4px;
 }
 
 /*------------------*/
@@ -287,12 +283,22 @@ color: #4e4e4e;
     position: relative;
 }
 
-.corner-text {
+.corner-text-promo {
     position: absolute;
     top: 10px; /* Distanza dal bordo superiore */
     left: 10px; /* Distanza dal bordo sinistro */
     color: white; /* Colore del testo */
-    font-size: 22px; /* Dimensione dl testo */
+    font-size: 26px; /* Dimensione dl testo */
+    background-color: rgba(255, 187, 53, 0.8); /* Sfondo semi-trasparente */
+    padding: 5px; /* Padding attorno al testo */
+    border-radius: 5px; /* Angoli arrotondati */
+}
+.corner-text-new {
+    position: absolute;
+    top: 10px; /* Distanza dal bordo superiore */
+    left: 10px; /* Distanza dal bordo sinistro */
+    color: white; /* Colore del testo */
+    font-size: 30px; /* Dimensione dl testo */
     background-color: rgba(255, 187, 53, 0.8); /* Sfondo semi-trasparente */
     padding: 5px; /* Padding attorno al testo */
     border-radius: 5px; /* Angoli arrotondati */

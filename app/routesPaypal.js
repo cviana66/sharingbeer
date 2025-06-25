@@ -19,7 +19,7 @@ module.exports = function(app, mongoose, moment) {
 
 app.post('/api/orders', lib.isLoggedIn, async function(req, res) {
 
-  var cart = req.session.cart;
+  var cart = req.session.newcart;
   //console.log(cart);
   req.session.order = {};
   const session = await mongoose.startSession();
