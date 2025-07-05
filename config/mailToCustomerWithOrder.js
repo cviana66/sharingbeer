@@ -33,22 +33,23 @@ var mailToCustomerWithOrder = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Tran
   						<td style="border-radius:12px;padding-left:30px;padding-right:30px;padding-top:30px;padding-bottom:12px;background-color:#ffffff" align="right"> \
   							<div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:10px"> \
   								<p> Ciao <span style="font-style:oblique;font-weight:bold">' + Name + '</span>  <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/clinking-beer-mugs.png" height="30" width="30"> </p> \
-  								<p> Sei curioso di sapere chi ha già accettato il tuo invito? <br>O se hai ancora inviti disponibili? <p> \
+                  <p> Ti è piaciuta la nostra birra? <br> Invita i tuoi amici!</p> \
+  								<p> Sei curioso di sapere chi ha già accettato il tuo invito? <br> O se hai ancora inviti disponibili? <p> \
                   <p> Entra nella sezione <span style="font-weight:bold"> Amici  </span> per scoprirlo. <p>\
-                  <p> E ricorda, ogni tuo nuovo amico che si registra e ogni suo acquisto aumenta i tuoi punti <span style="font-weight:bold">Pinta</span>! \
-                  <p> Non esitare a invitarli di nuovo... o di nuovi... e condividi la tua passione per la birra in <a href="'+server+'/listOfFriends" target="_blank"> SharingBeer. </a> \
   								<div align="center"> \
   								<a href="'+server+'/listOfFriends"> \
 										<button style="background:#428BCA;color:#fff;font-size:16px;border-radius:4px;line-height:50px;margin:25px25px;text-align:center;border: 0;"> \
                      Amici </button> \
                   </a> \
 									</div> \
-                  <div align="center">   <p> oppure </p>  </div> \
-                  <div><p> se non riesci ad accedere copia il seguente link nella barra degli indirizzi del browser: </p></div> \
-                  <div align="center">   <p> '+server+'/listOfFriends </p>  </div> \
-                </div> \
+                  <!--div align="center">   <p> oppure </p>  </div> \
+                    <div><p> se non riesci ad accedere copia il seguente link nella barra degli indirizzi del browser: </p></div> \
+                    <div align="center">   <p> '+server+'/listOfFriends </p>  </div> \
+                  </div--> \
                 <div style="font-family:Arial,Verdana;font-weight:300;font-size:16px;text-align:left;color:#222541;margin-top:40px"> \
-                	<p>A presto dal birrificio Viana. </br>Mi raccomando, bevi in modo responsabile :)</p> \
+                  <p> Ricorda, ogni tuo nuovo amico che si registra e ogni suo acquisto aumenta i tuoi punti <span style="font-weight:bold">Pinta</span>! \
+                  <p> Condividi la tua passione per la birra in <a href="'+server+'/listOfFriends" target="_blank"> SharingBeer. </a> \
+                	<p> A presto dal birrificio Viana. </br>Mi raccomando, bevi in modo responsabile :)</p> \
   							</div>  \
                 <div align="left"> \
                   <img style="padding-right:12px;vertical-align:middle" src="'+server+'/img/cellphone-android.png" height="24" width="24"> \
