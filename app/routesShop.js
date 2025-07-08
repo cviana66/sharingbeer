@@ -527,74 +527,6 @@ app.get('/shop', lib.isLoggedIn, async function (req, res) {
   }
 });
 
-//-----------------------------------
-// SHOP POST
-//-----------------------------------
-// app.post('/shop', lib.isLoggedIn, async function (req, res) {
-//     // inizializza il cart dalla sessione
-//     var cart = req.session.cart || {};    
-    
-//     console.debug('SHOP BODY', req.body);
-//     var id = req.body[0].id;
-
-//     try {
-//         // cerca il prodotto nel database
-//         const prod = await Product.findById(id);
-
-//         // Verifico se il prodotto è stato trovato
-//         if (!prod) {
-//           console.error('Error adding product to cart: ', err);
-//           let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
-//           return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
-//         }
-
-//         /*------------------------------------------------------------------------------
-//         / Verifico se il prodotto selezionato è disponibile.
-//         / La verifica è parziale a causa della possibilità di concorrenza nell'acquisto
-//         / da più users.
-//         / La verifica finale è fatta in orderSummary.
-//         /------------------------------------------------------------------------------*/
-//         var q = (!cart[id]) ? 0 : cart[id].qty; // se il carrello è vuoto
-
-//         console.debug('DISPONIBILITA: ', Number(prod.quantity), Number(q), priceCurier.length);
-
-//         if (req.session.numProducts < priceCurier.length) { // verifico il numero massimo di beerbox spedibili
-//             if ((Number(prod.quantity) - Number(q)) > 0) {
-//                 // Increase quantity or add the product in the shopping cart.
-//                 if (cart[id]) {
-//                     cart[id].qty++;
-//                     cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2);
-//                     req.session.numProducts++;
-//                 } else { // il prodotto è scelto per la prima volta
-//                     cart[id] = {
-//                         id: prod._id,
-//                         name: prod.name,
-//                         linkImage: prod.linkImage,
-//                         quantity: prod.quantity,
-//                         price: prod.price.toFixed(2),
-//                         prettyPrice: prod.prettyPrice(),
-//                         qty: 1,
-//                         subtotal: prod.price.toFixed(2)
-//                     };
-//                     req.session.numProducts++;
-//                 }
-//                 console.debug('CART in POST:',cart)
-//                 return res.status(200).send('{"statusText":"ok", "msg": ""}');
-//             } else {
-//                 const msg = 'Hai aggiunto l\'ultimo beerBox disponibile. La birra ' + prod.name + ' è ora esaurita. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.';
-//                 return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
-//             }
-//         } else {
-//             const msg = "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com";
-//             return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
-//         }
-//     } catch (err) {
-//         console.error('Error adding product to cart: ', err);
-//         let msg = 'Opps... qualche cosa non ha funzionato... riprova per favore';
-//         return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
-//     }
-// });
-
 //-----------------------------------------------------------
 // Route per la pagina di selezione birra
 //-----------------------------------------------------------
@@ -683,17 +615,18 @@ app.post('/composer', lib.isLoggedIn, async (req,res) => {
       for (const product of products) {
         totalQuantityToAdd += Number(product.quantity); //quantità in bottiglie
       }
-      console.debug('QUANTITA\' SPEDIZIONE DA SPEDIRE:', (req.session.numProducts + (totalQuantityToAdd /numBottigliePerBeerBox)))
-      if ((req.session.numProducts + (totalQuantityToAdd /numBottigliePerBeerBox)) <= priceCurier.length) {  // verifico il numero massimo di beerbox per una spedizione
-        
+      
+      console.debug('BEERBOX DA SPEDIRE:', req.session.numProducts, 'SU UN MAX DI:',priceCurier.length)
+      
+      if (req.session.numProducts < priceCurier.length) {  // verifico il numero massimo di beerbox per una spedizione  
         cart[idBBX] = {} //inizializzo il carrello
 
         for (const product of products) {
           id = product.id;
           quantityToAdd = Number(product.quantity); //quantità in bottiglie selezionata
           
-          console.debug('SHOP ITEM ID', id);
-          console.debug('Quantity to add:', quantityToAdd);
+          //console.debug('SHOP ITEM ID', id);
+          //console.debug('Quantity to add:', quantityToAdd);
 
           // cerca in tabella il prodotto da aggiungere
           const prod = await Product.findById(id);
@@ -761,8 +694,6 @@ app.post('/composer', lib.isLoggedIn, async (req,res) => {
         req.session.newcart = cart;    
         // Ricalcolo le varabili in sessione derivate dal carrello
         lib.newRetriveCart(req);
-        //==================================================
-
       } else {
         const msg = "Hai aggiunto il numero massimo di beerBox per una spedizione. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com";
         return res.status(200).send('{"statusText":"ko", "msg":"' + msg + '"}');
@@ -812,8 +743,8 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
 
     // Mette in sessione i prodotti dal carrello e le quantità dei prodotti nel carrello
     lib.newRetriveCart(req);    
-    console.debug('CART -> N° BEERBOX:', req.session.numProducts)
-    if (req.session.numProducts <= priceCurier.length) { // Verifico il numero massimo di beerbox spedibili
+    console.debug('CART -> N° BEERBOX:', req.session.numProducts, 'DI UN MAX DI:',priceCurier.length)
+    if (req.session.numProducts < priceCurier.length) { // Verifico il numero massimo di beerbox spedibili
       //const cart = req.session.cart;
       console.debug('CART in CART', cart);
 
@@ -865,7 +796,7 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
       req.session.newcart = cart;    
       // Ricalcolo le varabili in sessione derivate dal carrello
       lib.newRetriveCart(req);
-      //==================================================
+      
     } else {
       req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com");
     }
@@ -896,39 +827,6 @@ app.get('/cart', lib.isLoggedIn, async function (req, res) {
   }
 });
 
-//POST MINUS ===================================================================
-// app.post('/cart/minus', lib.isLoggedIn, async (req, res) => {
-//     // Load (or initialize) the cart
-//     req.session.cart = req.session.cart || {};
-//     var cart = req.session.cart;
-
-//     // Read the incoming product data
-//     var id = req.body.item_id;
-
-//     try {
-//         // Locate the product to be added
-//         const prod = await Product.findById(id);
-
-//         // Verifico se il prodotto è stato trovato
-//         if (!prod) {
-//             console.log('Product not found');
-//             return res.redirect('/shop');
-//         }
-
-//         // Decrement the product quantity in the shopping cart.
-//         if (cart[id] && cart[id].qty > 1) {
-//             cart[id].qty--;
-//             cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2);
-//             req.session.numProducts--;
-//         }
-
-//         // Redirect to the cart
-//         return res.redirect('/cart');
-//     } catch (err) {
-//         console.log('Error deleting product from cart: ', err);
-//         return res.redirect('/shop');
-//     }
-// });
 app.post('/cart/minus', lib.isLoggedIn, async (req, res) => {
     // Load (or initialize) the cart
     var cart = req.session.newcart;
@@ -970,19 +868,21 @@ app.post('/cart/plus', lib.isLoggedIn, async (req, res) => {
     var moltiplica = req.body.moltiplica; // Valore da moltiplicare 
     console.debug('GROUPID',req.body)
     try {
-        // Verifico se il gruppo esiste nel carrello
-        if (!cart[groupId]) {
-            console.log('Group not found in cart');
-            return res.redirect('/shop');
-        }
+        if (req.session.numProducts < priceCurier.length) { // Verifico il numero massimo di beerbox spedibili
+          // Verifico se il gruppo esiste nel carrello
+          if (!cart[groupId]) {
+              console.log('Group not found in cart');
+              return res.redirect('/shop');
+          }
 
-        // Moltiplica il valore di qty per la nuova chiave
-        for (const itemId in cart[groupId]) {
-            const product = cart[groupId][itemId];
-            product.moltiplica++            
+          // Moltiplica il valore di qty per la nuova chiave
+          for (const itemId in cart[groupId]) {
+              const product = cart[groupId][itemId];
+              product.moltiplica++            
+          }
+          req.session.numProducts++;
+          console.debug('CART PLUS DOPO:',cart, req.session.numProducts)
         }
-        req.session.numProducts++;
-        console.debug('CART PLUS DOPO:',cart, req.session.numProducts)
         // Redirect to the cart
         return res.redirect('/cart');
     } catch (err) {
@@ -990,52 +890,6 @@ app.post('/cart/plus', lib.isLoggedIn, async (req, res) => {
         return res.redirect('/shop');
     }
 });
-
-// app.post('/cart/plus', lib.isLoggedIn, async function (req, res) {
-//   // Load (or initialize) the cart
-//   req.session.cart = req.session.cart || {};
-//   const cart = req.session.cart;
-
-//   // Read the incoming product data
-//   const id = req.body.item_id;
-
-//   try {
-//     // Locate the product to be added
-//     const prod = await Product.findById(id);
-
-//     if (!prod) {
-//       console.log('Product not found');
-//       return res.redirect('/shop');
-//     }
-
-//     console.debug('PROD QUANTITY in PLUS', prod.quantity);
-//     console.debug('PROD QUANTITY in PLUS test', prod.quantity - (cart[id] ? cart[id].qty : 0));
-//     console.debug('PROD TEST', req.session.numProducts, priceCurier.length);
-
-//     if (cart[id] && req.session.numProducts < priceCurier.length) { // Verifico il numero massimo di beerbox spedibili
-//       if (prod.quantity - cart[id].qty > 0) { // Quantità disponibile > quantità nel carrello
-//         cart[id].qty++;
-//         cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2);
-//         req.session.numProducts++;
-//       } else if (prod.quantity - cart[id].qty < 0) { // Quantità disponibile è inferiore a quella nel carrello
-//         console.debug('PROD QUANTITY in PLUS < 0');
-//         cart[id].qty -= prod.quantity;
-//         cart[id].subtotal = (cart[id].qty * cart[id].price).toFixed(2);
-//         req.flash('cartMessage', 'Mi spiace ma la disponibilità è inferiore alla richiesta a causa di acquisti simultanei. I beerbox disponibili per la birra ' + prod.name + ' sono ' + cart[id].qty + '. A breve sarà in riassortimento');
-//       } else {
-//         req.flash('cartMessage', 'Mi spiace ma la disponibilità di birra ' + prod.name + ' è di solo ' + cart[id].qty + ' beerBox e non puoi più aggiungerne. Ci impegniamo a riassortirne lo stock nel più breve tempo possibile.');
-//       }
-//     } else {
-//       req.flash('cartMessage', "Hai aggiunto il numero massimo di beerBox spedibili. Se necessiti di un numero maggiore puoi scriverci all'indirizzo email birrificioviana@gmail.com");
-//     }
-
-//     res.redirect('/cart');
-
-//   } catch (err) {
-//     console.log('Error adding product to cart: ', err);
-//     res.redirect('/shop');
-//   }
-// });
 
 //POST DELETE ==================================================================
 app.post('/cart/delete', lib.isLoggedIn, async function (req, res) {
@@ -1062,38 +916,6 @@ app.post('/cart/delete', lib.isLoggedIn, async function (req, res) {
         return res.redirect('/shop');
     }
 });
-
-// app.post('/cart/delete', lib.isLoggedIn, async function (req, res) {
-//     // Load (or initialize) the cart
-//     req.session.cart = req.session.cart || {};
-//     var cart = req.session.cart; // cart è l'oggetto sessione
-
-//     // Read the incoming product data
-//     var id = req.body.item_id;
-
-//     try {
-//         // Locate the product to be deleted
-//         const prod = await Product.findById(id);
-
-//         // Verifico se il prodotto è stato trovato
-//         if (!prod) {
-//             console.log('Product not found');
-//             return res.redirect('/shop');
-//         }
-
-//         // Se il prodotto è nel carrello, lo rimuovo
-//         if (cart[id]) {
-//             delete req.session.cart[id];
-//             req.session.numProducts = 0; // Resetta il numero di prodotti
-//         }
-
-//         // Redirect to the cart
-//         return res.redirect('/cart');
-//     } catch (err) {
-//         console.log('Error deleting product from cart: ', err);
-//         return res.redirect('/shop');
-//     }
-// });
 
 // ========================= SHOP ADMIN ROUTE ==================================
 // =============================================================================

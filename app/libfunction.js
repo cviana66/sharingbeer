@@ -273,14 +273,14 @@ module.exports = {
     if (deliveryType == 'Consegna') {
       var daysToAdd = 0
       if (d == "sabato") {
-        //daysToAdd = (h<=13) ? 3 : 3
-        daysToAdd = (h<=13) ? 4 : 4 //modificato perVarazze il 14/6/25 e il 16/6/25
+        daysToAdd = (h<=13) ? 3 : 3
+        //daysToAdd = (h<=13) ? 4 : 4 //modificato per Varazze il 14/6/25 e il 16/6/25
       } else if (d == "domenica") {
-        //daysToAdd = (h<=13) ? 3 : 3
-        daysToAdd = (h<=13) ? 4 : 4 //modificato perVarazze il 14/6/25 e il 16/6/25
+        daysToAdd = (h<=13) ? 3 : 3
+        //daysToAdd = (h<=13) ? 4 : 4 //modificato per Varazze il 14/6/25 e il 16/6/25
       } else if (d == "lunedì") {
-        //daysToAdd = (h<=13) ? 2 : 3
-        daysToAdd = (h<=13) ? 3 : 3  //modificato perVarazze il 14/6/25 e il 16/6/25
+        daysToAdd = (h<=13) ? 2 : 3
+        //daysToAdd = (h<=13) ? 3 : 3  //modificato per Varazze il 14/6/25 e il 16/6/25
       } else if (d == "martedì") {
         daysToAdd = (h<=13) ? 2 : 3
       } else if (d == "mercoledì") {
