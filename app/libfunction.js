@@ -262,8 +262,8 @@ module.exports = {
     var d = moment().utc(timeZone).format('dddd');
     var h = moment().utc(timeZone).format('HH');
     console.debug('Giorno=',d,'ORA=',h)
-    //var data = new Date();
-    var data = new Date(2025, 7, 18); // Mese 7 corrisponde ad agosto (0-11) FERIE fino al 18 AGOSTO
+    var data = new Date();
+    //var data = new Date(2025, 7, 18); // Mese 7 corrisponde ad agosto (0-11) FERIE fino al 18 AGOSTO
 
     Date.prototype.addDays = function (days) {
       var date = new Date(this.valueOf());
