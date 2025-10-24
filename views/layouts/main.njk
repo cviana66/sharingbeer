@@ -37,9 +37,11 @@
 
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
 	<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-	<link rel="stylesheet" type="text/css" media="screen" href="/css/main.css">
-	<link rel="stylesheet" type="text/css" media="screen" href="/css/toggle.css">
-	<link rel="stylesheet" type="text/css" media="screen" href="/css/webcam.css">
+	
+	<!-- SharingBeer CSS Consolidati -->
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/sharingbeer-variables.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/sharingbeer.css">
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/components-special.css">
 	<link rel="stylesheet" type="text/css" media="screen" href="/css/style.css">
 
 	<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="7632fcc1-4707-48cb-85f9-ab4b85172a15"
@@ -98,13 +100,8 @@
 			<a class="navbar-brand" style="font-size:12px; color: #FFF; text-decoration: none;" href="#" onclick="goTo('/cart')">
 				<div id="carrello" style="display: flex; flex-direction:row; align-items:center; justify-content: center; margin-left: auto; margin-right: auto; font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;">
 					<span class="material-symbols-outlined"> Shopping_Cart </span>
-					{% if user %}
-					<span class="badge badge-warning" id="lblCartCount">
-						{% if numProducts %}
-						{{numProducts | round (1)}}
-						{% endif %}
-						
-					</span>
+					{% if user and numProducts and (numProducts > 0) %}
+					<span class="badge badge-warning" id="lblCartCount">{{ numProducts | round(1) }}</span>
 					{% endif %}
 				</div>
 				<div style="text-align: center;">
@@ -125,8 +122,8 @@
 		</li>
 		<li class="nav-item">	
 			<a class="navbar-brand" style="font-size:12px; color: #FFF; text-decoration: none;" href="#" onclick="goTo('/recomm')">
-				<div id="invita" style="display:flex; flex-direction:column; align-items:center;font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;">
-					<span id="imgInvita" class="material-symbols-outlined">Person_Add</span>
+				<div id="invita" class="{% if amiciDaInvitare %}invita_div{% endif %}" style="display:flex; flex-direction:column; align-items:center;font-variation-settings: 'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 48;">
+					<span id="imgInvita" class="material-symbols-outlined {% if amiciDaInvitare %}pulsa{% endif %}">Person_Add</span>
 				</div>
 				<div style="text-align: center">
 					Invita
@@ -349,13 +346,7 @@
 		}
 	});
 
-	if ( {{amiciDaInvitare}} ) {
-		console.log('HAI AMICI DA INVITARE')
-			document.querySelector('#invita').classList.add('invita_div'); // colora a intermittenza
-			document.querySelector('#imgInvita').classList.add('pulsa');  // anima l'immagine
-		} else {
-			console.log('NON HAI AMICI DA INVITARE')
-		}
+	// Evidenziazione "Invita" gestita server-side con classi condizionali
 
 		function goTo(pagina) {
 			document.getElementById("loading").style.display = 'block';

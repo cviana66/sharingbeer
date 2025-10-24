@@ -117,9 +117,19 @@
 		  const res = await response.json();
 
 		  if (res.statusText === 'ok') {
-		    var spanElement = document.getElementById('lblCartCount');
-		    var num = Number(document.getElementById('lblCartCount').textContent) + 1;
-		    spanElement.textContent = num.toString();
+		    const cartDiv = document.getElementById('carrello');
+		    let spanElement = document.getElementById('lblCartCount');
+		    const current = Number((spanElement && spanElement.textContent) ? spanElement.textContent : 0);
+		    const nextVal = current + 1;
+		    if (!spanElement && cartDiv && nextVal > 0) {
+		      spanElement = document.createElement('span');
+		      spanElement.className = 'badge badge-warning';
+		      spanElement.id = 'lblCartCount';
+		      cartDiv.appendChild(spanElement);
+		    }
+		    if (spanElement) {
+		      spanElement.textContent = nextVal.toString();
+		    }
 
 		    document.querySelector('#carrello').classList.remove('animate-div'); // animazione
 		    //sleep(500);

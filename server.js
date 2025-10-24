@@ -278,6 +278,8 @@ var SharingBeer = function () {
         self.app.use((req, res, next) => {
             if (!req.session.haiAmiciDaInvitare) req.session.haiAmiciDaInvitare = false;
             if (!req.session.returnTo) req.session.returnTo = '/'
+            // Expose to templates to avoid needing to pass explicitly on every render
+            res.locals.amiciDaInvitare = req.session.haiAmiciDaInvitare || false;
             next();
         });
     };

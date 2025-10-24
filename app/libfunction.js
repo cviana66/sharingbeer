@@ -29,9 +29,12 @@ module.exports = {
       } else {
         req.session.haiAmiciDaInvitare = false;
       }
+      // Sincronizza anche i locals per il render in questa stessa request
+      res.locals.amiciDaInvitare = req.session.haiAmiciDaInvitare;
       return next();
     } else {
       req.session.haiAmiciDaInvitare = false;
+      res.locals.amiciDaInvitare = false;
       console.debug('INDIRIZZO DA DOVE ARRIVO: ', req.originalUrl);
       req.session.returnTo = req.originalUrl;
       res.redirect('/login');

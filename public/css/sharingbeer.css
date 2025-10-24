@@ -1,0 +1,278 @@
+/* ============================================
+   SHARINGBEER - MAIN STYLES
+   File CSS consolidato principale
+   ============================================ */
+
+/* ====================
+   1. BASE & RESET
+   ==================== */
+
+html {
+  scroll-behavior: smooth;
+  overflow: hidden; /* Nasconde la barra di scorrimento del browser */
+}
+
+body {
+  font-size: var(--font-base);
+  background: var(--gradient-body);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow: hidden; /* Nasconde la barra di scorrimento del body */
+}
+
+/* ====================
+   2. TYPOGRAPHY
+   ==================== */
+
+.text-emphasis {
+  color: var(--text-emphasis);
+}
+
+.text-white {
+  color: var(--text-white);
+}
+
+/* Font custom */
+@font-face {
+  font-family: myFont;
+  src: url("/font/bauserif.ttf");
+}
+
+.sb-font {
+  font-family: myFont;
+}
+
+/* ====================
+   3. LAYOUT
+   ==================== */
+
+#pagina-sottostante {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.blocca-scroll {
+  overflow-y: hidden;
+  height: 100vh;
+}
+
+/* ====================
+   4. COMPONENTS
+   ==================== */
+
+/* 4.1 Buttons */
+.btn-my {
+  background-color: var(--color-accent-blue);
+  color: var(--text-white);
+  transition: background-color var(--transition-normal);
+}
+
+.btn-my:hover {
+  background-color: var(--color-accent-blue-dark);
+  color: var(--text-white);
+}
+
+/* 4.2 Badges */
+.badge {
+  position: absolute;
+  transform: translate(50%, -50%);
+  border-radius: var(--radius-xl);
+}
+
+
+#lblCartCount {
+  font-size: var(--font-lg);
+  background: var(--color-accent-gold);
+  color: var(--color-primary);
+  padding: 4px;
+}
+
+/* 4.3 Cards */
+.bg-dark {
+  background: var(--gradient-dark);
+  margin: var(--spacing-md) 0 0 0;
+  border-radius: var(--radius-md);
+}
+
+/* 4.4 Forms */
+div.input-error {
+  color: var(--text-warning);
+  font-size: var(--font-base);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 4.5 Material Icons */
+.material-symbols-outlined {
+  font-size: 30px;
+}
+
+/* ====================
+   5. ANIMATIONS
+   ==================== */
+
+/* 5.1 Invito Animato */
+.invita_div {
+  animation: cambiaDimensione 1.5s infinite;
+}
+
+@keyframes cambiaDimensione {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+.pulsa {
+  fill: white;
+  animation: cambiaColore 1.5s infinite;
+}
+
+@keyframes cambiaColore {
+  0% { color: var(--text-white); }
+  50% { color: var(--color-accent-orange); }
+  100% { color: var(--text-white); }
+}
+
+/* 5.2 Animate DIV */
+.animate-div {
+  animation: my-animation 0.9s ease-in-out;
+}
+
+@keyframes my-animation {
+  0% { transform: scale(1); }
+  50% { transform: scale(2.8); }
+  100% { transform: scale(1); }
+}
+
+/* ====================
+   6. MODALS & POPUPS
+   ==================== */
+
+/* 6.1 Info Popup */
+.infoPopup {
+  display: none;
+  position: fixed;
+  width: 80%;
+  height: 70%;
+  z-index: var(--z-popup);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--bg-card);
+  border: 1px solid var(--color-border-blue);
+  overflow-y: auto;
+}
+
+.blur.active {
+  filter: blur(2px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ====================
+   7. LOADING INDICATORS
+   ==================== */
+
+#loading,
+#waiting {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  display: block;
+  opacity: 0.7;
+  background-color: #000;
+  z-index: var(--z-modal);
+  text-align: center;
+}
+
+#loading img,
+#waiting img {
+  margin-top: 40%;
+}
+
+/* ====================
+   8. SHOP COMPONENTS
+   ==================== */
+
+.containerShop {
+  position: relative;
+}
+
+.corner-text-promo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+  font-size: 26px;
+  background-color: rgba(255, 187, 53, 0.8);
+  padding: 5px;
+  border-radius: var(--radius-sm);
+}
+
+.corner-text-new {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: white;
+  font-size: 30px;
+  background-color: rgba(255, 187, 53, 0.8);
+  padding: 5px;
+  border-radius: var(--radius-sm);
+}
+
+/* ====================
+   9. FORM UTILITIES (da toggle.css)
+   ==================== */
+
+.contenitore {
+  display: grid;
+  grid-template-columns: 100% auto;
+  gap: 0;
+  align-items: center;
+}
+
+.contenitore input[type="text"] {
+  width: 100%;
+}
+
+.password-toggle-icon,
+.passwordConfirm-toggle-icon,
+.reset-field-icon {
+  position: relative;
+  right: 35px;
+  cursor: pointer;
+}
+
+.password-toggle-icon i,
+.passwordConfirm-toggle-icon i,
+.reset-field-icon i {
+  font-size: 20px;
+  color: #333;
+  transition: color var(--transition-normal);
+}
+
+.password-toggle-icon i:hover,
+.passwordConfirm-toggle-icon i:hover,
+.reset-field-icon i:hover {
+  color: #333;
+}
+
+/* ====================
+   10. RESPONSIVE
+   ==================== */
+
+@media screen and (max-width: 768px) {
+  .material-symbols-outlined {
+    font-size: 24px;
+  }
+  
+  .corner-text-promo {
+    font-size: 20px;
+  }
+  
+  .corner-text-new {
+    font-size: 24px;
+  }
+}

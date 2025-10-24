@@ -1,0 +1,128 @@
+/* ============================================
+   SHARINGBEER - CSS CUSTOM PROPERTIES
+   Variables globali per tutto il progetto
+   ============================================ */
+
+:root {
+  /* ====================
+     COLORS - PRIMARY
+     ==================== */
+  --color-primary: #2A0009;
+  --color-primary-dark: #120004;
+  --color-primary-light: #480413;
+  
+  /* ====================
+     COLORS - ACCENT
+     ==================== */
+  --color-accent-blue: #5375BD;
+  --color-accent-blue-dark: #1140A4;
+  --color-accent-gold: #FFBB35;
+  --color-accent-orange: #FF9139;
+  --color-accent-orange-dark: #C67605;
+  --color-accent-teal: #009B95;
+  
+  /* ====================
+     COLORS - BORDERS
+     ==================== */
+  --color-border-primary: #903246;
+  --color-border-blue: #5375BD;
+  
+  /* ====================
+     COLORS - BACKGROUND
+     ==================== */
+  --bg-body-start: #C65800;
+  --bg-body-end: #976400;
+  --bg-card: #2A0009;
+  --bg-navbar: #120004;
+  
+  /* ====================
+     COLORS - TEXT
+     ==================== */
+  --text-white: #FFFFFF;
+  --text-emphasis: #FFBB35;
+  --text-warning: #FFC107;
+  
+  /* ====================
+     SPACING SYSTEM
+     ==================== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 40px;
+  
+  /* ====================
+     BORDER RADIUS
+     ==================== */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 18px;
+  
+  /* ====================
+     GRADIENTS
+     ==================== */
+  --gradient-body: repeating-linear-gradient(
+    135deg, 
+    var(--bg-body-start), 
+    var(--bg-body-start) 3px, 
+    var(--bg-body-end) 3px, 
+    var(--bg-body-end) 6px
+  );
+  
+  --gradient-navbar: repeating-linear-gradient(
+    135deg, 
+    var(--color-primary-dark), 
+    var(--color-primary-dark) 3px, 
+    var(--color-primary) 3px, 
+    var(--color-primary) 6px
+  );
+  
+  --gradient-dark: repeating-linear-gradient(
+    135deg, 
+    var(--color-primary), 
+    var(--color-primary) 3px, 
+    var(--color-primary-light) 3px, 
+    var(--color-primary-light) 6px
+  );
+  
+  /* ====================
+     TRANSITIONS
+     ==================== */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* ====================
+     Z-INDEX SCALE
+     ==================== */
+  --z-popup: 1000;
+  --z-modal: 99;
+  --z-navbar: 10;
+  --z-dropdown: 50;
+  
+  /* ====================
+     LAYOUT
+     ==================== */
+  --max-width-app: 700px;
+  --navbar-height: 70px;
+  
+  /* ====================
+     SHADOWS
+     ==================== */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.2);
+  
+  /* ====================
+     FONT SIZES
+     ==================== */
+  --font-xs: 0.75rem;    /* 12px */
+  --font-sm: 0.875rem;   /* 14px */
+  --font-base: 1rem;     /* 16px */
+  --font-lg: 1.125rem;   /* 18px */
+  --font-xl: 1.25rem;    /* 20px */
+  --font-2xl: 1.5rem;    /* 24px */
+  --font-3xl: 1.875rem;  /* 30px */
+}

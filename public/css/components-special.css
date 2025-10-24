@@ -1,0 +1,135 @@
+/* ============================================
+   SHARINGBEER - SPECIAL COMPONENTS
+   Componenti complessi standalone
+   ============================================ */
+
+/* ====================
+   WEBCAM MODULE
+   Componenti per interfaccia webcam
+   ==================== */
+
+/* removed unused #webcam-app styles (no matching element found in templates) */
+
+.webcam-container {
+  height: 100vh;
+  width: 100vw;
+  background-color: black;
+}
+
+/* removed unused #background-container styles (no matching element found in templates) */
+
+@media screen and (min-width: 768px) {
+  .webcam-container {
+    background-attachment: fixed;
+  }
+}
+
+.form-control.webcam-start {
+  position: relative;
+  background: var(--color-primary, #2A0009);
+  padding: 8px 0;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  height: 50px;
+  z-index: 9999;
+  top: 10%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.form-control.webcam-on {
+  position: fixed;
+  top: 5vh;
+  bottom: auto;
+  left: 0;
+  right: auto;
+  transition: all 100ms;
+  width: 145px !important;
+}
+
+.form-control.webcam-off {
+  transition: all 100ms;
+}
+
+.form-switch {
+  display: inline-block;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.form-switch i {
+  position: relative;
+  display: inline-block;
+  margin-right: 0.5rem;
+  width: 60px;
+  height: 30px;
+  background-color: #e6e6e6;
+  border-radius: 25px;
+  vertical-align: text-bottom;
+  transition: all 0.3s linear;
+}
+
+.form-switch i::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 56px;
+  height: 25px;
+  background-color: #fff;
+  border-radius: 15px;
+  transform: translate3d(2px, 2px, 0) scale3d(1, 1, 1);
+  transition: all 0.25s linear;
+}
+
+.form-switch i::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  background-color: #fff;
+  border: 1px solid grey;
+  border-radius: 15px;
+  transform: translate3d(2px, 2px, 0);
+  transition: all 0.2s ease-in-out;
+}
+
+.form-switch:active i::after {
+  width: 28px;
+  transform: translate3d(2px, 2px, 0);
+}
+
+.form-switch:active input:checked + i::after {
+  transform: translate3d(16px, 2px, 0);
+}
+
+.form-switch input {
+  display: none;
+}
+
+.form-switch input:checked + i {
+  background-color: #4bd763;
+}
+
+.form-switch input:checked + i::before {
+  transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0);
+}
+
+.form-switch input:checked + i::after {
+  transform: translate3d(32px, 2px, 0);
+}
+
+/* removed unused .webcam-container #demo-video (element not present) */
+
+#webcam-control {
+  top: 80%;
+  position: relative;
+}
+
+/* removed unused .webcam-container #canvas (template uses #qr-canvas) */
+
+/* removed unused .webcam-container #snapPicture (no matching element) */
