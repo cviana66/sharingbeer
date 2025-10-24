@@ -1,0 +1,26 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<div class="container" style="padding: 10px 10px 70px 10px;">
+  <h2 class="text-white" style="font-size: 1.4em;">Utilità</h2>
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin-top:10px;">
+    <div class="card-body text-white">
+      <p class="mb-1">Sezione utilità e strumenti rapidi.</p>
+      <p class="mb-0 text-muted" style="font-size: 0.9em;">(Pagina segnaposto: personalizzare con gli strumenti necessari)</p>
+    </div>
+  </div>
+
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin-top:10px;">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="text-white mb-1" style="font-size: 1.1em;">Dashboard vendite per prodotto</h5>
+          <p class="text-muted mb-0" style="font-size: 0.9em;">Mostra beerbox venduti e bottiglie (beerbox × {{ 6 }})</p>
+        </div>
+        <a class="btn btn-sm btn-warning" href="#" onclick="goTo('/utilita/dashboard')">Apri</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

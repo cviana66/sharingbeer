@@ -1,0 +1,43 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<div class="container" style="padding: 10px 10px 70px 10px;">
+  <h2 class="text-white" style="font-size: 1.4em;">Dashboard vendite per prodotto</h2>
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin-top:10px;">
+    <div class="card-body">
+      {% if stats and stats.length %}
+      <div class="table-responsive">
+        <table class="table table-sm table-dark" style="background-color:#2A0009;">
+          <thead>
+            <tr>
+              <th>Prodotto</th>
+              <th class="text-right">Beerbox</th>
+              <th class="text-right">Bottiglie</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in stats %}
+            <tr>
+              <td>{{ r.name }}</td>
+              <td class="text-right">{{ r.quantitaVenduta | round(2) }}</td>
+              <td class="text-right">{{ r.bottiglie }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th class="text-right">Totale</th>
+              <th class="text-right">{{ totalBeerbox | round(2) }}</th>
+              <th class="text-right">{{ totalBottiglie }}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      {% else %}
+        <p class="text-white mb-0">Nessun dato disponibile.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

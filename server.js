@@ -76,6 +76,8 @@ const routesDelivery = require('./app/routesDelivery');
 
 // dashboard clienti ===========================================================
 const routesDashboard = require('./app/routesDashboard');
+// utility ===========================================================
+const routesUtility = require('./app/routesUtility');
 
 // ================================
 // Gestione Debug
@@ -193,6 +195,7 @@ var SharingBeer = function () {
         geoMap(self.app, moment);
         routesDelivery(self.app, mongoose, moment);
         routesDashboard(self.app, mongoose, moment);
+    routesUtility(self.app, moment, mongoose);
     };
 
     /**
