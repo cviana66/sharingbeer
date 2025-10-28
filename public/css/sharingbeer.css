@@ -9,7 +9,9 @@
 
 html {
   scroll-behavior: smooth;
-  overflow: hidden; /* Nasconde la barra di scorrimento del browser */
+  height: 100%;
+  /* Consenti lo scroll verticale, nascondi solo eventuale overflow orizzontale */
+  overflow-x: hidden;
 }
 
 body {
@@ -18,7 +20,20 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  overflow: hidden; /* Nasconde la barra di scorrimento del body */
+  /* Abilita lo scroll verticale della pagina */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* scorrimento fluido su iOS */
+  /* Lo spazio per la navbar fissa + safe area iOS viene gestito dinamicamente
+     tramite la variabile CSS --fixed-bottom-height impostata via JS. */
+}
+
+/* Variabile di default per altezza navbar fissa */
+body { --fixed-bottom-height: 80px; }
+
+/* Applica il padding solo quando presente una navbar fissa (classe aggiunta via JS) */
+body.has-fixed-bottom {
+  padding-bottom: calc(var(--fixed-bottom-height) + env(safe-area-inset-bottom, 0px));
 }
 
 /* ====================
@@ -48,13 +63,21 @@ body {
    ==================== */
 
 #pagina-sottostante {
-  height: 100vh;
-  overflow-y: auto;
+  min-height: auto;
+  overflow: visible;
 }
 
 .blocca-scroll {
   overflow-y: hidden;
   height: 100vh;
+}
+
+/* Spaziatore opzionale per lasciare visibile il contenuto sopra la navbar fissa */
+.navbar-spacer { height: var(--fixed-bottom-height); }
+
+/* Safe area padding per navbar fissa */
+nav.fixed-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ====================

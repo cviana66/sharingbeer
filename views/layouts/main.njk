@@ -226,7 +226,7 @@
 
 <!------------------- NAVBAR EBD -------------------->
 
-<div class="container-fluid blur" style="margin:10px 0px 100px 0px;" id="pagina-sottostante">
+<div class="container-fluid blur" style="margin:10px 0px 16px 0px;" id="pagina-sottostante">
 	<div class="col-12 " style="margin: 0px 0px 0px 0px;">
 		<div class="row">
 			<div class="col-sm-2 col-lg-4"></div>
@@ -343,6 +343,31 @@
 	// Loading iniziale della pagina con azioni da effettuare
 	document.addEventListener("DOMContentLoaded", function() {
 		document.getElementById("loading").style.display = 'none';
+
+		// Calcola e applica il padding-bottom per non coprire il contenuto con la navbar fissa
+		function updateFixedBottomOffset() {
+			var nav = document.querySelector('nav.fixed-bottom');
+			if (!nav) {
+				document.body.classList.remove('has-fixed-bottom');
+				return;
+			}
+			var h = Math.ceil(nav.getBoundingClientRect().height);
+			document.body.style.setProperty('--fixed-bottom-height', h + 'px');
+			document.body.classList.add('has-fixed-bottom');
+		}
+
+		updateFixedBottomOffset();
+		window.addEventListener('resize', updateFixedBottomOffset);
+		window.addEventListener('orientationchange', updateFixedBottomOffset);
+		// Aggiorna anche quando si apre/chiude il menu collassato di Bootstrap
+		try {
+			var collapse = document.getElementById('navbarText');
+			if (collapse) {
+				$(collapse).on('shown.bs.collapse hidden.bs.collapse', function(){
+					setTimeout(updateFixedBottomOffset, 50);
+				});
+			}
+		} catch(e) { /* jQuery/Bootstrap non disponibili */ }
 	});
 
   // Ricarico la pagina se l'utente clicca INDIETRO sul bottone del browser
