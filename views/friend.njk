@@ -64,7 +64,11 @@
 
 <script  type="text/javascript">
   document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("loading").style.display = 'none';
+    if (window.Loader && typeof Loader.reset === 'function') {
+      Loader.reset();
+    } else {
+      document.getElementById("loading").style.display = 'none';
+    }
   });
 
   async function share(token,parentName,server,scadenzaInvito) {
@@ -77,8 +81,8 @@
       //--------------------------------------------
       // Disabilito il pulsante e abilito il loading
       //--------------------------------------------
-      document.getElementById("mybutton").disabled = 'true';
-      document.getElementById("loading").style.display = 'block';
+  document.getElementById("mybutton").disabled = 'true';
+  if (window.Loader && typeof Loader.show === 'function') Loader.show(); else document.getElementById("loading").style.display = 'block';
 
       var firstName = capitalizeFirstLetterOfEachWord(document.getElementById("inputFirstName").value);
 
@@ -116,11 +120,11 @@
           post('/infomessage',{msg:"Condivisione non avvenuta. Effettua nuovamente l'invito", type:"warning", err:data.err});
         }
       }).catch((error) => {
-        document.getElementById("loading").style.display = 'none';
+        if (window.Loader && typeof Loader.hide === 'function') Loader.hide(); else document.getElementById("loading").style.display = 'none';
         console.error(error)
         post('/infomessage',{msg:"Verifica al tuo indirizzo email se hai ricevuto il messaggio di invito per "+firstName+", altrimenti effettua nuovamente l'invito", type:"warning", err: error });
       }).finally(() => {
-        document.getElementById("loading").style.display = 'none';
+        if (window.Loader && typeof Loader.hide === 'function') Loader.hide(); else document.getElementById("loading").style.display = 'none';
       });
     }
   }

@@ -255,7 +255,7 @@ async function controlInputAndValidateAddress() {
     //console.debug('CITTA: ',document.getElementById("inputCity").value);
     //console.debug('VIA: ',document.getElementById("inputStreet").value);
 
-    document.getElementById("loading").style.display = 'block';
+  if (window.Loader && typeof Loader.show === 'function') Loader.show(); else document.getElementById("loading").style.display = 'block';
     document.getElementById("wrongNumciv").innerHTML = ''
     
     let data = {};
@@ -297,21 +297,21 @@ async function controlInputAndValidateAddress() {
             lon : res.lon
           }
           console.debug('PARAM',JSON.stringify(postData,null,2)); 
-          document.getElementById("loading").style.display = 'block';         
+          if (window.Loader && typeof Loader.show === 'function') Loader.show(); else document.getElementById("loading").style.display = 'block';         
           post('/register',postData);
 
         } else {
           console.debug('ERRORE nella ricerca dello indirizzo');
           document.getElementById("hiddenCAP").value ="";
           document.getElementById("hiddenAddressIsValid").value = "errato";
-          document.getElementById("loading").style.display = 'block';
+          if (window.Loader && typeof Loader.show === 'function') Loader.show(); else document.getElementById("loading").style.display = 'block';
           post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
         }
       },
       error: function (e) {
         //console.log("OVERPASS_CAP", e);
-        //document.getElementById("loading").style.display = 'none';
-        document.getElementById("loading").style.display = 'block';
+  //document.getElementById("loading").style.display = 'none';
+  if (window.Loader && typeof Loader.show === 'function') Loader.show(); else document.getElementById("loading").style.display = 'block';
         post('/infomessage',{msg:"Errore nella verifica dell'indirizzo. Riprova a inserirlo prestando attenzione al CAP e al numero civico.", type:"warning", err:data.err});
       }
     });
@@ -463,7 +463,7 @@ async function setValueCity(comune, provincia, istat) {
   document.getElementById("wrongStreet").innerHTML = "";
   document.getElementById("wrongNumciv").innerHTML = "";
 
-  document.getElementById("loading").style.display = 'block';
+  if (window.Loader && typeof Loader.show === 'function') Loader.show(); else document.getElementById("loading").style.display = 'block';
 
   try {
     //*******************************************************
@@ -473,7 +473,7 @@ async function setValueCity(comune, provincia, istat) {
     document.getElementById('inputNumciv').removeAttribute('readonly');
   }
   //console.log('RES: ',res);
-  document.getElementById("loading").style.display = 'none';
+  if (window.Loader && typeof Loader.hide === 'function') Loader.hide(); else document.getElementById("loading").style.display = 'none';
   //document.getElementById("inputStreet").focus();
   document.getElementById("inputCap").focus();
   document.getElementById('inputCap').removeAttribute('readonly');
@@ -650,7 +650,7 @@ var inputIstat = document.createElement("input");
     document.getElementById("addresses").appendChild(inputIstat);
 
 function goToOrderSummary(addressId,tipo) {
-  document.getElementById("loading").style.display = 'block';
+  if (window.Loader && typeof Loader.show === 'function') Loader.show(); else document.getElementById("loading").style.display = 'block';
   post('/orderSummary',{addressID:addressId,typeOfDelivery:tipo})
 }
 

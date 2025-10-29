@@ -127,9 +127,10 @@
 	</tr>
 </table>
 <script type="text/javascript">
-	function goTo(pagina) {
-  	document.getElementById("loading").style.display = 'block';
-  	return window.location.href = (pagina)  
-	}
+    function goTo(pagina) {
+    	if (window.Loader && typeof Loader.show === 'function') Loader.show();
+    	else document.getElementById("loading").style.display = 'block';
+    	return window.location.href = (pagina)  
+    }
 </script>
 {% endblock %}

@@ -44,6 +44,9 @@
 	<link rel="stylesheet" type="text/css" media="screen" href="/css/components-special.css">
 	<link rel="stylesheet" type="text/css" media="screen" href="/css/style.css">
 
+	<!-- Loader utility centralizzato -->
+	<script type="text/javascript" src="/js/loader.js"></script>
+
 	<script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="7632fcc1-4707-48cb-85f9-ab4b85172a15"
 	type="text/javascript" async></script>
 
@@ -342,7 +345,12 @@
 <script type="text/javascript">	
 	// Loading iniziale della pagina con azioni da effettuare
 	document.addEventListener("DOMContentLoaded", function() {
-		document.getElementById("loading").style.display = 'none';
+			// Nasconde il loader in maniera centralizzata (con fallback/timeout)
+			if (window.Loader && typeof Loader.reset === 'function') {
+				Loader.reset();
+			} else {
+				document.getElementById("loading").style.display = 'none';
+			}
 
 		// Calcola e applica il padding-bottom per non coprire il contenuto con la navbar fissa
 		function updateFixedBottomOffset() {
@@ -383,11 +391,13 @@
 	// Evidenziazione "Invita" gestita server-side con classi condizionali
 
 		function goTo(pagina) {
-			document.getElementById("loading").style.display = 'block';
+			if (window.Loader && typeof Loader.show === 'function') Loader.show();
+			else document.getElementById("loading").style.display = 'block';
 			return window.location.href = (pagina)  
 		}
 		function goToLogout() {
-			document.getElementById("loading").style.display = 'block';
+			if (window.Loader && typeof Loader.show === 'function') Loader.show();
+			else document.getElementById("loading").style.display = 'block';
 			post('/logout');
 		}
 	/**
