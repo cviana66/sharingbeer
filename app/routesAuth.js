@@ -34,8 +34,10 @@ module.exports = function (app, passport, moment, mongoose) {
   // show the login form
   app.get('/login', async function (req, res) {
     console.debug('IN LOGIN req.session.returnTo', req.session.returnTo)
+    const emailFromFlash = req.flash('loginEmail');
     res.render('login.njk', {
       message: req.flash('loginMessage'),
+      email: (emailFromFlash && emailFromFlash.length ? emailFromFlash[0] : ''),
       returnTo: req.session.returnTo,
       amiciDaInvitare: req.session.haiAmiciDaInvitare
     });

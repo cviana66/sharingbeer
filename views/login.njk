@@ -4,16 +4,16 @@
       <h3 class="text-white text-center bg-dark">Area Clienti</h3>
       <hr style="border-top: 1px solid #5375BD;">
 
-      <form role="form" action="/login" method="post">
+      <form role="form" action="/login" method="post" autocomplete="on">
         <div class="form-group">
           <!-- <label  for="inputUsernameEmail" class="text-white col-form-label-lg">Utente</label> -->
           <div class="input-error" id="wrongMail"></div>
-          <input type="text" class="form-control" id="inputUsernameEmail" name="email" value="{{ user }}" placeholder="Indirizzo email" autofocus required >
+          <input type="email" class="form-control" id="inputUsernameEmail" name="email" value="{{ email }}" placeholder="Indirizzo email" autofocus required autocomplete="username" >
         </div>
         <div class="form-group">
 
           <div class="contenitore">
-            <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password">
+            <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password" autocomplete="current-password">
             <a class="password-toggle-icon"><i class="bi bi-eye" id="togglePassword"></i></a>
           </div>
 
@@ -44,6 +44,12 @@
         </div>
       </div-->
       <script type="text/javascript">
+        // Svuota sempre la password al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', function(){
+          var pwd = document.getElementById('inputPassword');
+          if (pwd) pwd.value = '';
+        });
+
         const passwordField = document.getElementById("inputPassword");
         const togglePassword = document.querySelector(".password-toggle-icon i");
 

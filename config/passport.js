@@ -101,12 +101,14 @@ module.exports = function(passport) {
                 if (!user) {
                     console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /logn" User Not Found"');
                     // req.flash is the way to set flashdata using connect-flash
+                    req.flash('loginEmail', email);
                     return done(null, false, req.flash('loginMessage', 'Utente sconosciuto'));
                 }
                 // if the user is found but the password is wrong, return the message
                 if (!user.validPassword(password)) {
                     console.info(lib.logDate("Europe/Rome") + ' [INFO][RECOVERY:NO] "POST /logn" Wrong Password');
                     // create the loginMessage and save it to session as flashdata
+                    req.flash('loginEmail', email);
                     return done(null, false, req.flash('loginMessage', 'La password è errata'));
                 }
                 // all is well, return successful user
