@@ -39,7 +39,7 @@
                 <tr>
                   <td>{{ r.name }}</td>
                   <td class="text-right">{{ r.quantitaVenduta | round(2) }}</td>
-                  <td class="text-right">{{ r.bottiglie }}</td>
+                  <td class="text-right">{{ r.bottiglie | round(0) }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -47,7 +47,7 @@
                 <tr>
                   <th class="text-right">Totale Q{{ q.quarter }}</th>
                   <th class="text-right">{{ q.subtotalBeerbox | round(2) }}</th>
-                  <th class="text-right">{{ q.subtotalBottiglie }}</th>
+                  <th class="text-right">{{ q.subtotalBottiglie | round(0) }}</th>
                 </tr>
               </tfoot>
             </table>
@@ -60,7 +60,7 @@
               <tr>
                 <th class="text-right">Totale complessivo</th>
                 <th class="text-right">{{ totalBeerbox | round(2) }}</th>
-                <th class="text-right">{{ totalBottiglie }}</th>
+                <th class="text-right">{{ totalBottiglie | round(0) }}</th>
               </tr>
             </tfoot>
           </table>
