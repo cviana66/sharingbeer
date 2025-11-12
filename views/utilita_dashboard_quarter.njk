@@ -1,0 +1,75 @@
+{% extends "layouts/main.njk" %}
+{% block body %}
+
+<div class="container" style="padding: 10px 10px 70px 10px;">
+  <h2 class="text-white" style="font-size: 1.4em;">Dashboard vendite per prodotto — per Trimestre</h2>
+
+  <!-- Filtro Anno -->
+  <form class="form-inline" method="get" action="/utilita/dashboard" style="margin-top:8px;margin-bottom:8px;">
+    <input type="hidden" name="view" value="quarter">
+    <label for="yearSel" class="text-white" style="margin-right:8px;">Anno</label>
+    <select id="yearSel" name="year" class="form-control form-control-sm" onchange="this.form.submit()">
+      <option value="" {% if not selectedYear %}selected{% endif %}>Tutti</option>
+      {% if years and years.length %}
+        {% for y in years %}
+          <option value="{{ y }}" {% if selectedYear and (selectedYear | safe) == (y | safe) %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      {% endif %}
+    </select>
+    <noscript>
+      <button class="btn btn-sm btn-primary" type="submit" style="margin-left:8px;">Applica</button>
+    </noscript>
+  </form>
+  <div class="card" style="background-color:#2A0009;border-color:#903246;margin-top:10px;">
+    <div class="card-body">
+      {% if quarters and quarters.length %}
+        {% for q in quarters %}
+          <h5 class="text-white" style="margin-top:10px;">{{ q.year }} — Q{{ q.quarter }}</h5>
+          <div class="table-responsive">
+            <table class="table table-sm table-dark" style="background-color:#2A0009;">
+              <thead>
+                <tr>
+                  <th>Prodotto</th>
+                  <th class="text-right">Beerbox</th>
+                  <th class="text-right">Bottiglie</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in q.rows %}
+                <tr>
+                  <td>{{ r.name }}</td>
+                  <td class="text-right">{{ r.quantitaVenduta | round(2) }}</td>
+                  <td class="text-right">{{ r.bottiglie }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th class="text-right">Totale Q{{ q.quarter }}</th>
+                  <th class="text-right">{{ q.subtotalBeerbox | round(2) }}</th>
+                  <th class="text-right">{{ q.subtotalBottiglie }}</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        {% endfor %}
+        <hr style="border-color:#903246;">
+        <div class="d-flex justify-content-end">
+          <table class="table table-sm table-dark" style="max-width: 420px; background-color:#2A0009;">
+            <tfoot>
+              <tr>
+                <th class="text-right">Totale complessivo</th>
+                <th class="text-right">{{ totalBeerbox | round(2) }}</th>
+                <th class="text-right">{{ totalBottiglie }}</th>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-white mb-0">Nessun dato disponibile.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
